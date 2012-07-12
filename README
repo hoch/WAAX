@@ -1,2 +1,34 @@
 0711 The first commit; created README
 add nothing by Juhan
+
+Structure
+
+	lib-waaxnodes	(generator, filter)
+		: input = control data, sample data
+		: output = sample data
+
+	lib-instruments
+		: a collection of waax nodes
+		: input = control data
+		: output = sample data
+
+		+ polyphony management
+		+ handling various input types (GUI, websocket...)
+
+	lib-effects
+		: a collection of waax nodes
+		: input = control data, sample data
+		: output = sample data
+
+	lib-chanstrip
+		: a collection of inst/effect
+	
+	lib-gui
+		: producese control data
+		: frame rate
+		: parameter smoothing
+
+	* automation?
+	
+	* real-time parameter changes (urgent)
+	* dev tool kit (waveform, spectrogram)
