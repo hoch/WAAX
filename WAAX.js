@@ -1,7 +1,6 @@
 // ========================================================================
 // WAAX.js
 // - Web Audio API eXtension for Chrome/Safari
-// - revision: 1
 // 
 //                                 written by 
 //             Hongchan Choi           |           Juhan Nam 
@@ -26,34 +25,46 @@
 
 
 // ------------------------------------------------------------------------
-// WAAX: GLOBAL Name Space with constants + utilities
-var WAAX = WAAX || { REVISION: 1 };
+// class - WAAX
+// : global + singleton, root instance of WAAX framework
+//
+// @author Hongchan Choi / hongchan@ccrma.stanford.edu
+// ------------------------------------------------------------------------
+var WAAX = WAAX || { REVISION: 2 };
 
 
 // ------------------------------------------------------------------------
-// WAAX.Base : class for constants and utilities
+// class - Base 
+// : class for constants and utilities (static var/methods)
+//
+// @author Hongchan Choi / hongchan@ccrma.stanford.edu
+// ------------------------------------------------------------------------
 WAAX.Base = {
     
-    // system constants ....................................
+    // system constants ...................................................
     PI:  Math.PI,
     TWOPI: Math.PI * 2,
-    // TODO: e, log, decibel, pitch, freq... should be added here.
     sample_rate: 44100,
     buffer_size: 512,
+    // TODO: e, log, decibel, pitch, freq... should be added here.
 
-    // system methods (utilities) ..........................
+    // system methods (utilities) .........................................
+
     // mtof: midi to frequency
     mtof: function( _pitch ) {
 	return 440.0 * Math.pow(2, ((Math.floor(_pitch) - 69) / 12));
     },
+
     // ftom: frequency to midi
     ftom: function( _freq ) {
 	return Math.floor(69 + 12 * Math.log(_freq / 440.0) / Math.log(2)); 
     },
+
     // rand2: random number generator (integer)
     rand2: function(_a, _b) {
 	return Math.round(_a + Math.random() * (_b - _a));
     },
+
     // rand2f: random number generator (float)
     rand2f: function(_a, _b) {
 	return _a + Math.random() * (_b - _a);

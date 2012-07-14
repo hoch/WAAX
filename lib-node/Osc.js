@@ -4,7 +4,6 @@
 // 
 // a part of WAAX.js
 // - Web Audio API eXtension for Chrome/Safari
-// - revision: 1
 // 
 //                                 written by 
 //             Hongchan Choi           |           Juhan Nam 
