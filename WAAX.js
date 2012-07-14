@@ -71,3 +71,8 @@ WAAX.Base = {
     }
 
 };
+
+// Node class container
+WAAX.Node = {};
+
+// END OF FILE

@@ -45,15 +45,15 @@ WAAX.Node.SinOsc = function(_AudioContext)
     this.freq = 261.626; // middle C
     this.gain = 1.0;
     this.phase = 0.0;
-    this.factor = WAAX.TWOPI / WAAX.sample_rate;
+    this.factor = WAAX.Base.TWOPI / WAAX.Base.sample_rate;
     this.step = this.factor * this.freq;
 
     // api params
     this.num_input = 1; // for frequency modulation
     this.num_output = 2;
     this.context = _AudioContext;
-    this.node = _AudioContext.createJavaScriptNode(
-	WAAX.buffer_size, 
+    this.node = this.context.createJavaScriptNode(
+	WAAX.Base.buffer_size, 
 	this.num_input, 
 	this.num_output);
     var ref = this;
@@ -90,9 +90,9 @@ WAAX.Node.SinOsc.prototype = {
 	var bufL = _e.outputBuffer.getChannelData(0);
 	var bufR = _e.outputBuffer.getChannelData(1);
 	// filling up sample buffer
-	for (var i = 0; i < WAAX.buffer_size; ++i) {
+	for (var i = 0; i < WAAX.Base.buffer_size; ++i) {
 	    this.step = this.factor * ( this.freq + inL[i]);
-	    this.phase = (this.phase + this.step ) % WAAX.TWOPI;
+	    this.phase = (this.phase + this.step ) % WAAX.Base.TWOPI;
 	    var sample = Math.sin(this.phase);
 	    bufL[i] = bufR[i] = sample * this.gain;
 	}

@@ -32,7 +32,8 @@
 // class - PolyBlit1
 // : Polyonimal-based Bandlimited Impulse Train (Order = 1)
 // 
-// @author Juhan Nam / juhan@ccrma.stanford.edu
+// @author Juhan Nam / juhan@ccrma.stanford.edu (algorithm)
+// @author Hongchan Choi / hongchan@ccrma.stanford.edu (systemizing)
 // ------------------------------------------------------------------------
 
 
@@ -45,7 +46,7 @@ WAAX.Node.PolyBlit1 = function(_AudioContext)
     // synth params
     this.freq = 261.626; // middle C
     this.gain = 1.0;
-    this.period = WAAX.sample_rate / this.freq;
+    this.period = WAAX.Base.sample_rate / this.freq;
     this.phase = this.period;
     this.dc = 1.0 / this.period;
     this.z1 = 0.0;
@@ -55,7 +56,7 @@ WAAX.Node.PolyBlit1 = function(_AudioContext)
     this.num_output = 2;
     this.context = _AudioContext;
     this.node = _AudioContext.createJavaScriptNode(
-	WAAX.buffer_size, 
+	WAAX.Base.buffer_size, 
 	this.num_input, 
 	this.num_output);
     var ref = this;
@@ -91,7 +92,7 @@ WAAX.Node.PolyBlit1.prototype = {
 	var bufL = _e.outputBuffer.getChannelData(0);
 	var bufR = _e.outputBuffer.getChannelData(1);
 	// filling up sample buffer
-	for (var i = 0; i < WAAX.buffer_size; ++i) {
+	for (var i = 0; i < WAAX.Base.buffer_size; ++i) {
 	    var ir1 = 0.0, ir2 = 0.0;
 	    if ( this.phase < 0 ) {
 		// trigger impluse response
@@ -99,9 +100,9 @@ WAAX.Node.PolyBlit1.prototype = {
 		ir1 = 1 - d;
 		ir2 = d;
 		// if frequecy is changed
-		this.period = WAAX.sample_rate / this.freq;
+		this.period = WAAX.Base.sample_rate / this.freq;
 		this.dc = 1.0 / this.period;		
-		this.phase = this.phase + this.period;
+		this.phase += this.period;
 	    }
 	    // add impulse responses to the output	
 	    var sample = this.z1 + ir1 - this.dc;			
@@ -134,7 +135,7 @@ WAAX.Node.PolyBlit3 = function(_AudioContext)
     // synth params
     this.freq = 261.626; // middle C
     this.gain = 1.0;
-    this.period = WAAX.sample_rate / this.freq;
+    this.period = WAAX.Base.sample_rate / this.freq;
     this.phase = this.period;
     this.dc = 1.0 / this.period;
     this.z1 = 0.0;
@@ -146,7 +147,7 @@ WAAX.Node.PolyBlit3 = function(_AudioContext)
     this.num_output = 2;
     this.context = _AudioContext;
     this.node = _AudioContext.createJavaScriptNode(
-	WAAX.buffer_size, 
+	WAAX.Base.buffer_size, 
 	this.num_input, 
 	this.num_output);
     var ref = this;
@@ -155,10 +156,10 @@ WAAX.Node.PolyBlit3 = function(_AudioContext)
 
 
 // prototypes ..............................................................
-WAAX.Node.PolyBlit1.prototype = {
+WAAX.Node.PolyBlit3.prototype = {
    
     // constructor
-    constructor: WAAX.Node.PolyBlit1,
+    constructor: WAAX.Node.PolyBlit3,
     
     // connect & disconnect
     connect: function(_output_node) { this.node.connect(_output_node); },
@@ -182,20 +183,20 @@ WAAX.Node.PolyBlit1.prototype = {
 	var bufL = _e.outputBuffer.getChannelData(0);
 	var bufR = _e.outputBuffer.getChannelData(1);
 	// filling up sample buffer
-	for (var i = 0; i < WAAX.buffer_size; ++i) {
+	for (var i = 0; i < WAAX.Base.buffer_size; ++i) {
 	    var ir1 = 0.0, ir2 = 0.0, ir3 = 0.0, ir4 = 0.0;
 	    if ( this.phase < 0 ) {
 		// trigger impluse response
 		var d = 1 + this.phase;
 		ir1 = (1-d)*(1-d)*(1-d)*0.16666667;
 		ir2 = 0.5*(d*d*(d-2)+1.3333333);
-		ir3 = -0.5*((d-1)*(d-1)*(d-1)-1.33333333);
+		ir3 = -0.5*((d-1)*(d-1)*(d+1)-1.33333333);
 		ir4 = d*d*d*0.16666667;
 	
 		// if frequecy is changed
-		this.period = WAAX.sample_rate / this.freq;
+		this.period = WAAX.Base.sample_rate / this.freq;
 		this.dc = 1.0 / this.period;		
-		this.phase = this.phase + this.period;
+		this.phase += this.period;
 	    }
 	    // add impulse responses to the output	
 	    var sample = this.z1 + ir1 - this.dc;			
