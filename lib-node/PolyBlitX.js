@@ -52,7 +52,7 @@ WAAX.Node.PolyBlit1 = function(_AudioContext)
     this.z1 = 0.0;
 
     // api params
-    this.num_input = 0;
+    this.num_input = 1;
     this.num_output = 2;
     this.context = _AudioContext;
     this.node = _AudioContext.createJavaScriptNode(
@@ -143,7 +143,7 @@ WAAX.Node.PolyBlit3 = function(_AudioContext)
     this.z3 = 0.0;
 
     // api params
-    this.num_input = 0;
+    this.num_input = 1;
     this.num_output = 2;
     this.context = _AudioContext;
     this.node = _AudioContext.createJavaScriptNode(
