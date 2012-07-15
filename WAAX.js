@@ -30,25 +30,38 @@
 //
 // @author Hongchan Choi / hongchan@ccrma.stanford.edu
 // ------------------------------------------------------------------------
-var WAAX = WAAX || { REVISION: 2 };
+function __WAAX() {
+    // revision
+    this.REVISION = 3;
+    
+    // Web Audio API Context
+    this.context = new webkitAudioContext();
+    this.SAMPLE_RATE = this.context.sampleRate;
+    this.BUFFER_SIZE = 512;
+
+    // this context's final output
+    this.DAC = this.context.destination;
+
+};
+
+// create a global singleton
+var WAAX = WAAX || new __WAAX();
 
 
 // ------------------------------------------------------------------------
-// class - Base 
+// class - Std (standard)
 // : class for constants and utilities (static var/methods)
 //
 // @author Hongchan Choi / hongchan@ccrma.stanford.edu
 // ------------------------------------------------------------------------
-WAAX.Base = {
+WAAX.Std = {
     
-    // system constants ...................................................
+    // SYSTEM CONSTANTS ...................................................
     PI:  Math.PI,
     TWOPI: Math.PI * 2,
-    sample_rate: 44100,
-    buffer_size: 512,
     // TODO: e, log, decibel, pitch, freq... should be added here.
 
-    // system methods (utilities) .........................................
+    // SYSTEM METHODS (utilities) .........................................
 
     // mtof: midi to frequency
     mtof: function( _pitch ) {
@@ -72,7 +85,16 @@ WAAX.Base = {
 
 };
 
-// Node class container
+
+// ------------------------------------------------------------------------
+// pre-defined class containers 
+// : Core / Node / Inst / Efx
+//
+// @author Hongchan Choi / hongchan@ccrma.stanford.edu
+// ------------------------------------------------------------------------
+WAAX.Core = {};
 WAAX.Node = {};
+WAAX.Inst = {};
+WAAX.Efx = {};
 
 // END OF FILE

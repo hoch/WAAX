@@ -5,26 +5,24 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>QuickTest ::: WAAX.js - Web Audio API eXtenstion (rev 2)</title>
-<script type="text/javascript" src="/WAAX.js"></script>
-<script type="text/javascript" src="/lib-node/Osc.js"></script>
-<script type="text/javascript" src="/lib-node/PolyBlitX.js"></script>
+<script type="text/javascript" src="../../WAAX.js"></script>
+<script type="text/javascript" src="../../lib-node/Osc.js"></script>
+<script type="text/javascript" src="../../lib-node/PolyBlitX.js"></script>
 </head>
 
 <body>
 </body>
 <script>
 
-var ctx, sine, pb3;
+var sine, pb3;
   
 function init()
 {
-  ctx = new webkitAudioContext();
+  //sine = new WAAX.Node.SinOsc();
+  //sine.connect(WAAX.DAC);
   
-  //sine = new WAAX.Node.SinOsc(ctx);
-  //sine.connect(ctx.destination);
-  
-  pb3 = new WAAX.Node.PolyBlit3(ctx);
-  pb3.connect(ctx.destination);  
+  pb3 = new WAAX.Node.PolyBlit3();
+  pb3.connect(WAAX.DAC);  
 };
 
 window.onload = init;

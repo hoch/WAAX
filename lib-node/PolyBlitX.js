@@ -38,7 +38,7 @@
 
 
 // variables ..............................................................
-WAAX.Node.PolyBlit1 = function(_AudioContext)
+WAAX.Node.PolyBlit1 = function()
 {
     // version
     this.version = 1;
@@ -54,9 +54,8 @@ WAAX.Node.PolyBlit1 = function(_AudioContext)
     // api params
     this.num_input = 1;
     this.num_output = 2;
-    this.context = _AudioContext;
-    this.node = _AudioContext.createJavaScriptNode(
-	WAAX.Base.buffer_size, 
+    this.node = WAAX.context.createJavaScriptNode(
+	WAAX.BUFFER_SIZE, 
 	this.num_input, 
 	this.num_output);
     var ref = this;
@@ -92,7 +91,7 @@ WAAX.Node.PolyBlit1.prototype = {
 	var bufL = _e.outputBuffer.getChannelData(0);
 	var bufR = _e.outputBuffer.getChannelData(1);
 	// filling up sample buffer
-	for (var i = 0; i < WAAX.Base.buffer_size; ++i) {
+	for (var i = 0; i < WAAX.BUFFER_SIZE; ++i) {
 	    var ir1 = 0.0, ir2 = 0.0;
 	    if ( this.phase < 0 ) {
 		// trigger impluse response
@@ -100,7 +99,7 @@ WAAX.Node.PolyBlit1.prototype = {
 		ir1 = 1 - d;
 		ir2 = d;
 		// if frequecy is changed
-		this.period = WAAX.Base.sample_rate / this.freq;
+		this.period = WAAX.SAMPLE_RATE / this.freq;
 		this.dc = 1.0 / this.period;		
 		this.phase += this.period;
 	    }
@@ -127,7 +126,7 @@ WAAX.Node.PolyBlit1.prototype = {
 
 
 // variables ..............................................................
-WAAX.Node.PolyBlit3 = function(_AudioContext)
+WAAX.Node.PolyBlit3 = function()
 {
     // version
     this.version = 1;
@@ -135,7 +134,7 @@ WAAX.Node.PolyBlit3 = function(_AudioContext)
     // synth params
     this.freq = 261.626; // middle C
     this.gain = 1.0;
-    this.period = WAAX.Base.sample_rate / this.freq;
+    this.period = WAAX.SAMPLE_RATE / this.freq;
     this.phase = this.period;
     this.dc = 1.0 / this.period;
     this.z1 = 0.0;
@@ -145,9 +144,8 @@ WAAX.Node.PolyBlit3 = function(_AudioContext)
     // api params
     this.num_input = 1;
     this.num_output = 2;
-    this.context = _AudioContext;
-    this.node = _AudioContext.createJavaScriptNode(
-	WAAX.Base.buffer_size, 
+    this.node = WAAX.context.createJavaScriptNode(
+	WAAX.BUFFER_SIZE, 
 	this.num_input, 
 	this.num_output);
     var ref = this;
@@ -183,7 +181,7 @@ WAAX.Node.PolyBlit3.prototype = {
 	var bufL = _e.outputBuffer.getChannelData(0);
 	var bufR = _e.outputBuffer.getChannelData(1);
 	// filling up sample buffer
-	for (var i = 0; i < WAAX.Base.buffer_size; ++i) {
+	for (var i = 0; i < WAAX.BUFFER_SIZE; ++i) {
 	    var ir1 = 0.0, ir2 = 0.0, ir3 = 0.0, ir4 = 0.0;
 	    if ( this.phase < 0 ) {
 		// trigger impluse response
@@ -194,7 +192,7 @@ WAAX.Node.PolyBlit3.prototype = {
 		ir4 = d*d*d*0.16666667;
 	
 		// if frequecy is changed
-		this.period = WAAX.Base.sample_rate / this.freq;
+		this.period = WAAX.SAMPLE_RATE / this.freq;
 		this.dc = 1.0 / this.period;		
 		this.phase += this.period;
 	    }
