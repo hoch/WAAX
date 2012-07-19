@@ -11,7 +11,7 @@
 </head>
 
 <body>
-    <input id="master_mute_btn" type="button" onclick="toggle_mute()" value="MASTER MUTE">
+    <input id="master_mute_btn" type="button" onclick="toggle_mute()" value="AUDIO OFF" style="width:100px">
 </body>
 
 <script>
@@ -30,9 +30,15 @@ function init()
 
 function toggle_mute()
 {
-    if ( master_gain == 1.0 ) master_gain = 0.0;
-    else master_gain = 1.0;
-    WAAX.DAC.setMasterGain(master_gain);
+    if ( master_gain == 1.0 ) {
+        master_gain = 0.0;
+        document.getElementById('master_mute_btn').value = 'AUDIO ON';
+    } else {
+        master_gain = 1.0;
+        document.getElementById('master_mute_btn').value = 'AUDIO OFF';
+    }
+
+    WAAX.DAC.setGain(master_gain);
 };
 
 window.onload = init;

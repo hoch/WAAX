@@ -35,7 +35,7 @@
 var WAAX = WAAX || (function() {
 
     // revision
-    var _REVISION = 4;
+    var _REVISION = 5;
     console.log('WAAX.js r' + _REVISION);
     
     // Web Audio API Context
@@ -59,19 +59,19 @@ var WAAX = WAAX || (function() {
 
 
 // ------------------------------------------------------------------------
-// class - DAC (standard)
+// class - DAC (final output, including master gain)
 // : dac as a master gain to audioContextDestination
 //
 // @author Hongchan Choi / hongchan@ccrma.stanford.edu
 // ------------------------------------------------------------------------
 (function() {
 
-    // SYSTEM CONSTANTS ...................................................    
+    // master gain node
     this.node = WAAX.context.createGainNode();
     this.node.connect(WAAX.context.destination);
 
-    // SYSTEM METHODS (utilities) .........................................    
-    this.setMasterGain = function(_g) {
+    // setGain
+    this.setGain = function(_g) {
         this.node.gain.value = _g;
     };
 
@@ -93,22 +93,22 @@ var WAAX = WAAX || (function() {
 
     // SYSTEM METHODS (utilities) .........................................
     this.mtof = function(_pitch) {
-	return 440.0 * Math.pow(2, ((Math.floor(_pitch) - 69) / 12));
+	   return 440.0 * Math.pow(2, ((Math.floor(_pitch) - 69) / 12));
     };
 
     // ftom: frequency to midi                                             
     this.ftom = function( _freq ) {
-	return Math.floor(69 + 12 * Math.log(_freq / 440.0) / Math.log(2));
+	   return Math.floor(69 + 12 * Math.log(_freq / 440.0) / Math.log(2));
     };
 
     // rand2: random number generator (integer)                            
     this.rand2 = function(_a, _b) {
-	return Math.round(_a + Math.random() * (_b - _a));
+	   return Math.round(_a + Math.random() * (_b - _a));
     };
 
     // rand2f: random number generator (float)                             
     this.rand2f = function(_a, _b) {
-	return _a + Math.random() * (_b - _a);
+	   return _a + Math.random() * (_b - _a);
     };
     
 }).apply(WAAX.Std); // object injection
