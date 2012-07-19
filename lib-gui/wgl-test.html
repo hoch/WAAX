@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>untitled</title>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <script type="text/javascript" src="/lib-gui/ext/Three.js"></script>
+    <script type="text/javascript" src="/WAAX.js"></script>
+    <script type="text/javascript" src="/lib-node/Osc.js"></script>
+    <script type="text/javascript" src="/lib-node/PolyBlitX.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+</head>
+<body style="margin: 0">
+</body>
+<script type="text/javascript">
+    
+// GLOBAL: vars
+var domContainer;
+
+var camera, scene, renderer;
+var light1;
+var waveform;
+var mesh;
+
+var sine;
+var viznode;
+var RENDER_LOCK = false;
+
+// GLOBAL: clock 
+var clock = new THREE.Clock();
+
+function init() {
+  
+  sine = new WAAX.Node.PolyBlitBP3();
+  //sine = new WAAX.Node.SinOsc();
+  sine.connect(WAAX.DAC);
+
+  viznode = WAAX.context.createJavaScriptNode(WAAX.BUFFER_SIZE, 1, 1);
+  viznode.onaudioprocess = function(e) { vizcallback(e); };
+
+  // sine.setParams(1100.0, 0.5);
+  sine.setParams(1100.0, 0.5, 0.5);
+
+  sine.node.connect(viznode);
+  viznode.connect(WAAX.DAC.node);
+
+  // camera
+  camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 1, 15000);
+  camera.position.z = 512;
+
+  // scene
+  scene = new THREE.Scene();
+  scene.add(camera);
+  
+  // new THREE.Line( geometry, material, THREE.LinePieces )
+
+  // cubes and material
+  waveform = new THREE.Geometry();
+  waveform.dynamic = true;
+  for( var i=-WAAX.BUFFER_SIZE/2.0; i<WAAX.BUFFER_SIZE/2.0; i++ )
+    waveform.vertices.push(new THREE.Vector3(i, 0, 0));
+
+  // create cubes
+  for( var i=0; i<1; i++ ) {
+    
+    var material = new THREE.LineBasicMaterial({
+      color: 0x00ff00,
+      linewidth: 2.0
+    });
+    
+    mesh = new THREE.Line( waveform, material );
+    mesh.position.set( 0.0, 0.0, 0.0 );
+    mesh.matrixAutoUpdate = false;
+    mesh.updateMatrix();
+    scene.add(mesh);
+  }
+
+  // lights
+  // var ambient = new THREE.AmbientLight( 0xffffff );
+  // ambient.color.setHSV( 0.5, 0.2, 0.1 );
+  // scene.add( ambient );
+
+  // var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
+  // dirLight.position.set( 0, -1, 10 ).normalize();
+  // dirLight.color.setHSV(0.1, 0.725, 0.6);
+  // scene.add( dirLight );
+
+  // light1 = new THREE.PointLight( 0xffffff, 1.5, 8000 );
+  // light1.position.set( 20, 0, 100 );
+  // light1.color.setHSV( 0.5, 0.025, 0.7 );
+  // scene.add( light1 );
+  
+  // var light2 = new THREE.PointLight( 0xffffff, 1.0, 4500 );
+  // light2.position.set( -20, -20, 100 );
+  // light2.color.setHSV( 0.5, 0.025, 0.7 );
+  // scene.add( light2 );
+  
+  // var light3 = new THREE.PointLight( 0xffffff, 1.0, 4500 );
+  // light3.position.set( 0, 50, 100 );
+  // light3.color.setHSV( 0.5, 0.025, 0.7 );
+  // scene.add( light3 );
+
+  // renderer
+  renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    maxLight: 1,
+    alpha: true
+  });
+  var myClearColor = new THREE.Color();
+  renderer.setSize( window.innerWidth, window.innerHeight );
+  renderer.setClearColor( 0x000000, 1.0 );
+  renderer.gammaInput = true;
+  renderer.gammaOutput = true;
+  renderer.physicallyBasedShading = true;
+
+  //add dom elements
+  domContainer = document.createElement('div');
+  document.body.appendChild( domContainer );
+  domContainer.appendChild( renderer.domElement );
+
+  // link container and controls
+  // controls.domElement = container;
+  
+  // resize event handler
+  window.addEventListener('resize', resize, false );
+  
+}
+
+// update
+function update() {
+  // for( var i=0; i<WAAX.BUFFER_SIZE; i++ )
+  //  waveform.vertices[i].y = (Math.random()-0.5)*100.0;
+  if ( !RENDER_LOCK ) mesh.geometry.verticesNeedUpdate = true;
+}
+
+// render
+function render() 
+{
+  var delta = clock.getDelta();
+  // light1.position.copy( camera.position );
+  update();
+  RENDER_LOCK = true;
+  renderer.render( scene, camera );
+  RENDER_LOCK = false;
+}
+
+// animate
+function animate()
+{
+  requestAnimationFrame( animate );
+  render();
+}
+
+// resize
+function resize(evt)
+{
+  renderer.setSize( window.innerWidth, window.innerHeight );
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+}
+
+// audiocallback
+function vizcallback(_e) {
+  if ( !RENDER_LOCK )
+  {
+    // get references to callback buffers
+    var inL = _e.inputBuffer.getChannelData(0); // input
+    var _out = _e.outputBuffer.getChannelData(0);
+    // filling up sample buffer
+    for (var i = 0; i < WAAX.BUFFER_SIZE; ++i) {
+    
+      waveform.vertices[i].y = inL[i] * 100.0;
+      // _out[i] = 0.0;
+      // bufL[i] = bufR[i] = sample * this.gain;  
+    }
+  
+  }
+}
+
+
+// onload event
+window.addEventListener('load', function() {
+  init();
+  animate();
+});
+
+</script>
+</html>
