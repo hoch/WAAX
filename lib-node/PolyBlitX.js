@@ -52,7 +52,7 @@ WAAX.Node.PolyBlit1 = function(_AudioContext)
     this.z1 = 0.0;
 
     // api params
-    this.num_input = 0;
+    this.num_input = 1;
     this.num_output = 2;
     this.context = _AudioContext;
     this.node = _AudioContext.createJavaScriptNode(
@@ -206,6 +206,296 @@ WAAX.Node.PolyBlit3.prototype = {
 	    this.z3 = ir4;
 	    // update phase  
 	    this.phase -= 1.0;
+	    // output samples
+	    bufL[i] = bufR[i] = sample * this.gain;
+	}
+    }
+};
+
+// ------------------------------------------------------------------------
+// class - PolyBlitBP1
+// : Polyonimal-based Bipolar Bandlimited Impulse Train (Order = 1)
+// 
+// @author Juhan Nam / juhan@ccrma.stanford.edu (algorithm)
+// @author Hongchan Choi / hongchan@ccrma.stanford.edu (systemizing)
+// ------------------------------------------------------------------------
+
+
+// variables ..............................................................
+WAAX.Node.PolyBlitBP1 = function(_AudioContext)
+{
+    // version
+    this.version = 1;
+
+    // synth params
+    this.freq = 261.626; // middle C
+    this.prev_freq = this.freq;
+    this.gain = 1.0;
+    this.width = 0.5;  // duty cycle in pulse width modulation 
+    this.period = WAAX.Base.sample_rate / this.freq;
+    this.pos_phase = this.period*0.5;
+    this.neg_phase = this.pos_phase + this.period*this.width;
+    this.pos_z1 = 0.0;
+    this.neg_z1 = 0.0;
+
+    // api params
+    this.num_input = 1;
+    this.num_output = 2;
+    this.context = _AudioContext;
+    this.node = _AudioContext.createJavaScriptNode(
+	WAAX.Base.buffer_size, 
+	this.num_input, 
+	this.num_output);
+    var ref = this;
+    this.node.onaudioprocess = function(e) { ref.cb(e); };
+};
+
+// prototypes ..............................................................
+WAAX.Node.PolyBlitBP1.prototype = {
+   
+    // constructor
+    constructor: WAAX.Node.PolyBlitBP1,
+    
+    // connect & disconnect
+    connect: function(_output_node) { this.node.connect(_output_node); },
+    disconnect: function() { this.node.disconnect(); },
+
+    // setFreq
+    setFreq: function(_freq) { this.prev_freq = this.freq; this.freq = _freq; },
+
+    // setGain
+    setGain: function(_gain) { this.gain = _gain; },
+
+    // setWidth
+    setWidth: function(_width) { this.width = _width; },
+
+    // setParams
+    setParams: function(_freq, _gain, _width) { 
+	this.setFreq(_freq);
+	this.setGain(_gain);
+	this.setWidth(_width);
+    },
+    
+    // callback
+    cb: function(_e) {
+	// get references to callback buffers
+	var bufL = _e.outputBuffer.getChannelData(0);
+	var bufR = _e.outputBuffer.getChannelData(1);
+
+	// filling up sample buffer
+	for (var i = 0; i < WAAX.Base.buffer_size; ++i) {
+	    var pos_ir1 = 0.0, pos_ir2 = 0.0;
+	    var neg_ir1 = 0.0, neg_ir2 = 0.0;
+
+	    if ( (this.pos_phase < 0) && (this.neg_phase < 0) ) {
+			// trigger positive impluse response
+			var d = 1 + this.pos_phase;
+			pos_ir1 = 1 - d;
+			pos_ir2 = d;
+			// trigger negative impluse response
+			d = 1 + this.neg_phase;
+			neg_ir1 = -(1 - d);
+			neg_ir2 = -d;
+			
+            // update phase 
+            if ( this.prev_freq != this.freq ) {
+            	this.period = WAAX.Base.sample_rate / this.freq;
+			}
+			
+            if ( this.pos_phase < this.neg_phase ) {
+                this.pos_phase = this.pos_phase + this.period;
+				this.neg_phase = this.pos_phase + this.period*this.width;
+            } else {
+				this.neg_phase = this.pos_phase + this.period*this.width;
+                this.pos_phase = this.pos_phase + this.period;
+			}            
+		} else if ( (this.pos_phase < 0) && (this.neg_phase >= 0) ) {
+			// trigger positive impluse response only 
+			var d = 1 + this.pos_phase;
+			pos_ir1 = 1 - d;
+			pos_ir2 = d;
+			
+			// update parameters
+			if ( this.prev_freq != this.freq ) {
+            	this.period = WAAX.Base.sample_rate / this.freq;	
+    		}
+     		// update positive pulse phase
+            this.pos_phase = this.pos_phase + this.period;			
+		
+		} else if ( (this.pos_phase >= 0) && (this.neg_phase < 0) ) {
+			// trigger negative impluse response only 
+			var d = 1 + this.neg_phase;
+			neg_ir1 = -(1 - d);
+			neg_ir2 = -d;
+			
+			// update negative pulse phase
+			this.neg_phase = this.pos_phase + this.period*this.width;
+		}
+		
+	    // add impulse responses to the output	
+	    var sample = this.pos_z1 + pos_ir1 + this.neg_z1 + neg_ir1;
+	    // update delay
+	    this.pos_z1 = pos_ir2;
+	    this.neg_z1 = neg_ir2;
+
+	    // update phase  
+	    this.pos_phase -= 1.0;
+	    this.neg_phase -= 1.0;
+	    
+	    // output samples
+	    bufL[i] = bufR[i] = sample * this.gain;
+	}
+    }
+};
+
+// ------------------------------------------------------------------------
+// class - PolyBlitBP3
+// : Polyonimal-based Bipolar Bandlimited Impulse Train (Order = 3)
+// 
+// @author Juhan Nam / juhan@ccrma.stanford.edu (algorithm)
+// @author Hongchan Choi / hongchan@ccrma.stanford.edu (systemizing)
+// ------------------------------------------------------------------------
+
+// variables ..............................................................
+WAAX.Node.PolyBlitBP3 = function(_AudioContext)
+{
+    // version
+    this.version = 1;
+
+    // synth params
+    this.freq = 261.626; // middle C
+    this.prev_freq = this.freq;
+    this.gain = 1.0;
+    this.width = 0.5;  // duty cycle in pulse width modulation 
+    this.period = WAAX.Base.sample_rate / this.freq;
+    this.pos_phase = this.period*0.5;
+    this.neg_phase = this.pos_phase + this.period*this.width;
+    this.pos_z1 = 0.0;
+    this.pos_z2 = 0.0;
+    this.pos_z3 = 0.0;
+    this.neg_z1 = 0.0;
+    this.neg_z2 = 0.0;
+    this.neg_z3 = 0.0;
+
+    // api params
+    this.num_input = 1;
+    this.num_output = 2;
+    this.context = _AudioContext;
+    this.node = _AudioContext.createJavaScriptNode(
+	WAAX.Base.buffer_size, 
+	this.num_input, 
+	this.num_output);
+    var ref = this;
+    this.node.onaudioprocess = function(e) { ref.cb(e); };
+};
+
+// prototypes ..............................................................
+WAAX.Node.PolyBlitBP3.prototype = {
+   
+    // constructor
+    constructor: WAAX.Node.PolyBlitBP3,
+    
+    // connect & disconnect
+    connect: function(_output_node) { this.node.connect(_output_node); },
+    disconnect: function() { this.node.disconnect(); },
+
+    // setFreq
+    setFreq: function(_freq) { this.prev_freq = this.freq; this.freq = _freq; },
+
+    // setGain
+    setGain: function(_gain) { this.gain = _gain; },
+
+    // setWidth
+    setWidth: function(_width) { this.width = _width; },
+
+    // setParams
+    setParams: function(_freq, _gain, _width) { 
+	this.setFreq(_freq);
+	this.setGain(_gain);
+	this.setWidth(_width);
+    },
+    
+    // callback
+    cb: function(_e) {
+	// get references to callback buffers
+	var bufL = _e.outputBuffer.getChannelData(0);
+	var bufR = _e.outputBuffer.getChannelData(1);
+
+	// filling up sample buffer
+	for (var i = 0; i < WAAX.Base.buffer_size; ++i) {
+	    var pos_ir1 = 0.0, pos_ir2 = 0.0, pos_ir3 = 0.0, pos_ir4 = 0.0;
+	    var neg_ir1 = 0.0, neg_ir2 = 0.0, neg_ir3 = 0.0, neg_ir4 = 0.0;
+
+	    if ( (this.pos_phase < 0) && (this.neg_phase < 0) ) {
+			// trigger positive impluse response
+			var d = 1 + this.pos_phase;
+			pos_ir1 = (1-d)*(1-d)*(1-d)*0.16666667;
+			pos_ir2 = 0.5*(d*d*(d-2)+1.3333333);
+			pos_ir3 = -0.5*((d-1)*(d-1)*(d+1)-1.33333333);
+			pos_ir4 = d*d*d*0.16666667;
+
+			// trigger negative impluse response
+			d = 1 + this.neg_phase;
+			neg_ir1 = -(1-d)*(1-d)*(1-d)*0.16666667;
+			neg_ir2 = -0.5*(d*d*(d-2)+1.3333333);
+			neg_ir3 = 0.5*((d-1)*(d-1)*(d+1)-1.33333333);
+			neg_ir4 = -d*d*d*0.16666667;
+			
+            // update phase 
+            if ( this.prev_freq != this.freq ) {
+            	this.period = WAAX.Base.sample_rate / this.freq;
+			}
+			
+            if ( this.pos_phase < this.neg_phase ) {
+                this.pos_phase = this.pos_phase + this.period;
+				this.neg_phase = this.pos_phase + this.period*this.width;
+            } else {
+				this.neg_phase = this.pos_phase + this.period*this.width;
+                this.pos_phase = this.pos_phase + this.period;
+			}            
+		} else if ( (this.pos_phase < 0) && (this.neg_phase >= 0) ) {
+			// trigger positive impluse response only 
+			var d = 1 + this.pos_phase;
+			pos_ir1 = (1-d)*(1-d)*(1-d)*0.16666667;
+			pos_ir2 = 0.5*(d*d*(d-2)+1.3333333);
+			pos_ir3 = -0.5*((d-1)*(d-1)*(d+1)-1.33333333);
+			pos_ir4 = d*d*d*0.16666667;
+			
+			// update parameters
+			if ( this.prev_freq != this.freq ) {
+            	this.period = WAAX.Base.sample_rate / this.freq;	
+    		}
+     		// update positive pulse phase
+            this.pos_phase = this.pos_phase + this.period;			
+		
+		} else if ( (this.pos_phase >= 0) && (this.neg_phase < 0) ) {
+			// trigger negative impluse response only 
+			var d = 1 + this.neg_phase;
+			neg_ir1 = -(1-d)*(1-d)*(1-d)*0.16666667;
+			neg_ir2 = -0.5*(d*d*(d-2)+1.3333333);
+			neg_ir3 = 0.5*((d-1)*(d-1)*(d+1)-1.33333333);
+			neg_ir4 = -d*d*d*0.16666667;
+			
+			// update negative pulse phase
+			this.neg_phase = this.pos_phase + this.period*this.width;
+		}
+		
+	    // add impulse responses to the output	
+	    var sample = this.pos_z1 + pos_ir1 + this.neg_z1 + neg_ir1;
+
+	    // update delay
+	    this.pos_z1 = this.pos_z2 + pos_ir2;
+	    this.pos_z2 = this.pos_z3 + pos_ir3;
+	    this.pos_z3 = pos_ir4;
+
+	    this.neg_z1 = this.neg_z2 + neg_ir2;
+	    this.neg_z2 = this.neg_z3 + neg_ir3;
+	    this.neg_z3 = neg_ir4;
+
+	    // update phase  
+	    this.pos_phase -= 1.0;
+	    this.neg_phase -= 1.0;
+	    
 	    // output samples
 	    bufL[i] = bufR[i] = sample * this.gain;
 	}

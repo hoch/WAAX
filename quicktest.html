@@ -14,17 +14,20 @@
 </body>
 <script>
 
-var ctx, sine, pb3;
+var ctx, sine, pb1, pb3;
   
 function init()
 {
   ctx = new webkitAudioContext();
   
-  sine = new WAAX.Node.SinOsc(ctx);
-  sine.connect(ctx.destination);
+  //sine = new WAAX.Node.SinOsc(ctx);
+  //sine.connect(ctx.destination);
   
-  // pb1 = new WAAX.Node.PolyBlit1(ctx);
-  // pb1.connect(ctx.destination);  
+  //pb1 = new WAAX.Node.PolyBlit1(ctx);
+  //pb1.connect(ctx.destination);  
+
+  pb3 = new WAAX.Node.PolyBlitBP3(ctx);
+  pb3.connect(ctx.destination);  
 };
 
 window.onload = init;
