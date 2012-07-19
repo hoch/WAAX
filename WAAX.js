@@ -24,28 +24,58 @@
  */
 
 
+// TODO: add DAC AudioGainNode as Master Out
+
 // ------------------------------------------------------------------------
 // class - WAAX
 // : global + singleton, root instance of WAAX framework
 //
 // @author Hongchan Choi / hongchan@ccrma.stanford.edu
 // ------------------------------------------------------------------------
-function __WAAX() {
+var WAAX = WAAX || (function() {
+
     // revision
-    this.REVISION = 3;
+    var _REVISION = 4;
+    console.log('WAAX.js r' + _REVISION);
     
     // Web Audio API Context
-    this.context = new webkitAudioContext();
-    this.SAMPLE_RATE = this.context.sampleRate;
-    this.BUFFER_SIZE = 512;
+    var _context = new webkitAudioContext();
 
-    // this context's final output
-    this.DAC = this.context.destination;
+    // object literal
+    return {
+    	REVISION: _REVISION,
+    	context: _context,
+    	SAMPLE_RATE: _context.sampleRate,
+    	BUFFER_SIZE: 512,
+    	DAC: {},
+    	Std: {},
+    	Node: {},
+    	Inst: {},
+    	Efx: {},
+    	Gui: {}
+    };
 
-};
+})();
 
-// create a global singleton
-var WAAX = WAAX || new __WAAX();
+
+// ------------------------------------------------------------------------
+// class - DAC (standard)
+// : dac as a master gain to audioContextDestination
+//
+// @author Hongchan Choi / hongchan@ccrma.stanford.edu
+// ------------------------------------------------------------------------
+(function() {
+
+    // SYSTEM CONSTANTS ...................................................    
+    this.node = WAAX.context.createGainNode();
+    this.node.connect(WAAX.context.destination);
+
+    // SYSTEM METHODS (utilities) .........................................    
+    this.setMasterGain = function(_g) {
+        this.node.gain.value = _g;
+    };
+
+}).apply(WAAX.DAC); // object injection
 
 
 // ------------------------------------------------------------------------
@@ -54,47 +84,33 @@ var WAAX = WAAX || new __WAAX();
 //
 // @author Hongchan Choi / hongchan@ccrma.stanford.edu
 // ------------------------------------------------------------------------
-WAAX.Std = {
-    
+(function() {
+
     // SYSTEM CONSTANTS ...................................................
-    PI:  Math.PI,
-    TWOPI: Math.PI * 2,
+    this.PI = Math.PI;
+    this.TWOPI = Math.PI * 2.0;
     // TODO: e, log, decibel, pitch, freq... should be added here.
 
     // SYSTEM METHODS (utilities) .........................................
-
-    // mtof: midi to frequency
-    mtof: function( _pitch ) {
+    this.mtof = function(_pitch) {
 	return 440.0 * Math.pow(2, ((Math.floor(_pitch) - 69) / 12));
-    },
+    };
 
-    // ftom: frequency to midi
-    ftom: function( _freq ) {
-	return Math.floor(69 + 12 * Math.log(_freq / 440.0) / Math.log(2)); 
-    },
+    // ftom: frequency to midi                                             
+    this.ftom = function( _freq ) {
+	return Math.floor(69 + 12 * Math.log(_freq / 440.0) / Math.log(2));
+    };
 
-    // rand2: random number generator (integer)
-    rand2: function(_a, _b) {
+    // rand2: random number generator (integer)                            
+    this.rand2 = function(_a, _b) {
 	return Math.round(_a + Math.random() * (_b - _a));
-    },
+    };
 
-    // rand2f: random number generator (float)
-    rand2f: function(_a, _b) {
+    // rand2f: random number generator (float)                             
+    this.rand2f = function(_a, _b) {
 	return _a + Math.random() * (_b - _a);
-    }
-
-};
-
-
-// ------------------------------------------------------------------------
-// pre-defined class containers 
-// : Core / Node / Inst / Efx
-//
-// @author Hongchan Choi / hongchan@ccrma.stanford.edu
-// ------------------------------------------------------------------------
-WAAX.Core = {};
-WAAX.Node = {};
-WAAX.Inst = {};
-WAAX.Efx = {};
+    };
+    
+}).apply(WAAX.Std); // object injection
 
 // END OF FILE

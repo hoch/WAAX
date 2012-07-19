@@ -53,13 +53,13 @@ WAAX.Node.PolyBlit1 = function()
 
     // api params
     this.num_input = 1;
-    this.num_output = 2;
+    this.num_output = 1;
     this.node = WAAX.context.createJavaScriptNode(
-	WAAX.BUFFER_SIZE, 
-	this.num_input, 
-	this.num_output);
+    	WAAX.BUFFER_SIZE, 
+    	this.num_input, 
+    	this.num_output);
     var ref = this;
-    this.node.onaudioprocess = function(e) { ref.cb(e); };
+    this.node.onaudioprocess = function(_e) { ref.cb(_e); };
 };
 
 
@@ -70,7 +70,7 @@ WAAX.Node.PolyBlit1.prototype = {
     constructor: WAAX.Node.PolyBlit1,
     
     // connect & disconnect
-    connect: function(_output_node) { this.node.connect(_output_node); },
+    connect: function(_theother) { this.node.connect(_theother.node); },
     disconnect: function() { this.node.disconnect(); },
 
     // setFreq
@@ -81,37 +81,36 @@ WAAX.Node.PolyBlit1.prototype = {
 
     // setParams
     setParams: function(_freq, _gain) { 
-	this.setFreq(_freq);
-	this.setGain(_gain);
+    	this.setFreq(_freq);
+    	this.setGain(_gain);
     },
     
     // callback
     cb: function(_e) {
-	// get references to callback buffers
-	var bufL = _e.outputBuffer.getChannelData(0);
-	var bufR = _e.outputBuffer.getChannelData(1);
-	// filling up sample buffer
-	for (var i = 0; i < WAAX.BUFFER_SIZE; ++i) {
-	    var ir1 = 0.0, ir2 = 0.0;
-	    if ( this.phase < 0 ) {
-		// trigger impluse response
-		var d = 1 + this.phase;
-		ir1 = 1 - d;
-		ir2 = d;
-		// if frequecy is changed
-		this.period = WAAX.SAMPLE_RATE / this.freq;
-		this.dc = 1.0 / this.period;		
-		this.phase += this.period;
-	    }
-	    // add impulse responses to the output	
-	    var sample = this.z1 + ir1 - this.dc;			
-	    // update delay
-	    this.z1 = ir2;
-	    // update phase  
-	    this.phase -= 1.0;
-	    // output samples
-	    bufL[i] = bufR[i] = sample * this.gain;
-	}
+    	// get references to callback buffers
+    	var bufL = _e.outputBuffer.getChannelData(0);
+    	// filling up sample buffer
+    	for (var i = 0; i < WAAX.BUFFER_SIZE; ++i) {
+    	    var ir1 = 0.0, ir2 = 0.0;
+    	    if ( this.phase < 0 ) {
+        		// trigger impluse response
+        		var d = 1 + this.phase;
+        		ir1 = 1 - d;
+        		ir2 = d;
+        		// if frequecy is changed
+        		this.period = WAAX.SAMPLE_RATE / this.freq;
+        		this.dc = 1.0 / this.period;		
+        		this.phase += this.period;
+    	    }
+    	    // add impulse responses to the output	
+    	    var sample = this.z1 + ir1 - this.dc;			
+    	    // update delay
+    	    this.z1 = ir2;
+    	    // update phase  
+    	    this.phase -= 1.0;
+    	    // output samples
+    	    bufL[i] = sample * this.gain;
+    	}
     }
 };
 
@@ -145,11 +144,11 @@ WAAX.Node.PolyBlit3 = function()
     this.num_input = 1;
     this.num_output = 2;
     this.node = WAAX.context.createJavaScriptNode(
-	WAAX.BUFFER_SIZE, 
-	this.num_input, 
-	this.num_output);
+    	WAAX.BUFFER_SIZE, 
+    	this.num_input, 
+    	this.num_output);
     var ref = this;
-    this.node.onaudioprocess = function(e) { ref.cb(e); };
+    this.node.onaudioprocess = function(_e) { ref.cb(_e); };
 };
 
 
@@ -160,7 +159,7 @@ WAAX.Node.PolyBlit3.prototype = {
     constructor: WAAX.Node.PolyBlit3,
     
     // connect & disconnect
-    connect: function(_output_node) { this.node.connect(_output_node); },
+    connect: function(_theother) { this.node.connect(_theother.node); },
     disconnect: function() { this.node.disconnect(); },
 
     // setFreq
@@ -171,42 +170,40 @@ WAAX.Node.PolyBlit3.prototype = {
 
     // setParams
     setParams: function(_freq, _gain) { 
-	this.setFreq(_freq);
-	this.setGain(_gain);
+    	this.setFreq(_freq);
+    	this.setGain(_gain);
     },
     
     // callback
     cb: function(_e) {
-	// get references to callback buffers
-	var bufL = _e.outputBuffer.getChannelData(0);
-	var bufR = _e.outputBuffer.getChannelData(1);
-	// filling up sample buffer
-	for (var i = 0; i < WAAX.BUFFER_SIZE; ++i) {
-	    var ir1 = 0.0, ir2 = 0.0, ir3 = 0.0, ir4 = 0.0;
-	    if ( this.phase < 0 ) {
-		// trigger impluse response
-		var d = 1 + this.phase;
-		ir1 = (1-d)*(1-d)*(1-d)*0.16666667;
-		ir2 = 0.5*(d*d*(d-2)+1.3333333);
-		ir3 = -0.5*((d-1)*(d-1)*(d+1)-1.33333333);
-		ir4 = d*d*d*0.16666667;
-	
-		// if frequecy is changed
-		this.period = WAAX.SAMPLE_RATE / this.freq;
-		this.dc = 1.0 / this.period;		
-		this.phase += this.period;
-	    }
-	    // add impulse responses to the output	
-	    var sample = this.z1 + ir1 - this.dc;			
-	    // update delay
-	    this.z1 = this.z2 + ir2;
-	    this.z2 = this.z3 + ir3;
-	    this.z3 = ir4;
-	    // update phase  
-	    this.phase -= 1.0;
-	    // output samples
-	    bufL[i] = bufR[i] = sample * this.gain;
-	}
+    	// get references to callback buffers
+    	var bufL = _e.outputBuffer.getChannelData(0);
+    	// filling up sample buffer
+    	for (var i = 0; i < WAAX.BUFFER_SIZE; ++i) {
+    	    var ir1 = 0.0, ir2 = 0.0, ir3 = 0.0, ir4 = 0.0;
+    	    if ( this.phase < 0 ) {
+        		// trigger impluse response
+        		var d = 1 + this.phase;
+        		ir1 = (1-d)*(1-d)*(1-d)*0.16666667;
+        		ir2 = 0.5*(d*d*(d-2)+1.3333333);
+        		ir3 = -0.5*((d-1)*(d-1)*(d+1)-1.33333333);
+        		ir4 = d*d*d*0.16666667;
+        		// if frequecy is changed
+        		this.period = WAAX.SAMPLE_RATE / this.freq;
+        		this.dc = 1.0 / this.period;		
+        		this.phase += this.period;
+        	}
+    	    // add impulse responses to the output	
+    	    var sample = this.z1 + ir1 - this.dc;			
+    	    // update delay
+    	    this.z1 = this.z2 + ir2;
+    	    this.z2 = this.z3 + ir3;
+    	    this.z3 = ir4;
+    	    // update phase  
+    	    this.phase -= 1.0;
+    	    // output samples
+    	    bufL[i] = sample * this.gain;
+    	}
     }
 };
 
