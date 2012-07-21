@@ -26,18 +26,21 @@ var mesh;
 var sine;
 var viznode;
 var RENDER_LOCK = false;
+var phase;
 
 // GLOBAL: clock 
 var clock = new THREE.Clock();
 
 function init() {
   
-  sine = new WAAX.Node.PolyBlitBP3();
-  //sine = new WAAX.Node.SinOsc();
+  //sine = new WAAX.Node.PolyBlitBP3();
+  sine = new WAAX.Node.SinOsc();
   sine.connect(WAAX.DAC);
 
   viznode = WAAX.context.createJavaScriptNode(WAAX.BUFFER_SIZE, 1, 1);
   viznode.onaudioprocess = function(e) { vizcallback(e); };
+
+  phase = WAAX.Std.TWOPI / WAAX.BUFFER_SIZE;
 
   // sine.setParams(1100.0, 0.5);
   sine.setParams(1100.0, 0.5, 0.5);
@@ -109,7 +112,7 @@ function init() {
   });
   var myClearColor = new THREE.Color();
   renderer.setSize( window.innerWidth, window.innerHeight );
-  renderer.setClearColor( 0x000000, 1.0 );
+  renderer.setClearColor( 0x000000, 0.8 );
   renderer.gammaInput = true;
   renderer.gammaOutput = true;
   renderer.physicallyBasedShading = true;
@@ -167,17 +170,23 @@ function vizcallback(_e) {
     // get references to callback buffers
     var inL = _e.inputBuffer.getChannelData(0); // input
     var _out = _e.outputBuffer.getChannelData(0);
+    var _theta = 0.0;
     // filling up sample buffer
     for (var i = 0; i < WAAX.BUFFER_SIZE; ++i) {
-    
-      waveform.vertices[i].y = inL[i] * 100.0;
+      // linear (x)
+      // var windowed = inL[i] * Math.sin(_theta/2.0);
+      // waveform.vertices[i].y = windowed * 100.0;
+      
+      // polar
+      var windowed = inL[i] * Math.sin(_theta/2.0) + 1.0;
+      waveform.vertices[i].x = (windowed) * Math.sin(_theta) * 100.0;
+      waveform.vertices[i].y = (windowed) * Math.cos(_theta) * -100.0;
       // _out[i] = 0.0;
       // bufL[i] = bufR[i] = sample * this.gain;  
+      _theta += phase;
     }
-  
   }
 }
-
 
 // onload event
 window.addEventListener('load', function() {
