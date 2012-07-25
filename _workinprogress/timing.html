@@ -9,39 +9,26 @@
     <script type="text/javascript" src="/WAAX.js"></script>
     <script type="text/javascript" src="/lib-node/Osc.js"></script>
     <script type="text/javascript" src="/lib-node/PolyBlitX.js"></script>
-    <script type="text/javascript" src="/lib-gui/Scope.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 </head>
 <body style="margin: 0">
 </body>
 <script type="text/javascript">
 
-// global
-var myGUI = {};
+var controlRate = 20; // ms
 
-// setup
-function setup() {
-    myGUI.mod = new WAAX.Node.SinOsc();
-    myGUI.sin = new WAAX.Node.SinOsc();
-    myGUI.scope = new WAAX.Gui.Scope(600, 600);
-    myGUI.mod.connect(myGUI.sin);
-    myGUI.sin.connect(myGUI.scope);
-    myGUI.sin.connect(WAAX.DAC);
-
-    myGUI.mod.setParams(880, 1000);
+function loop() {
+    setTimeout(loop(), controlRate);
+    console.log(WAAX.context.currentTime);    
 };
 
-// draw
-function draw() {
-    requestAnimationFrame(draw);
-    myGUI.scope.draw();
-};
-
-// onload event
 window.addEventListener('load', function() {
-    setup();
-    draw();
+    // setup();
+    loop();
 });
-    
+
+
 </script>
 </html>
+
+//9002370220

@@ -24,8 +24,6 @@
  */
 
 
-// TODO: add DAC AudioGainNode as Master Out
-
 // ------------------------------------------------------------------------
 // class - WAAX
 // : global + singleton, root instance of WAAX framework
@@ -48,6 +46,7 @@ var WAAX = WAAX || (function() {
     	SAMPLE_RATE: _context.sampleRate,
     	BUFFER_SIZE: 512,
     	DAC: {},
+        Core: {},
     	Std: {},
     	Node: {},
     	Inst: {},
@@ -79,7 +78,7 @@ var WAAX = WAAX || (function() {
 
 
 // ------------------------------------------------------------------------
-// class - Std (standard)
+// class - Std (standard library)
 // : class for constants and utilities (static var/methods)
 //
 // @author Hongchan Choi / hongchan@ccrma.stanford.edu
@@ -96,17 +95,17 @@ var WAAX = WAAX || (function() {
 	   return 440.0 * Math.pow(2, ((Math.floor(_pitch) - 69) / 12));
     };
 
-    // ftom: frequency to midi                                             
+    // ftom: frequency to midi
     this.ftom = function( _freq ) {
 	   return Math.floor(69 + 12 * Math.log(_freq / 440.0) / Math.log(2));
     };
 
-    // rand2: random number generator (integer)                            
+    // rand2: random number generator (integer)
     this.rand2 = function(_a, _b) {
 	   return Math.round(_a + Math.random() * (_b - _a));
     };
 
-    // rand2f: random number generator (float)                             
+    // rand2f: random number generator (float)                        
     this.rand2f = function(_a, _b) {
 	   return _a + Math.random() * (_b - _a);
     };

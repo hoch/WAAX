@@ -50,18 +50,20 @@ WAAX.Gui.Scope = function (_width, _height)
   this.eScopeType = 'Linear'; // or 'Polar'
   this.domContainer;
   this.magitude = 100;
-  this.phase = WAAX.Std.TWOPI / WAAX.BUFFER_SIZE;
+
+  this.ringBufferSize = WAAX.BUFFER_SIZE * 2;
+  this.w = WAAX.Std.TWOPI / this.ringBufferSize;
 
   // module: build window
   this.frameWindow = [];
   this.polarX = [];
   this.polarY = []; 
   var _phi = 0.0;
-  for (var i = 0; i < WAAX.BUFFER_SIZE; ++i) {
+  for (var i = 0; i < this.ringBufferSize; ++i) {
     this.frameWindow[i] = Math.sin(_phi/2.0);
     this.polarX[i] = Math.sin(_phi);
     this.polarY[i] = Math.cos(_phi);
-    _phi += this.phase;
+    _phi += this.w;
   }
 
   // api params
@@ -76,10 +78,14 @@ WAAX.Gui.Scope = function (_width, _height)
 
   // TODO: THREE.js stuff = needs to be changed to native javascript
   this.geom = new THREE.Geometry();
-  for( var i=-WAAX.BUFFER_SIZE/2.0; i<WAAX.BUFFER_SIZE/2.0; i++ )
-    this.geom.vertices.push(new THREE.Vector3(i, 0, 0));
+  
+  var _xcoord = 0;
+  for( var i=0; i<this.ringBufferSize; i++ )
+    this.geom.vertices.push(new THREE.Vector3(_xcoord++, 0, 0));
+
   this.mat = new THREE.LineBasicMaterial({color: 0x00ff00, linewidth: 2.0});
   this.mesh = new THREE.Line(this.geom, this.mat);
+  this.mesh.position.set(this.ringBufferSize*-0.5, 0, 0);
   this.mesh.geometry.dynamic = true;
   
   this.camera = new THREE.PerspectiveCamera(
@@ -105,7 +111,7 @@ WAAX.Gui.Scope = function (_width, _height)
 
 WAAX.Gui.Scope.prototype = {
 
-// constructor
+  // constructor
   constructor: WAAX.Gui.Scope,
 
   // connect & disconnect
@@ -154,7 +160,7 @@ WAAX.Gui.Scope.prototype = {
       {
         for (var i = 0; i < WAAX.BUFFER_SIZE; ++i) {
           var windowed = inL[i] * this.frameWindow[i] + 1.0;
-          v[i].x = (windowed) * this.polarX[i] * m;
+          v[i].x = this.polarX[i] * m;
           v[i].y = (windowed) * this.polarY[i] * -m;
           _theta += p;
         }

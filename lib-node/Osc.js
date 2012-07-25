@@ -80,8 +80,8 @@ WAAX.Node.SinOsc.prototype = {
 
     // setParams
     setParams: function(_freq, _gain) { 
-    	this.setFreq(_freq);
-    	this.setGain(_gain);
+    	if ( _freq != undefined ) this.setFreq(_freq);
+    	if ( _gain != undefined ) this.setGain(_gain);
     },
     
     // callback
@@ -91,8 +91,8 @@ WAAX.Node.SinOsc.prototype = {
     	var _bufL = _e.outputBuffer.getChannelData(0);
     	// filling up sample buffer
     	for (var i = 0; i < WAAX.BUFFER_SIZE; ++i) {
-    	    this.step = this.factor * (this.freq + _inL[i]);
-    	    this.phase = (this.phase + this.step) % WAAX.Std.TWOPI;
+    	    this.step = this.factor * (this.freq + _inL[i]); // fm
+    	    this.phase = (this.phase + this.step); // % WAAX.Std.TWOPI;
     	    var sample = Math.sin(this.phase);
     	    _bufL[i] = sample * this.gain;
     	}
