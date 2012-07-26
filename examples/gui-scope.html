@@ -23,7 +23,7 @@ var myGUI = {};
 function setup() {
     myGUI.mod = new WAAX.Node.SinOsc();
     myGUI.sin = new WAAX.Node.SinOsc();
-    myGUI.scope = new WAAX.Gui.Scope(600, 600);
+    myGUI.scope = new WAAX.Gui.Scope(800, 600);
     myGUI.mod.connect(myGUI.sin);
     myGUI.sin.connect(myGUI.scope);
     myGUI.sin.connect(WAAX.DAC);

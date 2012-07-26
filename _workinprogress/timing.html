@@ -12,14 +12,26 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 </head>
 <body style="margin: 0">
+    <div id='dumpbox'>
+        <span>CONTEXT RUNNING TIME = </span>
+        <span id="timer"></span>
+        <span> ms</span>
+    </div>
 </body>
 <script type="text/javascript">
 
-var controlRate = 20; // ms
+var controlRate = 1000; // ms
+var startTime = WAAX.context.currentTime;
+var elapsed = 0;
+var hour, min, sec, ms;
+
+// hour.minute.second.ms
 
 function loop() {
-    setTimeout(loop(), controlRate);
-    console.log(WAAX.context.currentTime);    
+    setTimeout("loop()", controlRate);
+    elapsed = WAAX.context.currentTime - startTime;
+    ms = elapsed * 1000;
+    $('#timer').text(ms);
 };
 
 window.addEventListener('load', function() {
@@ -30,5 +42,3 @@ window.addEventListener('load', function() {
 
 </script>
 </html>
-
-//9002370220
