@@ -1,115 +1,135 @@
-// ========================================================================
-// WAAX.js
-// - Web Audio API eXtension for Chrome/Safari
-// 
-//                                 written by 
-//             Hongchan Choi           |           Juhan Nam 
-//      hongchan@ccrma.stanford.edu    |    juhan@ccrma.stanford.edu
-// ========================================================================
+/**
+  @namespace WX
+  @description project namespace
+*/
+var WX = WX || { REVISION:1 };
 
-/* Copyright (C) 2011-2012  Juhan Nam & Hongchan Choi
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// basic variables, constants, functions
+WX.context = new webkitAudioContext();
+WX.SAMPLE_RATE = WX.context.sampleRate;
+WX.BUFFER_SIZE = 512;
 
+WX.PI = Math.PI;
+WX.TWOPI = Math.PI * 2.0;
+WX.EPS = Number.MIN_VALUE;
 
-// ------------------------------------------------------------------------
-// class - WAAX
-// : global + singleton, root instance of WAAX framework
-//
-// @author Hongchan Choi / hongchan@ccrma.stanford.edu
-// ------------------------------------------------------------------------
-var WAAX = WAAX || (function() {
+// midi2freq: midi to frequency
+WX.midi2freq = function(midipitch) {
+  return 440.0 * Math.pow(2, ((Math.floor(midipitch) - 69) / 12));
+};
 
-    // revision
-    var _REVISION = 5;
-    console.log('WAAX.js r' + _REVISION);
-    
-    // Web Audio API Context
-    var _context = new webkitAudioContext();
+// freq2midi: frequency to midi
+WX.freq2midi = function(freq) {
+  return Math.floor(69 + 12 * Math.log(freq / 440.0) / Math.log(2));
+};
 
-    // object literal
-    return {
-    	REVISION: _REVISION,
-    	context: _context,
-    	SAMPLE_RATE: _context.sampleRate,
-    	BUFFER_SIZE: 512,
-    	DAC: {},
-        Core: {},
-    	Std: {},
-    	Node: {},
-    	Inst: {},
-    	Efx: {},
-    	Gui: {}
-    };
+// random2f: random number generator (float)
+WX.random2f = function(min, max) {
+  return min + Math.random() * (max - min);
+};
 
-})();
+// randdom2: random number generator (integer)
+WX.random2 = function(min, max) {
+  return Math.round(min + Math.random() * (max - min));
+};
 
 
-// ------------------------------------------------------------------------
-// class - DAC (final output, including master gain)
-// : dac as a master gain to audioContextDestination
-//
-// @author Hongchan Choi / hongchan@ccrma.stanford.edu
-// ------------------------------------------------------------------------
-(function() {
+/**
+  @class Fader <Unit>
+  @description a wrapper class for gainNode
+*/
 
-    // master gain node
-    this.node = WAAX.context.createGainNode();
-    this.node.connect(WAAX.context.destination);
+WX.Fader = function() {
+  this.node = WX.context.createGainNode();
+  this.tempGain = 1.0;
+  this.status = true; // unmuted
 
-    // setGain
-    this.setGain = function(_g) {
-        this.node.gain.value = _g;
-    };
+  this.to = function(unit) {
+    // TODO: type checking
+    this.node.connect(unit.node);
+    // method chaining
+    return unit;
+  };
 
-}).apply(WAAX.DAC); // object injection
+  this.connect = function(node) {
+    // TODO: type checking
+    this.node.connect(node);
+  };
+
+  this.set = function(json) {
+    var obj = JSON.parse(json);
+    if (typeof json.gain === "number") {
+      this.node.gain.value = json.gain;
+    }
+  };
+
+  this.setGain = function(gain) {
+    this.tempGain = gain;
+    if (this.status === true ) {
+      this.node.gain.value = gain;
+    }
+  };
+
+  this.mute = function() {
+    this.status = false;
+    this.node.gain.value = 0.0;
+  };
+
+  this.unmute = function() {
+    this.status = true;
+    this.node.gain.value = this.tempGain;
+  };
+
+  // setDB
+  // mute
+  // solo??
+};
 
 
-// ------------------------------------------------------------------------
-// class - Std (standard library)
-// : class for constants and utilities (static var/methods)
-//
-// @author Hongchan Choi / hongchan@ccrma.stanford.edu
-// ------------------------------------------------------------------------
-(function() {
+/**
+  @class Clock <Unit>
+  @description a master clock, singlton, manages timebase
+*/
+WX.Clock = function() {
+  this.tick = 1000/60;
+  this.last = 0;
+  this.status = false;
+  
+  this.start = function() {
+    this.last = 0;
+    this.status = true;
+    this.loop();
+  };
 
-    // SYSTEM CONSTANTS ...................................................
-    this.PI = Math.PI;
-    this.TWOPI = Math.PI * 2.0;
-    // TODO: e, log, decibel, pitch, freq... should be added here.
+  this.stop = function() {
+    this.status = false;
+  };
 
-    // SYSTEM METHODS (utilities) .........................................
-    this.mtof = function(_pitch) {
-	   return 440.0 * Math.pow(2, ((Math.floor(_pitch) - 69) / 12));
-    };
+  this.loop = function() {
+    var self = this;
+    var now = WX.context.currentTime;
+    var delta = now - this.last;
+    var id = -1;
 
-    // ftom: frequency to midi
-    this.ftom = function( _freq ) {
-	   return Math.floor(69 + 12 * Math.log(_freq / 440.0) / Math.log(2));
-    };
+    // maybe I can use onaudioprocess on ScriptProcessNode
+    // to get more precise timing
+    // ? : how can compare the timing? (setTimeout vs onaudioproces)
 
-    // rand2: random number generator (integer)
-    this.rand2 = function(_a, _b) {
-	   return Math.round(_a + Math.random() * (_b - _a));
-    };
+    if (this.status) {
+      id = window.setTimeout(function() {
+        // console.log(self.last);
+        self.loop();
+      }, self.tick);
+      this.last = now;
+    }
+    return id;
+  };
+};
 
-    // rand2f: random number generator (float)                        
-    this.rand2f = function(_a, _b) {
-	   return _a + Math.random() * (_b - _a);
-    };
-    
-}).apply(WAAX.Std); // object injection
+// creating a master fader
+WX.MasterFader = new WX.Fader();
+WX.MasterFader.connect(WX.context.destination);
 
-// END OF FILE
+// creating and starting a master clock
+WX.MasterClock = new WX.Clock();
+WX.MasterClock.start();

@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>WAAX.js - Web Audio API eXtenstion</title>
+
+</head>
+
+<body>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="WAAX.js"></script>
+<script src="unit/Oscillator.js"></script>
+<script src="block/Osc2.js"></script>
+
+<script>
+
+// var osc = new WX.Oscillator("TRIANGLE");
+// osc.to(WX.MasterFader);
+
+var o2 = new WX.Osc2();
+o2.to(WX.MasterFader);
+
+window.addEventListener('load', function() {
+    console.log('loaded. - go!');
+});
+
+</script>
+</body>
+
+
+</html>
