@@ -58,7 +58,6 @@ Classes
 -------
 ###Units
 - Generators
-  
   Oscillator(), FMOperator(), Wavetable(), SampleBuffer(), ADSR(), EnvelopeFollower()
 
 - Effects
