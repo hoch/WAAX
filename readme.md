@@ -13,7 +13,7 @@ WAAX (Web Audio API eXtension)
 ------------------------------
 **A JavaScript Framework for Music/Audio Programming on Modern Browsers (Chrome/Safari/FireFox)**
 
-    '''mySaw.to(myFilter).to(myEnvelope).to(WX.MasterFader);'''
+'''mySaw.to(myFilter).to(myEnvelope).to(WX.MasterFader);'''
 
 WAAX is an experimental javascript framework for [Web Audio API][1] incorporated in the modern browsers such as Chrome, Safari and FireFox. With music/sound creation in mind, it is designed to provide users with higher level of musical control: complex real-time sound synthesis, ready-made instruments, even a timebase system for sophisticated structure.
 
