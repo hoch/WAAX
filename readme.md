@@ -1,7 +1,19 @@
+Current Milestone (11/11~11/15)
+-------------------------------
+* Oscillator() -> Osc2()
+* Filter() -> ResonZ(), HPF()
+* Envelope() 
+* Delay() -> StereoDelay()
+* SynaMon()
+* Clip()
+
+
+
 WAAX (Web Audio API eXtension)
 ------------------------------
 **A JavaScript Framework for Music/Audio Programming on Modern Browsers (Chrome/Safari/FireFox)**
 
+> mySaw.to(myFilter).to(myEnvelope).to(WX.MasterFader);
 
 WAAX is an experimental javascript framework for [Web Audio API][1] incorporated in the modern browsers such as Chrome, Safari and FireFox. With music/sound creation in mind, it is designed to provide users with higher level of musical control: complex real-time sound synthesis, ready-made instruments, even a timebase system for sophisticated structure.
 
@@ -58,46 +70,32 @@ Classes
 -------
 ###Units
 - Generators
+
   Oscillator(), FMOperator(), Wavetable(), SampleBuffer(), ADSR(), EnvelopeFollower()
 
 - Effects
 
   Delay(), Filter(), Reverb(), Compressor(), Waveshaper()
 
-/Blocks
-  <Synth>
-  Osc2(), Osc3(), FM3(), FM7(), WaveTab3(), Samplex()  
-  <Processor>
-  ResonZ(), LPF(), HPF(), EQ3(), EQ5(), EQ7(), 
-  StereoDelay(), Chorus(), Flanger(),
-  ConVerb(), NVerb(), 
-  QuadComp(), Limiter(), Gate(), DeEsser(),
-  Enhancer(), Exciter(), Overdrive(), Vinyl()
-  
-/Modules
-  SynaMon()
-  FMOne()
-  Xpler
+###Blocks
+- Synth
+  Osc2(), Osc3(), FM3(), FM7(), WaveTab3(), Sampler()
 
-/Timebase
+- Processor
+
+  ResonZ(), LPF(), HPF(), EQ3(), EQ5(), EQ7(), StereoDelay(), Chorus(), Flanger(), ConVerb(), NVerb(), QuadComp(), Limiter(), Gate(), DeEsser(), Enhancer(), Exciter(), Overdrive(), Vinyl()
+  
+###Modules
+  SynaMon(), FMOne(), Xpler
+
+###Timebase
   Clip()
 
-Utilities.js
-  random2(), random2f(), scale(), db2rms(), 
-  midi2freq(), freq2midi()
+###Utilities
+  random2(), random2f(), scale(), db2rms(), midi2freq(), freq2midi()
 
 
 
-Milestone
----------
-(1.5 week)
-BB & Preset: Oscillator() -> Osc2()
-BB & Preset: Filter() -> ResonZ(), HPF()
-BB: Envelope() -> Fader for OSC2
-BB: Envelope() -> Filter
-BB & Preset: Delay() -> StereoDelay()
-Instrument: SynaMon()
-time-base
 
 Questions
 ---------
