@@ -80,23 +80,17 @@ Connections
 Classes
 -------
 ###Units
-- Generators
-  `Oscillator()`, `FMOperator()`, `Wavetable()`, `SampleBuffer()`, `ADSR()`, `EnvelopeFollower()`
+- Generators: `Oscillator()`, `FMOperator()`, `Wavetable()`, `SampleBuffer()`, `ADSR()`, `EnvelopeFollower()`
 
-- Effects
-
-  `Delay()`, `Filter()`, `Reverb()`, `Compressor()`, `Waveshaper()`
+- Effects: `Delay()`, `Filter()`, `Reverb()`, `Compressor()`, `Waveshaper()`
 
 ###Blocks
-- Synth
-  `Osc2()`, `Osc3()`, `FM3()`, `FM7()`, `WaveTab3()`, `Sampler()`
+- Synth: `Osc2()`, `Osc3()`, `FM3()`, `FM7()`, `WaveTab3()`, `Sampler()`
 
-- Processor
-
-  `ResonZ()`, `LPF()`, `HPF()`, `EQ3()`, `EQ5()`, `EQ7()`, `StereoDelay()`, `Chorus()`, `Flanger()`, `ConVerb()`, `NVerb()`, `QuadComp()`, `Limiter()`, `Gate()`, `DeEsser()`, `Enhancer()`, `Exciter()`, `Overdrive()`, `Vinyl()`
+- Processor: `ResonZ()`, `LPF()`, `HPF()`, `EQ3()`, `EQ5()`, `EQ7()`, `StereoDelay()`, `Chorus()`, `Flanger()`, `ConVerb()`, `NVerb()`, `QuadComp()`, `Limiter()`, `Gate()`, `DeEsser()`, `Enhancer()`, `Exciter()`, `Overdrive()`, `Vinyl()`
   
 ###Modules
-  `SynaMon()`, `FMOne()`, `Xpler
+  `SynaMon()`, `FMOne()`, `Xpler()`
 
 ###Timebase
   `Clip()`
