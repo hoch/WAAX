@@ -1,6 +1,7 @@
-WAAX
-====
-*Web Audio API eXtension for Modern Browsers (Chrome/Safari/FireFox)*
+WAAX (Web Audio API eXtension)
+------------------------------
+** A JavaScript Framework for Music/Audio Programming on Modern Browsers (Chrome/Safari/FireFox)**
+
 
 WAAX is an experimental javascript framework for [Web Audio API][1] incorporated in the modern browsers such as Chrome, Safari and FireFox. With music/sound creation in mind, it is designed to provide users with higher level of musical control: complex real-time sound synthesis, ready-made instruments, even a timebase system for sophisticated structure.
 
@@ -12,6 +13,18 @@ The author of this library is Hongchan Choi at [CCRMA][2], Stanford University.
 
 [1]: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html "Web Audio API: W3C Editor's Draft"
 [2]: https://ccrma.stanford.edu/ "The Center for Computer Research in Music and Acoustics"
+
+
+
+Concept
+-------
+
+As a framework rather than a library, it imposes a key concept and methodology with its layered structure:
+
+  *Node - Unit - Block - Instrument*
+  
+
+
 
 Layers
 ------
