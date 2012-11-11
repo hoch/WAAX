@@ -17,14 +17,15 @@ WAAX (Web Audio API eXtension)
 
 WAAX is an experimental javascript framework for [Web Audio API][1] incorporated in the modern browsers such as Chrome, Safari and FireFox. With music/sound creation in mind, it is designed to provide users with higher level of musical control: complex real-time sound synthesis, ready-made instruments, even a timebase system for sophisticated structure.
 
-The goal of this project is to make web audio programming more approachable by expanding the audio domain with new web technologies that make the browser user-centered, highly-visualized and ever-connected. Also the library is strongly inspired by THREE.js, which is one of WebGL JavaScript library being used most in the scene, and hopefully it can be a sonic counterpart in the web-based audiovisual system.
+The goal of this project is to make web audio programming more approachable by expanding the audio domain with new web technologies that make the browser user-centered, highly-visualized and ever-connected. Also the library is strongly inspired by [THREE.js][2], which is one of WebGL JavaScript library being used most in the scene, and hopefully it can be a sonic counterpart in the web-based audiovisual system.
 
 In addition to core technology, the library comes with an interactive web-based IDE for rapid experiment and deployment. It allows users to perform JavaScript audio progoramming and export the code snippet for other web projects.
 
-The author of this library is Hongchan Choi at [CCRMA][2], Stanford University.
+The author of this library is Hongchan Choi at [CCRMA][3], Stanford University.
 
 [1]: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html "Web Audio API: W3C Editor's Draft"
-[2]: https://ccrma.stanford.edu/ "The Center for Computer Research in Music and Acoustics"
+[2]: https://github.com/mrdoob/three.js/ "THREE.js: Github Repo"
+[3]: https://ccrma.stanford.edu/ "The Center for Computer Research in Music and Acoustics at Stanford"
 
 
 
