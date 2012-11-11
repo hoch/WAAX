@@ -77,24 +77,24 @@ Classes
 
 - Effects
 
-  Delay()`, `Filter()`, `Reverb()`, `Compressor()`, `Waveshaper()`
+  `Delay()`, `Filter()`, `Reverb()`, `Compressor()`, `Waveshaper()`
 
 ###Blocks
 - Synth
-  Osc2()`, `Osc3()`, `FM3()`, `FM7()`, `WaveTab3()`, `Sampler()`
+  `Osc2()`, `Osc3()`, `FM3()`, `FM7()`, `WaveTab3()`, `Sampler()`
 
 - Processor
 
-  ResonZ()`, `LPF()`, `HPF()`, `EQ3()`, `EQ5()`, `EQ7()`, `StereoDelay()`, `Chorus()`, `Flanger()`, `ConVerb()`, `NVerb()`, `QuadComp()`, `Limiter()`, `Gate()`, `DeEsser()`, `Enhancer()`, `Exciter()`, `Overdrive()`, `Vinyl()`
+  `ResonZ()`, `LPF()`, `HPF()`, `EQ3()`, `EQ5()`, `EQ7()`, `StereoDelay()`, `Chorus()`, `Flanger()`, `ConVerb()`, `NVerb()`, `QuadComp()`, `Limiter()`, `Gate()`, `DeEsser()`, `Enhancer()`, `Exciter()`, `Overdrive()`, `Vinyl()`
   
 ###Modules
-  SynaMon()`, `FMOne()`, `Xpler
+  `SynaMon()`, `FMOne()`, `Xpler
 
 ###Timebase
-  Clip()`
+  `Clip()`
 
 ###Utilities
-  random2()`, `random2f()`, `scale()`, `db2rms()`, `midi2freq()`, `freq2midi()`
+  `random2()`, `random2f()`, `scale()`, `db2rms()`, `midi2freq()`, `freq2midi()`
 
 
 
