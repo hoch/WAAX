@@ -38,20 +38,19 @@ As a framework rather than a library, it imposes a key concept and methodology w
 
 Connections
 -----------
-Node -> Unit (semi WX connection)     "connect(Unit.node)" call
-Unit -> Node (semi-web audio api)     "connect" method
-Unit -> Unit (pure WAAX connection)   "to" method
-Node -> Node (pure web audio api)     "connect" method
 
-Unit -> Block
-Block -> Block
-Block -> Unit
+###Atomic
+- **Node -> Node** (connection between Web Audio API nodes)
 
-block should have unit(input/output)
-then all the connection will be between units
+###Semi WX-type
+- **Node -> Unit** (incoming)
+- **Unit -> Node** (outgoing)
 
-
-
+###WX-type
+- **Unit -> Unit**
+- **Unit -> Block**
+- **Block -> Unit**
+- **Block -> Block**
 
 
 Structure
