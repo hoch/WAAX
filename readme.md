@@ -8,6 +8,14 @@ Current Milestone (11/11~11/15)
 * Clip()
 
 
+Questions
+---------
+1. does offlineAudioContext exist in current implementation?
+2. why does "stop()" method irreversible? is this to save resources as well?
+
+
+
+
 
 WAAX (Web Audio API eXtension)
 ------------------------------
@@ -95,12 +103,3 @@ Classes
 
 ###Utilities
   `random2()`, `random2f()`, `scale()`, `db2rms()`, `midi2freq()`, `freq2midi()`
-
-
-
-
-Questions
----------
-1) does offlineAudioContext exist in current implementation?
-2) why does "stop()" method irreversible? is this to save resources as well?
-
