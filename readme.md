@@ -8,9 +8,9 @@ In addition to core technology, the library comes with an interactive web-based 
 
 The goal of this project is to make web audio programming more approachable. The library strongly inspired by THREE.js, which is one of WebGL JavaScript library being used most in the scene, and hopefully it can be a sonic counterpart in the web-based audiovisual system.
 
-The author of this experimental library is Hongchan Choi at CCRMA[1], Stanford University.
+The author of this experimental library is Hongchan Choi at [CCRMA][1], Stanford University.
 
-[1]: The Center for Computer Research in Music and Acoustics, https://ccrma.stanford.edu
+[1]: https://ccrma.stanford.edu/ "The Center for Computer Research in Music and Acoustics"
 
 
 
