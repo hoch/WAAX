@@ -1,3 +1,5 @@
+[1]
+
 Layers
 ------
 Node - Unit - Block - Module
@@ -19,6 +21,7 @@ Block -> Unit
 
 block should have unit(input/output)
 then all the connection will be between units
+
 
 
 
