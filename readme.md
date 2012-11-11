@@ -1,5 +1,4 @@
-Current Milestone (11/11~11/15)
--------------------------------
+###Current Milestone (11/11~11/15)
 * Oscillator() -> Osc2()
 * Filter() -> ResonZ(), HPF()
 * Envelope() 
@@ -8,8 +7,7 @@ Current Milestone (11/11~11/15)
 * Clip()
 
 
-Questions
----------
+###Questions
 1. does offlineAudioContext exist in current implementation?
 2. why does "stop()" method irreversible? is this to save resources as well?
 
