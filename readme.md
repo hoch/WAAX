@@ -40,7 +40,7 @@ Connections
 -----------
 
 ###Atomic
-- Node - Node (connection between Web Audio API nodes)
+- *Node - Node* (connection between Web Audio API nodes)
 
 ###Semi WX-type
 - *Node - Unit* (incoming)
