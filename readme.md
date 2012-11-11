@@ -24,17 +24,15 @@ As a framework rather than a library, it imposes a key concept and methodology w
   *Node - Unit - Block - Module*
   
 - **Node** A node is a built-in atom of Web Audio API. The object can be interconnected to create an audio graph.
-- **Unit** A basic object provided by WAAX framework. It consists of more than 2 Nodes and is encapsulated with sonically meaningful features. Also handles several underlying mechanics for Web Audio API: *Oscillator, FM Operator, ADSR Envelope, Delay, Low/Hi Pass Filter, Compressor...*
-- **Block** A building block for actual signal processor and music instrument. It consists of more than 2 Units and usually comes with more musically meaningful features: *Polyphonic Sampler, Oscillator Bank, Equalizer, QuadBand Compressor, Multi-tap Delay...*
-- **Module** A concoction of more than 2 Blocks. The highest level of encapsulation in the framework: *Subtracitve Synthesizer with effects, Acoustic Piano with IR Reverb, Full-featured S&S Sampler...*
 
+- **Unit** A basic object provided by WAAX framework. It consists of more than 2 Nodes and is encapsulated with sonically meaningful features. Also handles several underlying mechanics for Web Audio API: 
+  *Oscillator, FM Operator, ADSR Envelope, Delay, Low/Hi Pass Filter, Compressor...*
 
-Layers
-------
-Node - Unit - Block - Module
-* Transport
-* Data Structure
-* Visualization
+- **Block** A building block for actual signal processor and music instrument. It consists of more than 2 Units and usually comes with more musically meaningful features: 
+  *Polyphonic Sampler, Oscillator Bank, Equalizer, QuadBand Compressor, Multi-tap Delay...*
+- **Module** A concoction of more than 2 Blocks. The highest level of encapsulation in the framework: 
+  *Subtracitve Synthesizer with effects, Acoustic Piano with IR Reverb, Full-featured S&S Sampler...*
+
 
 
 Connections
