@@ -1,4 +1,6 @@
-[1]
+WAAX
+====
+Web Audio API eXtension for Modern Browers (Chrome/Safari/FireFox)
 
 Layers
 ------
