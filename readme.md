@@ -36,7 +36,7 @@ Concept
 
 As a framework rather than a library, it imposes a key concept and methodology with its layered structure:
 
-  *Node - Unit - Block - Module*
+    *Node - Unit - Block - Module*
   
 - **Node**: A node is a built-in atom of Web Audio API. The object can be interconnected to create an audio graph.
 
