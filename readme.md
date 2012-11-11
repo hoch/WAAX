@@ -12,7 +12,7 @@
 2. why does "stop()" method irreversible? is this to save resources as well?
 
 
-
+----------
 
 
 WAAX (Web Audio API eXtension)
