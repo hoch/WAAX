@@ -47,25 +47,22 @@ Connections
 - *Unit - Node* (outgoing)
 
 ###WX-type
-- *Unit - Unit*
+- *Unit - Unit* (atomic level in WX-type connection)
 - *Unit - Block*
 - *Block - Unit*
 - *Block - Block*
 
 
-Structure
----------
-WAAX.js
 
-Utilities.js
-  random2(), random2f(), scale(), db2rms(), 
-  midi2freq(), freq2midi()
+Classes
+-------
+###Units
+- Generators
+  
+  Oscillator(), FMOperator(), Wavetable(), SampleBuffer(), ADSR(), EnvelopeFollower()
 
-/Units
-  <Gen>
-  Oscillator(), FMOperator(), Wavetable(), SampleBuffer(),
-  ADSR(), EnvelopeFollower(),
-  <Efx>
+- Effects
+
   Delay(), Filter(), Reverb(), Compressor(), Waveshaper()
 
 /Blocks
@@ -85,6 +82,11 @@ Utilities.js
 
 /Timebase
   Clip()
+
+Utilities.js
+  random2(), random2f(), scale(), db2rms(), 
+  midi2freq(), freq2midi()
+
 
 
 Milestone
