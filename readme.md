@@ -27,7 +27,7 @@ WAAX is an experimental javascript framework for [Web Audio API][1] incorporated
 
 The goal of this project is to make web audio programming more approachable by expanding the audio domain with new web technologies that make the browser user-centered, highly-visualized and ever-connected. Also the library is strongly inspired by [THREE.js][2], which is one of WebGL JavaScript libraries being used most in the scene, and hopefully it can be a sonic counterpart in the web-based audiovisual system.
 
-In addition to core technology, the library comes with an interactive web-based IDE for rapid experiment and deployment. It allows users to perform JavaScript audio progoramming and export the code snippet for other web projects.
+In addition to core technology, the library comes with an interactive web-based IDE for rapid experiment and deployment. It allows users to perform JavaScript audio programming and export the code snippet for other web projects.
 
 The author of this library is Hongchan Choi at [CCRMA][3], Stanford University.
 
@@ -53,7 +53,7 @@ As a framework rather than a library, it imposes a key concept and methodology w
   *Polyphonic Sampler, Oscillator Bank, Equalizer, QuadBand Compressor, Multi-tap Delay...*
 
 - **Module**: A concoction of more than 2 Blocks. The highest level of encapsulation in the framework: 
-  *Subtracitve Synthesizer with effects, Acoustic Piano with IR Reverb, Full-featured S&S Sampler...*
+  *Subtractive Synthesizer with effects, Acoustic Piano with IR Reverb, Full-featured S&S Sampler...*
 
 
 

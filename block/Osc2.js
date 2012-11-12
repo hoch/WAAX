@@ -52,7 +52,7 @@ WX.Osc2.prototype = {
   }
 
   // glide?
-  // continuous pitch movment?
+  // continuous pitch movement?
   // no polyphonic
 
 };

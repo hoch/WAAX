@@ -3,9 +3,7 @@ WX.Inlet = function() {
 };
 
 WX.Inlet.prototype = {
-  constructor: WX.Inlet;
-
-  
+  constructor: WX.Inlet,
 
 };
 
@@ -15,7 +13,7 @@ WX.Outlet = function() {
 };
 
 WX.Outlet.prototype = {
-  constructor: WX.Outlet;
+  constructor: WX.Outlet,
 
 
 };
