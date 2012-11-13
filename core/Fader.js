@@ -4,9 +4,11 @@
  * @author hoch (hongchan@ccrma)
  */
 WX.Fader = function() {
-  // this unit only has one inlet
+  // NOTE: by using two gain nodes, pre/post fader
+  // structure will be possible.
   this.inlet = WX.context.createGainNode();
-  this.tempGain = 1.0;
+  this.outlet = WX.context.createGainNode();
+  this.inlet.connect(this.outlet);
   this.muted = false;
 };
 
@@ -20,7 +22,7 @@ WX.Fader.prototype = {
    * @return {unit} reference to destination for method chaining
    */
   to: function(unit) {
-    this.inlet.connect(unit.inlet);
+    this.outlet.connect(unit.inlet);
     return unit;
   },
   
@@ -28,7 +30,7 @@ WX.Fader.prototype = {
    * cutting connection from its destination
    */
   cut: function() {
-    this.inlet.disconnect();
+    this.outlet.disconnect();
   },
 
   /**
@@ -36,7 +38,7 @@ WX.Fader.prototype = {
    * @param  {Audionode} node Web Audio API node
    */
   toNode: function(node) {
-    this.inlet.connect(node);
+    this.outlet.connect(node);
   },
 
   /**
@@ -44,10 +46,7 @@ WX.Fader.prototype = {
    * @param {float} gain gain of fader
    */
   setGain: function(gain) {
-    this.tempGain = gain;
-    if (this.muted === false) {
-      this.inlet.gain.value = gain;
-    }
+    this.outlet.gain.value = gain;
   },
 
   /**
@@ -55,11 +54,7 @@ WX.Fader.prototype = {
    * @param {float} db loudness in decibels
    */
   setDB: function(db) {
-    var rms = WX.db2rms(db);
-    this.tempGain = rms;
-    if (this.muted === false) {
-      this.inlet.gain.value = rms;
-    }
+    this.outlet.gain.value = WX.db2rms(db);
   },
 
   mute: function() {
@@ -69,7 +64,7 @@ WX.Fader.prototype = {
 
   unmute: function() {
     this.muted = false;
-    this.inlet.gain.value = this.tempGain;
+    this.inlet.gain.value = 1.0;
   }
 };
 

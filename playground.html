@@ -19,8 +19,13 @@
 
 <script>
 
-var myOsc = new WX.Osc("SAW");
-myOsc.to(WX.Out);
+var myMod = new WX.Osc("SIN");
+var myCar = new WX.Osc("SIN");
+
+myMod.setGain(10.0).setFreq(1);
+myCar.setGain(0.2).setFreq(220);
+
+myMod.to(myCar).to(WX.Out);
 
 window.addEventListener('load', function() {
     console.log('loaded. - go!');
