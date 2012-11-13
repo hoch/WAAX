@@ -1,11 +1,9 @@
 ###Current Milestone (11/11~11/15)
-* Oscillator() -> Osc2()
-* Filter() -> ResonZ(), HPF()
-* Envelope() 
-* Delay() -> StereoDelay()
-* SynaMon()
-* Clip()
-
+* Osc.js `Osc` `Osc3`
+* Filter.js `LPF`
+* Env.js `Ramp` `ADSR`
+* Delay.js `FBDelay`
+* Timebase.js `Clip` `Clock`
 
 ###Questions
 1. does offlineAudioContext exist in current implementation?
@@ -65,10 +63,10 @@ Connections
 Unit Classes
 ------------
 ###Generators
-`Osc` `Osc2` `Osc`
+`Osc` `Osc3`
 `FMOp` `FM3` `FM7`
 `WaveTab` `WaveTab3`
-`Samp` `SampX`
+`Samp1` `SampX`
 
 ###Envelopes
 `Ramp` `ADSR` `EnvFol`

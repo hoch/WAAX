@@ -13,15 +13,12 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script src="WAAX.js"></script>
 <script src="unit/Core.js"></script>
-<script src="unit/Oscillator.js"></script>
-<script src="block/Osc2.js"></script>
+<script src="unit/Osc.js"></script>
+<script src="core/Util.js"></script>
 
 <script>
 
-// var osc = new WX.Oscillator("TRIANGLE");
-// osc.to(WX.MasterFader);
-
-var o2 = new WX.Osc2();
+var o2 = new WX.Osc3();
 o2.to(WX.MasterFader);
 
 window.addEventListener('load', function() {
@@ -29,6 +26,7 @@ window.addEventListener('load', function() {
 });
 
 </script>
+
 </body>
 
 
