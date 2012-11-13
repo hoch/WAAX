@@ -1,27 +1,28 @@
 /**
- * WAAX abstraction of oscillator
- * @param {string} oscType type of waveform
+ * WAAX abstraction of low pass filter
+ * @param {float} cutoff cutoff frequency of filter
+ * @param {float} Q      quality
  * @version 1
  * @author hoch (hongchan@ccrma)
  */
-WX.Osc = function(oscType) {
+WX.LPF = function(cutoff, Q) {
   this.inlet = WX.context.createGainNode();
-  this.osc = WX.context.createOscillator();
+  this.lpf = WX.context.createBiquadFilter();
   this.outlet = WX.context.createGainNode();
   
-  // to enable FM Synthesis: node(node)->freq(a-rate)
-  this.inlet.connect(this.osc.frequency);
-  this.osc.connect(this.outlet);
-  this.osc.start(0);
+  this.inlet.connect(this.lpf);
+  this.lpf.connect(this.outlet);
 
-  this.osc.frequency.value = 261.626;
+  this.lpf.type = 0;
+  this.lpf.frequency.value = 1000.0;
+  this.lpf.Q.value = 1.0;
   this.outlet.gain.value = 1.0;
-  this.setType(oscType);
+
 };
 
-WX.Osc.prototype = {
+WX.LPF.prototype = {
 
-  constructor: WX.Osc,
+  constructor: WX.LPF,
 
   /**
    * connection to other unit
@@ -51,12 +52,22 @@ WX.Osc.prototype = {
   },
 
   /**
-   * set frequency of oscillator (AudioParam)
-   * @param {float} freq frequency of oscillator
+   * set cutoff frequency of filter (AudioParam)
+   * @param {float} cutoff frequency of filter
    * @return {unit} reference to this unit
    */
-  setFreq: function(freq) {
-    this.osc.frequency.value = freq;
+  setCutoff: function(cutoff) {
+    this.lpf.frequency.value = cutoff;
+    return this;
+  },
+
+  /**
+   * set quality factor of filter
+   * @param {float} quality quality of filter
+   * @return {unit} reference to this unit
+   */
+  setQ: function(quality) {
+    this.lpf.Q.value = quality;
     return this;
   },
 
@@ -71,37 +82,10 @@ WX.Osc.prototype = {
   },
 
   /**
-   * set oscillator type
-   * @param {string} type type of oscillator (SIN/SQR/SAW/TRI)
-   * @return {unit} reference to this unit
+   * TODO: get frequency response of filter
    */
-  setType: function(type) {
-    if (type === undefined) {
-      this.osc.type = 0;
-      return this;
-    }
-    switch(type) {
-      case "SINE":
-      case "SIN":
-        this.osc.type = 0;
-        break;
-      case "SQUARE":
-      case "SQR":
-        this.osc.type = 1;
-        break;
-      case "SAWTOOTH":
-      case "SAW":
-        this.osc.type = 2;
-        break;
-      case "TRIANGLE":
-      case "TRI":
-        this.osc.type = 3;
-        break;
-      default:
-        this.osc.type = 0;
-        break;
-    }
-    return this;
+  getFrequencyResponse: function() {
+    // no contents
   },
 
   /**

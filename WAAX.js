@@ -4,7 +4,7 @@
  */
 var WX = WX || { REVISION:1 };
 
-// Audio Context
+// WAA audio context
 WX.context = new webkitAudioContext();
 
 // parameters
