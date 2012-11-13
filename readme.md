@@ -66,11 +66,8 @@ Unit Classes
 ------------
 ###Generators
 `Osc` `Osc2` `Osc`
-
 `FMOp` `FM3` `FM7`
-
 `WaveTab` `WaveTab3`
-
 `Samp` `SampX`
 
 ###Envelopes
