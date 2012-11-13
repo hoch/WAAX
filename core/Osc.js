@@ -1,83 +1,114 @@
 /**
-  @class Osc
-  @description WAAX abstraction of oscillator
-  @author hoch (hongchan@ccrma)
-  */
+ * WAAX abstraction of oscillator
+ * @param {unit} oscType type of waveform
+ * @version 1
+ * @author hoch (hongchan@ccrma)
+ */
 WX.Osc = function(oscType) {
+  this.inlet = WX.context.createGainNode();
   this.osc = WX.context.createOscillator();
-  this.gain = WX.context.createGainNode();
-  this.osc.connect(this.gain);
+  this.outlet = WX.context.createGainNode();
+  
+  this.inlet.connect(this.osc.frequency);
+  this.osc.connect(this.outlet);
   this.osc.start(0);
 
-  if (oscType !== undefined) {
-    this.setType(oscType);
-  } else {
-    this.setType("SINE");
-  }
-  
   this.osc.frequency.value = 261.626;
-  this.gain.gain.value = 1.0;
+  this.outlet.gain.value = 1.0;
+  this.setType(oscType);
 };
 
-WX.Oscillator.prototype = {
+WX.Osc.prototype = {
 
-  constructor: WX.Oscillator,
+  constructor: WX.Osc,
 
+  /**
+   * connection to other unit
+   * @param  {unit} unit destination unit
+   * @return {unit} reference to destination for method chaining
+   */
   to: function(unit) {
-    this.gain.connect(unit.node);
-    // NOTE: this will mute this permanently
-    // this.osc.start(0);
+    this.outlet.connect(unit.inlet);
     return unit;
   },
   
+  /**
+   * cutting connection from its destination
+   */
   cut: function() {
     // NOTE: this will mute this permanently
     // this.osc.stop(0);
-    this.gain.disconnect();
+    this.outlet.disconnect();
   },
 
-  connect: function(node) {
-    // this.osc.start();
-    this.gain.connect(node);
+  /**
+   * connection to Web Audio API node
+   * @param  {Audionode} node Web Audio API node
+   */
+  toNode: function(node) {
+    this.outlet.connect(node);
   },
 
+  /**
+   * set frequency of oscillator (AudioParam)
+   * @param {float} freq frequency of oscillator
+   * @return {unit} reference to this unit
+   */
+  setFreq: function(freq) {
+    this.osc.frequency.value = freq;
+    return this;
+  },
+
+  /**
+   * set gain of oscillator (AudioParam)
+   * @param {float} gain gain of oscillator
+   * @return {unit} reference to this unit
+   */
+  setGain: function(gain) {
+    this.outlet.gain.value = gain;
+    return this;
+  },
+
+  /**
+   * set oscillator type
+   * @param {string} type type of oscillator (SIN/SQR/SAW/TRI)
+   * @return {unit} reference to this unit
+   */
   setType: function(type) {
     if (type === undefined) {
       this.osc.type = 0;
-      return;
+      return this;
     }
     switch(type) {
       case "SINE":
+      case "SIN":
         this.osc.type = 0;
         break;
       case "SQUARE":
+      case "SQR":
         this.osc.type = 1;
         break;
       case "SAWTOOTH":
+      case "SAW":
         this.osc.type = 2;
         break;
       case "TRIANGLE":
+      case "TRI":
         this.osc.type = 3;
         break;
       default:
         this.osc.type = 0;
         break;
     }
-  },
-
-  setFreq: function(freq) {
-    this.osc.frequency.value = freq;
     return this;
   },
 
-  setGain: function(freq) {
-    this.gain.gain.value = freq;
-    return this;
-  },
-
+  /**
+   * set parameters with JSON
+   * @param {json} json various parameters
+   * @description deprecated for slow performance
+   */
   set: function(json) {
-    // parse json and assign to parameter
-    // NOTE: this is too slow to parse and validate parameters
-    // it is not appropriate for function calls every 20ms.
+    // no contents
   }
 };

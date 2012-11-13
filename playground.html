@@ -12,14 +12,15 @@
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script src="WAAX.js"></script>
-<script src="unit/Core.js"></script>
-<script src="unit/Osc.js"></script>
 <script src="core/Util.js"></script>
+<script src="core/Clock.js"></script>
+<script src="core/Fader.js"></script>
+<script src="core/Osc.js"></script>
 
 <script>
 
-var o2 = new WX.Osc3();
-o2.to(WX.MasterFader);
+var myOsc = new WX.Osc("SAW");
+myOsc.to(WX.Out);
 
 window.addEventListener('load', function() {
     console.log('loaded. - go!');

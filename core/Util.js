@@ -1,3 +1,8 @@
+// constants
+WX.PI = Math.PI;
+WX.TWOPI = Math.PI * 2.0;
+WX.EPS = Number.MIN_VALUE;
+
 // midi2freq: midi to frequency
 WX.midi2freq = function(midipitch) {
   return 440.0 * Math.pow(2, ((Math.floor(midipitch) - 69) / 12));
