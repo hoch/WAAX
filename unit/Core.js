@@ -5,6 +5,15 @@ WX.Inlet = function() {
 WX.Inlet.prototype = {
   constructor: WX.Inlet,
 
+  to: function(unit) {
+    this.node.connect(unit.node);
+    return unit;
+  },
+
+  cut: function() {
+    this.node.disconnect();
+  }
+
 };
 
 
@@ -15,5 +24,13 @@ WX.Outlet = function() {
 WX.Outlet.prototype = {
   constructor: WX.Outlet,
 
+  to: function(unit) {
+    this.node.connect(unit.node);
+    return unit;
+  },
+
+  cut: function() {
+    this.node.disconnect();
+  }
 
 };

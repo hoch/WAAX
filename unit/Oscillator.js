@@ -15,12 +15,14 @@ WX.Oscillator.prototype = {
 
   to: function(unit) {
     this.gain.connect(unit.node);
+    // NOTE: this will mute this permanently
     // this.osc.start(0);
     return unit;
   },
   
   cut: function() {
-    // this.osc.stop(0); this will mute osc permanantely
+    // NOTE: this will mute this permanently
+    // this.osc.stop(0);
     this.gain.disconnect();
   },
 
@@ -65,5 +67,7 @@ WX.Oscillator.prototype = {
 
   set: function(json) {
     // parse json and assign to parameter
+    // NOTE: this is too slow to parse and validate parameters
+    // it is not appropriate for function calls every 20ms.
   }
 };

@@ -35,7 +35,7 @@ WX.random2 = function(min, max) {
 
 
 /**
-  @class Fader <Unit>
+  @class Fader
   @description a wrapper class for gainNode
 */
 

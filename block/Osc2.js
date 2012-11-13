@@ -1,6 +1,9 @@
 WX.Osc2 = function() {
   this.oscA = new WX.Oscillator("TRIANGLE");
   this.oscB = new WX.Oscillator("SAWTOOTH");
+  this.outlet = new WX.Outlet();
+  this.oscA.to(this.outlet);
+  this.oscB.to(this.outlet);
 
   // octave: 8, 16, 32
   // detune
@@ -16,15 +19,13 @@ WX.Osc2.prototype = {
 
   constructor: WX.Osc2,
 
-  to: function(unit) {
-    this.oscA.to(unit);
-    this.oscB.to(unit);
-    return unit;
+  to: function(block) {
+    this.outlet.to(block.inlet);
+    return block;
   },
 
   cut: function() {
-    this.oscA.cut();
-    this.oscB.cut();
+    this.outlet.cut();
   },
 
   setGainA: function(gain) {

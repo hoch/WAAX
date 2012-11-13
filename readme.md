@@ -60,38 +60,44 @@ As a framework rather than a library, it imposes a key concept and methodology w
 Connections
 -----------
 
-###Atomic
+###Atomic connection
 - *Node - Node* (connection between Web Audio API nodes)
 
-###Semi WX-type
-- *Node - Unit* (incoming)
-- *Unit - Node* (outgoing)
-
-###WX-type
+###WX-type connection
 - *Unit - Unit*
-- *Unit - Block*
-- *Block - Unit*
-- *Block - Block*
 
 
 
-Classes
--------
-###Units
-- Generators: `Oscillator`, `FMOperator`, `Wavetable`, `SampleBuffer`, `ADSR`, `EnvelopeFollower`
+Unit Classes
+------------
+###Generators
+`Osc` `Osc2` `Osc`
+`FMOp` `FM3` `FM7`
+`WaveTab` `WaveTab3`
+`Samp` `SampX`
 
-- Effects: `Delay`, `Filter`, `Reverb`, `Compressor`, `Waveshaper`
+###Envelopes
+`Ramp` `ADSR` `EnvFol`
 
-###Blocks
-- Synth: `Osc2`, `Osc3`, `FM3`, `FM7`, `WaveTab3`, `Sampler`
+###Effects
+`LPF` `HPF` `Notch` `EQ3` `EQ5`
+`Delay` `FBDelay` `StereoDelay` `NTapDelay` `Chorus` `Flanger`
+`APVerb` `ConVerb`
+`Compressor` `Gate` `DeEsser` `QuadComp` `Limiter`
+`OverD` `Dist` `WaveShaper` `Enhancer` `Exciter`
+`Vinyl`
 
-- Processor: `ResonZ`, `LPF`, `HPF`, `EQ3`, `EQ5`, `EQ7`, `StereoDelay`, `Chorus`, `Flanger`, `ConVerb`, `NVerb`, `QuadComp`, `Limiter`, `Gate`, `DeEsser`, `Enhancer`, `Exciter`, `Overdrive`, `Vinyl`
-  
-###Modules
-  `SynaMon`, `FMOne`, `Xpler`
 
-###Timebase
-  `Clip`
 
-###Utilities
-  `random2`, `random2f`, `scale`, `db2rms`, `midi2freq`, `freq2midi`
+Timebase Classes
+----------------
+`Clip` `Clock`
+
+
+
+Utilities
+---------
+`random2` `random2f`
+`scale` 
+`db2rms` `rms2db`
+`midi2freq` `freq2midi`
