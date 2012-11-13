@@ -17,7 +17,6 @@ WX.LPF = function(cutoff, Q) {
   this.lpf.frequency.value = 1000.0;
   this.lpf.Q.value = 1.0;
   this.outlet.gain.value = 1.0;
-
 };
 
 WX.LPF.prototype = {

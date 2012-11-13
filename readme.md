@@ -84,6 +84,12 @@ Timebase Classes
 - `Clock` a master clock for the context (singleton)
 - `Clip` a logical unit of musical data (audio graph, note on/off, continuous parameter changes)
 - `Dispatcher` a central device (singleton) that manages clips - user can add/remove clips to/from dispatcher, and also the dispatcher will terminate a clip when its life cycle is over.
+- `Parser' 
+
+
+Networking Classes
+------------------
+- `socket` enables full-duplex connection to other remote WAAX clients
 
 
 

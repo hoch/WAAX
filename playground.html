@@ -17,18 +17,45 @@
 <script src="core/Fader.js"></script>
 <script src="core/Osc.js"></script>
 <script src="core/LPF.js"></script>
+<script src="core/ADSR.js"></script>
+<script src="core/Delay.js"></script>
 
 <script>
 
 var myMod = new WX.Osc("SIN");
-var myCar = new WX.Osc("SIN");
+var myCar = new WX.Osc("SAW");
 var myLpf = new WX.LPF();
+var myAdsr = new WX.ADSR(5, 15, 0.35, 60);
+var myDly = new WX.Delay(250, 0.15);
 
-myMod.setGain(10.0).setFreq(1);
-myCar.setGain(0.2).setFreq(220);
-myLpf.setCutoff(110.0).setQ(2.0);
+myMod.setGain(10.0).setFreq(100);
+myCar.setGain(0.4).setFreq(880);
+myLpf.setCutoff(1200.0).setQ(4.0);
+myDly.setFeedbackGain(0.5);
 
-myMod.to(myCar).to(myLpf).to(WX.Out);
+myMod.to(myCar).to(myLpf).to(myAdsr).to(myDly).to(WX.Out);
+
+var pitches = [0, 4, 5, 7, 11, 12];
+
+$(document).keydown( function(event) {
+  if (event.which == 81 && myAdsr.running === false) {
+    event.preventDefault();
+    var pitch = pitches[WX.random2(0, 5)] + 12 * WX.random2(3, 5);
+    var freq = WX.midi2freq(pitch);
+    var Q = WX.random2f(1.0, 8.0);
+    myMod.setGain(WX.random2f(2.0, 8.0)).setFreq(freq * 5);
+    myCar.setFreq(freq);
+    myLpf.setCutoff(freq * 5).setQ(Q);
+    myAdsr.start();
+  }
+});
+
+$(document).keyup( function(event) {
+  if (event.which == 81) {
+    event.preventDefault();
+    myAdsr.release();
+  }
+});
 
 window.addEventListener('load', function() {
     console.log('loaded. - go!');
@@ -37,6 +64,5 @@ window.addEventListener('load', function() {
 </script>
 
 </body>
-
 
 </html>
