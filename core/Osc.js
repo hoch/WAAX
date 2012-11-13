@@ -1,10 +1,20 @@
-WX.Oscillator = function(type) {
+/**
+  @class Osc
+  @description WAAX abstraction of oscillator
+  @author hoch (hongchan@ccrma)
+  */
+WX.Osc = function(oscType) {
   this.osc = WX.context.createOscillator();
   this.gain = WX.context.createGainNode();
-  this.osc.start(0);
   this.osc.connect(this.gain);
+  this.osc.start(0);
 
-  this.setType(type);
+  if (oscType !== undefined) {
+    this.setType(oscType);
+  } else {
+    this.setType("SINE");
+  }
+  
   this.osc.frequency.value = 261.626;
   this.gain.gain.value = 1.0;
 };
