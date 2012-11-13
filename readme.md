@@ -27,7 +27,7 @@ The goal of this project is to make web audio programming more approachable by e
 
 In addition to core technology, the library comes with an interactive web-based IDE for rapid experiment and deployment. It allows users to perform JavaScript audio programming and export the code snippet for other web projects.
 
-The author of this library is Hongchan Choi at [CCRMA][3], Stanford University.
+The author of this project is Hongchan Choi at [CCRMA][3], Stanford University.
 
 [1]: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html "Web Audio API: W3C Editor's Draft"
 [2]: https://github.com/mrdoob/three.js/ "THREE.js: Github Repo"
@@ -40,12 +40,11 @@ Concept
 
 As a framework rather than a library, it imposes a key concept and methodology with its layered structure:
 
-    Node(lowest) < Unit
+    Node (pure Web Audio API level) > Unit (WAAX Abstraction)
   
 - **Node**: A node is a built-in atom of Web Audio API. The object can be interconnected to create an audio graph.
 
-- **Unit**: A basic object provided by WAAX framework. It consists of more than 2 Nodes and is encapsulated with sonically meaningful features. Also handles several underlying mechanics for Web Audio API: 
-  *Oscillator, FM Operator, ADSR Envelope, Delay, Low/Hi Pass Filter, Compressor...*
+- **Unit**: A atom object provided by WAAX framework. It is conceptually identical to 'Unit Generator' of other audio programming environment. It consists of more than 2 Nodes encapsulating user-friendly features. Also handles several underlying mechanics for Web Audio API.
 
 
 
