@@ -19,8 +19,10 @@ WX.Delay = function(delayTime, mix) {
   this.dry.connect(this.outlet);
   this.wet.connect(this.outlet);
 
+  // TODO: mix should be between (0.0~1.0)
   this.mix = mix;
 
+  // TODO: delayTime should be positive
   this.delay.delayTime.value = delayTime / 1000.0;
   this.feedback.gain.value = 0.0;
   this.wet.gain.value = this.mix;

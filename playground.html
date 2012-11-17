@@ -10,10 +10,14 @@
 
 <body>
 
+<div id="msg"></div>
+<div id="timer"></div>
+
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script src="WAAX.js"></script>
 <script src="core/Util.js"></script>
-<script src="core/Clock.js"></script>
+<script src="core/Timebase.js"></script>
+<script src="core/Clip.js"></script>
 <script src="core/Fader.js"></script>
 <script src="core/Osc.js"></script>
 <script src="core/LPF.js"></script>
@@ -27,6 +31,7 @@ var myCar = new WX.Osc("SAW");
 var myLpf = new WX.LPF();
 var myAdsr = new WX.ADSR(5, 15, 0.35, 60);
 var myDly = new WX.Delay(250, 0.15);
+var myClip = new WX.Clip(5.0);
 
 myMod.setGain(10.0).setFreq(100);
 myCar.setGain(0.4).setFreq(880);
@@ -35,9 +40,11 @@ myDly.setFeedbackGain(0.5);
 
 myMod.to(myCar).to(myLpf).to(myAdsr).to(myDly).to(WX.Out);
 
+WX.TB.add(myClip);
+
 var pitches = [0, 4, 5, 7, 11, 12];
 
-$(document).keydown( function(event) {
+$(document).keydown(function(event) {
   if (event.which == 81 && myAdsr.running === false) {
     event.preventDefault();
     var pitch = pitches[WX.random2(0, 5)] + 12 * WX.random2(3, 5);
@@ -50,10 +57,20 @@ $(document).keydown( function(event) {
   }
 });
 
-$(document).keyup( function(event) {
+$(document).keyup(function(event) {
   if (event.which == 81) {
     event.preventDefault();
     myAdsr.release();
+  }
+});
+
+$(document).keypress(function(event) {
+  if (event.which === 46) {
+    if (WX.Out.muted === false) {
+      WX.Out.mute();
+    } else {
+      WX.Out.unmute();
+    }
   }
 });
 

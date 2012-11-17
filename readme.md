@@ -1,12 +1,23 @@
 ###Current Milestone (11/11~11/15)
 * Osc3.js `Osc3`
-* Env.js `Ramp` `ADSR`
-* Delay.js `FBDelay`
+* Env.js `Ramp`
 * Timebase.js `Clip` `Clock`
 
 ###Questions
 1. does offlineAudioContext exist in current implementation?
 2. why does "stop()" method irreversible? is this to save resources as well?
+3. using "worker" for virtual machine/timing mechanism
+
+4. Clock(dispatcher) needs to be just one shot (no needs to start/stop)
+5. Clip registered to dispatcher and dispatcher advance/update all the clip with consistent callback
+5.5 WXevent = Measure:Beat:Tick
+
+ex) 
+  var e = new WX.Event([1, 2, 120]);
+  var note = new WX.Note(e, Vel, Pitch);
+  
+
+6. using web workers for... offline FFT?
 
 
 ----------
@@ -17,7 +28,7 @@ WAAX (Web Audio API eXtension)
 **A JavaScript Framework for Music/Audio Programming on Modern Browsers (Chrome/Safari/FireFox)**
 
 ```javascript
-mySaw.to(myLPF).to(myADSR).to(WX.Out);
+mySaw.to(myLPF).to(myADSR).to(myDelay).to(WX.Out);
 ```
 
 WAAX is an experimental javascript framework for [Web Audio API][1] incorporated in the modern browsers such as Chrome, Safari and FireFox. With music/sound creation in mind, it is designed to provide users with higher level of musical control: complex real-time sound synthesis, ready-made instruments, even a timebase system for sophisticated structure.

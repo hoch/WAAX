@@ -4,9 +4,17 @@
  * @author hoch (hongchan@ccrma)
  */
 WX.Clock = function() {
-  this.tick = 1000/60;
-  this.last = 0;
+  this.frameSize = 256;
   this.running = false;
+  this.elapsedTime = 0.0;
+  this.last = 0.0;
+  
+  this.clock = WX.context.createScriptProcessor(this.frameSize, 0, 1);
+  var me = this;
+  this.clock.onaudioprocess = function(e) {
+    me.callback(e);
+  };
+  this.clock.connect(WX.context.destination);
 };
 
 WX.Clock.prototype = {
@@ -17,9 +25,13 @@ WX.Clock.prototype = {
    * starts clock and initiate timed loop
    */
   start: function() {
-    this.last = 0;
+    this.elapsedTime = 0.0;
     this.running = true;
-    this.loop();
+    var me = this;
+    this.clock.onaudioprocess = function(e) {
+      me.callback(e);
+    };
+    $('#msg').text("[WX:CLOCK] started.");
   },
 
   /**
@@ -27,29 +39,32 @@ WX.Clock.prototype = {
    */
   stop: function() {
     this.running = false;
+    this.clock.onaudioprocess = null;
+    $('#msg').text("[WX:CLOCK] stopped.");
+    $('#timer').text("");
   },
 
   /**
-   * timed loop
-   * @return {int} process ID of current iteration
+   * toggle clock
    */
-  loop: function() {
-    var self = this;
+  toggle: function() {
+    if (this.running === true ) {
+      this.stop();
+    } else {
+      this.start();
+    }
+  },
+
+  /**
+   * timed callback, block-accuracy callback
+   * @param  {event} e AudioProcessingEvent
+   */
+  callback: function(e) {
     var now = WX.context.currentTime;
     var delta = now - this.last;
-    var id = -1;
-
-    // do timed processing
-    // : adding delta to all the clips running in dispatcher
-
-    if (this.running === true) {
-      id = window.setTimeout(function() {
-        // console.log(self.last);
-        self.loop();
-      }, self.tick);
-      this.last = now;
-    }
-    return id;
+    this.elapsedTime += delta;
+    this.last = now;
+    $('#timer').html(this.elapsedTime + "<br />" + delta);
   }
 };
 
