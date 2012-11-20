@@ -19,26 +19,29 @@
 <script src="core/Timebase.js"></script>
 <script src="core/Clip.js"></script>
 <script src="core/Fader.js"></script>
-<script src="core/Osc.js"></script>
+<script src="core/Oscil.js"></script>
 <script src="core/LPF.js"></script>
 <script src="core/ADSR.js"></script>
 <script src="core/Delay.js"></script>
+<script src="core/ConVerb.js"></script>
 
 <script>
 
-var myMod = new WX.Osc("SIN");
-var myCar = new WX.Osc("SAW");
+var myMod = new WX.Oscil("SIN");
+var myCar = new WX.Oscil("SAW");
 var myLpf = new WX.LPF();
 var myAdsr = new WX.ADSR(5, 15, 0.35, 60);
 var myDly = new WX.Delay(250, 0.15);
+var myVerb = new WX.ConVerb("core/ir/1644-960ambiencehall.wav");
 var myClip = new WX.Clip(5.0);
 
 myMod.setGain(10.0).setFreq(100);
 myCar.setGain(0.4).setFreq(880);
 myLpf.setCutoff(1200.0).setQ(4.0);
 myDly.setFeedbackGain(0.5);
+myVerb.setMix(0.25);
 
-myMod.to(myCar).to(myLpf).to(myAdsr).to(myDly).to(WX.Out);
+myMod.to(myCar).to(myLpf).to(myAdsr).to(myDly).to(myVerb).to(WX.Out);
 
 WX.TB.add(myClip);
 

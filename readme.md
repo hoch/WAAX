@@ -1,7 +1,15 @@
-###Current Milestone (11/11~11/15)
-* Osc3.js `Osc3`
-* Env.js `Ramp`
+###Current Milestone (11/19~11/25)
+
+* Gen3.js (2 Osc + Noise Gen)
+* FMOp.js
+* WaveTab.js
+
+* LPF24.js
+* ConVerb.js
+* Comp.js
+
 * Timebase.js `Clip` `Clock`
+
 
 ###Questions
 1. does offlineAudioContext exist in current implementation?
@@ -28,7 +36,21 @@ WAAX (Web Audio API eXtension)
 **A JavaScript Framework for Music/Audio Programming on Modern Browsers (Chrome/Safari/FireFox)**
 
 ```javascript
-mySaw.to(myLPF).to(myADSR).to(myDelay).to(WX.Out);
+var myMod = new WX.Osc("SIN");
+var myCar = new WX.Osc("SAW");
+var myLpf = new WX.LPF();
+var myAdsr = new WX.ADSR(5, 15, 0.35, 60);
+var myDly = new WX.Delay(250, 0.15);
+var myVerb = new WX.ConVerb("core/ir/1644-960ambiencehall.wav");
+var myClip = new WX.Clip(5.0);
+
+myMod.setGain(10.0).setFreq(100);
+myCar.setGain(0.4).setFreq(880);
+myLpf.setCutoff(1200.0).setQ(4.0);
+myDly.setFeedbackGain(0.5);
+myVerb.setMix(0.25);
+
+myMod.to(myCar).to(myLpf).to(myAdsr).to(myDly).to(myVerb).to(WX.Out);
 ```
 
 WAAX is an experimental javascript framework for [Web Audio API][1] incorporated in the modern browsers such as Chrome, Safari and FireFox. With music/sound creation in mind, it is designed to provide users with higher level of musical control: complex real-time sound synthesis, ready-made instruments, even a timebase system for sophisticated structure.

@@ -4,24 +4,24 @@
  * @version 1
  * @author hoch (hongchan@ccrma)
  */
-WX.Osc = function(oscType) {
+WX.Oscil = function(oscType) {
   this.inlet = WX.context.createGainNode();
-  this.osc = WX.context.createOscillator();
+  this.oscil = WX.context.createOscillator();
   this.outlet = WX.context.createGainNode();
   
   // to enable FM Synthesis: node(node)->freq(a-rate)
-  this.inlet.connect(this.osc.frequency);
-  this.osc.connect(this.outlet);
-  this.osc.start(0);
+  this.inlet.connect(this.oscil.frequency);
+  this.oscil.connect(this.outlet);
+  this.oscil.start(0);
 
-  this.osc.frequency.value = 261.626;
+  this.oscil.frequency.value = 261.626;
   this.outlet.gain.value = 1.0;
   this.setType(oscType);
 };
 
-WX.Osc.prototype = {
+WX.Oscil.prototype = {
 
-  constructor: WX.Osc,
+  constructor: WX.Oscil,
 
   /**
    * connection to other unit
@@ -56,7 +56,7 @@ WX.Osc.prototype = {
    * @return {unit} reference to this unit
    */
   setFreq: function(freq) {
-    this.osc.frequency.value = freq;
+    this.oscil.frequency.value = freq;
     return this;
   },
 
@@ -77,28 +77,28 @@ WX.Osc.prototype = {
    */
   setType: function(type) {
     if (type === undefined) {
-      this.osc.type = 0;
+      this.oscil.type = 0;
       return this;
     }
     switch(type) {
       case "SINE":
       case "SIN":
-        this.osc.type = 0;
+        this.oscil.type = 0;
         break;
       case "SQUARE":
       case "SQR":
-        this.osc.type = 1;
+        this.oscil.type = 1;
         break;
       case "SAWTOOTH":
       case "SAW":
-        this.osc.type = 2;
+        this.oscil.type = 2;
         break;
       case "TRIANGLE":
       case "TRI":
-        this.osc.type = 3;
+        this.oscil.type = 3;
         break;
       default:
-        this.osc.type = 0;
+        this.oscil.type = 0;
         break;
     }
     return this;
