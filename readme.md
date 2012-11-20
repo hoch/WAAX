@@ -70,7 +70,6 @@ As a framework rather than a library, it imposes a key concept and methodology w
 
 Connections
 -----------
-
 ### Atomic connection
 - *Node - Node* (use standard `connect()` method)
 
@@ -90,7 +89,7 @@ Unit Classes
 `WaveTab` `WaveTab3`
 `Samp1` `SampX`
 
-### Envelopes
+### Envelopes & Control
 `Ramp` `ADSR` `EnvFol`
 
 ### Effects
@@ -102,24 +101,26 @@ Unit Classes
 `Vinyl`
 
 
-Instrument Class
-----------------
-**`Instrument`** has noteOn(), noteOff(), and setParams() methods, usually real-time controlled by user, or triggered by Clip.
-**`Preset`** manages preset/template format for instruments
+Instrument Classes
+------------------
+- `Instrument` has noteOn(), noteOff(), and setParams() methods, usually real-time controlled by user, or triggered by Clip.
+- `Preset` manages preset/template format for instruments
 
 
 Timebase Classes
 ----------------
-- `Timeline` a master clock for the context (singleton), can be used to register/advnace `Clip` instances.
+- `Timeline` a master clock for the context (singleton), can be used to register/advnace `Clip` instances. will terminate a clip when its life cycle is over.
 - `Clip` a logical unit of musical data (instrument, note on/off, continuous parameter changes)
-- `Dispatcher` a central device (singleton) that manages clips - user can add/remove clips to/from dispatcher, and also the dispatcher will terminate a clip when its life cycle is over.
-- `Parser' 
+
+
+Data Classes
+------------
+- `Parser` parsing WAXON(WAAX-JSON) data type into WAAX data structure
 
 
 Networking Classes
 ------------------
-- `socket` enables full-duplex connection to other remote WAAX clients
-
+- `Socket` enables full-duplex connection to other remote WAAX clients
 
 
 Utilities
