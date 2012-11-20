@@ -1,30 +1,18 @@
-###Current Milestone (11/19~11/25)
+### Current Milestone (11/19~11/25)
 
-* Gen3.js (2 Osc + Noise Gen)
-* FMOp.js
-* WaveTab.js
+* Oscil3.js (2 Oscs + Noise Gen)
+* FMOP.js : `FMOP` (FM operator)
+* WaveTab.js : `WaveTab`
+* LPF24.js : `LPF24`
+* Comp.js : `C1`
+* Timebase.js : `Clip` `Clock`
 
-* LPF24.js
-* ConVerb.js
-* Comp.js
-
-* Timebase.js `Clip` `Clock`
-
-
-###Questions
+### Notes
 1. does offlineAudioContext exist in current implementation?
 2. why does "stop()" method irreversible? is this to save resources as well?
 3. using "worker" for virtual machine/timing mechanism
-
 4. Clock(dispatcher) needs to be just one shot (no needs to start/stop)
-5. Clip registered to dispatcher and dispatcher advance/update all the clip with consistent callback
-5.5 WXevent = Measure:Beat:Tick
-
-ex) 
-  var e = new WX.Event([1, 2, 120]);
-  var note = new WX.Note(e, Vel, Pitch);
-  
-
+5. Clip registered to Timeline and it advances/updates all the clips with consistent callback from onaudioprocess (256 samples interval)
 6. using web workers for... offline FFT?
 
 
@@ -83,39 +71,47 @@ As a framework rather than a library, it imposes a key concept and methodology w
 Connections
 -----------
 
-###Atomic connection
-- *Node - Node* (connection between Web Audio API nodes)
+### Atomic connection
+- *Node - Node* (use standard `connect()` method)
 
-###WX-type connection
-- *Unit - Unit*
+### WX-type connection
+- *Unit - Unit* (use `to()` method)
 
+### semi WX-type connection
+- *Unit - Node* (use `toNode()` method)
+- *Node - Unit* (could be a problem...)
 
 
 Unit Classes
 ------------
-###Generators
-`Osc` `Osc3`
-`FMOp` `FM3` `FM7`
+### Generators
+`Oscil` `Oscil3`
+`FMOP` `FM3` `FM7`
 `WaveTab` `WaveTab3`
 `Samp1` `SampX`
 
-###Envelopes
+### Envelopes
 `Ramp` `ADSR` `EnvFol`
 
-###Effects
+### Effects
 `LPF` `HPF` `Notch` `EQ3` `EQ5`
-`Delay` `FBDelay` `StereoDelay` `NTapDelay` `Chorus` `Flanger`
+`FBDelay` `StereoDelay` `NTapDelay` `Chorus` `Flanger`
 `APVerb` `ConVerb`
 `Compressor` `Gate` `DeEsser` `QuadComp` `Limiter`
 `OverD` `Dist` `WaveShaper` `Enhancer` `Exciter`
 `Vinyl`
 
 
+Instrument Class
+----------------
+**`Instrument`** has noteOn(), noteOff(), and setParams() methods, usually real-time controlled by user, or triggered by Clip.
+**`Preset`** manages preset/template format for instruments
+
 
 Timebase Classes
 ----------------
-- `Clock` a master clock for the context (singleton)
-- `Clip` a logical unit of musical data (audio graph, note on/off, continuous parameter changes)
+- `Timeline` a master clock for the context (singleton), can be used to register/advnace `Clip` instances.
+- `Clip` a logical unit of musical data (instrument, note on/off, continuous parameter changes)
 - `Dispatcher` a central device (singleton) that manages clips - user can add/remove clips to/from dispatcher, and also the dispatcher will terminate a clip when its life cycle is over.
 - `Parser' 
 
