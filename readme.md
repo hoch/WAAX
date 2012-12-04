@@ -1,24 +1,3 @@
-### Current Milestone (11/19~11/25)
-
-* Oscil3.js (2 Oscs + Noise Gen)
-* FMOP.js : `FMOP` (FM operator)
-* WaveTab.js : `WaveTab`
-* LPF24.js : `LPF24`
-* Comp.js : `C1`
-* Timebase.js : `Clip` `Clock`
-
-### Notes
-1. does offlineAudioContext exist in current implementation?
-2. why does "stop()" method irreversible? is this to save resources as well?
-3. using "worker" for virtual machine/timing mechanism
-4. Clock(dispatcher) needs to be just one shot (no needs to start/stop)
-5. Clip registered to Timeline and it advances/updates all the clips with consistent callback from onaudioprocess (256 samples interval)
-6. using web workers for... offline FFT?
-
-
-----------
-
-
 WAAX (Web Audio API eXtension)
 ------------------------------
 **A JavaScript Framework for Music/Audio Programming on Modern Browsers (Chrome/Safari/FireFox)**

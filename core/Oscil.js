@@ -5,18 +5,21 @@
  * @author hoch (hongchan@ccrma)
  */
 WX.Oscil = function(oscType) {
+  // creating ugens
   this.inlet = WX.context.createGainNode();
   this.oscil = WX.context.createOscillator();
   this.outlet = WX.context.createGainNode();
   
-  // to enable FM Synthesis: node(node)->freq(a-rate)
-  this.inlet.connect(this.oscil.frequency);
-  this.oscil.connect(this.outlet);
-  this.oscil.start(0);
-
+  // setting parameters
   this.oscil.frequency.value = 261.626;
   this.outlet.gain.value = 1.0;
   this.setType(oscType);
+  this.oscil.start(0);
+
+  // connecting ugens
+  // to enable FM Synthesis: node(node)->freq(a-rate)
+  this.inlet.connect(this.oscil.frequency);
+  this.oscil.connect(this.outlet);
 };
 
 WX.Oscil.prototype = {

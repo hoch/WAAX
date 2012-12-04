@@ -9,6 +9,7 @@
 </head>
 
 <body>
+<h1><a href="index.html">Index</a></h1>
 
 <div id="msg"></div>
 <div id="timer"></div>
@@ -20,6 +21,7 @@
 <script src="core/Clip.js"></script>
 <script src="core/Fader.js"></script>
 <script src="core/Oscil.js"></script>
+<script src="core/Sampler.js"></script>
 <script src="core/LPF.js"></script>
 <script src="core/ADSR.js"></script>
 <script src="core/Delay.js"></script>
@@ -29,6 +31,7 @@
 
 var myMod = new WX.Oscil("SIN");
 var myCar = new WX.Oscil("SAW");
+var mySamp = new WX.Sampler("core/samples/flute.wav")
 var myLpf = new WX.LPF();
 var myAdsr = new WX.ADSR(5, 15, 0.35, 60);
 var myDly = new WX.Delay(250, 0.15);
@@ -36,12 +39,14 @@ var myVerb = new WX.ConVerb("core/ir/1644-960ambiencehall.wav");
 var myClip = new WX.Clip(5.0);
 
 myMod.setGain(10.0).setFreq(100);
-myCar.setGain(0.4).setFreq(880);
+myCar.setGain(0.7).setFreq(880);
+mySamp.setBasePitch(69); // A4
 myLpf.setCutoff(1200.0).setQ(4.0);
 myDly.setFeedbackGain(0.5);
 myVerb.setMix(0.25);
 
 myMod.to(myCar).to(myLpf).to(myAdsr).to(myDly).to(myVerb).to(WX.Out);
+mySamp.to(myAdsr);
 
 WX.TB.add(myClip);
 
@@ -56,6 +61,7 @@ $(document).keydown(function(event) {
     myMod.setGain(WX.random2f(2.0, 8.0)).setFreq(freq * 5);
     myCar.setFreq(freq);
     myLpf.setCutoff(freq * 5).setQ(Q);
+    mySamp.start(60 + pitches[WX.random2(0, 5)]);
     myAdsr.start();
   }
 });
@@ -63,6 +69,7 @@ $(document).keydown(function(event) {
 $(document).keyup(function(event) {
   if (event.which == 81) {
     event.preventDefault();
+    mySamp.stop();
     myAdsr.release();
   }
 });

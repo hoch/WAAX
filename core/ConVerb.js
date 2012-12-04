@@ -22,7 +22,7 @@ WX.ConVerb = function(url) {
   this.dry.gain.val = 1.0 - this.mix;
 
   if (url !== undefined) {
-    this.loadIR(url);  
+    this.loadIR(url);
   }
 };
 
@@ -73,7 +73,7 @@ WX.ConVerb.prototype = {
         me.convolver.buffer = WX.context.createBuffer(xhr.response, false);
       } catch(error) {
         console.log("[WX:ConVerb] file loading error: " + url + " (" + error.message + ")");
-      }            
+      } 
     };
     xhr.send();
   },
