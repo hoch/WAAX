@@ -1,26 +1,36 @@
 /**
- * WAAX abstraction of oscillator
- * @param {string} oscType type of waveform
+ * WAAX oscillator
  * @version 1
- * @author hoch (hongchan@ccrma)
+ * @author hoch (hongchan@ccrma.stanford.edu)
  */
-WX.Oscil = function(oscType) {
-  // creating ugens
+
+
+// NOTES
+// - needs phase offset or sync
+// - use WX.WaveTab for wavetable synthesis
+
+
+/**
+ * multifunction oscillator
+ * @param {object} params parameters in JSON format
+ */
+WX.Oscil = function(params) {
+  // inlet node for FM synthesis
   this.inlet = WX.context.createGainNode();
   this.oscil = WX.context.createOscillator();
   this.outlet = WX.context.createGainNode();
+
+  // parsing & setting parameters
+  this.set(params);
   
-  // setting parameters
-  this.oscil.frequency.value = 261.626;
-  this.outlet.gain.value = 1.0;
-  this.setType(oscType);
+  // start generation: stop() will disable this node permanently
   this.oscil.start(0);
 
-  // connecting ugens
   // to enable FM Synthesis: node(node)->freq(a-rate)
   this.inlet.connect(this.oscil.frequency);
   this.oscil.connect(this.outlet);
 };
+
 
 WX.Oscil.prototype = {
 
@@ -40,14 +50,12 @@ WX.Oscil.prototype = {
    * cutting connection from its destination
    */
   cut: function() {
-    // NOTE: this will mute this permanently
-    // this.osc.stop(0);
     this.outlet.disconnect();
   },
 
   /**
    * connection to Web Audio API node
-   * @param  {Audionode} node Web Audio API node
+   * @param  {AudioNode} node Web Audio API node
    */
   toNode: function(node) {
     this.outlet.connect(node);
@@ -109,10 +117,17 @@ WX.Oscil.prototype = {
 
   /**
    * set parameters with JSON
-   * @param {json} json various parameters
-   * @description deprecated for slow performance
+   * @param {json} params parameters in JSON format
    */
-  set: function(json) {
-    // no contents
+  set: function(params) {
+    if (typeof params === "object") {
+      this.oscil.frequency.value = params.frequency || WX.MID_C;
+      this.outlet.gain.value = params.gain || 1.0;
+      this.setType(params.type || "SIN");
+    } else {
+      this.oscil.frequency.value = WX.MID_C;
+      this.outlet.gain.value = 1.0;
+      this.setType("SIN");
+    }
   }
 };

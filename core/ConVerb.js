@@ -4,6 +4,8 @@
  */
 WX.ConVerb = function(url) {
 
+  this.id = "ConVerb";
+
   this.inlet = WX.context.createGainNode();
   this.convolver = WX.context.createConvolver();
   this.dry = WX.context.createGainNode();
@@ -23,6 +25,8 @@ WX.ConVerb = function(url) {
 
   if (url !== undefined) {
     this.loadIR(url);
+  } else {
+    WX.error(this.id, "invalid url");
   }
 };
 
@@ -72,8 +76,8 @@ WX.ConVerb.prototype = {
       try {
         me.convolver.buffer = WX.context.createBuffer(xhr.response, false);
       } catch(error) {
-        console.log("[WX:ConVerb] file loading error: " + url + " (" + error.message + ")");
-      } 
+        WX.error(me.id, "error: invalid url, " + url + " (" + error.message + ")");
+      }
     };
     xhr.send();
   },

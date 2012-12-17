@@ -29,17 +29,15 @@
 
 <script>
 
-var myMod = new WX.Oscil("SIN");
-var myCar = new WX.Oscil("SAW");
+var myMod = new WX.Oscil({ frequency: 100, gain: 10.0 });
+var myCar = new WX.Oscil({ type: "SAW", frequency: 880, gain: 0.7 });
 var mySamp = new WX.Sampler("core/samples/flute.wav")
 var myLpf = new WX.LPF();
 var myAdsr = new WX.ADSR(5, 15, 0.35, 60);
 var myDly = new WX.Delay(250, 0.15);
-var myVerb = new WX.ConVerb("core/ir/1644-960ambiencehall.wav");
+var myVerb = new WX.ConVerb("core/ir/1644-ambiencehall.wav");
 var myClip = new WX.Clip(5.0);
 
-myMod.setGain(10.0).setFreq(100);
-myCar.setGain(0.7).setFreq(880);
 mySamp.setBasePitch(69); // A4
 myLpf.setCutoff(1200.0).setQ(4.0);
 myDly.setFeedbackGain(0.5);
