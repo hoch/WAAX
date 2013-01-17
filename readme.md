@@ -1,6 +1,6 @@
 WAAX (Web Audio API eXtension)
 ------------------------------
-**A JavaScript Framework for Music/Audio Programming on Modern Browsers (Chrome/Safari/FireFox)**
+**A JavaScript Framework for Music/Audio Programming with Chrome**
 
 ```javascript
 // FM sound with low-pass filter and ADSR envelope
