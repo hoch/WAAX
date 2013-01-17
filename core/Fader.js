@@ -1,73 +1,78 @@
 /**
- * WAAX abstraction of Gain node, simulates fader
- * @version 1
- * @author hoch (hongchan@ccrma)
+ * @class Fader
+ * @description fader abstraction based on gain node
  */
 WX.Fader = function() {
-  // NOTE: by using two gain nodes, pre/post fader
-  // structure will be possible.
-  this.inlet = WX.context.createGainNode();
-  this.outlet = WX.context.createGainNode();
-  this.inlet.connect(this.outlet);
-  this.muted = false;
+  // calling super constructor
+  WX._Unit.call(this);
+  // creating unit-specific properties
+  Object.defineProperties(this, {
+    _muted: {
+      enumerable: false,
+      writable: true,
+      value: false
+    },
+    _label: {
+      enumerable: false,
+      writable: false,
+      value: WX._Dictionary.Fader
+    }
+  });
+  // performing unit-specific actions
+  this._inlet.connect(this._outlet);
+  // assign (default) parameters
+  this.params = { gain: 1.0 };
 };
 
-WX.Fader.prototype = {
-
-  constructor: WX.Fader,
+WX.Fader.prototype = Object.create(WX._Unit.prototype, {
 
   /**
-   * connection to other unit
-   * @param  {unit} unit destination unit
-   * @return {unit} reference to destination for method chaining
+   * get/set mute
+   * @param {boolean} mute status
    */
-  to: function(unit) {
-    this.outlet.connect(unit.inlet);
-    return unit;
+  mute: {
+    enumerable: true,
+    get: function() {
+      return this._muted;
+    },
+    set: function(status) {
+      if (status === true) {
+        this._muted = true;
+        this._inlet.gain.value = 0.0;
+      } else {
+        this._muted = false;
+        this._inlet.gain.value = 1.0;
+      }
+    }
+  },
+
+  /**
+   * get/set loudness in dB of this fader
+   * @param {float} db loudness in decibels
+   */
+  db: {
+    enumerable: true,
+    get: function() {
+      return WX.rms2db(this._outlet.gain.value);
+    },
+    set: function(value) {
+      this._outlet.gain.value = WX.db2rms(value);
+    }
   },
   
   /**
-   * cutting connection from its destination
+   * NOTE: experimental feature for R1
+   * TODO: verify if this is working
    */
-  cut: function() {
-    this.outlet.disconnect();
-  },
-
-  /**
-   * connection to Web Audio API node
-   * @param  {Audionode} node Web Audio API node
-   */
-  toNode: function(node) {
-    this.outlet.connect(node);
-  },
-
-  /**
-   * set gain of this fader
-   * @param {float} gain gain of fader
-   */
-  setGain: function(gain) {
-    this.outlet.gain.value = gain;
-  },
-
-  /**
-   * set loudness in dB of this fader
-   * @param {float} db loudness in decibels
-   */
-  setDB: function(db) {
-    this.outlet.gain.value = WX.db2rms(db);
-  },
-
-  mute: function() {
-    this.muted = true;
-    this.inlet.gain.value = 0.0;
-  },
-
-  unmute: function() {
-    this.muted = false;
-    this.inlet.gain.value = 1.0;
+  modulateWith: {
+    value: function(source) {
+      source._outlet.connect(this._inlet.gain);
+    }
   }
-};
+});
 
-// creating a master fader
+/**
+ * creating default master output: WX.Out
+ */
 WX.Out = new WX.Fader();
-WX.Out.toNode(WX.context.destination);
+WX.Out.toNode(WX._context.destination);

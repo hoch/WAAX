@@ -1,121 +1,145 @@
 /**
- * WAAX abstraction of linear ADSR envelope
- * @param {float} attack  attack time in ms
- * @param {float} decay   decay time in ms
- * @param {float} sustain sustain time in ms
- * @param {float} release release time in ms
+ * @class ADSR
+ * @description abstraction of linear ADSR envelope
+ * @param {object} duration for ADSR phase duration in seconds
+ *                          { a, d, s, r }
  */
-WX.ADSR = function(attack, decay, sustain, release) {
-  // this unit has inlet only
-  this.inlet = WX.context.createGainNode();
-  // TODO: validate the parameters and map them
-  this.setADSR(attack, decay, sustain, release);
-  this.inlet.gain.value = 0.0;
-  this.running = false;
+WX.ADSR = function(json) {
+  // calling super constructor
+  WX._Unit.call(this);
+  // creating unit-specific properties
+  Object.defineProperties(this, {
+    _a: {
+      enumerable: false,
+      writable: true,
+      value: 0.005
+    },
+    _d: {
+      enumerable: false,
+      writable: true,
+      value: 0.015
+    },
+    _s: {
+      enumerable: false,
+      writable: true,
+      value: 0.35
+    },
+    _r: {
+      enumerable: false,
+      writable: true,
+      value: 0.015
+    },
+    _running: {
+      enumerable: false,
+      writable: true,
+      value: false
+    },
+    _label: {
+      enumerable: false,
+      writable: false,
+      value: WX._Dictionary.ADSR
+    }
+  });
+  // performing unit-specific actions
+  this._inlet.connect(this._outlet);
+  this._inlet.gain.value = 0.0;
+  // assign (default) parameters
+  this.params = json;
 };
 
-WX.ADSR.prototype = {
-
-  constructor: WX.ADSR,
+WX.ADSR.prototype = Object.create(WX._Unit.prototype, {
 
   /**
-   * connection to other unit
-   * @param  {unit} unit destination unit
-   * @return {unit} reference to destination for method chaining
+   * get: current status of envelope
    */
-  to: function(unit) {
-    this.inlet.connect(unit.inlet);
-    return unit;
-  },
-  
-  /**
-   * cutting connection from its destination
-   */
-  cut: function() {
-    this.inlet.disconnect();
-  },
-
-  /**
-   * connection to Web Audio API node
-   * @param  {Audionode} node Web Audio API node
-   */
-  toNode: function(node) {
-    this.inlet.connect(node);
-  },
-
-  /**
-   * set attack
-   * @param {float} attack attack time
-   */
-  setAttack: function(attack) {
-    this.att = attack / 1000.0;
-  },
-
-  /**
-   * set decay
-   * @param {float} decay decay time
-   */
-  setDecay: function(decay) {
-    this.dec = decay / 1000.0;
-  },
-
-  /**
-   * set sustain
-   * @param {float} sustain sustain gain
-   */
-  setSustain: function(sustain) {
-    this.sus = sustain;
-  },
-
-  /**
-   * set release
-   * @param {float} release release time
-   */
-  setRelease: function(release) {
-    this.rel = release / 1000.0;
-  },
-
-  /**
-   * set envelope time
-   * @param {float} attack  attack time in ms
-   * @param {float} decay   decay time in ms
-   * @param {float} sustain sustain time in ms
-   * @param {float} release release time in ms
-   */
-  setADSR: function(attack, decay, sustain, release) {
-    this.att = attack / 1000.0;
-    this.dec = decay / 1000.0;
-    this.sus = sustain;
-    this.rel = release / 1000.0;
-  },
-
-  /**
-   * start ADSR envelope
-   */
-  start: function() {
-    if (this.running === true) {
-      return;
+  running: {
+    enumerable: true,
+    get: function() {
+      return this._running;
     }
-    var now = WX.context.currentTime;
-    // schedule event for attack, decay and sustain
-    this.inlet.gain.linearRampToValueAtTime(0.0, now);
-    this.inlet.gain.linearRampToValueAtTime(1.0, now + this.att);
-    this.inlet.gain.linearRampToValueAtTime(this.sus, now + this.att + this.dec);
-    this.running = true;
+  },
+
+  /**
+   * get/set: attack time in second
+   */
+  a: {
+    enumerable: true,
+    get: function() {
+      return this._a;
+    },
+    set: function(value) {
+      this._a = value;
+    }
+  },
+
+  /**
+   * get/set: decay time in second
+   */
+  d: {
+    enumerable: true,
+    get: function() {
+      return this._d;
+    },
+    set: function(value) {
+      this._d = value;
+    }
+  },
+
+  /**
+   * get/set: sustain level
+   */
+  s: {
+    enumerable: true,
+    get: function() {
+      return this._s;
+    },
+    set: function(value) {
+      this._s = value;
+    }
+  },
+
+  /**
+   * get/set: release time in second
+   */
+  r: {
+    enumerable: true,
+    get: function() {
+      return this._r;
+    },
+    set: function(value) {
+      this._r = value;
+    }
+  },
+
+  /**
+   * fire envelope
+   */
+  noteOn: {
+    value: function() {
+      var now = WX._context.currentTime;
+      // cancel previous state
+      this._inlet.gain.cancelScheduledValues(now);
+      this._inlet.gain.setValueAtTime(this._inlet.gain.value, now);
+      // schedule event for attack, decay and sustain
+      this._inlet.gain.linearRampToValueAtTime(0.0, now);
+      this._inlet.gain.linearRampToValueAtTime(1.0, now + this._a);
+      this._inlet.gain.linearRampToValueAtTime(this._s, now + this._a + this._d);
+      this._running = true;
+    }
   },
 
   /**
    * release ADSR envelope from sustain phase
    */
-  release: function() {
-    if (this.running === false) {
-      return;
+  noteOff: {
+    value: function() {
+      var now = WX._context.currentTime;
+      // cancel progress and force it into release phase
+      this._inlet.gain.cancelScheduledValues(now);
+      this._inlet.gain.setValueAtTime(this._inlet.gain.value, now);
+      // start release phase
+      this._inlet.gain.linearRampToValueAtTime(0.0, now + this._r);
+      this._running = false;
     }
-    var now = WX.context.currentTime;
-    // cancel progress and force it into release phase
-    this.inlet.gain.cancelScheduledValues(now);
-    this.inlet.gain.setValueAtTime(this.inlet.gain.value, now);
-    this.inlet.gain.linearRampToValueAtTime(0.0, now + this.rel);
-    this.running = false;
   }
-};
+});

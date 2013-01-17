@@ -1,133 +1,63 @@
 /**
- * WAAX oscillator
- * @version 1
- * @author hoch (hongchan@ccrma.stanford.edu)
+ * @class Oscil
+ * @description fader abstraction based on gain node
+ * @param {object} json parameters in JSON notation
  */
-
-
-// NOTES
-// - needs phase offset or sync
-// - use WX.WaveTab for wavetable synthesis
-
-
-/**
- * multifunction oscillator
- * @param {object} params parameters in JSON format
- */
-WX.Oscil = function(params) {
-  // inlet node for FM synthesis
-  this.inlet = WX.context.createGainNode();
-  this.oscil = WX.context.createOscillator();
-  this.outlet = WX.context.createGainNode();
-
-  // parsing & setting parameters
-  this.set(params);
-  
-  // start generation: stop() will disable this node permanently
-  this.oscil.start(0);
-
-  // to enable FM Synthesis: node(node)->freq(a-rate)
-  this.inlet.connect(this.oscil.frequency);
-  this.oscil.connect(this.outlet);
+WX.Oscil = function(json) {
+  // calling super constructor
+  WX._Unit.call(this);
+  // creating unit-specific properties
+  Object.defineProperties(this, {
+    _oscil: {
+      enumerable: false,
+      writable: false,
+      value: WX._context.createOscillator()
+    },
+    _label: {
+      enumerable: false,
+      writable: false,
+      value: WX._Dictionary.Oscil
+    }
+  });
+  // performing unit-specific actions
+  this._inlet.connect(this._oscil.frequency); // to enable FM
+  this._oscil.connect(this._outlet);
+  // NOTE: stop() will disable this node permanently
+  // noteOn() is deprecated but it's still there in Safari and Chrome stable
+  // this.oscil.start(0);
+  this._oscil.noteOn(0);
+  // assign (default) parameters
+  this.params = json || { frequency: 440, type: 'sine', gain: 1.0 };
 };
 
-
-WX.Oscil.prototype = {
-
-  constructor: WX.Oscil,
+WX.Oscil.prototype = Object.create(WX._Unit.prototype, {
 
   /**
-   * connection to other unit
-   * @param  {unit} unit destination unit
-   * @return {unit} reference to destination for method chaining
+   * get/set frequency of oscillator
+   * @param {float} value frequency of oscillator
    */
-  to: function(unit) {
-    this.outlet.connect(unit.inlet);
-    return unit;
-  },
-  
-  /**
-   * cutting connection from its destination
-   */
-  cut: function() {
-    this.outlet.disconnect();
-  },
-
-  /**
-   * connection to Web Audio API node
-   * @param  {AudioNode} node Web Audio API node
-   */
-  toNode: function(node) {
-    this.outlet.connect(node);
-  },
-
-  /**
-   * set frequency of oscillator (AudioParam)
-   * @param {float} freq frequency of oscillator
-   * @return {unit} reference to this unit
-   */
-  setFreq: function(freq) {
-    this.oscil.frequency.value = freq;
-    return this;
-  },
-
-  /**
-   * set gain of oscillator (AudioParam)
-   * @param {float} gain gain of oscillator
-   * @return {unit} reference to this unit
-   */
-  setGain: function(gain) {
-    this.outlet.gain.value = gain;
-    return this;
-  },
-
-  /**
-   * set oscillator type
-   * @param {string} type type of oscillator (SIN/SQR/SAW/TRI)
-   * @return {unit} reference to this unit
-   */
-  setType: function(type) {
-    if (type === undefined) {
-      this.oscil.type = 0;
-      return this;
+  frequency: {
+    enumerable: true,
+    get: function() {
+      return this._oscil.frequency.value;
+    },
+    set: function(value) {
+      this._oscil.frequency.value = value;
     }
-    switch(type) {
-      case "SINE":
-      case "SIN":
-        this.oscil.type = 0;
-        break;
-      case "SQUARE":
-      case "SQR":
-        this.oscil.type = 1;
-        break;
-      case "SAWTOOTH":
-      case "SAW":
-        this.oscil.type = 2;
-        break;
-      case "TRIANGLE":
-      case "TRI":
-        this.oscil.type = 3;
-        break;
-      default:
-        this.oscil.type = 0;
-        break;
-    }
-    return this;
   },
 
   /**
-   * set parameters with JSON
-   * @param {json} params parameters in JSON format
+   * get/set oscillator type
+   * @param {float} value type of waveform
    */
-  set: function(params) {
-    if (typeof params === "object") {
-      this.oscil.frequency.value = params.frequency || WX.MID_C;
-      this.outlet.gain.value = params.gain || 1.0;
-      this.setType(params.type || "SIN");
-    } else {
-      this.oscil.frequency.value = WX.MID_C;
-      this.outlet.gain.value = 1.0;
-      this.setType("SIN");
+  type: {
+    enumerable: true,
+    get: function() {
+      return this._oscil.type;
+    },
+    set: function(value) {
+      // TODO: sanity check for type
+      this._oscil.type = value;
     }
   }
-};
+});

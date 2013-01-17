@@ -3,28 +3,43 @@ WAAX (Web Audio API eXtension)
 **A JavaScript Framework for Music/Audio Programming on Modern Browsers (Chrome/Safari/FireFox)**
 
 ```javascript
-var myMod = new WX.Osc("SIN");
-var myCar = new WX.Osc("SAW");
-var myLpf = new WX.LPF();
-var myAdsr = new WX.ADSR(5, 15, 0.35, 60);
-var myDly = new WX.Delay(250, 0.15);
-var myVerb = new WX.ConVerb("core/ir/1644-960ambiencehall.wav");
-var myClip = new WX.Clip(5.0);
+// FM sound with low-pass filter and ADSR envelope
+var mod = new WX.Oscil({ frequency:50, gain:2.0 }),
+    car = new WX.Oscil({ type:"sawtooth", frequency:880, gain:0.7 }),
+    lpf = new WX.LPF({ cutoff: 1200.0, Q: 4.0 }),
+    adsr = new WX.ADSR({ a:0.005, d:0.015, s:0.15, r:0.5 });
+// connecting units
+mod.to(car).to(lpf).to(adsr).to(WX.Out);
+lpf.modulateWith(lfo);
 
-myMod.setGain(10.0).setFreq(100);
-myCar.setGain(0.4).setFreq(880);
-myLpf.setCutoff(1200.0).setQ(4.0);
-myDly.setFeedbackGain(0.5);
-myVerb.setMix(0.25);
+// a simple drum sampler with compressor, reverb, and delay
+var kd = new WX.Sampler({ source:"core/samples/kick-1.wav" }),
+    sd = new WX.Sampler({ source:"core/samples/snare-1.wav" }),
+    hh = new WX.Sampler({ source:"core/samples/hihat-1.wav" }),
+    comp1 = new WX.Comp({ threshold:-20.0, ratio:8.0 }),
+    verb1 = new WX.ConVerb({ source:"core/ir/1644-ambiencehall.wav", mix: 0.5 }),
+    delay1 = new WX.FeedbackDelay({ delayTime:0.2, feedback:0.7, mix:0.25 }),
+// connecting and setting units
+kd.to(comp1).to(WX.Out);
+sd.to(verb1).to(WX.Out);
+hh.to(delay1).to(WX.Out);
+comp1.gain = 2.0;
 
-myMod.to(myCar).to(myLpf).to(myAdsr).to(myDly).to(myVerb).to(WX.Out);
+// noise with tremolo by LFO
+var noise = new WX.Noise(),
+    lfo = new WX.LFO({ rate:0.5, shape:'sine' }),
+    fader1 = new WX.Fader();
+// connecting and setting units    
+noise.to(fader1).to(WX.Out);
+fader1.modulateWith(lfo);
+noise.gain = 0.01;
 ```
 
-WAAX is an experimental javascript framework for [Web Audio API][1] incorporated in the modern browsers such as Chrome, Safari and FireFox. With music/sound creation in mind, it is designed to provide users with higher level of musical control: complex real-time sound synthesis, ready-made instruments, even a timebase system for sophisticated structure.
+WAAX is an experimental javascript framework for [Web Audio API][1] incorporated in Chrome. With music/sound creation in mind, it is designed to provide users with higher level of musical control: complex real-time sound synthesis, ready-made instruments, even a timebase system for sophisticated structure. (However, instruments and the timebase are not implemented in the current revision.)
 
-The goal of this project is to make web audio programming more approachable by expanding the audio domain with new web technologies that make the browser user-centered, highly-visualized and ever-connected. Also the library is strongly inspired by [THREE.js][2], which is one of WebGL JavaScript libraries being used most in the scene, and hopefully it can be a sonic counterpart in the web-based audiovisual system.
+The goal of this project is to make web audio programming more approachable by expanding the computer music domain with new web technologies that make the browser user-centered, highly-visualized and ever-connected. Also the library is strongly inspired by [THREE.js][2], which is one of WebGL JavaScript libraries being used most for web-based 3D graphics, and hopefully it can be a sonic counterpart in the audiovisual system on the browser.
 
-In addition to core technology, the library comes with an interactive web-based IDE for rapid experiment and deployment. It allows users to perform JavaScript audio programming and export the code snippet for other web projects.
+In addition to core technology, the library is planned to embrace an interactive web-based IDE for rapid experiment and deployment. It will allow users to program music/sound and export a compiled code snippet for other web projects.
 
 The author of this project is Hongchan Choi at [CCRMA][3], Stanford University.
 
@@ -33,18 +48,16 @@ The author of this project is Hongchan Choi at [CCRMA][3], Stanford University.
 [3]: https://ccrma.stanford.edu/ "The Center for Computer Research in Music and Acoustics at Stanford"
 
 
-
 Concept
 -------
 
-As a framework rather than a library, it imposes a key concept and methodology with its layered structure:
+As a framework rather than a library, it imposes a key concept with its layered structure:
 
-    Node (pure Web Audio API level) > Unit (WAAX Abstraction)
+    Node (Web Audio API) > Unit (WAAX Abstraction)
   
 - **Node**: A node is a built-in atom of Web Audio API. The object can be interconnected to create an audio graph.
 
-- **Unit**: A atom object provided by WAAX framework. It is conceptually identical to 'Unit Generator' of other audio programming environment. It consists of more than 2 Nodes encapsulating user-friendly features. Also handles several underlying mechanics for Web Audio API.
-
+- **Unit**: An object provided by WAAX framework. It is conceptually identical to 'Unit Generator' of other audio programming environments. It consists of more than 2 Nodes encapsulating user-friendly features. Also handles several underlying mechanics for Web Audio API.
 
 
 Connections
@@ -55,56 +68,47 @@ Connections
 ### WX-type connection
 - *Unit - Unit* (use `to()` method)
 
-### semi WX-type connection
+### Semi WX-type connection
 - *Unit - Node* (use `toNode()` method)
-- *Node - Unit* (could be a problem...)
+- *Node - Unit* (use `.connect(Unit._inlet)` method)
 
 
 Unit Classes
 ------------
 ### Generators
-`Oscil` `Oscil3`
-`FMOP` `FM3` `FM7`
-`WaveTab` `WaveTab3`
-`Samp1` `SampX`
+`Oscil` `LFO` `Noise` `Sampler` 
 
-### Envelopes & Control
-`Ramp` `ADSR` `EnvFol`
+### Envelopes
+`ADSR`
 
 ### Effects
-`LPF` `HPF` `Notch` `EQ3` `EQ5`
-`FBDelay` `StereoDelay` `NTapDelay` `Chorus` `Flanger`
-`APVerb` `ConVerb`
-`Compressor` `Gate` `DeEsser` `QuadComp` `Limiter`
-`OverD` `Dist` `WaveShaper` `Enhancer` `Exciter`
-`Vinyl`
+`LPF`
+`HPF`
+`FeedBackDelay`
+`ConVerb`
+`Compressor`
 
 
 Instrument Classes
 ------------------
-- `Instrument` has noteOn(), noteOff(), and setParams() methods, usually real-time controlled by user, or triggered by Clip.
-- `Preset` manages preset/template format for instruments
+(not implemented in current revision)
 
 
 Timebase Classes
 ----------------
-- `Timeline` a master clock for the context (singleton), can be used to register/advnace `Clip` instances. will terminate a clip when its life cycle is over.
-- `Clip` a logical unit of musical data (instrument, note on/off, continuous parameter changes)
+(not implemented in current revision)
 
 
 Data Classes
 ------------
-- `Parser` parsing WAXON(WAAX-JSON) data type into WAAX data structure
+(not implemented in current revision)
 
 
 Networking Classes
 ------------------
-- `Socket` enables full-duplex connection to other remote WAAX clients
+(not implemented in current revision)
 
 
 Utilities
 ---------
-`random2` `random2f`
-`scale` 
-`db2rms` `rms2db`
-`midi2freq` `freq2midi`
+`random2` `random2f` `db2rms` `rms2db` `midi2freq` `freq2midi`
