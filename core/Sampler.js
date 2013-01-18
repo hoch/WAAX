@@ -28,7 +28,7 @@ WX.Sampler = function(json) {
     _url: {
       enumerable: false,
       writable: true,
-      value: "core/samples/kick-0.wav"
+      value: ""
     },
     _basePitch: {
       enumerable: false,

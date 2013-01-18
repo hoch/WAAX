@@ -27,7 +27,7 @@ WX.ConVerb = function(json) {
     _url: {
       enumerable: false,
       writable: true,
-      value: "core/ir/1644-ambiencehall.wav"
+      value: ""
     },
     _label: {
       enumerable: false,

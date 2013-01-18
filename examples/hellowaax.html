@@ -9,7 +9,7 @@
 <h1>Hello WAAX!</h1>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<script src="../WAAX.js"></script>
+<script src="../core/WAAX.js"></script>
 <script src="../core/Util.js"></script>
 <script src="../core/Fader.js"></script>
 <script src="../core/Oscil.js"></script>
@@ -24,8 +24,8 @@
 
 <script>
 // resource path
-var PATH_IR = "../ir/",
-    PATH_SAMPLES = "../samples/";
+var PATH_IR = "../core/data/ir/",
+    PATH_SAMPLES = "../core/data/samples/";
 
 // FM sound with low-pass filter and ADSR envelope
 var mod = new WX.Oscil({ frequency:50, gain:2.0 }),
