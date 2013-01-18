@@ -31,9 +31,9 @@ As Web Audio API has the "node" object, WAAX has its own atomic object called "u
 // creating WAAX units
 var kick = new WX.Sampler({ source: "kd.wav", basePitch: 60 }),
     comp = new WX.Comp({ threshold: -20.0, ratio: 4.0 });
-// connect units
+// connecting units
 kick.to(comp).to(WX.Out);
-// parameters
+// setting parameter
 comp.ratio = 8.0;
 ```
 As shown above, a WAAX unit is basically a JavaScript object that encapsulates user-friendly features by handling several underlying chores. The connection between several WAAX units can be achieved by chaining `.to()` method. `WX.Out` is the master fader of WAAX system.
