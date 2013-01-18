@@ -55,12 +55,25 @@
   Keyboard
 
 
-### Today
+### compile multiple js into one
 
-* getter and setter
-  http://stackoverflow.com/questions/812961/javascript-getters-and-setters-for-dummies
-  http://robertnyman.com/javascript/javascript-getters-setters.html
+https://github.com/dfsq/compressJS.sh
 
+// ==ClosureCompiler==
+// @compilation_level WHITESPACE_ONLY
+// @output_file_name WAAX.min.js
+// @code_url https://github.com/hoch/waax/raw/master/core/WAAX.js
+// @code_url https://github.com/hoch/waax/raw/master/core/Util.js
+// @code_url https://github.com/hoch/waax/raw/master/core/ADSR.js
+// @code_url https://github.com/hoch/waax/raw/master/core/Comp.js
+// @code_url https://github.com/hoch/waax/raw/master/core/Fader.js
+// @code_url https://github.com/hoch/waax/raw/master/core/FeedbackDelay.js
+// @code_url https://github.com/hoch/waax/raw/master/core/LFO.js
+// @code_url https://github.com/hoch/waax/raw/master/core/LPF.js
+// @code_url https://github.com/hoch/waax/raw/master/core/Noise.js
+// @code_url https://github.com/hoch/waax/raw/master/core/Oscil.js
+// @code_url https://github.com/hoch/waax/raw/master/core/Sampler.js
+// ==/ClosureCompiler==
 
 ### adding license to multiple source codes
 

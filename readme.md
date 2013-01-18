@@ -34,6 +34,7 @@ noise.to(fader1).to(WX.Out);
 fader1.modulateWith(lfo);
 noise.gain = 0.01;
 ```
+See it in action [here][3].
 
 WAAX is an experimental javascript framework for [Web Audio API][1] incorporated in Chrome. With music/sound creation in mind, it is designed to provide users with higher level of musical control: complex real-time sound synthesis, ready-made instruments, even a timebase system for sophisticated structure. (However, instruments and the timebase are not implemented in the current revision.)
 
@@ -41,11 +42,9 @@ The goal of this project is to make web audio programming more approachable by e
 
 In addition to core technology, the library is planned to embrace an interactive web-based IDE for rapid experiment and deployment. It will allow users to program music/sound and export a compiled code snippet for other web projects.
 
-The author of this project is Hongchan Choi at [CCRMA][3], Stanford University.
-
 [1]: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html "Web Audio API: W3C Editor's Draft"
 [2]: https://github.com/mrdoob/three.js/ "THREE.js: Github Repo"
-[3]: https://ccrma.stanford.edu/ "The Center for Computer Research in Music and Acoustics at Stanford"
+[3]: http://hoch.github.com/waax/examples/hellowaax.html
 
 
 Concept

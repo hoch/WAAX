@@ -111,8 +111,8 @@ WX._Unit.prototype = Object.create(null, {
     get: function() {
       return this._outlet.gain.value;
     },
-    set: function(float) {
-      this._outlet.gain.value = float;
+    set: function(value) {
+      this._outlet.gain.value = value;
     }
   },
 
