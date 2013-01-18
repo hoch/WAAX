@@ -53,10 +53,10 @@ WX.Fader.prototype = Object.create(WX._Unit.prototype, {
   db: {
     enumerable: true,
     get: function() {
-      return WX.rms2db(this._outlet.gain.value);
+      return WX.lin2db(this._outlet.gain.value);
     },
     set: function(value) {
-      this._outlet.gain.value = WX.db2rms(value);
+      this._outlet.gain.value = WX.db2lin(value);
     }
   },
   

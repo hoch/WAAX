@@ -7,7 +7,7 @@ mySaw.to(myLPF).to(myADSR).to(WX.Out);
 myLPF.modulateWith(myLFO);
 ```
 
-WAAX is an experimental JavaScript library for [Web Audio API][1] incorporated in Chrome. With **music creation and performance** in mind, it is designed to provide users with higher level of abstraction.
+WAAX is an experimental JavaScript library for [Web Audio API][1] incorporated in Chrome. With **music creation and performance** in mind, it is designed to provide users with the higher level of abstraction.
 
 The goal of this project is to make audio programming more approachable by encapsulating several technical steps that web developers and designers have to go through to set up Web Audio API. From computer musician's perspective, it is also inspiring to integrate powerful web technologies to audio programming.
 
@@ -85,4 +85,4 @@ This class will include network-related features based on WebSocket and PeerConn
 Utilities
 ---------
 Some useful functions for the music application.
-`random2` `random2f` `db2rms` `rms2db` `midi2freq` `freq2midi`
+`random2` `random2f` `db2lin` `lin2db` `midi2freq` `freq2midi`

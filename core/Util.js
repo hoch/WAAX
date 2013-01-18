@@ -60,13 +60,24 @@ WX.random2 = function(min, max) {
   return Math.round(min + Math.random() * (max - min));
 };
 
-WX.rms2db = function(rms) {
-  return
-}
+/**
+ * convert linear amplitude to decibel
+ * @param  {float} value linear amplitude
+ * @return {float} decibel
+ */
+WX.lin2db = function(amp) {
+  // if below -100dB, set to -100dB to prevent taking log of zero
+  return 20.0 * (amp > 0.00001 ? (Math.log(amp) / Math.LN10): -5.0);
+};
 
-WX.db2rms = function(db) {
-  return
-}
+/**
+ * convert decibel to linear complitude
+ * @param  {float} db decibel
+ * @return {float}    linear amplitude
+ */
+WX.db2lin = function(db) {
+  return Math.pow(10.0, db / 20.0);
+};
 
 /**
  * error logging
