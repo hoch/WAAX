@@ -47,7 +47,7 @@ node.connect(comp._inlet);
 
 Class: Unit
 -----------
-**NOTE**: __still in progress!__
+**NOTE**: _still in progress!_
 
 Unit classes in WAAX are largely based on the UGen structure of [STK][5]. All the unit classes are extended from the base class "WX._Unit" and have two default nodes: `_inlet` and `_outlet`.
 
@@ -64,19 +64,19 @@ Unit classes in WAAX are largely based on the UGen structure of [STK][5]. All th
 
 Class: Module
 -------------
-**NOTE**: __Currently not implemented yet.__
+**NOTE**: _Currently not implemented yet._
 
 The `Module` object is a collection of units that functions at the higher level of interaction. You can think of it as a "virtual instrument" in modern digital audio workstations. (VSTi, effect plug-ins and etc) It provides more musically-oriented feature like synthesizer, sampler and effect plug-in.
 
 Class: Timebase
 ---------------
-**NOTE**: __Currently not implemented yet.__
+**NOTE**: _Currently not implemented yet._
 
 The `Timebase` will be a singleton object that manages all the timing/sequencing tasks. Hopefully it can be used in conjunction with Web MIDI API in near future.
 
 Class: Networking
 -----------------
-**NOTE**: __Currently not implemented yet.__
+**NOTE**: _Currently not implemented yet._
 
 This class will include network-related features based on WebSocket and PeerConnection API from WebRTC. It will enable users to interact with the audience of web-based music applications or other player/performer for collaboration.
 
