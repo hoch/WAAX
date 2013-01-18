@@ -3,22 +3,25 @@ WAAX (Web Audio API eXtension)
 **A JavaScript Framework for Music/Audio Programming with Chrome**
 
 ```javascript
+// resource path
+var PATH_IR = "../core/data/ir/",
+    PATH_SAMPLES = "../core/data/drums/";
+
 // FM sound with low-pass filter and ADSR envelope
 var mod = new WX.Oscil({ frequency:50, gain:2.0 }),
-    car = new WX.Oscil({ type:"sawtooth", frequency:880, gain:0.7 }),
+    car = new WX.Oscil({ type:1, frequency:880, gain:0.7 }),
     lpf = new WX.LPF({ cutoff: 1200.0, Q: 4.0 }),
-    adsr = new WX.ADSR({ a:0.005, d:0.015, s:0.15, r:0.5 });
+    adsr = new WX.ADSR({ a:0.005, d:0.015, s:0.15, r:0.5, gain:0.5 });
 // connecting units
 mod.to(car).to(lpf).to(adsr).to(WX.Out);
-lpf.modulateWith(lfo);
 
 // a simple drum sampler with compressor, reverb, and delay
-var kd = new WX.Sampler({ source:"core/samples/kick-1.wav" }),
-    sd = new WX.Sampler({ source:"core/samples/snare-1.wav" }),
-    hh = new WX.Sampler({ source:"core/samples/hihat-1.wav" }),
+var kd = new WX.Sampler({ source:PATH_SAMPLES + "kick-2.wav" }),
+    sd = new WX.Sampler({ source:PATH_SAMPLES + "snare-2.wav" }),
+    hh = new WX.Sampler({ source:PATH_SAMPLES + "hihat-2.wav" }),
     comp1 = new WX.Comp({ threshold:-20.0, ratio:8.0 }),
-    verb1 = new WX.ConVerb({ source:"core/ir/1644-ambiencehall.wav", mix: 0.5 }),
-    delay1 = new WX.FeedbackDelay({ delayTime:0.2, feedback:0.7, mix:0.25 }),
+    verb1 = new WX.ConVerb({ source:PATH_IR + "hall.wav", mix: 0.5 }),
+    delay1 = new WX.FeedbackDelay({ delayTime:0.2, feedback:0.7, mix:0.25 });
 // connecting and setting units
 kd.to(comp1).to(WX.Out);
 sd.to(verb1).to(WX.Out);
@@ -26,8 +29,8 @@ hh.to(delay1).to(WX.Out);
 comp1.gain = 2.0;
 
 // noise with tremolo by LFO
-var noise = new WX.Noise(),
-    lfo = new WX.LFO({ rate:0.5, shape:'sine' }),
+var noise = new WX.Noise({ type:'white' }),
+    lfo = new WX.LFO({ rate:0.5, shape:0 }),
     fader1 = new WX.Fader();
 // connecting and setting units    
 noise.to(fader1).to(WX.Out);

@@ -57,7 +57,7 @@
 
 ### compile multiple js into one
 
-https://github.com/dfsq/compressJS.sh
+http://closure-compiler.appspot.com/home
 
 // ==ClosureCompiler==
 // @compilation_level SIMPLE_OPTIMIZATIONS
