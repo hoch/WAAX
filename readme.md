@@ -52,7 +52,7 @@ Class: Unit
 -----------
 **NOTE**: _still in progress!_
 
-Unit classes in WAAX are largely based on the UGen structure of [STK][5]. All the unit classes are extended from the base class "WX._Unit" and have two default nodes: `_inlet` and `_outlet`.
+Unit classes in WAAX are largely based on the UGen structure of [STK][6]. All the unit classes are extended from the base class "WX._Unit" and have two default nodes: `_inlet` and `_outlet`.
 
 ### Generators
 `Oscil` `LFO` `Noise` `Sampler`
@@ -63,7 +63,7 @@ Unit classes in WAAX are largely based on the UGen structure of [STK][5]. All th
 ### Processors
 `LPF` `FeedBackDelay` `ConVerb` `Compressor`
 
-[5]: https://ccrma.stanford.edu/software/stk/classes.html
+[6]: https://ccrma.stanford.edu/software/stk/classes.html
 
 Class: Module
 -------------
