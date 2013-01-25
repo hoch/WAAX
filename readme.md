@@ -15,12 +15,13 @@ The library is strongly inspired by [THREE.js][2] and [ChucK][3]: Three.js is on
 
 As the project grows, this library will embrace more features such as: ready-made instruments, comprehensive timebase system (in conjunction with Web MIDI API), and musical interconnection between Chrome clients.
 
-See the demo ["hello WAAX"][4].
+See the demo [hello WAAX][4] and [interactive code editor][5].
 
 [1]: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html "Web Audio API: W3C Editor's Draft"
 [2]: https://github.com/mrdoob/three.js/ "THREE.js: Github Repo"
 [3]: http://chuck.cs.princeton.edu/
 [4]: http://hoch.github.com/waax/examples/hellowaax.html
+[5]: http://hoch.github.com/waax/examples/editor.html
 
 
 Using WAAX
