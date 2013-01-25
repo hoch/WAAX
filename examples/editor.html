@@ -123,15 +123,15 @@
       window.URL = window.URL || window.webkitURL;
 
       // deflate
-      var decode = function (string) {
+      var decode = function(string) {
         return RawDeflate.inflate(window.atob(string));
       };
-      var encode = function (string) {
+      var encode = function(string) {
         return window.btoa(RawDeflate.deflate(string));
       };
 
       // default code (encoded)
-      var defaultCode = decode('bVRtT9swEP5cfsWtfAlTcQJTNdYXpq2UMWloCJCmfXTja+KR2JnjtBTU/76zk1QtS1TV9t3je+7Vk3dXP2ePv+/mkNo8uzya1EtvkiIXtPYmOVoOccpNiXbar+zy9KLvFaXdZOh2vYUWG3h1u96Cx0+J0ZUSp7HOtBnB8dJ/Y6/OuUmkGkFUH/UKzTLT6xGkUghUXrp1xsPW+iRsPJk4lpo4NrKwUJp42k+tLUZhmBuh9YIl0qbVgsU6D21qENmfMlxUMhPNMZeKRP1LMu9t7Jm7PHLcYQhrbZ64jwCW2lDkRucIiyohJ2uyWAtkidZJhp6qCD1IVnkoy7LCMhSUM5l9lmL6YfjpIjqOz86ddbmEANZSCb1mUik0v6SwKUynU4jgBF67dFBwg8ruycYHsBuUSWrf4GrhGLY+y/S5dcUpGp6j4QMoY1Q4ALoh0KAZt/oEKVhrNgPIuUUjeUY7LNOxz45U0gYnHsyVdAh3csdlpWIrtYIa0jSD/6spyUGFa3i8uZ/P2R2askC6sMKZ1wbwcTjoiD7sCHUAZ/SLIsrYeI+AFbqUzgX2QlzDKKod6/lID9gfnKR1vNdGfAD5HuuSpyiMVt8afQDnUUTELWubn4N7t5Sqr7yU8W2jDaiozRxEz5H/XJwGl4a8HoE1Fe4Jfkiy5SIfwTlsofXRVeA/nqCjWK1zPmjGhQh89XaG2nofGJtxteLlfaNq6ruDMhr7B/mCHY076GrElkrouMpdQ7qxZbwoyN4spVEMdl3HhM7nGTpUe2172E27LqOGarz6S/Nlv3g5Ia5d1oIWd5AwZrT1GPZM4V6Rmim9JlPvIWJUh+G4A7rpgp69yR6rN0E7RU2H74ew98BMwvrhoofMPa3/AA==');
+      var defaultCode = decode('TZFRa8MgEMefs09xy0sT6DR9GIzWFMq2Po1lD4N2jyYxjSPRopeFMvbdpzW0FcQ773fH37/s/qV4/vz6eIUW+259x8IRsVbw2p0R6wVyqFpurMA8HrB5eIo9QCeClbo+nUlbGXlEsKbKY0JoOciuprvNZk96qci3jdeMBuYG92HkN6WgtLQCRoktoBG97jSUJ3jbFr7+w80E5KDECLs9efdp8gt4OorlbGwlihn8pXOPR12jr6Sb4TjDUSwz8jgH23LXkl3ghtfCLK781udJupqEVVopUaFUB+CqBufEOR6URAtueeysjaBOwqzUh25SMWAYE65Jr+uhczp27pWJ0xiKofnApXIaMpItVpMtN44xGpx2zvs/+gc=');
 
       var documents = [{ filename: 'Untitled', filetype: 'text/plain', autoupdate: true, code: defaultCode }];
 
