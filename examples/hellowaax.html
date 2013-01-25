@@ -7,18 +7,14 @@
 </head>
 <body>
 <h1>Hello WAAX!</h1>
-<ul>
-  <dt><span class="key">Q</span></dt>
-  <dd></dd>
-
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script src="../build/WAAX.min.js"></script>
 
 <script>
 // resource path
-var PATH_IR = "../core/data/ir/",
-    PATH_SAMPLES = "../core/data/drums/";
+var PATH_IR = "../data/ir/",
+    PATH_SAMPLES = "../data/drums/";
 
 // FM sound with low-pass filter and ADSR envelope
 var mod = new WX.Oscil({ frequency:50, gain:2.0 }),
