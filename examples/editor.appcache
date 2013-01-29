@@ -6,12 +6,12 @@ editor.html
 js/esprima.js
 js/rawdeflate.js
 js/rawinflate.js
-js/codemirror/codemirror.css
-js/codemirror/codemirror.js
-js/codemirror/mode/css.js
-js/codemirror/mode/htmlmixed.js
-js/codemirror/mode/javascript.js
-js/codemirror/mode/xml.js
+js/codemirror/lib/codemirror.css
+js/codemirror/lib/codemirror.js
+js/codemirror/mode/css/css.js
+js/codemirror/mode/htmlmixed/htmlmixed.js
+js/codemirror/mode/javascript/javascript.js
+js/codemirror/mode/xml/xml.js
 
 NETWORK:
 *
