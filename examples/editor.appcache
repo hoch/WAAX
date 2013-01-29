@@ -5,8 +5,8 @@ CACHE:
 js/esprima.js
 js/rawdeflate.js
 js/rawinflate.js
-js/codemirror/lib/codemirror.css
-js/codemirror/lib/codemirror.js
+#js/codemirror/lib/codemirror.css
+#js/codemirror/lib/codemirror.js
 js/codemirror/mode/css/css.js
 js/codemirror/mode/htmlmixed/htmlmixed.js
 js/codemirror/mode/javascript/javascript.js
