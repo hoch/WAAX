@@ -2,7 +2,6 @@ CACHE MANIFEST
 # 2013-1-29
 
 CACHE:
-editor.html
 js/esprima.js
 js/rawdeflate.js
 js/rawinflate.js
