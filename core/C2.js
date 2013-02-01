@@ -119,7 +119,7 @@ WX._customUnitInternals.DualLevelDetector.prototype = Object.create(null, {
  * @param {object} json parameters in JSON notation
  *                      { threshold, ratio, knee, attack, release }
  */
-WX.Comp = function(json) {
+WX.C2 = function(json) {
   // calling super constructor
   WX._Unit.call(this);
   // creating unit-specific properties
