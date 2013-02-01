@@ -1,3 +1,5 @@
+WX._customUnitInternals = {};
+
 /**
  * @class DualLevelDetector
  * @description program-dependent envelope following for custom compressors
