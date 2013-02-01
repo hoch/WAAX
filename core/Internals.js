@@ -43,7 +43,7 @@ WX._Internals.DualLevelDetector = function() {
   this.reset();
 };
 
-WX._customUnitInternals.DualLevelDetector.prototype = Object.create(null, {
+WX._Internals.DualLevelDetector.prototype = Object.create(null, {
 
   /**
    * attack
