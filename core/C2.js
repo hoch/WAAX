@@ -76,7 +76,7 @@ WX.C2.prototype = Object.create(WX._Unit.prototype, {
         level = this._detector.process(s);
         // gain computer: compression with ratio
         delta = WX.lin2db(level / this._threshold);
-        gaindB = (delta <= 0.0) ? 0.0 : delta * iratio;
+        gaindB = (delta <= 0.0) ? 0.0 : delta * this._iratio;
         // gain computer: limiting
         // gaindB = Math.min(0.0, WX.lin2db(this._threshold / level));
         // get linear gain
