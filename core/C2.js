@@ -161,7 +161,7 @@ WX.C2 = function(json) {
         // callback loop
         for (var i = 0, b = WX._customUnitBufferSize; i < b; ++i) {
           // peak detection
-          level = this._detector.process(Math.max(Math.abs(inputL[i]), Math.abs(inputR[i])));
+          level = this._detector.processLevel(Math.max(Math.abs(inputL[i]), Math.abs(inputR[i])));
           // gain computer: limiting
           gaindB = Math.min(0.0, WX.lin2db(this._threshold / level));
           // get linear gain
