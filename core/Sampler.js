@@ -105,7 +105,7 @@ WX.Sampler.prototype = Object.create(WX._Unit.prototype, {
   noteOn: {
     value: function(pitch) {
       if (!this._ready) {
-        WX.error(me, "sampler is not ready.");
+        WX.error(this, "sampler is not ready.");
         return;
       }
       // is this efficient?
