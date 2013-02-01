@@ -1,5 +1,3 @@
-WX._customUnitInternals = {};
-
 /**
  * @class DualLevelDetector
  * @description program-dependent envelope following for custom compressors
@@ -144,13 +142,13 @@ WX.C2 = function(json) {
       writable: false,
       value: new WX._customUnitInternals.DualLevelDetector()
     },
-    // _processor: {
-    //   enumerable: false,
-    //   writable: false,
-    //   value: WX._context.createScriptProcessor(
-    //       WX._customUnitBufferSize, 2, 2
-    //     )
-    // },
+    _processor: {
+      enumerable: false,
+      writable: false,
+      value: WX._context.createScriptProcessor(
+          WX._customUnitBufferSize, 2, 2
+        )
+    },
     _callback: {
       value: function(event) {
         // temp vars
@@ -176,7 +174,6 @@ WX.C2 = function(json) {
     }
   });
   var me = this;
-  this._processor = WX._context.createScriptProcessor(512, 2, 2);
   this._processor.onaudioprocess = function(event) {
     me._callback(event);
   };
