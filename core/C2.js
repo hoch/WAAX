@@ -165,7 +165,7 @@ WX.C2 = function(json) {
           // gain computer: limiting
           gaindB = Math.min(0.0, WX.lin2db(this._threshold / level));
           // get linear gain
-          gain = WX.db2lin(gainDB);
+          gain = WX.db2lin(gaindB);
           // compute output
           outputL[i] = inputL[i] * gain * this._makeup;
           outputR[i] = inputR[i] * gain * this._makeup;
