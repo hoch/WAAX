@@ -161,6 +161,17 @@ WX._Unit.prototype = Object.create(null, {
   }
 });
 
+/**
+ * buffer size for custom units
+ * @type {int} must be power of 2
+ */
+WX._customUnitBufferSize = 512;
+
+/**
+ * internal function space for custom units
+ * @type {Object}
+ */
+WX._Internals = {};
 
 /**
  * creating templates for noise generation

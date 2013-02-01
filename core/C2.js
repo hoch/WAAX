@@ -1,133 +1,8 @@
 /**
- * buffer size for custom units
- * @type {int} must be power of 2
- */
-WX._customUnitBufferSize = 512;
-
-/**
- * internal function space for custom units
- * @type {Object}
- */
-WX._customUnitInternals = {};
-
-/**
- * @class DualLevelDetector
- * @description program-dependent envelope following for custom compressors
- */
-WX._customUnitInternals.DualLevelDetector = function() {
-  Object.defineProperties(this, {
-    _fs: {
-      enumerable: false,
-      writable: false,
-      value: WX._context.sampleRate
-    },
-    _attackFast: {
-      enumerable: false,
-      writable: true,
-      value: 1.0 - Math.exp(-1.0 / (0.125 * this._fs))
-    },
-    _releaseFast: {
-      enumerable: false,
-      writable: true,
-      value: 1.0 - Math.exp(-1.0 / (0.5 * this._fs))
-    },
-    _levelFast: {
-      enumerable: false,
-      writable: true,
-      value: 0
-    },
-    _attackSlow: {
-      enumerable: false,
-      writable: true,
-      value: 1.0 - Math.exp(-1.0 / (0.25 * this._fs))
-    },
-    _releaseSlow: {
-      enumerable: false,
-      writable: true,
-      value: 1.0 - Math.exp(-1.0 / this._fs)
-    },
-    _levelSlow: {
-      enumerable: false,
-      writable: true,
-      value: 0
-    }
-  });
-};
-
-WX._customUnitInternals.DualLevelDetector.prototype = Object.create(null, {
-
-  /**
-   * get/set attack
-   * @param {float} value attack in seconds
-   */
-  attack: {
-    enumerable: true,
-    get: function() {
-      return this._attackFast;
-    },
-    set: function(value) {
-      this._attackFast = 1 - Math.exp(-1.0 / (value * this._fs));
-    }
-  },
-
-  /**
-   * get/set release
-   * @param {float} value release in seconds
-   */
-  release: {
-    enumerable: true,
-    get: function() {
-      return this._releaseFast;
-    },
-    set: function(value) {
-      this._releaseFast = 1 - Math.exp(-1.0 / (value * this._fs));
-    }
-  },
-
-  /**
-   * reset
-   * @description resetting previous tracked level
-   */
-  reset: {
-    enumerable: false,
-    value: function() {
-      this._levelFast = 0.0;
-      this._levelSlow = 0.0;
-    }
-  },
-
-  /**
-   * process and return tracked level
-   * @type {float} input value
-   * @return {float} output value
-   */
-  processLevel: {
-      value: function(input) {
-        // slow detector first
-        var s = Math.abs(input);
-        if (s > this._levelSlow) {
-          this._levelSlow += this._attackSlow * (s - this._levelSlow);
-        } else {
-          this._levelSlow += this._releaseSlow * (s - this._levelSlow);
-        }
-        // fast detector
-        if (s > this._levelFast) {
-          this._levelFast += this._attackFast * (s - this._levelFast);
-        } else {
-          this._levelFast += this._releaseFast * (this._levelSlow - this._levelFast);
-        }
-        // write level_fast
-        return this._levelFast;
-      }
-    }
-});
-
-
-/**
- * @class C2 (module)
- * @description compressor with scriptProcessorNode + sidechain
+ * @class C2
+ * @description custom unit compressor with program-dependent action
  * @param {object} json parameters in JSON notation
- *                      { threshold, ratio, knee, attack, release }
+ *                      { threshold, ratio, attack, release }
  */
 WX.C2 = function(json) {
   // calling super constructor
@@ -137,22 +12,27 @@ WX.C2 = function(json) {
     _threshold: {
       enumerable: false,
       writable: true,
-      value: -12.0
+      value: WX.db2lin(-12.0)
     },
     _ratio: {
       enumerable: false,
       writable: true,
       value: 4.0
     },
+    _iratio: {
+      enumerable: false,
+      writable: true,
+      value: 1.0 / (this._ratio - 1.0)
+    },
     _makeup: {
       enumerable: false,
       writable: true,
-      value: 1.0
+      value: WX.db2lin(0.0)
     },
     _detector: {
       enumerable: false,
       writable: false,
-      value: new WX._customUnitInternals.DualLevelDetector()
+      value: new WX._Internals.DualLevelDetector()
     },
     _processor: {
       enumerable: false,
@@ -160,29 +40,6 @@ WX.C2 = function(json) {
       value: WX._context.createScriptProcessor(
           WX._customUnitBufferSize, 2, 2
         )
-    },
-    _callback: {
-      value: function(event) {
-        // temp vars
-        var level, gaindB, gain;
-        // input and output array buffer
-        var inputL = event.inputBuffer.getChannelData(0);
-        var inputR = event.inputBuffer.getChannelData(1);
-        var outputL = event.outputBuffer.getChannelData(0);
-        var outputR = event.outputBuffer.getChannelData(1);
-        // callback loop
-        for (var i = 0, b = WX._customUnitBufferSize; i < b; ++i) {
-          // peak detection
-          level = this._detector.processLevel(Math.max(Math.abs(inputL[i]), Math.abs(inputR[i])));
-          // gain computer: limiting
-          gaindB = Math.min(0.0, WX.lin2db(this._threshold / level));
-          // get linear gain
-          gain = WX.db2lin(gaindB);
-          // compute output
-          outputL[i] = inputL[i] * gain * this._makeup;
-          outputR[i] = inputR[i] * gain * this._makeup;
-        }
-      }
     }
   });
   var me = this;
@@ -196,20 +53,52 @@ WX.C2 = function(json) {
   this.params = json;
 };
 
-
 WX.C2.prototype = Object.create(WX._Unit.prototype, {
 
   /**
+   * callback for onaudioprocess
+   * @param {object} event
+   */
+  _callback: {
+    value: function(event) {
+      // temp vars
+      var level, leveldB, gain, gaindB, delta;
+      // input and output array buffer
+      var inputL = event.inputBuffer.getChannelData(0);
+      var inputR = event.inputBuffer.getChannelData(1);
+      var outputL = event.outputBuffer.getChannelData(0);
+      var outputR = event.outputBuffer.getChannelData(1);
+      // callback loop
+      for (var i = 0, b = WX._customUnitBufferSize; i < b; ++i) {
+        // get abs-max from stereo
+        var s = Math.max(Math.abs(inputL[i]), Math.abs(inputR[i]));
+        // peak detection
+        level = this._detector.process(s);
+        // gain computer: compression with ratio
+        delta = WX.lin2db(level / this._threshold);
+        gaindB = (delta <= 0.0) ? 0.0 : delta * iratio;
+        // gain computer: limiting
+        // gaindB = Math.min(0.0, WX.lin2db(this._threshold / level));
+        // get linear gain
+        gain = WX.db2lin(gaindB);
+        // compute output
+        outputL[i] = inputL[i] * gain * this._makeup;
+        outputR[i] = inputR[i] * gain * this._makeup;
+      }
+    }
+  },
+
+  /**
    * get/set threshold
-   * @param {float} value threshold: default -24, nominal range of -100 to 0.
+   * @param {float} dB for user, linear for internal processing
    */
   threshold: {
     enumerable: true,
     get: function() {
-      return this._threshold;
+      return WX.lin2db(this._threshold);
     },
     set: function(value) {
-      this._threshold = value;
+      this._threshold = WX.db2lin(value);
     }
   },
 
@@ -224,6 +113,7 @@ WX.C2.prototype = Object.create(WX._Unit.prototype, {
     },
     set: function(value) {
       this._ratio = value;
+      this._iratio = 1.0 / (this._ratio - 1.0);
     }
   },
 
