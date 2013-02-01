@@ -1,8 +1,7 @@
 CACHE MANIFEST
-# 2012-1-28
+# 2013-1-28
 
 CACHE:
-editor.html
 files/inconsolata.woff
 js/esprima.js
 js/rawdeflate.js
