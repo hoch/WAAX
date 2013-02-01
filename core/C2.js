@@ -1,4 +1,16 @@
 /**
+ * buffer size for custom units
+ * @type {int} must be power of 2
+ */
+WX._customUnitBufferSize = 512;
+
+/**
+ * internal function space for custom units
+ * @type {Object}
+ */
+WX._customUnitInternals = {};
+
+/**
  * @class DualLevelDetector
  * @description program-dependent envelope following for custom compressors
  */
