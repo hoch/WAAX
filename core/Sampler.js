@@ -39,6 +39,11 @@ WX.Sampler = function(json) {
       enumerable: false,
       writable: false,
       value: WX._Dictionary.Sampler
+    },
+    _ready: {
+      enumerable: false,
+      writable: true,
+      value: false
     }
   });
   // assign (default) parameters
@@ -68,6 +73,7 @@ WX.Sampler.prototype = Object.create(WX._Unit.prototype, {
       xhr.onload = function() {
         try {
           me._buffer = WX._context.createBuffer(xhr.response, true);
+          me._ready = true;
         } catch(error) {
           WX.error(me, "file loading error: " + url + " (" + error.message + ")");
         }
@@ -98,6 +104,10 @@ WX.Sampler.prototype = Object.create(WX._Unit.prototype, {
    */
   noteOn: {
     value: function(pitch) {
+      if (!this._ready) {
+        WX.error(this, "sampler is not ready.");
+        return;
+      }
       // is this efficient?
       this._node = WX._context.createBufferSource();
       this._node.buffer = this._buffer;
