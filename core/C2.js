@@ -176,9 +176,7 @@ WX.C2 = function(json) {
     }
   });
   var me = this;
-  this._processor = WX._context.createScriptProcessor(
-    WX._customUnitBufferSize, 1, 1
-  );
+  this._processor = WX._context.createScriptProcessor(512, 1, 1);
   this._processor.onaudioprocess = function(event) {
     me._callback(event);
   };
