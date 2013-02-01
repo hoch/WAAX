@@ -143,5 +143,19 @@ WX.C2.prototype = Object.create(WX._Unit.prototype, {
     set: function(value) {
       this._detector.release = value;
     }
+  },
+
+  /**
+   * get/set makeup
+   * @param {float} makeup gain in decibel
+   */
+  makeup: {
+    enumerable: true,
+    get: function() {
+      return WX.lin2db(this._makeup);
+    },
+    set: function(value) {
+      this._makeup = WX.db2lin(value);
+    }
   }
 });
