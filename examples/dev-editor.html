@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html manifest="editor.appcache">
+<html manifest="dev-editor.appcache">
   <head>
-    <title>WAAX: Interactive Editor</title>
+    <title>WAAX: Interactive Editor (Dev)</title>
     <link rel="stylesheet" href="js/codemirror/codemirror.css">
     <script src="js/codemirror/codemirror.js"></script>
     <script src="js/codemirror/mode/xml.js"></script>
@@ -13,7 +13,7 @@
     <script src="js/esprima.js"></script>
     <style>
       @font-face {
-        font-family: 'inconsolata';*/
+        font-family: 'inconsolata';
         src: url('files/inconsolata.woff') format('woff');
         font-weight: normal;
         font-style: normal;
@@ -131,13 +131,13 @@
       };
 
       // default code (encoded)
-      var defaultCode = decode('XVPfT9swEH5O/4pbnxIW2aGjnRQCUgXb06SygSgT4sF1HOIpsTvbaalQ//edm6TNiGTdD33f57vLOft0u7h5+H33DUpXV9ejrDVBVgqWe0t7Z6XzHdogs9zItQNr+NW4dG6dUlpqXpJX6cpmRbiu6ZaxN7pqZJXT5Xz+RGqpyB87vs5oSx7oeDfwh1JYS8dL4BWz1mc2zLQpYeEKnpMYLmKYxvA1hvNzPJOXywG5UdIdadpypCixheUTWVguq/Ad3G4t0gnso9jDApZbcwLNb+9/IYalCUlQPPcW77JoMTSH8Eit1sWJ+ePuOxJ543RRpFhVglBEHmoLNsKsTtAbrR4xgXCrG8NFOiaE5swxKg0tWVWRLduMY6jlWwoJ+dLLYDvE6dBXHHkH7z9Yr35wfJeNi4bzMI1SwvigaBR3UqsuFUbwfqjNqxZG/G2E4jsscul/VC4nPhd2g3/GpGEq1/UkTOJp9AKfsUU4g0Ee/8os6vr1mq9MqlauQxRhO8yEzDoYNkDaiSHw/zrO4IIklyPovhb784PejCR+AUjS6fnJEKWdWKiwS1nhHmQtdOPCfgDHzgf4ougJQT+eNtz7C6ZtsB8OVuKiSebE6CPFL/VpwTPavhh8Qf5J/QM=');
+      var defaultCode = decode('jdJRa8MgEAfwZ/cprn1qHxJhz7ZQ0gUGYylsa9dHo8fiZjSoHeTbzzSM0a4BfTnhfhyH/tlsWxWvx90DNKHV6zs2FsIa5HKo9PdSW9nHStgsy0DiN2rbtWgCeAxBmQ9YnIywbac0yiVk2dl64VQXiROreZ5TYR3Sw2bznn/6+ZrRsT0p34LS1xLiuYkfTUBnuPZps0su0aXRyov/e9ymz1Z5TKMvvO106gpPZXUJCZmku/KaTtrCmj26OvHFEGXNxdcWNe+Tv6WIkUibX9xPueFKKIXenhwIKxEadDj0/yyjY0BjYIcE/wA=');
 
       var documents = [{ filename: 'Untitled', filetype: 'text/plain', autoupdate: true, code: defaultCode }];
 
-      if (localStorage.codeeditor !== undefined) {
-        documents = JSON.parse(localStorage.codeeditor);
-      }
+      // if (localStorage.codeeditor !== undefined) {
+      //   documents = JSON.parse(localStorage.codeeditor);
+      // }
 
       if (window.location.hash) {
         var hash = window.location.hash.substr(1);
@@ -155,7 +155,7 @@
       // editor
       var interval;
       var editor = CodeMirror(document.getElementById('editor'), {
-        value: documents[0].code,
+        value: defaultCode,
         mode: "text/html",
         lineNumbers: true,
         matchBrackets: true,
