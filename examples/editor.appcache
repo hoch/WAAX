@@ -1,0 +1,19 @@
+CACHE MANIFEST
+# 2012-11-28
+
+CACHE:
+/favicon.ico
+editor.html
+files/inconsolata.woff
+js/esprima.js
+js/rawdeflate.js
+js/rawinflate.js
+js/codemirror/codemirror.css
+js/codemirror/codemirror.js
+js/codemirror/mode/css.js
+js/codemirror/mode/htmlmixed.js
+js/codemirror/mode/javascript.js
+js/codemirror/mode/xml.js
+
+NETWORK:
+*

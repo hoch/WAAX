@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <script src="../core/WAAX.js"></script>
+    <script src="../core/Util.js"></script>
+    <script src="../core/Fader.js"></script>
+    <script src="../core/Sampler.js"></script>
+    <script src="../core/Internals.js"></script>
+    <script src="../core/C2.js"></script>
+    <script src="../core/Comp.js"></script>
+    <script>
+      
+      var samp = new WX.Sampler({ source: "../data/drums/fillin.wav" });
+      var c2 = new WX.C2({ threshold: -36.0, ratio: 20.0, makeup: 20.0 });
+      //      samp.to(c2).to(WX.Out);
+      samp.to(WX.Out);      
+      
+      // runner
+      function runner() {
+        samp.noteOn();
+        setTimeout(function() {
+          samp.noteOff();
+          runner();
+        }, 5000);
+      };
+      
+      // initiate
+      // runner();
+      
+    </script>
+  </body>
+</html>

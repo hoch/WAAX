@@ -2,19 +2,19 @@
 <html manifest="editor.appcache">
   <head>
     <title>WAAX: Interactive Editor</title>
-    <link rel="stylesheet" href="js/codemirror/lib/codemirror.css">
-    <script src="js/codemirror/lib/codemirror.js"></script>
-    <script src="js/codemirror/mode/xml/xml.js"></script>
-    <script src="js/codemirror/mode/javascript/javascript.js"></script>
-    <script src="js/codemirror/mode/css/css.js"></script>
-    <script src="js/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+    <link rel="stylesheet" href="js/codemirror/codemirror.css">
+    <script src="js/codemirror/codemirror.js"></script>
+    <script src="js/codemirror/mode/xml.js"></script>
+    <script src="js/codemirror/mode/javascript.js"></script>
+    <script src="js/codemirror/mode/css.js"></script>
+    <script src="js/codemirror/mode/htmlmixed.js"></script>
     <script src="js/rawinflate.js"></script>
     <script src="js/rawdeflate.js"></script>
     <script src="js/esprima.js"></script>
     <style>
       @font-face {
-        font-family: 'inconsolata';
-        src: url('files/inconsolata.woff') format('woff');
+        /*font-family: 'inconsolata';*/
+        /*src: url('files/inconsolata.woff') format('woff');*/
         font-weight: normal;
         font-style: normal;
       }
@@ -131,7 +131,7 @@
       };
 
       // default code (encoded)
-      var defaultCode = decode('bVRtT9swEP5cfsWtfAlTcQJTNdYXpq2UMWloCJCmfXTja+KR2JnjtBTU/76zk1QtS1TV9t3je+7Vk3dXP2ePv+/mkNo8uzya1EtvkiIXtPYmOVoOccpNiXbar+zy9KLvFaXdZOh2vYUWG3h1u96Cx0+J0ZUSp7HOtBnB8dJ/Y6/OuUmkGkFUH/UKzTLT6xGkUghUXrp1xsPW+iRsPJk4lpo4NrKwUJp42k+tLUZhmBuh9YIl0qbVgsU6D21qENmfMlxUMhPNMZeKRP1LMu9t7Jm7PHLcYQhrbZ64jwCW2lDkRucIiyohJ2uyWAtkidZJhp6qCD1IVnkoy7LCMhSUM5l9lmL6YfjpIjqOz86ddbmEANZSCb1mUik0v6SwKUynU4jgBF67dFBwg8ruycYHsBuUSWrf4GrhGLY+y/S5dcUpGp6j4QMoY1Q4ALoh0KAZt/oEKVhrNgPIuUUjeUY7LNOxz45U0gYnHsyVdAh3csdlpWIrtYIa0jSD/6spyUGFa3i8uZ/P2R2askC6sMKZ1wbwcTjoiD7sCHUAZ/SLIsrYeI+AFbqUzgX2QlzDKKod6/lID9gfnKR1vNdGfAD5HuuSpyiMVt8afQDnUUTELWubn4N7t5Sqr7yU8W2jDaiozRxEz5H/XJwGl4a8HoE1Fe4Jfkiy5SIfwTlsofXRVeA/nqCjWK1zPmjGhQh89XaG2nofGJtxteLlfaNq6ruDMhr7B/mCHY076GrElkrouMpdQ7qxZbwoyN4spVEMdl3HhM7nGTpUe2172E27LqOGarz6S/Nlv3g5Ia5d1oIWd5AwZrT1GPZM4V6Rmim9JlPvIWJUh+G4A7rpgp69yR6rN0E7RU2H74ew98BMwvrhoofMPa3/AA==');
+      var defaultCode = decode('XVPfT9swEH5O/4pbnxIW2aGjnRQCUgXb06SygSgT4sF1HOIpsTvbaalQ//edm6TNiGTdD33f57vLOft0u7h5+H33DUpXV9ejrDVBVgqWe0t7Z6XzHdogs9zItQNr+NW4dG6dUlpqXpJX6cpmRbiu6ZaxN7pqZJXT5Xz+RGqpyB87vs5oSx7oeDfwh1JYS8dL4BWz1mc2zLQpYeEKnpMYLmKYxvA1hvNzPJOXywG5UdIdadpypCixheUTWVguq/Ad3G4t0gnso9jDApZbcwLNb+9/IYalCUlQPPcW77JoMTSH8Eit1sWJ+ePuOxJ543RRpFhVglBEHmoLNsKsTtAbrR4xgXCrG8NFOiaE5swxKg0tWVWRLduMY6jlWwoJ+dLLYDvE6dBXHHkH7z9Yr35wfJeNi4bzMI1SwvigaBR3UqsuFUbwfqjNqxZG/G2E4jsscul/VC4nPhd2g3/GpGEq1/UkTOJp9AKfsUU4g0Ee/8os6vr1mq9MqlauQxRhO8yEzDoYNkDaiSHw/zrO4IIklyPovhb784PejCR+AUjS6fnJEKWdWKiwS1nhHmQtdOPCfgDHzgf4ougJQT+eNtz7C6ZtsB8OVuKiSebE6CPFL/VpwTPavhh8Qf5J/QM=');
 
       var documents = [{ filename: 'Untitled', filetype: 'text/plain', autoupdate: true, code: defaultCode }];
 
@@ -229,7 +229,7 @@
       buttonShare.textContent = 'share';
       buttonShare.addEventListener('click', function (event) {
         var dom = document.createElement('input');
-        dom.value = 'http://mrdoob.com/projects/htmleditor/#B/' + encode(editor.getValue());
+        dom.value = encode(editor.getValue());
         dom.style.width = '400px';
         dom.style.padding = '5px';
         dom.style.marginTop = '20px';
@@ -259,7 +259,7 @@
         dom.style.padding = '5px';
         dom.style.border = '0px';
         dom.style.textAlign = 'center';
-        dom.innerHTML = '<h1>HTML EDITOR<\/h1><a href="https://github.com/mrdoob/htmleditor" target="_blank">Source code</a>.<br>Powered by <a href="http://codemirror.net/" target="_blank">CodeMirror ' + CodeMirror.version + '</a> and <a href="http://esprima.org/" target="_blank">Esprima ' + esprima.version + '</a>.';
+        dom.innerHTML = 'SOME CREDITS HERE. <br>Powered by <a href="http://codemirror.net/" target="_blank">CodeMirror ' + CodeMirror.version + '</a> and <a href="http://esprima.org/" target="_blank">Esprima ' + esprima.version + '</a>.';
         popup.set(dom);
         popup.show();
       }, false);
@@ -356,6 +356,7 @@
 
       // actions
       var update = function () {
+        console.log("hey it's updating");
         while (preview.children.length > 0) {
           preview.removeChild(preview.firstChild);
         }
