@@ -47,6 +47,19 @@ WX._Dictionary = Object.freeze({
 WX._context = new webkitAudioContext();
 
 /**
+ * buffer size for custom units
+ * @type {int} must be power of 2
+ */
+WX._customUnitBufferSize = 512;
+
+/**
+ * internal function space for custom units
+ * @type {Object}
+ */
+WX._customUnitInternals = {};
+
+
+/**
  * @class _Unit
  * @description internal base object for all WAAX Unit Generator
  */
