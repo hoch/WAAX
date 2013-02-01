@@ -147,7 +147,7 @@ WX.C2 = function(json) {
     _processor: {
       enumerable: false,
       writable: false,
-      value: WX._context.createScriptProcessorNode(
+      value: WX._context.createScriptProcessor(
           WX._customUnitBufferSize, 2, 2
         )
     },
