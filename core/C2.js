@@ -137,7 +137,7 @@ WX.C2 = function(json) {
     _makeup: {
       enumerable: false,
       writable: true,
-      value: 0.0
+      value: 1.0
     },
     _detector: {
       enumerable: false,
