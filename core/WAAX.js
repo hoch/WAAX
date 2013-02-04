@@ -7,9 +7,9 @@
 
 /**
  * @namespace WX
- * @revision 1
+ * @revision 2
  */
-var WX = WX || { REVISION:1 };
+var WX = WX || { REVISION:2 };
 
 /**
  * starting message
