@@ -1,4 +1,5 @@
 .DS_Store
 gitup
 notes.md
-compressjs.sh
+update-waax
+compiler.jar
