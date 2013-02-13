@@ -34,10 +34,12 @@ WX._Dictionary = Object.freeze({
   Sampler: "Sampler.unit",
   LPF: "LPF.unit",
   ADSR: "ADSR.unit",
-  Compressor: "Compressor.unit",
+  Comp: "Comp.unit",
   FeedbackDelay: "FeedbackDelay.unit",
-  ConVerb: "ConVerb.unit"
+  ConVerb: "ConVerb.unit",
+  Custom: "Custom.unit"
   // modules
+  // not yet implemented
 });
 
 /**

@@ -4,6 +4,11 @@
  * @param {object} json parameters in JSON notation
  *                      { threshold, ratio, attack, release }
  */
+
+// TODO: gain-reduction from compression
+// TODO: auto-makeup
+// TODO: convert all parameters into k-param
+
 WX.C2 = function(json) {
   // calling super constructor
   WX._Unit.call(this);
@@ -40,8 +45,14 @@ WX.C2 = function(json) {
       value: WX._context.createScriptProcessor(
           WX._customUnitBufferSize, 2, 2
         )
+    },
+    _label: {
+      enumerable: false,
+      writable: false,
+      value: WX._Dictionary.Custom
     }
   });
+  // attaching callback function for onaudioprocess event
   var me = this;
   this._processor.onaudioprocess = function(event) {
     me._callback(event);

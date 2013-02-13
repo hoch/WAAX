@@ -1,4 +1,12 @@
 /**
+ * @title Internal.js
+ * @description some classes used inside of units or modules:
+ *              DualLevelDetector
+ *              RingBuffer
+ */
+
+
+/**
  * @class Internal:DualLevelDetector
  * @description program-dependent level detector for dynamic processing
  */
@@ -113,4 +121,95 @@ WX._Internals.DualLevelDetector.prototype = Object.create(null, {
         return this._levelFast;
       }
     }
+});
+
+
+
+/**
+ * @class Internal:RingBuffer
+ * @description ring buffer with block write for faster data drawing
+ * @param {int} blockSize write block size (default = 512)
+ * @param {int} blockNum number of block in power of 2 (default = 8)
+ */
+WX._Internals.RingBuffer = function(blockSize, blockNum) {
+  // pre sanity check
+  var bs = (blockSize || 512);
+      bn = (blockNum || 8);
+  // define properties
+  Object.defineProperties(this, {
+    _blockSize: {
+      enumerable: false,
+      writable: false,
+      value: bs
+    },
+    _bufferSize: {
+      enumerable: false,
+      writable: false,
+      value: bs * bn
+    },
+    _buffer: {
+      enumerable: false,
+      writable: true,
+      value: undefined
+    },
+    _writer: {
+      enumerable: false,
+      writable: true,
+      value: 0
+    },
+    _reader: {
+      enumerable: false,
+      writable: true,
+      value: 0
+    }
+  });
+  // assign new array after the property setting
+  this._buffer = new Float32Array(this._bufferSize);
+};
+
+WX._Internals.RingBuffer.prototype = Object.create(null, {
+
+  /**
+   * writeBlock
+   * @description writing sample frame into buffer
+   * @param {array} block(Float32Array) to write in
+   */
+  writeBlock: {
+    enumerable: true,
+    value: function(array) {
+      var endBlock = this._writer + this._blockSize,
+          i = 0;
+      // blind writing
+      while (this._writer < endBlock) {
+        this._buffer[this._writer++] = array[i++];
+      }
+      // check pointer boundary
+      if (this._writer == this._bufferSize) {
+        this._writer = 0;
+      }
+      // update read pointer
+      this._reader = this._writer;
+    }
+  },
+
+  /**
+   * copyBuffertoArray
+   * @description fetching data from buffer to external array
+   * @param {array} array(Float32Array) to update
+   * @note THIS NEEDS TO BE FIXED.
+   */
+  // copyBuffertoArray: {
+  //   enumerable: true,
+  //   value: function(array) {
+  //     var i = 0,
+  //         b = this._bufferSize,
+  //         r = this._reader;
+  //     while (i < b) {
+  //       array[i++] = this._buffer[r++];
+  //       if (r == b) {
+  //         r = 0;
+  //       }
+  //     }
+  //   }
+  // }
 });

@@ -13,6 +13,11 @@ WX.Comp = function(json) {
       enumerable: false,
       writable: false,
       value: WX._context.createDynamicsCompressor()
+    },
+    _label: {
+      enumerable: false,
+      writable: false,
+      value: WX._Dictionary.Comp
     }
   });
   // performing unit-specific actions
