@@ -4,6 +4,10 @@
  * @param {object} json parameters in JSON notation
  *                      { delaytime: second, feedback: float, mix: wet }
  */
+
+// TODO: some filtering (hi/lo-cutting)
+// TODO: delay time beat matching (BPM)
+
 WX.FeedbackDelay = function(json) {
   // calling super constructor
   WX._Unit.call(this);

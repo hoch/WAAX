@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <!-- canvas for visualization -->
+    <canvas id="waax-canvas" width="300" height="800"></canvas>
+    
+    <!-- development setting (uncompiled) -->
+    <script src="../core/WAAX.js"></script>
+    <script src="../core/Util.js"></script>
+      <script src="../core/Internals.js"></script>
+    <script src="../core/Fader.js"></script>
+    <script src="../core/Oscil.js"></script>
+    <script src="../core/Noise.js"></script>
+    <script src="../core/Sampler.js"></script>
+    <script src="../core/LFO.js"></script>    
+    <script src="../core/LPF.js"></script>      
+    <script src="../core/ADSR.js"></script>     
+    <script src="../core/ConVerb.js"></script>
+    <script src="../core/FeedbackDelay.js"></script>
+      <script src="../core/Comp.js"></script>
+    <script src="../core/C2.js"></script>
+    <script src="../core/WaveformV.js"></script>
+    <script>
+      // pitch class
+      var pitches = [0, 4, 5, 7, 11, 12];
+      
+          // units
+          var osc = new WX.Oscil({ type:2 }),
+            adsr = new WX.ADSR({ a:0.01, d:0.05, s:0.1, r:0.05 }),
+            lpf = new WX.LPF({ cutoff: 1200.0 });
+            verb = new WX.ConVerb({ source:"../data/ir/hall.wav", mix: 0.3 });
+          osc.to(adsr).to(lpf).to(verb).to(WX.Out);
+      
+      // visualizing bridge
+      var viz = new WX.WaveformV();
+      lpf.to(viz).to(WX.Out);
+      
+      // arppegiator
+      function arp() {
+        osc.frequency = WX.midi2freq(pitches[WX.random2(0,5)] + 12 * WX.random2(4, 6));
+        osc.gain = WX.random2f(0.05, 0.6);
+        lpf.cutoff = osc.frequency * 4.0;
+        lpf.Q = WX.random2f(6.0, 12.0);
+        adsr.noteOn();
+        setTimeout(function() {
+          adsr.noteOff();
+                arp();
+            }, 250);
+          };
+      
+      // canvas context
+      var cvs = document.getElementById('waax-canvas');
+          cvs.style.position = 'absolute';
+          cvs.style.right = '100px';
+          var ctx = cvs.getContext('2d');
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = 'black';
+      
+      // user-defined render function
+      viz.onRender = function(buffer) {
+        // clear
+        ctx.clearRect(0, 0, cvs.width, cvs.height);
+        // draw waveform
+        ctx.beginPath();
+        for(var i = 0, b = buffer.length; i < b; ++i) {
+          ctx.lineTo(100 - buffer[i] * 300, i*0.2);
+        }
+        ctx.stroke();
+      }
+      
+      // drawFrame
+      function drawFrame() {
+        setTimeout(function() {
+          viz.render();
+          drawFrame();
+        }, 1000/30);
+      }
+      
+      // initiate!
+      arp();
+      drawFrame();
+      
+    </script>
+  </body>
+</html>
