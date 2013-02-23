@@ -33,9 +33,10 @@ As this library is in early stages of development, it currently demonstrates min
 
 Demo
 ----
-Requirements: _Google Chrome 24+ on any platform(Win/OSX/Linux)._
+Requirement: _Google Chrome 24+ on any platform(Win/OSX/Linux)._
 
-See its potential in the first demo: **[interactive code editor][6]
+See its potential in the first demo: **[interactive code editor][6]**
+
 _Adjust your volume setting before clicking. It might be loud!_
 
 [6]: http://hoch.github.com/waax/examples/editor.html
