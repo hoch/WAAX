@@ -23,7 +23,7 @@ The facade of API is strongly inspired by [THREE.js][2] and [ChucK][3]: Three.js
 
 As this library is in early stages of development, it currently demonstrates minimum set of features, however, it will embrace more elements as it grows: ready-made instruments, comprehensive timebase system (in conjunction with Web MIDI API), and musical interconnection between multiple Chrome clients.
 
-See its potential in the first demo: [interactive code editor][6].
+See its potential in the first demo: [interactive code editor][6] - **Adjust your volume setting before clicking. It might be loud!**
 
 [1]: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html "Web Audio API: W3C Editor's Draft"
 [2]: https://github.com/mrdoob/three.js/ "THREE.js: Github Repo"
