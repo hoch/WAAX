@@ -3,87 +3,106 @@ WAAX (Web Audio API eXtension)
 **JavaScript library for music and audio programming with Chrome**
 
 ```javascript
-mySaw.to(myLPF).to(myADSR).to(WX.Out);
-myLPF.modulateWith(myLFO);
+// creating units
+var saw = new WX.Oscil({ type:2 }),
+    sqr = new WX.Oscil({ type:1 }),
+    lpf = new WX.LPRez({ range:4000, Q:12 }),
+    env = new WX.ADSR({ a:0.001, d:0.002, s:0.3, r:0.1 }),
+    vrb = new WX.ConVerb({ source:"ir/hall.wav", mix:0.3 });
+// building an audiograph
+WX.link(saw, lpf ,env, vrb ,WX.DAC);
+// connecting units
+sqr.to(lpf);
 ```
 
-WAAX is an experimental JavaScript library for [Web Audio API][1] incorporated in Chrome. With **music creation and performance** in mind, it is designed to provide users with the higher level of abstraction.
+WAAX is an experimental JavaScript library built on top of [Web Audio API][1] in Chrome. With **music creation and performance** in mind, it offers the higher level of functionality than basic building blocks of Web Audio API.
 
-The goal of this project is to make audio programming more approachable by encapsulating several technical steps that web developers and designers have to go through to set up Web Audio API. From computer musician's perspective, it is also inspiring to integrate powerful web technologies to audio programming.
+The goal of this project is 1) to facilitate experiments and iterations of web-based audio programming and 2) to hide audio-specific chores from web developers who are not familiar with audio programming.
 
-The library is strongly inspired by [THREE.js][2] and [ChucK][3]: Three.js is one of WebGL JavaScript libraries being used most for web-based 3D graphics. ChucK is "strongly-timed" audio programming language being actively developed and used by computer music communities of Princeton/Stanford university.
+The facade of API is strongly inspired by [THREE.js][2] and [ChucK][3]: Three.js is one of WebGL JavaScript libraries being used most for web-based 3D graphics. ChucK is an experimental audio programming language being actively developed and used by computer music communities such as [PLOrk][4](Princeton Laptop Orchestra) and [SLOrk][5](Stanford Laptop Orchestra).
 
-As the project grows, this library will embrace more features such as: ready-made instruments, comprehensive timebase system (in conjunction with Web MIDI API), and musical interconnection between Chrome clients.
+As this library is in early stages of development, it currently demonstrates minimum set of features, however, it will embrace more elements as it grows: ready-made instruments, comprehensive timebase system (in conjunction with Web MIDI API), and musical interconnection between multiple Chrome clients.
 
-See the demo [hello WAAX][4] and [interactive code editor][5].
+See its potential in the first demo: [interactive code editor][6].
 
 [1]: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html "Web Audio API: W3C Editor's Draft"
 [2]: https://github.com/mrdoob/three.js/ "THREE.js: Github Repo"
 [3]: http://chuck.cs.princeton.edu/
-[4]: http://hoch.github.com/waax/examples/hellowaax.html
-[5]: http://hoch.github.com/waax/examples/editor.html
+[4]: http://plork.cs.princeton.edu/
+[5]: http://slork.stanford.edu/
+[6]: http://hoch.github.com/waax/examples/editor.html
 
 
-Using WAAX
-----------
+Usage
+-----
 
-As Web Audio API has the "node" object, WAAX has its own atomic object called "unit". It is conceptually identical to 'Unit Generator' of other audio programming environments and consists of more than 2 Web Audio API nodes in general.
+
+### Unit: Creation
+
+Like the _node_ in Web Audio API, WAAX has its own atomic object called **unit**. It is conceptually identical to 'unit generator' of other audio programming environments and consists of more than 2 nodes in general.
+
 ```javascript
 // creating WAAX units
 var kick = new WX.Sampler({ source: "kd.wav", basePitch: 60 }),
-    comp = new WX.Comp({ threshold: -20.0, ratio: 4.0 });
-// connecting units
-kick.to(comp).to(WX.Out);
-// setting parameter
-comp.ratio = 8.0;
+    comp = new WX.Comp();
 ```
-As shown above, a WAAX unit is basically a JavaScript object that encapsulates user-friendly features by handling several underlying chores. The connection between several WAAX units can be achieved by chaining `.to()` method. `WX.Out` is the master fader of WAAX system.
 
-The connection from a WAAX unit to Web Audio API node can be done by `.toNode()` method, but the connection from a node to an unit should be done manually.
+A unit can be created with an object of initial parameters, or it can be set with default parameters when it is created without any argument.
+
+
+### Unit: Connection
+
 ```javascript
-var node = myAudioContext.createGainNode();
+// connecting units with .to() method
+kick.to(comp).to(WX.DAC);
+// connecting units with WX.link() method
+WX.link(kick, comp, WX.DAC);
+```
+As shown above, the connection between several WAAX units can be achieved by chaining `.to()` method. `WX.DAC` is the master channel of WAAX system. 
+
+```javascript
+// native Web Audio API node
+var node = myAudioContext.createGain();
 // unit => node
-kick.toNode(node);
+kick.connect(node);
 // node => unit
 node.connect(comp._inlet);
 ```
 
-Class: Unit
------------
-**NOTE**: _still in progress!_
+The connection from a WAAX unit to Web Audio API node can be done by `.connect()` method, which is the same method in Web Audio API, but the connection from a node to a unit should be done manually with `._inlet` node from a unit.
 
-Unit classes in WAAX are largely based on the UGen structure of [STK][6]. All the unit classes are extended from the base class "WX._Unit" and have two default nodes: `_inlet` and `_outlet`.
 
-### Generators
-`Oscil` `LFO` `Noise` `Sampler`
+### Unit: Parameters
 
-### Envelopes
-`ADSR`
+```javascript
+comp.threshold = -12;
+comp.ratio = 8.0;
+kick.params = { source:"kd2.wav", basePitch: 48 };
+
+console.log(kick.source);
+>>> "kd2.wav"
+console.log(kick.params);
+>>> { source:"kd2.wav", basePitch: 48 }
+```
+
+All the parameters of a unit is accessible by simply setting or getting values. Alternatively, passing an object with parameters into `.params` is also possible. Getting available parameters from a unit can be done by printing out `.params` as well.
+
+
+Units and Parameters
+--------------------
+
+### Generator
+`WX.Oscil` `WX.Noise` `WX.Sampler` `WX.LFO`
 
 ### Processors
-`LPF` `FeedBackDelay` `ConVerb` `Compressor`
+`WX.ADSR` `WX.LPRez` `WX.TwinDelay` `WX.ConVerb` `WX.Comp` `WX.C2`
 
-[6]: https://ccrma.stanford.edu/software/stk/classes.html
+### Analyzer
+_NOTE: Not available yet_
+`WX.Scope` `WX.Spectrum` `WX.Waterfall` 
 
-Class: Module
--------------
-**NOTE**: _Currently not implemented yet._
-
-The `Module` object is a collection of units that functions at the higher level of interaction. You can think of it as a "virtual instrument" in modern digital audio workstations. (VSTi, effect plug-ins and etc) It provides more musically-oriented feature like synthesizer, sampler and effect plug-in.
-
-Class: Timebase
----------------
-**NOTE**: _Currently not implemented yet._
-
-The `Timebase` will be a singleton object that manages all the timing/sequencing tasks. Hopefully it can be used in conjunction with Web MIDI API in near future.
-
-Class: Networking
------------------
-**NOTE**: _Currently not implemented yet._
-
-This class will include network-related features based on WebSocket and PeerConnection API from WebRTC. It will enable users to interact with the audience of web-based music applications or other player/performer for collaboration.
 
 Utilities
 ---------
-Some useful functions for the music application.
-`random2` `random2f` `db2lin` `lin2db` `midi2freq` `freq2midi`
+
+`WX.random2` `WX.random2f` `WX.db2lin` `WX.lin2db` `WX.pitch2freq` `WX.freq2pitch`

@@ -1,13 +1,9 @@
 /**
  * @class ConVerb
  * @description convolution reverberation with convolve node
- * @param {object} json parameters in JSON notation
- *                      { source: url, mix: wet }
  */
 WX.ConVerb = function(json) {
-  // calling super constructor
-  WX._Unit.call(this);
-  // creating unit-specific properties
+  WX.Unit.Processor.call(this);
   Object.defineProperties(this, {
     _convolver: {
       enumerable: false,
@@ -27,30 +23,28 @@ WX.ConVerb = function(json) {
     _url: {
       enumerable: false,
       writable: true,
-      value: ""
+      value: "../data/ir/hall.wav"
     },
-    _label: {
-      enumerable: false,
-      writable: false,
-      value: WX._Dictionary.ConVerb
+    _defaults: {
+      value: {
+        source: "../data/ir/hall.wav",
+        mix: 0.25
+      }
     }
   });
-  // performing unit-specific actions
-  this._inlet.connect(this._convolver);
+  this._inputGain.connect(this._convolver);
+  this._inputGain.connect(this._dry);
   this._convolver.connect(this._wet);
-  this._inlet.connect(this._dry);
-  this._dry.connect(this._outlet);
-  this._wet.connect(this._outlet);
-  // assign (default) parameters
-  this.params = json;
+  this._dry.connect(this._outputGain);
+  this._wet.connect(this._outputGain);
+  this.params = this._defaults;
+  if (typeof json === "object") {
+    this.params = json;
+  }
+  this.label += "ConVerb";
 };
 
-WX.ConVerb.prototype = Object.create(WX._Unit.prototype, {
-
-  /**
-   * get/set source location URL of IR sample
-   * @param {string} url location of IR sample
-   */
+WX.ConVerb.prototype = Object.create(WX.Unit.Processor.prototype, {
   source: {
     enumerable: true,
     get: function() {
@@ -77,11 +71,6 @@ WX.ConVerb.prototype = Object.create(WX._Unit.prototype, {
       return true;
     }
   },
-
-  /**
-   * get/set mix between wet/dry (1.0 means 100% wet)
-   * @param {float} mix wet mix amount
-   */
   mix: {
     enumerable: true,
     get: function() {

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <div id="wx-console" style="position: absolute; bottom: 3px; left: 35px; font-family: monospace"></div>
+    <!-- development setting (uncompiled) -->
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Helper.js"></script>
+    <script src="../src/core/Template.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/core/Internal.js"></script>
+    <script src="../src/units/processors/Fader.js"></script>
+    <script src="../src/units/processors/ADSR.js"></script>
+    <script src="../src/units/processors/LPRez.js"></script>
+    <script src="../src/units/processors/TwinDelay.js"></script>
+    <script src="../src/units/processors/ConVerb.js"></script>    
+    <script src="../src/units/processors/Comp.js"></script>
+    <script src="../src/units/processors/C2.js"></script>   
+    <script src="../src/units/generators/Oscil.js"></script>
+    <script src="../src/units/generators/LFO.js"></script>
+    <script src="../src/units/generators/Noise.js"></script>
+    <script src="../src/units/generators/Sampler.js"></script>
+    <script>      
+      var osc1 = new WX.Oscil({ type:2, gain:0.6 }),
+        osc2 = new WX.Oscil({ type:1, gain:0.6 }),
+        adsr = new WX.ADSR({ 
+          a: 0.005, d: 0.03, s: 0.2, r: 0.1 
+        }),
+        rez = new WX.LPRez({ 
+          a: 0.05, d: 0.015, s: 0.5, r: 0.05, 
+          range:4000, Q:9 
+        }),
+        pong = new WX.TwinDelay({ 
+          delayTimeLeft:0.360, delayTimeRight:0.240, 
+          feedbackLeft:0.4, feedbackRight:0.25,
+          crosstalk: 0.2, mix:0.2 
+        }),
+        verb = new WX.ConVerb({ mix:0.2 }),
+        comp = new WX.Comp({ 
+          threshold: -24, ratio: 8, gain: 12 
+        }),
+        c2 = new WX.C2({
+          threshold: -24, ratio: 8, makeup: 12 
+        });
+      
+      WX.link(osc1, rez, adsr, pong, verb, comp, WX.DAC);
+      osc2.to(rez);
+      
+      var pit = [3, 0, 5, 0, 3, 2, 1, 0, 0, 0, 8, 0, 6, 0, 7, 0];
+      var acc = [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0];
+      var sli = [0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1];
+      var glideTime = 0.180;
+      var gridDur = 0.240;
+      var c = 0;
+      
+      function loop() {
+        setTimeout(function() {
+          var f = WX.pitch2freq(pit[c] + 48);
+          
+          if(sli[c] == 0) {
+            osc1.frequency = f;
+            osc2.frequency = f * 0.5;
+          } else {
+            osc1.glide(f, glideTime);
+            osc2.glide(f * 0.5, glideTime);
+          }
+          
+          rez.cutoff = f * 1.5;
+          if(sli[c] == 0) {
+            rez.noteOn();
+          } else {
+            rez.noteOff(gridDur);
+          }
+
+          adsr.gain = acc[c] + 1 * 0.5;
+          adsr.noteOn();
+          adsr.noteOff(gridDur);          
+          
+          c = ++c > 15 ? 0 : c;
+          
+          loop();
+        }, gridDur * 1000);
+      }
+      
+      loop();
+    </script>
+  </body>
+</html>

@@ -1,8 +1,6 @@
 /**
  * @class C2
  * @description custom unit compressor with program-dependent action
- * @param {object} json parameters in JSON notation
- *                      { threshold, ratio, attack, release }
  */
 
 // TODO: gain-reduction from compression
@@ -10,9 +8,7 @@
 // TODO: convert all parameters into k-param
 
 WX.C2 = function(json) {
-  // calling super constructor
-  WX._Unit.call(this);
-  // creating unit-specific properties
+  WX.Unit.Processor.call(this);
   Object.defineProperties(this, {
     _threshold: {
       enumerable: false,
@@ -37,19 +33,23 @@ WX.C2 = function(json) {
     _detector: {
       enumerable: false,
       writable: false,
-      value: new WX._Internals.DualLevelDetector()
+      value: new WX.Internal.DualLevelDetector()
     },
     _processor: {
       enumerable: false,
       writable: false,
       value: WX._context.createScriptProcessor(
-          WX._customUnitBufferSize, 2, 2
+          256, 2, 2
         )
     },
-    _label: {
-      enumerable: false,
-      writable: false,
-      value: WX._Dictionary.Custom
+    _defaults: {
+      value: {
+        threshold: -12,
+        ratio: 4,
+        attack: 0.01,
+        release: 0.25,
+        makeup: 8
+      }
     }
   });
   // attaching callback function for onaudioprocess event
@@ -58,18 +58,18 @@ WX.C2 = function(json) {
     me._callback(event);
   };
   // performing unit-specific actions
-  this._inlet.connect(this._processor);
-  this._processor.connect(this._outlet);
+  this._inputGain.connect(this._processor);
+  this._processor.connect(this._outputGain);
   // assign (default) parameters
-  this.params = json;
+  this.params = this._defaults;
+  if (typeof json === "object") {
+    this.params = json;
+  }
+  this.label += "C2";
 };
 
-WX.C2.prototype = Object.create(WX._Unit.prototype, {
-
-  /**
-   * callback for onaudioprocess
-   * @param {object} event
-   */
+WX.C2.prototype = Object.create(WX.Unit.Processor.prototype, {
+  // custom callback
   _callback: {
     value: function(event) {
       // temp vars
@@ -80,7 +80,7 @@ WX.C2.prototype = Object.create(WX._Unit.prototype, {
       var outputL = event.outputBuffer.getChannelData(0);
       var outputR = event.outputBuffer.getChannelData(1);
       // callback loop
-      for (var i = 0, b = WX._customUnitBufferSize; i < b; ++i) {
+      for (var i = 0; i < 256; ++i) {
         // get abs-max from stereo
         var s = Math.max(Math.abs(inputL[i]), Math.abs(inputR[i]));
         // peak detection
@@ -98,11 +98,6 @@ WX.C2.prototype = Object.create(WX._Unit.prototype, {
       }
     }
   },
-
-  /**
-   * get/set threshold
-   * @param {float} dB for user, linear for internal processing
-   */
   threshold: {
     enumerable: true,
     get: function() {
@@ -112,11 +107,6 @@ WX.C2.prototype = Object.create(WX._Unit.prototype, {
       this._threshold = WX.db2lin(value);
     }
   },
-
-  /**
-   * get/set ratio
-   * @param {float} value arbitrary ratio
-   */
   ratio: {
     enumerable: true,
     get: function() {
@@ -127,11 +117,6 @@ WX.C2.prototype = Object.create(WX._Unit.prototype, {
       this._iratio = 1.0 / (this._ratio - 1.0);
     }
   },
-
-  /**
-   * get/set attack
-   * @param {float} value attack in seconds
-   */
   attack: {
     enumerable: true,
     get: function() {
@@ -141,11 +126,6 @@ WX.C2.prototype = Object.create(WX._Unit.prototype, {
       this._detector.attack = value;
     }
   },
-
-  /**
-   * get/set release
-   * @param {float} value release in seconds
-   */
   release: {
     enumerable: true,
     get: function() {
@@ -155,11 +135,6 @@ WX.C2.prototype = Object.create(WX._Unit.prototype, {
       this._detector.release = value;
     }
   },
-
-  /**
-   * get/set makeup
-   * @param {float} makeup gain in decibel
-   */
   makeup: {
     enumerable: true,
     get: function() {

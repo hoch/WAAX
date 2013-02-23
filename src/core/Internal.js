@@ -10,7 +10,7 @@
  * @class Internal:DualLevelDetector
  * @description program-dependent level detector for dynamic processing
  */
-WX._Internals.DualLevelDetector = function() {
+WX.Internal.DualLevelDetector = function() {
   Object.defineProperties(this, {
     _fs: {
       enumerable: false,
@@ -51,7 +51,7 @@ WX._Internals.DualLevelDetector = function() {
   this.reset();
 };
 
-WX._Internals.DualLevelDetector.prototype = Object.create(null, {
+WX.Internal.DualLevelDetector.prototype = Object.create(null, {
 
   /**
    * attack
@@ -131,7 +131,7 @@ WX._Internals.DualLevelDetector.prototype = Object.create(null, {
  * @param {int} blockSize write block size (default = 512)
  * @param {int} blockNum number of block in power of 2 (default = 8)
  */
-WX._Internals.RingBuffer = function(blockSize, blockNum) {
+WX.Internal.RingBuffer = function(blockSize, blockNum) {
   // pre sanity check
   var bs = (blockSize || 512);
       bn = (blockNum || 8);
@@ -167,7 +167,7 @@ WX._Internals.RingBuffer = function(blockSize, blockNum) {
   this._buffer = new Float32Array(this._bufferSize);
 };
 
-WX._Internals.RingBuffer.prototype = Object.create(null, {
+WX.Internal.RingBuffer.prototype = Object.create(null, {
 
   /**
    * writeBlock
@@ -190,7 +190,7 @@ WX._Internals.RingBuffer.prototype = Object.create(null, {
       // update read pointer
       this._reader = this._writer;
     }
-  },
+  }
 
   /**
    * copyBuffertoArray

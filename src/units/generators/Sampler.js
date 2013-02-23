@@ -1,61 +1,49 @@
 /**
  * @class Sampler
- * @description basic sampler abstraction based on buffer source node
- * @param {object} json parameters in JSON notation
- *                      { source: url, basePitch: pitch }
  */
 
 // TODO: loop, loopStart, loopEnd
 // TODO: voice management, max voice
-// TODO: pitch modulation from inlet
-// TODO: how to delete unused inlet
+// TODO: pitch modulation
+// TODO: play with time scheduling
 
 WX.Sampler = function(json) {
-  // calling super constructor
-  WX._Unit.call(this);
-  // creating unit-specific properties
+  WX.Unit.Generator.call(this);
   Object.defineProperties(this, {
     _buffer: {
-      enumerable: false,
       writable: true,
       value: undefined
     },
-    _node: {
-      enumerable: false,
+    _player: {
       writable: true,
       value: undefined
     },
     _url: {
-      enumerable: false,
       writable: true,
       value: ""
     },
     _basePitch: {
-      enumerable: false,
       writable: true,
       value: 60
     },
-    _label: {
-      enumerable: false,
-      writable: false,
-      value: WX._Dictionary.Sampler
-    },
-    _ready: {
-      enumerable: false,
+    _loaded: {
       writable: true,
       value: false
+    },
+    _defaults: {
+      value: {
+        basePitch: 60
+      }
     }
   });
-  // assign (default) parameters
-  this.params = json;
+  this.params = this._defaults;
+  if (typeof json === "object") {
+    this.params = json;
+  }
+  this.label += "Sampler";
 };
 
-WX.Sampler.prototype = Object.create(WX._Unit.prototype, {
-
-  /**
-   * get/set source location URL of sample
-   * @param {string} url location of sample
-   */
+WX.Sampler.prototype = Object.create(WX.Unit.Generator.prototype, {
   source: {
     enumerable: true,
     get: function() {
@@ -73,7 +61,8 @@ WX.Sampler.prototype = Object.create(WX._Unit.prototype, {
       xhr.onload = function() {
         try {
           me._buffer = WX._context.createBuffer(xhr.response, true);
-          me._ready = true;
+          me._loaded = true;
+          WX.info(me, "loaded: " + url);
         } catch(error) {
           WX.error(me, "file loading error: " + url + " (" + error.message + ")");
         }
@@ -83,11 +72,6 @@ WX.Sampler.prototype = Object.create(WX._Unit.prototype, {
       return true;
     }
   },
-
-  /**
-   * get/set base pitch of sample (original pitch)
-   * @type {Object}
-   */
   basePitch: {
     enumerable: true,
     get: function() {
@@ -97,40 +81,31 @@ WX.Sampler.prototype = Object.create(WX._Unit.prototype, {
       this._basePitch = pitch;
     }
   },
-
-  /**
-   * fire sampler
-   * @param {float} pitch playing pitch of sample
-   */
   noteOn: {
     value: function(pitch) {
-      if (!this._ready) {
+      if (!this._loaded) {
         WX.error(this, "sampler is not ready.");
         return;
       }
       // is this efficient?
-      this._node = WX._context.createBufferSource();
-      this._node.buffer = this._buffer;
-      this._node.connect(this._outlet);
+      this._player = WX._context.createBufferSource();
+      this._player.buffer = this._buffer;
+      this._player.connect(this._outputGain);
       // NOTE: calculate pitch and play the sound
       // (2 ^ (semitones change/12) = rate
       if (pitch !== undefined) {
         var rate = Math.pow(2, (pitch - this._basePitch) / 12);
-        this._node.playbackRate.setValueAtTime(rate, 0);
+        this._player.playbackRate.setValueAtTime(rate, 0);
       }
       // new method name, noteOn() is deprecated
-      this._node.start(0);
+      this._player.start(0);
     }
   },
-
-  /**
-   * stop sampler
-   */
   noteOff: {
-    value: function() {
-      if (this._node) {
+    value: function(interval) {
+      if (this._player) {
         // new method name, noteOff() is deprecated
-        this._node.stop(0);
+        this._player.stop(interval || 0);
       }
     }
   }

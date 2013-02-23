@@ -1,39 +1,41 @@
 /**
  * @class Comp
  * @description compressor abstraction
- * @param {object} json parameters in JSON notation
- *                      { threshold, ratio, knee, attack, release }
  */
+
+// TODO: auto makeup is possible?
+// TODO: return gain reduction to visualize
+
 WX.Comp = function(json) {
-  // calling super constructor
-  WX._Unit.call(this);
-  // creating unit-specific properties
+  WX.Unit.Processor.call(this);
   Object.defineProperties(this, {
     _comp: {
       enumerable: false,
       writable: false,
       value: WX._context.createDynamicsCompressor()
     },
-    _label: {
-      enumerable: false,
-      writable: false,
-      value: WX._Dictionary.Comp
+    _defaults: {
+      value: {
+        threshold: -12,
+        ratio: 4,
+        knee: 0.5,
+        attack: 0.01,
+        release: 0.25
+      }
     }
   });
   // performing unit-specific actions
-  this._inlet.connect(this._comp);
-  this._comp.connect(this._outlet);
+  this._inputGain.connect(this._comp);
+  this._comp.connect(this._outputGain);
   // assign (default) parameters
-  this.params = json;
+  this.params = this._defaults;
+  if (typeof json === "object") {
+    this.params = json;
+  }
+  this.label += "Comp";
 };
 
-
-WX.Comp.prototype = Object.create(WX._Unit.prototype, {
-
-  /**
-   * get/set threshold
-   * @param {float} value threshold: default -24, nominal range of -100 to 0.
-   */
+WX.Comp.prototype = Object.create(WX.Unit.Processor.prototype, {
   threshold: {
     enumerable: true,
     get: function() {
@@ -43,11 +45,6 @@ WX.Comp.prototype = Object.create(WX._Unit.prototype, {
       this._comp.threshold.value = value;
     }
   },
-
-  /**
-   * get/set ratio
-   * @param {float} value arbitrary ratio
-   */
   ratio: {
     enumerable: true,
     get: function() {
@@ -57,11 +54,6 @@ WX.Comp.prototype = Object.create(WX._Unit.prototype, {
       this._comp.ratio.value = value;
     }
   },
-
-  /**
-   * get/set knee
-   * @param {float} value knee parameter in db
-   */
   knee: {
     enumerable: true,
     get: function() {
@@ -71,11 +63,6 @@ WX.Comp.prototype = Object.create(WX._Unit.prototype, {
       this._comp.knee.value = value;
     }
   },
-
-  /**
-   * get/set attack
-   * @param {float} value attack in seconds
-   */
   attack: {
     enumerable: true,
     get: function() {
@@ -85,11 +72,6 @@ WX.Comp.prototype = Object.create(WX._Unit.prototype, {
       this._comp.attack.value = value;
     }
   },
-
-  /**
-   * get/set release
-   * @param {float} value release in seconds
-   */
   release: {
     enumerable: true,
     get: function() {
