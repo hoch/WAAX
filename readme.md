@@ -113,8 +113,8 @@ There are several components (which are yet to be released publicly) to be incor
 [8]: http://webaudio.github.com/web-midi-api/
 
 
-Contact
--------
-This project is initiated and managed by hoch([Hongchan Choi][9]).
+Contact and License
+-------------------
+This project is initiated and managed by hoch([Hongchan Choi][9]). Please refer LICENSE file (MIT License) for more info.
 
 [9]: https://ccrma.stanford.edu/~hongchan/
