@@ -77,12 +77,12 @@ The connection from a WAAX unit to Web Audio API node can be done by `.connect()
 ```javascript
 comp.threshold = -12;
 comp.ratio = 8.0;
-kick.params = { source:"kd2.wav", basePitch: 48 };
+kick.params = { source:"kd2.wav", basePitch:48 };
 
 console.log(kick.source);
 >>> "kd2.wav"
 console.log(kick.params);
->>> { source:"kd2.wav", basePitch: 48 }
+>>> { source:"kd2.wav", basePitch:48 }
 ```
 
 All the parameters of a unit is accessible by simply setting or getting values. Alternatively, passing an object with parameters into `.params` is also possible. Getting available parameters from a unit can be done by printing out `.params` as well.
@@ -98,8 +98,8 @@ Units and Parameters
 `WX.ADSR` `WX.LPRez` `WX.TwinDelay` `WX.ConVerb` `WX.Comp` `WX.C2`
 
 ### Analyzer
-_NOTE: Not available yet_
 `WX.Scope` `WX.Spectrum` `WX.Waterfall` 
+_NOTE: Not available yet_
 
 
 Utilities
