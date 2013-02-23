@@ -1,6 +1,6 @@
 WAAX (Web Audio API eXtension)
 ------------------------------
-**JavaScript library for music and audio programming with Chrome**
+**JavaScript library for music and audio programming on Chrome**
 
 ```javascript
 // creating units
@@ -23,13 +23,21 @@ The facade of API is strongly inspired by [THREE.js][2] and [ChucK][3]: Three.js
 
 As this library is in early stages of development, it currently demonstrates minimum set of features, however, it will embrace more elements as it grows: ready-made instruments, comprehensive timebase system (in conjunction with Web MIDI API), and musical interconnection between multiple Chrome clients.
 
-See its potential in the first demo: [interactive code editor][6] - **Adjust your volume setting before clicking. It might be loud!**
 
 [1]: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html "Web Audio API: W3C Editor's Draft"
 [2]: https://github.com/mrdoob/three.js/ "THREE.js: Github Repo"
 [3]: http://chuck.cs.princeton.edu/
 [4]: http://plork.cs.princeton.edu/
 [5]: http://slork.stanford.edu/
+
+
+Demo
+----
+Requirements: _Google Chrome 24+ on any platform(Win/OSX/Linux)._
+
+See its potential in the first demo: **[interactive code editor][6]
+_Adjust your volume setting before clicking. It might be loud!_
+
 [6]: http://hoch.github.com/waax/examples/editor.html
 
 
