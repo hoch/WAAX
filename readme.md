@@ -90,6 +90,7 @@ All the parameters of a unit is accessible by simply setting or getting values. 
 
 Units and Parameters
 --------------------
+As WAAX is in early stages of development, there are several components (which are yet to be released publicly) to be incorporated into this library in the near future. I am currently expanding its sonic vocabulary by adding more units to the library. The followings are a basic set of units as the first milestone.
 
 ### Generator
 `WX.Oscil` `WX.Noise` `WX.Sampler` `WX.LFO`
@@ -97,12 +98,23 @@ Units and Parameters
 ### Processors
 `WX.ADSR` `WX.LPRez` `WX.TwinDelay` `WX.ConVerb` `WX.Comp` `WX.C2`
 
-### Analyzer
+### Analyzer _(Not Available Yet)_
 `WX.Scope` `WX.Spectrum` `WX.Waterfall` 
-_NOTE: Not available yet_
 
-
-Utilities
----------
-
+### Utilities
 `WX.random2` `WX.random2f` `WX.db2lin` `WX.lin2db` `WX.pitch2freq` `WX.freq2pitch`
+
+
+Futurework
+----------
+There are several components (which are yet to be released publicly) to be incorporated into this library in the near future. One of these components is [WebRTC][7], the new web technology that enables a peer-to-peer connection between browsers. It realizes the idea of real time collaboration by interconnecting multiple clients without complicated server-side programming. The other one is [Web MIDI API][8] that empowers the browser to access local MIDI devices (i.e. USB-MIDI keyboards and controllers)
+
+[7]: http://dev.w3.org/2011/webrtc/editor/webrtc.html#rtcdatachannel
+[8]: http://webaudio.github.com/web-midi-api/
+
+
+Contact
+-------
+This project is initiated and managed by hoch([Hongchan Choi][9]).
+
+[9]: https://ccrma.stanford.edu/~hongchan/
