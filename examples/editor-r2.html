@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CodeMirror: HTML5 preview</title>
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <!-- code mirror and custom -->
+    <link rel=stylesheet href="js/codemirror-latest/lib/codemirror.css">
+    <link rel=stylesheet href="js/codemirror-latest/theme/solarized.css">
+    <style type=text/css>
+      .CodeMirror {
+        float: left;
+        width: 100%;
+        height: 100%;
+      }
+      iframe {
+        width: 100%;
+        float: left;
+        height: 300px;
+        border: 0;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      .mainview {
+        width: 100%;
+        position: absolute;
+        top: 41px;
+      }
+      .wx-editor {
+        width: 50%;
+        display: inline-block;
+      }
+      .wx-preview {
+        width: 49.5%; 
+        display: inline-block;
+      }
+      .navbar-inverse .navbar-inner {
+        padding: 0 10px;
+      }
+    </style>
+  </head>
+  <body>
+
+<!-- nav bar -->
+<div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar-inner">
+    <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="brand" href="#">WAAX.r3</a>
+    <div class="nav-collapse collapse">
+      <ul class="nav">
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">File <b class="caret"></b></a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="drop-file">
+            <li><a tabindex="-1" href="">New</a></li>
+            <li><a tabindex="-1" href="">Save to Cache</a></li>
+            <li><a tabindex="-1" href="">Import...</a></li>
+            <li><a tabindex="-1" href="">Export...</a></li>
+          </ul>
+        </li>
+      </ul>
+      <div class="pull-right">
+        <button type="button" class="btn" data-toggle="button"><i class="icon-volume-up"></i></button>
+      </div>
+    </div><!--/.nav-collapse -->
+  </div>
+</div>
+
+<div class="mainview">
+
+<div class="wx-editor">
+<!-- code begins -->
+<textarea id="code" name="code">
+<!doctype html>
+<html>
+  <head>
+    <meta charset=utf-8>
+    <title>HTML5 canvas demo</title>
+    <style>p {font-family: monospace;}</style>
+  </head>
+  <body>
+    <p>Canvas pane goes here:</p>
+    <canvas id="pane" width="300px" height="200px"></canvas>
+    <script>
+      var canvas = document.getElementById('pane');
+      var context = canvas.getContext('2d');
+      context.fillStyle = 'rgb(250,0,0)';
+      context.fillRect(10, 10, 55, 50);
+      context.fillStyle = 'rgba(0, 0, 250, 0.5)';
+      context.fillRect(30, 30, 55, 50);
+    </script>
+  </body>
+</html>
+</textarea>
+<!-- code ends -->
+</div>
+<div class="wx-preview">
+  <!-- preview -->
+  <iframe id="previewFrame"></iframe>
+</div>
+</div>
+</div>
+
+<!-- scripts -->
+<script src="js/jquery-1.9.1.min.js"></script>
+<script src="js/codemirror-latest/lib/codemirror.js"></script>
+<script src="js/codemirror-latest/mode/xml/xml.js"></script>
+<script src="js/codemirror-latest/mode/javascript/javascript.js"></script>
+<script src="js/codemirror-latest/mode/css/css.js"></script>
+<script src="js/codemirror-latest/mode/htmlmixed/htmlmixed.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<!-- program -->
+<script>
+  var delay;
+  // Initialize CodeMirror editor with a nice html5 canvas demo.
+  var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+    mode: 'text/html',
+    tabMode: 'indent',
+    lineNumbers: true,
+    matchBrackets: true,
+    indentWithTabs: true,
+    tabSize: 2,
+    indentUnit: 2,
+    theme: "solarized dark"
+  });
+  //editor.setOption("theme", "ambiance");
+  editor.on("change", function() {
+    clearTimeout(delay);
+    delay = setTimeout(updatePreview, 500);
+  });
+  
+  editor.setSize(null, "500px");
+  
+  function updatePreview() {
+    var previewFrame = document.getElementById('previewFrame');
+    var preview = previewFrame.contentDocument || previewFrame.contentWindow.document;
+    preview.open();
+    preview.write(editor.getValue());
+    preview.close();
+  }
+  setTimeout(updatePreview, 500);
+</script>
+</body>
+</html>
