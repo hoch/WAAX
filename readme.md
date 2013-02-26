@@ -101,7 +101,7 @@ All the parameters of a unit is accessible by simply setting or getting values. 
 
 ```javascript
 // creating waveform display with target canvas ID
-var wf = new WX.Waveform({ canvas: "CANVAS-ID"});
+var wf = new WX.Waveform({ canvas:"CANVAS-ID" });
 // connecting compressor unit to waveform visualizer
 comp.to(wf);
 // draw waveform
