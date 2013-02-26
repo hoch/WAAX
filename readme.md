@@ -97,6 +97,20 @@ console.log(kick.params);
 All the parameters of a unit is accessible by simply setting or getting values. Alternatively, passing an object with parameters into `.params` is also possible. Getting available parameters from a unit can be done by printing out `.params` as well.
 
 
+### Visualization
+
+```javascript
+// creating waveform display with target canvas ID
+var wf = new WX.Waveform({ canvas: "CANVAS-ID"});
+// connecting compressor unit to waveform visualizer
+comp.to(wf);
+// draw waveform
+wf.draw();
+```
+
+Using a set of units called _Analyzers_, visualizing waveforms and spectrum can be achieved instantly. The visual content will be automatically resized according to the size of the target canvas DOM element.
+
+
 Units and Parameters
 --------------------
 As WAAX is in early stages of development, there are several components (which are yet to be released publicly) to be incorporated into this library in the near future. I am currently expanding its sonic vocabulary by adding more units to the library. The followings are a basic set of units as the first milestone. A detailed documentation of each unit will be available soon.
@@ -107,8 +121,8 @@ As WAAX is in early stages of development, there are several components (which a
 ### Processors
 `WX.ADSR` `WX.LPRez` `WX.TwinDelay` `WX.ConVerb` `WX.Comp` `WX.C2`
 
-### Analyzer _(Not Available Yet)_
-`WX.Scope` `WX.Spectrum` `WX.Waterfall` 
+### Analyzer
+`WX.Waveform` `WX.Spectrum` `WX.Waterfall` 
 
 ### Utilities
 `WX.random2` `WX.random2f` `WX.db2lin` `WX.lin2db` `WX.pitch2freq` `WX.freq2pitch`
