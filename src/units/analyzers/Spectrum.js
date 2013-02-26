@@ -1,7 +1,7 @@
 /**
- * @class Waveform
+ * @class Spectrum
  */
-WX.Waveform = function(json) {
+WX.Spectrum = function(json) {
   WX.Unit.Analyzer.call(this);
   Object.defineProperties(this, {
     _canvas: {
@@ -22,11 +22,12 @@ WX.Waveform = function(json) {
     },
     _defaults: {
       value: {
-        canvas: "canvas-wx-waveform",
+        canvas: "canvas-wx-spectrum",
         style: {
           color: "#0f0",
           bgcolor: "#000",
-          width: 1.0
+          width: 1.0,
+          timeSmoothing: 0
         }
       }
     }
@@ -36,10 +37,10 @@ WX.Waveform = function(json) {
   if (typeof json === "object") {
     this.params = json;
   }
-  this.label += "Waveform";
+  this.label += "Spectrum";
 };
 
-WX.Waveform.prototype = Object.create(WX.Unit.Analyzer.prototype, {
+WX.Spectrum.prototype = Object.create(WX.Unit.Analyzer.prototype, {
   canvas: {
     enumerable: true,
     get: function() {
@@ -72,7 +73,8 @@ WX.Waveform.prototype = Object.create(WX.Unit.Analyzer.prototype, {
       var s = {
         color: this._context2D.strokeStyle,
         width: this._context2D.lineWidth,
-        bgcolor: this._canvas.style.backgroundColor
+        bgcolor: this._canvas.style.backgroundColor,
+        timeSmoothing: this._analyzer.timeSmoothingConstant
       };
       return s;
     },
@@ -84,6 +86,7 @@ WX.Waveform.prototype = Object.create(WX.Unit.Analyzer.prototype, {
       this._context2D.strokeStyle = json.color || "#0f0";
       this._context2D.lineWidth = json.width || 1.0;
       this._canvas.style.backgroundColor = json.bgcolor || "#000";
+      this._analyzer.timeSmoothingConstant = json.timeSmoothing || 0.0;
     }
   },
   pause: {
@@ -99,7 +102,7 @@ WX.Waveform.prototype = Object.create(WX.Unit.Analyzer.prototype, {
       if (this._pause) {
         return;
       } else {
-        this._analyzer.getByteTimeDomainData(this._buffer);
+        this._analyzer.getByteFrequencyData(this._buffer);
         var c = this._context2D;
         c.clearRect(0, 0, this._canvas.width, this._canvas.height);
         c.beginPath();
