@@ -46,7 +46,7 @@ Usage
 -----
 
 
-### Unit: Creation
+### Creating Units
 
 Like the _node_ in Web Audio API, WAAX has its own atomic object called **unit**. It is conceptually identical to 'unit generator' of other audio programming environments and consists of more than 2 nodes in general.
 
@@ -59,7 +59,7 @@ var kick = new WX.Sampler({ source: "kd.wav", basePitch: 60 }),
 A unit can be created with an object of initial parameters, or it can be set with default parameters when it is created without any argument.
 
 
-### Unit: Connection
+### Making Connections
 
 ```javascript
 // connecting units with .to() method
@@ -81,7 +81,7 @@ node.connect(comp._inlet);
 The connection from a WAAX unit to Web Audio API node can be done by `.connect()` method, which is the same method in Web Audio API, but the connection from a node to a unit should be done manually with `._inlet` node from a unit.
 
 
-### Unit: Parameters
+### Setting Parameters
 
 ```javascript
 comp.threshold = -12;
@@ -111,8 +111,8 @@ wf.draw();
 Using a set of units called _Analyzers_, visualizing waveforms and spectrum can be achieved instantly. The visual content will be automatically resized according to the size of the target canvas DOM element.
 
 
-Units and Parameters
---------------------
+Units: Generators, Processors and Analyzers
+-------------------------------------------
 As WAAX is in early stages of development, there are several components (which are yet to be released publicly) to be incorporated into this library in the near future. I am currently expanding its sonic vocabulary by adding more units to the library. The followings are a basic set of units as the first milestone. A detailed documentation of each unit will be available soon.
 
 ### Generators
