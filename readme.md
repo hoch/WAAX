@@ -115,13 +115,13 @@ Units and Parameters
 --------------------
 As WAAX is in early stages of development, there are several components (which are yet to be released publicly) to be incorporated into this library in the near future. I am currently expanding its sonic vocabulary by adding more units to the library. The followings are a basic set of units as the first milestone. A detailed documentation of each unit will be available soon.
 
-### Generator
+### Generators
 `WX.Oscil` `WX.Noise` `WX.Sampler` `WX.LFO`
 
 ### Processors
 `WX.ADSR` `WX.LPRez` `WX.TwinDelay` `WX.ConVerb` `WX.Comp` `WX.C2`
 
-### Analyzer
+### Analyzers
 `WX.Waveform` `WX.Spectrum` `WX.Waterfall` 
 
 ### Utilities
