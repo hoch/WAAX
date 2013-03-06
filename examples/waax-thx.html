@@ -4,6 +4,7 @@
   </head>
   <body>
     <h1>WAAX does THX!!</h1>
+    <!-- this is the target canvas for visualization -->
     <canvas id="canvas-wx-spectrum" width="650px" height="255px"></canvas>
     <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
     <script>
@@ -12,7 +13,8 @@
        * by Perry R. Cook and Ge Wang for ChucK
        * WAAX version ported by Hongchan Choi
        */
-      // F-1, B1b,  F1,    B2b,   F2,    B3b,   F3,    A5,    F4,   A6
+      
+      // target and initial pitches
       var targets = [ 
         29.0, 87.5, 116.0, 175.0, 233.0, 350.0, 524.0, 880.0, 1048, 1760,
         29.0, 87.5, 116.0, 175.0, 233.0, 350.0, 524.0, 880.0, 1048, 1760,
@@ -20,25 +22,35 @@
       ];
       var initials = [];
       
+      // creating & setting units
       var verb = new WX.ConVerb({ mix:0.025 });
+      // compression with the default setting with doubled makeup gain
       var comp = new WX.Comp({ gain:2 });
+      // NOTE: the default target canvas is "canvas-wx-spectrum"
       var sp = new WX.Spectrum({ style:{ color:"#f66" } });
+      // array for saw oscillators
       var saws = [];
       for(var i = 0; i < 30; ++i) {
         initials[i] = WX.random2f(200.0, 800.0);
         saws[i] = new WX.Oscil({ type:1, frequency:initials[i], gain:0.1 });
+        // connect all saw oscs to reverberation
         saws[i].to(verb);
       }
+      // connect: reverb => compressor => master out
       verb.to(comp).to(WX.DAC);
+      // master 
       comp.to(sp);
+      // lower the master volume for your safety
       WX.DAC.db = -24;
       
-      function animate() {
-        requestAnimationFrame(animate);
+      // visualization driver
+      function draw() {
+        requestAnimationFrame(draw);
         sp.draw();
       }
-      animate();
+      draw();
       
+      // start gliding!
       for(var i = 0; i < 30; ++i) {
         saws[i].glide(targets[i], 4.0);
       }
