@@ -284,7 +284,12 @@
   /**
    * initialization
    */
+  // check appcache manifest and update
+  var appCache = window.applicationCache;
+  appCache.update();
+  // resize codemirror
   resizeCodeArea();
+  // load from local storage (if available)
   if(!loadFromCache()) {
     loadExample('../examples/hellowaax.html');
   }
