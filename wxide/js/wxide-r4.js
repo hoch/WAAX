@@ -289,7 +289,11 @@
   appCache.update();
   if (appCache.status == window.applicationCache.UPDATEREADY) {
     appCache.swapCache();
+    if (confirm('A new version of this site is available. Reload the page.')) {
+      window.location.reload();
+    }
   }
+
   // resize codemirror
   resizeCodeArea();
   // load from local storage (if available)
