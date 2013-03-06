@@ -287,6 +287,9 @@
   // check appcache manifest and update
   var appCache = window.applicationCache;
   appCache.update();
+  if (appCache.status == window.applicationCache.UPDATEREADY) {
+    appCache.swapCache();
+  }
   // resize codemirror
   resizeCodeArea();
   // load from local storage (if available)
