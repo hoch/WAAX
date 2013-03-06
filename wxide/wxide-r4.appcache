@@ -1,9 +1,10 @@
 CACHE MANIFEST
-# 2013-3-6
+# 2013-3-6:v4
 
 CACHE:
 wxide-r4.html
 css/fonts/droid-sans-mono.woff
+css/images/glyphicons-halflings-white.png
 css/codemirror-monokai.css
 js/jquery-1.9.1.min.js
 js/bootstrap.min.js
@@ -13,6 +14,7 @@ js/codemirror/mode/htmlmixed.js
 js/codemirror/mode/javascript.js
 js/codemirror/mode/css.js
 js/esprima.js
+../build/WAAX.min.js
 
 NETWORK:
 *
