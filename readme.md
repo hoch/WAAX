@@ -1,8 +1,6 @@
 WAAX (Web Audio API eXtension)
 ------------------------------
-**JavaScript library for music and audio programming on Chrome**
-
-Check out WAAX's [mini-IDE][6]!!
+**JavaScript library for music and audio programming on Chrome** - Check out [midiIDE][6]!
 
 ```javascript
 // creating units
@@ -35,14 +33,17 @@ As this library is in early stages of development, it currently demonstrates min
 
 Demo
 ----
-Requirement: _Google Chrome 24+ on any platform(Win/OSX/Linux)._
+Requirements: **Google Chrome 24+** on any platform(Win/OSX/Linux).
 
-See its potential in the first demo: **[interactive code editor][6]**
+ * **[miniIDE][6]**
+ * [WAAX does THX][10]
+ * [Rezobass][11]
 
 _Adjust your volume setting before clicking. It might be loud!_
 
 [6]: http://hoch.github.com/waax/examples/editor.html
-
+[10]: http://hoch.github.com/waax/examples/waax-thx.html
+[11]: http://hoch.github.com/waax/examples/rezobass.html
 
 Usage
 -----
