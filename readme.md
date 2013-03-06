@@ -38,12 +38,14 @@ Requirements: **Google Chrome 24+** on any platform(Win/OSX/Linux).
  * **[mini-IDE][6]**
  * [WAAX does THX][10]
  * [Rezobass][11]
+ * [Samplr][12]
 
 _Adjust your volume setting before clicking. It might be loud!_
 
 [6]: http://hoch.github.com/waax/examples/editor.html
 [10]: http://hoch.github.com/waax/examples/waax-thx.html
 [11]: http://hoch.github.com/waax/examples/rezobass.html
+[12]: http://hoch.github.com/waax/examples/samplr.html
 
 Usage
 -----
