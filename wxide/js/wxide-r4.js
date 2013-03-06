@@ -226,6 +226,9 @@
       case 'a-menu-ex-rezobass':
         loadExample('../examples/rezobass.html');
         break;
+      case 'a-menu-ex-samplr':
+        loadExample('../examples/samplr.html');
+        break;
     }
   });
 
