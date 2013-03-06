@@ -68,7 +68,10 @@
   }
   // cache: loadFromCache
   function loadFromCache() {
-    var data = JSON.parse(localStorage.wxide);
+    var data = null;
+    if (localStorage.wxide !== undefined) {
+      data = JSON.parse(localStorage.wxide);
+    }
     if (data !== null) {
       editor.setValue(data);
       setStatusText("Loaded from cache.");
