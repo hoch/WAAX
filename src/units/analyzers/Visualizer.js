@@ -1,9 +1,14 @@
 /**
- * @class Waveform
+ * @class Visualizer
  */
-WX.Waveform = function(json) {
+WX.Visualizer = function(json) {
   WX.Unit.Analyzer.call(this);
   Object.defineProperties(this, {
+    _drawCallback: {
+      enumerable: false,
+      writable: true,
+      value: function() {}
+    },
     _canvas: {
       writable: true,
       value: null
@@ -22,7 +27,7 @@ WX.Waveform = function(json) {
     },
     _defaults: {
       value: {
-        canvas: "canvas-wx-waveform",
+        canvas: "canvas-wx-Visualizer",
         style: {
           color: "#0f0",
           bgcolor: "#000",
@@ -36,10 +41,10 @@ WX.Waveform = function(json) {
   if (typeof json === "object") {
     this.params = json;
   }
-  this.label += "Waveform";
+  this.label += "Visualizer";
 };
 
-WX.Waveform.prototype = Object.create(WX.Unit.Analyzer.prototype, {
+WX.Visualizer.prototype = Object.create(WX.Unit.Analyzer.prototype, {
   canvas: {
     enumerable: true,
     get: function() {
@@ -94,20 +99,21 @@ WX.Waveform.prototype = Object.create(WX.Unit.Analyzer.prototype, {
       this._pause = bool;
     }
   },
+  onRender: {
+    set: function(userFunction) {
+      this._drawCallback = userFunction;
+    },
+    get: function() {
+      return this._drawCallback;
+    }
+  },
   draw: {
     value: function(event) {
       if (this._pause) {
         return;
       } else {
         this._analyzer.getByteTimeDomainData(this._buffer);
-        var c = this._context2D;
-        c.clearRect(0, 0, this._canvas.width, this._canvas.height);
-        c.beginPath();
-        c.moveTo(0, (1.0 - this._buffer[0]/255) * this._scaleY);
-        for(var i = 1, b = this._buffer.length; i < b; ++i) {
-          c.lineTo(i * this._unitX, (1.0 - this._buffer[i]/255) * this._scaleY);
-        }
-        c.stroke();
+        this._drawCallback.call(this, this._context2D, this._buffer);
       }
     }
   }

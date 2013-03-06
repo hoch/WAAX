@@ -10,7 +10,7 @@
       <li><b>Slash (/)</b> - Hihat</li>
     </ul>
     <p>NOTE: Make sure to click here to get focus first.</p>
-    <canvas id="canvas-wx-waveform" width="675px" height="360px"></canvas>
+    <canvas id="canvas-wx-waveform" width="750px" height="360px" style="position:absolute; bottom:0; left:0;"></canvas>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
     <script>
@@ -25,7 +25,9 @@
           hh = new WX.Sampler({ source:PATH_SAMPLES + "hihat-2.wav" }),
           comp = new WX.Comp({ threshold:-9.0, ratio:8.0, gain:4.0 }),
           verb = new WX.ConVerb({ source:PATH_IR + "hall.wav", mix:0.01 });
-      var wf = new WX.Waveform({ style:{ width:2 } });
+      var wf = new WX.Waveform({ 
+        style:{ width:2, color:"#000", bgcolor:"#fff" } 
+      });
 
       // connections
       kd1.to(verb).to(comp).to(WX.DAC);
