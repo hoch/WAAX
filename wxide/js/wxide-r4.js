@@ -285,20 +285,18 @@
    * initialization
    */
   // check appcache manifest and update
-  var appCache = window.applicationCache;
-  appCache.update();
-  if (appCache.status == window.applicationCache.UPDATEREADY) {
-    appCache.swapCache();
-    if (confirm('A new version of this site is available. Reload the page.')) {
-      window.location.reload();
+  $(document).ready(function() {
+    var appCache = window.applicationCache;
+    appCache.update();
+    if (appCache.status == window.applicationCache.UPDATEREADY) {
+      appCache.swapCache();
     }
-  }
-
-  // resize codemirror
-  resizeCodeArea();
-  // load from local storage (if available)
-  if(!loadFromCache()) {
-    loadExample('../examples/hellowaax.html');
-  }
-  setStatusText("Ready. (r4)");
+    // resize codemirror
+    resizeCodeArea();
+    // load from local storage (if available)
+    if(!loadFromCache()) {
+      loadExample('../examples/hellowaax.html');
+    }
+    setStatusText("Ready. (r4)");
+  });
 }());
