@@ -2,7 +2,7 @@ CACHE MANIFEST
 # 2013-3-4
 
 CACHE:
-wxide-r4.html
+#wxide-r4.html
 css/fonts/droid-sans-mono.woff
 css/codemirror-monokai.css
 js/jquery-1.9.1.min.js
