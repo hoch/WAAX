@@ -1,0 +1,79 @@
+@font-face {
+    font-family: 'inconsolata';
+    src: url('fonts/inconsolata.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+.wxc-editor {
+    position: relative;
+    min-width: 300px;
+    min-height: 362px;
+    width: 550px;
+    height: 700px;
+    border: 1px solid #666;
+    box-shadow: 2px 2px 10px #999;
+    z-index: 50;
+}
+.wxc-showEditor {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background-color: #666;
+    width: 38px;
+    height: 38px;
+    padding-left: 2px;
+    border-radius: 5px;
+    z-index: 50;
+}
+.wxc-editor-menuBar {
+    width: (100% - 10px);
+    height: 42px;
+    padding: 0 5px;
+    background-color: #666;
+    cursor: move;
+    z-index: 60;
+}
+.wxc-button {
+    font-size: 11px;
+    margin: 7px 5px 0 5px;
+    border-radius: 2px;
+}
+.wxc-editor-codeArea {
+    width: 100%;
+    height: (100% - 62px);
+    min-height: 300px;
+    overflow: hidden;
+    z-index: 40;
+    /* background-color: #fdf; */
+}
+.wxc-editor-statusBar {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 20px;
+    background-color: #666;
+}
+.wxc-editor-statusBar-text {
+    margin: 0 0 0 5px;
+    color: #ddd;
+    font-family: sans-serif;
+    font-size: 9px;
+}
+.ui-menu {
+    position: absolute;
+    width: 120px;
+    font-size: 11px;
+    z-index: 100;
+}
+.pull-right {
+    float: right;
+}
+.wxc-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* background-color: #ddf; */
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
