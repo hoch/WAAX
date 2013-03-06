@@ -218,7 +218,7 @@
     var elId = $(this)[0].id;
     switch (elId) {
       case 'a-menu-ex-default':
-        loadExample('../examples/default.html');
+        loadExample('../examples/hellowaax.html');
         break;
       case 'a-menu-ex-thx':
         loadExample('../examples/waax-thx.html');
@@ -283,7 +283,7 @@
    */
   resizeCodeArea();
   if(!loadFromCache()) {
-    loadExample('../examples/default.html');
+    loadExample('../examples/hellowaax.html');
   }
   setStatusText("Ready. (r4)");
 }());
