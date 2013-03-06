@@ -18,25 +18,31 @@
           PATH_IR = "../data/ir/";
 
       // a simple drum sampler with compressor, reverb, and delay
-      var kd = new WX.Sampler({ source:PATH_SAMPLES + "kick-1.wav" }),
+      var kd1 = new WX.Sampler({ source:PATH_SAMPLES + "kick-1.wav" }),
+          kd2 = new WX.Sampler({ source:PATH_SAMPLES + "kick-2.wav" }),
           sd = new WX.Sampler({ source:PATH_SAMPLES + "snare-1.wav" }),
           hh = new WX.Sampler({ source:PATH_SAMPLES + "hihat-2.wav" }),
-          comp = new WX.Comp({ threshold:-6.0, ratio:8.0, gain:2.0 }),
+          comp = new WX.Comp({ threshold:-9.0, ratio:8.0, gain:4.0 }),
           verb = new WX.ConVerb({ source:PATH_IR + "hall.wav", mix:0.01 });
       var wf = new WX.Waveform({ style:{ width:2 } });
 
       // connections
-      kd.to(verb).to(comp).to(WX.DAC);
+      kd1.to(verb).to(comp).to(WX.DAC);
+      kd2.to(verb);
       sd.to(verb);
       hh.to(verb);
       comp.to(wf);
+      
+      // summing 2 KDs for solid bottom
+      kd1.gain = 0.5;
+      kd2.gain = 0.5;
       
       // key input handling
       $(window).keydown(function(event) {
         event.preventDefault();
         switch(event.which) {
-          // noteOn with pitches
-          case 90:  kd.noteOn(55);  break;
+          // noteOn with pitches (60 is default base pitch)
+          case 90:  kd1.noteOn(55); kd2.noteOn(60); break;
           case 16:  sd.noteOn(67);  break;
           case 191: hh.noteOn(67);  break;
         }
