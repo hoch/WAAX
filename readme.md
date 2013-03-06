@@ -2,6 +2,8 @@ WAAX (Web Audio API eXtension)
 ------------------------------
 **JavaScript library for music and audio programming on Chrome**
 
+Check out WAAX's [mini-IDE][6]!!
+
 ```javascript
 // creating units
 var saw = new WX.Oscil({ type:2 }),

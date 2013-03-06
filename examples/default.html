@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Hello WAAX!</h1>
+    <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
+    <script>
+      // a sine wave
+      var osc = new WX.Oscil();
+      // connect it to output
+      osc.to(WX.DAC);
+      // set output volume in dB
+      WX.DAC.db = -24;
+    </script>
+  </body>
+</html>

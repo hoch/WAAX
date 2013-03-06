@@ -1,0 +1,120 @@
+<!-- 
+  WXIDE(WAAX IDE) revision 4 
+  * by Hongchan Choi (hoch, hongchan@ccrma.stanford.edu)
+  * references
+    - jQuery: http://jquery.com/
+    - javascript editor: http://codemirror.net/
+    - code parsing: http://esprima.org/
+    - UI Theme: http://bootswatch.com/cerulean/
+    - UI Theme: http://twitter.github.com/bootstrap/
+    - inspired by: http://mrdoob.com/projects/htmleditor/
+-->
+
+<!DOCTYPE html>
+<html manifest="wxide-r4.appcache">
+<head>
+  <meta charset="utf-8" />
+  <title>WXIDE r4</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="js/codemirror/codemirror.css">
+  <link rel="stylesheet" href="css/codemirror-monokai.css">
+  <link rel="stylesheet" href="css/wxide-r4.css">
+</head>
+
+<body>
+
+  <!-- toggleEditor button -->
+  <div id="d-showEditor">
+    <button type="button" class="btn btn-small btn-info" id="b-showEditor"><i class="icon-resize-full icon-white"></i></button>
+  </div>
+
+  <!-- modal: about -->
+  <div id="d-modal-about" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">WXIDE r4</h3>
+    </div>
+    <div class="modal-body">
+      <p>WXIDE: Web-based IDE for WAAX (revision 4)</p>
+      <p>by Hongchan Choi (hoch)</p>
+      <p>hongchan@ccrma.stanford.edu</p>
+      <p>powered by: Bootstrap/jQuery/CodeMirror/Esprima</p>
+      <p>GitHub Page | CCRMA Home</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+  </div>
+
+  <!-- modal: export -->
+  <div id="d-modal-export" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">Export as HTML</h3>
+    </div>
+    <div class="modal-body">
+        <input id="f-input-fileName" type="text" placeholder="your-html-file.wx" />
+        <p>Your HTML file will be saved at Chrome's Download folder with '.wx' extension.</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        <a id="a-modal-save"><button id="b-modal-save" class="btn btn-primary">Save</button></a>
+    </div>
+  </div>
+
+  <!-- editor -->
+  <div id="d-editor">
+
+  <!-- menu -->
+  <div id="d-menu">
+    <div id="tool" class="pull-right">
+      <button type="button" class="btn btn-small btn-info" id="b-menu-hide"><i class="icon-resize-small icon-white"></i></button>
+      <button type="button" class="btn btn-small btn-info" id="b-menu-autoupdate" data-toggle="button"><i class="icon-refresh icon-white"></i></button>
+      <button type="button" class="btn btn-small btn-info" id="b-menu-mute"><i class="icon-volume-off icon-white"></i></button>
+    </div>
+    <div id="menu">
+      <button type="button" class="btn btn-small btn-info" id="b-menu-new">New</button>
+      <button type="button" class="btn btn-small btn-info" id="b-menu-save">Save</button>
+      <button type="button" class="btn btn-small btn-info" id="b-menu-import"><input type="file" class="file" id="f-fileInput"/>Import...</button>
+      <button type="button" class="btn btn-small btn-info" id="b-menu-export">Export...</button>
+      <div class="btn-group">
+        <button type="button" class="btn btn-small btn-info dropdown-toggle" data-toggle="dropdown">Examples <b class="caret"></b></button>
+        <ul class="dropdown-menu" id="l-examples">
+          <li><a id="a-menu-ex-default">Hello WAAX!</a></li>
+          <li><a id="a-menu-ex-thx">WAAX does THX</a></li>
+          <li><a id="a-menu-ex-rezobass">RezoBass</a></li>
+          <li class="divider"></li>
+          <li class="disabled"><a id="a-menu-ex-wx7">WX7 FM Synth</a></li>
+          <li class="disabled"><a id="a-menu-ex-wpc60" class="muted">WPC-60</a></li>
+          <li class="disabled"><a id="a-menu-ex-winimoog" class="muted">Winimoog</a></li>
+          <li class="disabled"><a id="a-menu-ex-wb303" class="muted">WB-303 Bassline</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- code mirror -->
+  <div id="d-codemirror"></div>
+
+  <!-- status bar -->
+  <div id="d-status">
+    <button type="button" class="btn btn-mini btn-default" id="b-about">WXIDE r4</button>
+    <span id="s-status-text"></span>
+  </div>
+
+  </div>
+
+  <!-- preview iframe -->
+  <div id="d-preview"></div>
+
+  <!-- script -->
+  <script src="js/jquery-1.9.1.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/codemirror/codemirror.js"></script>
+  <script src="js/codemirror/mode/xml.js"></script>
+  <script src="js/codemirror/mode/javascript.js"></script>
+  <script src="js/codemirror/mode/css.js"></script>
+  <script src="js/codemirror/mode/htmlmixed.js"></script>
+  <script src="js/esprima.js"></script>
+  <script src="js/wxide-r4.js"></script>
+</body>
