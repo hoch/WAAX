@@ -242,6 +242,12 @@
       case 'a-menu-ex-samplr':
         loadExample('../examples/samplr.html');
         break;
+      case 'a-menu-ex-visualizer':
+        loadExample('../examples/visualizer.html');
+        break;
+      case 'a-menu-ex-devmode':
+        loadExample('../examples/devmode.html');
+        break;
     }
   });
 

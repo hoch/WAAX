@@ -40,7 +40,7 @@ WX.Unit.Common.prototype = Object.create(null, {
           this[p] = json[p];
         } else {
           // otherwise do nothing and iterate next parameter
-          WX.warn(this, p + " is not available.");
+          WX.warn(this, p + " is not an available property.");
         }
       }
     }
