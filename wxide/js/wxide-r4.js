@@ -308,10 +308,10 @@
   // check appcache manifest and update
   $(document).ready(function() {
     var appCache = window.applicationCache;
-    appCache.update();
-    if (appCache.status == window.applicationCache.UPDATEREADY) {
+    appCache.addEventListener('updateready', function() {
+      appCache.update();
       appCache.swapCache();
-    }
+    });
     // resize codemirror
     resizeCodeArea();
     // load from local storage (if available)
