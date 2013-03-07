@@ -35,11 +35,11 @@ Demo
 ----
 Requirements: **Google Chrome 24+** on any platform(Win/OSX/Linux).
 
- * **[mini-IDE][6]** 
- * [WAAX does THX][10]
- * [Rezobass][11]
- * [Samplr][12]
- * [Custom Visualizer][13]
+ * **[mini-IDE][6]** (it includes all the example below)
+  * [WAAX does THX][10]
+  * [Rezobass][11]
+  * [Samplr][12]
+  * [Custom Visualizer][13]
 
 _Adjust your volume setting before clicking. It might be loud!_
 
