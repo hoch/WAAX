@@ -68,12 +68,18 @@ Object.defineProperties(WX, {
   },
   info: {
     value: function(object, message) {
-      console.log("[WX:" + object.label + "] " + message);
+      console.log("[WX:" + object.label + "] Info: " + message);
+    }
+  },
+  warn: {
+    value: function(object, message) {
+      console.log("[WX:" + object.label + "] Warning: " + message);
     }
   },
   error: {
     value: function(object, message) {
-      console.log("[WX:" + object.label + "] " + message);
+      var msg = "[WX:" + object.label + "] Error: " + message;
+      throw new Error(msg);
     }
   },
 
