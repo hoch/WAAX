@@ -164,6 +164,19 @@
       setStatusText("Example loaded.");
     });
   }
+  // browser checking
+  function browserCheck() {
+    if (/chrome/.test(navigator.userAgent.toLowerCase()) === false) {
+      alert("Sorry. Your browser is not compatible with WAAX. Use Chrome 24+ to use WAAX.");
+      throw "[WX.ERROR] Incompatible browser.";
+    } else {
+      var version = parseInt(window.navigator.appVersion.match(/Chrome\/(.*?) /)[1], 10);
+      if (version < 24) {
+        alert("Sorry. Chrome 24+ is required to use WAAX.");
+        throw "[WX.ERROR] Outdated Chrome.";
+      }
+    }
+  }
 
   /**
    * button click or event dispatcher
@@ -284,6 +297,8 @@
   /**
    * initialization
    */
+  // browser check first
+  browserCheck();
   // check appcache manifest and update
   $(document).ready(function() {
     var appCache = window.applicationCache;
