@@ -56,4 +56,4 @@ var WX = WX || Object.create(null, {
 /**
  * booting up
  */
-console.log("[WAAX (r" + WX._revision + ")] Starting...");
+console.log("[WAAX:r" + WX._revision + "] Starting...");
