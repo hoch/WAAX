@@ -34,14 +34,13 @@ WX.Unit.Common.prototype = Object.create(null, {
     set: function(json) {
       if (typeof json !== "object") {
         WX.error(this, "invalid JSON.");
-        return;
       }
       for(var p in json) {
         if (this[p] !== undefined) {
           this[p] = json[p];
         } else {
           // otherwise do nothing and iterate next parameter
-          WX.error(this, p + " is not available.");
+          WX.warn(this, p + " is not available.");
         }
       }
     }

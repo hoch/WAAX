@@ -3,23 +3,28 @@
  */
 WX.Visualizer = function(json) {
   WX.Unit.Analyzer.call(this);
+  this.label += "Visualizer";
   Object.defineProperties(this, {
     _drawCallback: {
       enumerable: false,
       writable: true,
       value: function() {}
     },
-    _canvas: {
+    _context: {
       writable: true,
-      value: null
-    },
-    _context2D: {
-      writable: true,
-      value: null
+      value: undefined
     },
     _buffer: {
       writable: true,
       value: new Uint8Array(this._analyzer.frequencyBinCount)
+    },
+    _width: {
+      writable: true,
+      value: 600
+    },
+    _height: {
+      writable: true,
+      value: 300
     },
     _pause: {
       writable: true,
@@ -27,12 +32,7 @@ WX.Visualizer = function(json) {
     },
     _defaults: {
       value: {
-        canvas: "canvas-wx-Visualizer",
-        style: {
-          color: "#0f0",
-          bgcolor: "#000",
-          width: 1.0
-        }
+        context: undefined
       }
     }
   });
@@ -41,57 +41,27 @@ WX.Visualizer = function(json) {
   if (typeof json === "object") {
     this.params = json;
   }
-  this.label += "Visualizer";
 };
 
 WX.Visualizer.prototype = Object.create(WX.Unit.Analyzer.prototype, {
-  canvas: {
+  context: {
     enumerable: true,
     get: function() {
-      return this._canvas;
+      return this._context;
     },
-    set: function(canvasId) {
-      this._canvas = document.getElementById(canvasId);
-      if (this._canvas === null) {
-        WX.error(this, "no valid canvas DOM.");
-        return;
+    set: function(ctx) {
+      if (ctx === null) {
+        WX.error(this, "invalid drawing context.");
+      } else {
+        this._context = ctx;
+        // flip vertically
+        // this._context.scale(1,-1);
+        this.updateSize();
       }
-      this._context2D = this._canvas.getContext('2d');
-      // flip vertically
-      // this._context2D.scale(1,-1);
-      this.update();
-    }
-  },
-  update: {
-    value: function() {
-      this._unitX = this._canvas.width / this._buffer.length;
-      this._scaleY = this._canvas.height;
-    }
-  },
-  style: {
-    get: function() {
-      if (this._context2D === null) {
-        WX.error(this, "no context2D exists.");
-        return;
-      }
-      var s = {
-        color: this._context2D.strokeStyle,
-        width: this._context2D.lineWidth,
-        bgcolor: this._canvas.style.backgroundColor
-      };
-      return s;
-    },
-    set: function(json) {
-      if (typeof json !== "object") {
-        WX.error(this, "invalid JSON.");
-        return;
-      }
-      this._context2D.strokeStyle = json.color || "#0f0";
-      this._context2D.lineWidth = json.width || 1.0;
-      this._canvas.style.backgroundColor = json.bgcolor || "#000";
     }
   },
   pause: {
+    enumerable: true,
     get: function() {
       return this._pause;
     },
@@ -107,13 +77,19 @@ WX.Visualizer.prototype = Object.create(WX.Unit.Analyzer.prototype, {
       return this._drawCallback;
     }
   },
+  updateSize: {
+    value: function() {
+      this._width = this._context.canvas.width;
+      this._height = this._context.canvas.height;
+    }
+  },
   draw: {
     value: function(event) {
       if (this._pause) {
         return;
       } else {
         this._analyzer.getByteTimeDomainData(this._buffer);
-        this._drawCallback.call(this, this._context2D, this._buffer);
+        this._drawCallback.call(this, this._buffer, this._context, this._width, this._height);
       }
     }
   }
