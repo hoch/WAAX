@@ -7,7 +7,7 @@
 /**
  * checking browser version and compatibility
  */
-if(/chrome/.test(navigator.userAgent.toLowerCase()) === false) {
+if (/chrome/.test(navigator.userAgent.toLowerCase()) === false) {
   alert("Sorry. Your browser is not compatible with WAAX. Use Chrome 24+ to use WAAX.");
   throw "[WX.ERROR] Incompatible browser.";
 } else {
@@ -15,8 +15,6 @@ if(/chrome/.test(navigator.userAgent.toLowerCase()) === false) {
   if (version < 24) {
     alert("Sorry. Chrome 24+ is required to use WAAX.");
     throw "[WX.ERROR] Outdated Chrome.";
-  } else {
-    console.log("[WAAX (r" + WX._revision + ")] Starting...");
   }
 }
 
@@ -54,3 +52,8 @@ var WX = WX || Object.create(null, {
     writable: true
   }
 });
+
+/**
+ * booting up
+ */
+console.log("[WAAX (r" + WX._revision + ")] Starting...");
