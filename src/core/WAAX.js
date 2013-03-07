@@ -1,19 +1,22 @@
 /**
  * WAAX: Web Audio API eXtension
- * @author hoch
+ * @author Hongchan Choi (hoch)
  *         hongchan@ccrma.stanford.edu
- *         hongchan@google.com
  */
 
 /**
- * checking browser compatibility
+ * checking browser version and compatibility
  */
-if(window.navigator.appVersion.match(/Chrome\/(.*?) /)[1] === null) {
-  alert("Your browser is not compatible with WAAX. Use Chrome 24+ to use WAAX.");
+if(/chrome/.test(navigator.userAgent.toLowerCase()) === false) {
+  alert("Sorry. Your browser is not compatible with WAAX. Use Chrome 24+ to use WAAX.");
+  throw "[WX.ERROR] Incompatible browser.";
 } else {
   var version = parseInt(window.navigator.appVersion.match(/Chrome\/(.*?) /)[1], 10);
   if (version < 24) {
-    alert("Chrome 24+ is required to use WAAX.");
+    alert("Sorry. Chrome 24+ is required to use WAAX.");
+    throw "[WX.ERROR] Outdated Chrome.";
+  } else {
+    console.log("[WAAX (r" + WX._revision + ")] Starting...");
   }
 }
 
@@ -51,8 +54,3 @@ var WX = WX || Object.create(null, {
     writable: true
   }
 });
-
-/**
- * booting up
- */
-console.log("WAAX (r" + WX._revision + ")");
