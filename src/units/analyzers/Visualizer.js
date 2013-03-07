@@ -6,13 +6,12 @@ WX.Visualizer = function(json) {
   this.label += "Visualizer";
   Object.defineProperties(this, {
     _drawCallback: {
-      enumerable: false,
       writable: true,
       value: function() {}
     },
     _context: {
       writable: true,
-      value: undefined
+      value: null
     },
     _buffer: {
       writable: true,
@@ -32,11 +31,9 @@ WX.Visualizer = function(json) {
     },
     _defaults: {
       value: {
-        context: undefined
       }
     }
   });
-  // stuffs
   this.params = this._defaults;
   if (typeof json === "object") {
     this.params = json;
@@ -50,9 +47,10 @@ WX.Visualizer.prototype = Object.create(WX.Unit.Analyzer.prototype, {
       return this._context;
     },
     set: function(ctx) {
-      if (ctx === null) {
-        WX.error(this, "invalid drawing context.");
+      if (ctx === undefined) {
+        WX.error(this, "invalid drawing context. (undefined)");
       } else {
+        // TODO: check if ctx is valid context
         this._context = ctx;
         // flip vertically
         // this._context.scale(1,-1);
@@ -67,6 +65,15 @@ WX.Visualizer.prototype = Object.create(WX.Unit.Analyzer.prototype, {
     },
     set: function(bool) {
       this._pause = bool;
+    }
+  },
+  bufferSize: {
+    enumerable: true,
+    get: function() {
+      return this._buffer.length;
+    },
+    set: function(size) {
+      // do nothing
     }
   },
   onRender: {

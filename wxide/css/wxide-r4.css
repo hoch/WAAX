@@ -85,8 +85,8 @@
 
 .CodeMirror {
   font-family: "Droid Sans Mono";
-  font-size: 13px;
-  line-height: 1.3em;    
+  font-size: 12px;
+  line-height: 1.2em;    
 }
 .CodeMirror pre {
   padding: 0 8px;

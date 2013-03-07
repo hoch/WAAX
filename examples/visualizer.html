@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Custom Visualizer!!</h1>
+    <canvas id="wx-viz" width="600" height="600"></canvas>
+    <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
+    <script>
+
+      var cvs = document.getElementById('wx-viz');
+      var ctx = cvs.getContext('2d');
+      
+      // a sine wave
+      var osc = new WX.Oscil({ type:0, frequency:400 });
+      var viz = new WX.Visualizer({ context:ctx });
+      viz.context = ctx;
+      //console.log(viz.context);
+      // connect it to output
+      osc.to(WX.DAC);
+      osc.to(viz);
+      // set output volume in dB
+      WX.DAC.db = -24;
+      
+      // build window
+      var s = viz.bufferSize;
+      var window = [], polarX = [], polarY = [], phi = 0.0;
+      var w = WX.TWOPI / s;
+      for (var k = 0; k < s; ++k) {
+        window[k] = Math.sin(phi / 2.0);
+        polarX[k] = Math.sin(phi);
+        polarY[k] = Math.cos(phi);
+        phi += w;
+      }
+      var mag = 350;
+      
+      ctx.webkitImageSmoothingEnabled = false;
+      
+      // user-defined render function
+      viz.onRender = function(buffer, ctx, w, h) {
+        var cx = w / 2.0, cy = h / 4.0;
+        ctx.lineWidth = 3;
+        ctx.clearRect(0, 0, w, h);
+        ctx.beginPath();
+        for(var i = 0, b = buffer.length; i < b; ++i) {
+          var windowed = (1.0 - buffer[i]/255) * window[i] * -mag;
+          var x = cx + polarX[i] * windowed;
+          var y = cy + polarY[i] * windowed;
+          ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+      
+      function draw() {
+        requestAnimationFrame(draw);
+        viz.draw();
+      }
+      requestAnimationFrame(draw);
+      
+      function glide() {
+        setTimeout(function() {
+          osc.glide(WX.random2f(40.0, 5000.0), 3.0);
+          osc.type = WX.random2(0, 3);
+          glide();
+        }, 3000);
+      }
+      glide();
+    </script>
+  </body>
+</html>
