@@ -6,6 +6,18 @@
  */
 
 /**
+ * checking browser compatibility
+ */
+if(window.navigator.appVersion.match(/Chrome\/(.*?) /)[1] === null) {
+  alert("Your browser is not compatible with WAAX. Use Chrome 24+ to use WAAX.");
+} else {
+  var version = parseInt(window.navigator.appVersion.match(/Chrome\/(.*?) /)[1], 10);
+  if (version < 24) {
+    alert("Chrome 24+ is required to use WAAX.");
+  }
+}
+
+/**
  * @namespace WX
  * @revision 3
  */
