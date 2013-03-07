@@ -35,7 +35,7 @@ Demo
 ----
 Requirements: **Google Chrome 24+** on any platform(Win/OSX/Linux).
 
- * **[mini-IDE][6]**
+ * **[mini-IDE][6]** 
  * [WAAX does THX][10]
  * [Rezobass][11]
  * [Samplr][12]
