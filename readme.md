@@ -2,6 +2,9 @@ WAAX (Web Audio API eXtension)
 ------------------------------
 **JavaScript library for music and audio programming on Chrome** - Check out [mini-IDE][6]!
 
+[Introduction](#indroduction) - [Demo](#demo)
+[Usages](#usages) - [Creating Units](#creating-units) | [Making Connections](#making-connections) | [Setting Parameters](#setting-parameters) | [Visualization](#visualization) | [GUI](#gui)
+
 ```javascript
 // creating units
 var saw = new WX.Oscil({ type:2 }),
@@ -14,6 +17,10 @@ WX.link(saw, lpf ,env, vrb ,WX.DAC);
 // connecting units
 sqr.to(lpf);
 ```
+
+
+Introduction
+------------
 
 WAAX is an experimental JavaScript library built on top of [Web Audio API][1] in Chrome. With **music creation and performance** in mind, it offers the higher level of functionality than basic building blocks of Web Audio API.
 
@@ -51,9 +58,9 @@ _Adjust your volume setting before clicking. It might be loud!_
 [13]: http://hoch.github.com/waax/examples/visualizer.html
 [14]: http://hoch.github.com/waax/examples/uimanager.html
 
-Usage
------
 
+Usages
+------
 
 ### Creating Units
 
@@ -120,6 +127,23 @@ wf.draw();
 Using a set of units called _Analyzers_, visualizing waveforms and spectrum can be achieved instantly. The visual content will be automatically resized according to the size of the target canvas DOM element.
 
 
+### GUI
+
+```javascript
+// GUI manager singleton using cavnvas:context2D
+var UIMan = new UIManager(context2D);
+// a slider
+var mySlider = new UISlider({ label:"GAIN", x:10, y:10, width:300, height:30,
+                              scale:1, offset:0, defaultValue:0.3 });
+// add slider to the manager
+UIMan.addElement(mySlider);
+// set modulation mapping to an WAAX oscillator
+mySlider.target = osc.modulationTarget.gain;
+```
+
+The basic GUI interaction is possible with a simple GUI manager provided by WAAX. Currently it only offers a slider element, but button, knob and 2D pad will be added to the UI element collection. WAAX units have "modulationTarget" that can be connected to modulation source such as a GUI slider with a single line of code.
+
+
 Units: Generators, Processors and Analyzers
 -------------------------------------------
 As WAAX is in early stages of development, there are several components (which are yet to be released publicly) to be incorporated into this library in the near future. I am currently expanding its sonic vocabulary by adding more units to the library. The followings are a basic set of units as the first milestone. A detailed documentation of each unit will be available soon.
@@ -131,7 +155,10 @@ As WAAX is in early stages of development, there are several components (which a
 `WX.ADSR` `WX.LPRez` `WX.TwinDelay` `WX.ConVerb` `WX.Comp` `WX.C2`
 
 ### Analyzers
-`WX.Waveform` `WX.Spectrum` `WX.Waterfall` 
+`WX.Waveform` `WX.Spectrum` `WX.Visualizer` 
+
+### UI
+`UIManager` `UISlider`
 
 ### Utilities
 `WX.random2` `WX.random2f` `WX.db2lin` `WX.lin2db` `WX.pitch2freq` `WX.freq2pitch`
