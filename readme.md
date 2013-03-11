@@ -49,6 +49,7 @@ Demo
 Requirements: **Google Chrome 24+** on any platform(Win/OSX/Linux).
 
  * **[mini-IDE][6]** (it includes all the example below)
+  * [Hello WAAX][15] 
   * [WAAX does THX][10]
   * [Rezobass][11]
   * [Samplr][12]
@@ -63,6 +64,7 @@ _Adjust your volume setting before clicking. It might be loud!_
 [12]: http://hoch.github.com/waax/examples/samplr.html
 [13]: http://hoch.github.com/waax/examples/visualizer.html
 [14]: http://hoch.github.com/waax/examples/uimanager.html
+[15]: http://hoch.github.com/waax/examples/hellowaax.html
 
 
 Usages
