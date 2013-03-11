@@ -47,7 +47,7 @@ Requirements: **Google Chrome 24+** on any platform(Win/OSX/Linux).
   * [Rezobass][11]
   * [Samplr][12]
   * [Custom Visualizer][13]
-  * [Simple UIManagement][14]
+  * [Simple GUI][14]
 
 _Adjust your volume setting before clicking. It might be loud!_
 
@@ -141,7 +141,7 @@ UIMan.addElement(mySlider);
 mySlider.target = osc.modulationTarget.gain;
 ```
 
-The basic GUI interaction is possible with a simple GUI manager provided by WAAX. Currently it only offers a slider element, but button, knob and 2D pad will be added to the UI element collection. WAAX units have "modulationTarget" that can be connected to modulation source such as a GUI slider with a single line of code.
+The basic GUI interaction is possible with a simple GUI manager provided by WAAX. Currently it only offers a slider element, but button, knob and 2D pad will be added to the UI element collection. WAAX units have "modulationTarget" that can be connected to modulation source such as a GUI slider with a single line of code. Note that the animation loop is required to run the 2D canvas. See the GUI example above to see how it works.
 
 
 Units: Generators, Processors and Analyzers
@@ -157,7 +157,7 @@ As WAAX is in early stages of development, there are several components (which a
 ### Analyzers
 `WX.Waveform` `WX.Spectrum` `WX.Visualizer` 
 
-### UI
+### GUI
 `UIManager` `UISlider`
 
 ### Utilities
