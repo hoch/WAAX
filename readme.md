@@ -3,6 +3,7 @@ WAAX (Web Audio API eXtension)
 **JavaScript library for music and audio programming on Chrome** - Check out [mini-IDE][6]!
 
 [Introduction](#indroduction) - [Demo](#demo)
+
 [Usages](#usages) - [Creating Units](#creating-units) | [Making Connections](#making-connections) | [Setting Parameters](#setting-parameters) | [Visualization](#visualization) | [GUI](#gui)
 
 ```javascript
