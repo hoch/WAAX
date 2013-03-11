@@ -345,6 +345,8 @@ UISlider.prototype = Object.create(null, {
     },
     set: function(audioParam) {
       this._target = audioParam;
+      // transmit current value to target
+      this._target.linearRampToValueAtTime(this.params.value, 0.02);
     }
   },
   draw: {
