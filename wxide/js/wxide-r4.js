@@ -248,6 +248,9 @@
       case 'a-menu-ex-devmode':
         loadExample('../examples/devmode.html');
         break;
+      case 'a-menu-ex-uimanager':
+        loadExample('../examples/uimanager.html');
+        break;
     }
   });
 
