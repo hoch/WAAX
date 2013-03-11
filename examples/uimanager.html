@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>UIManager (experimental...)</h1>
+    <canvas id="wx-uiPanel" width="400" height="400"></canvas>
+    <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
+    <script>
+      var osc = new WX.Oscil();
+      osc.to(WX.DAC);
+      
+      // canvas and context
+      var cvs = document.getElementById("wx-uiPanel");
+      var ctx = cvs.getContext('2d');
+      
+      var UIMan = new UIManager(ctx);
+      var s1 = new UISlider({ label:"GAIN", x:10, y:10, width:300, height:30, 
+                             scale:1, offset:0, defaultValue:0.3 }),
+          s2 = new UISlider({ label:"FREQUENCY", x:10, y:90, width:300, height:30, 
+                             scale:2000, offset: 60, defaultValue:120 });
+      UIMan.addElement(s1, s2);
+      
+      // modulation mapping
+      s1.target = osc.modulationTarget.gain;
+      s2.target = osc.modulationTarget.frequency;
+      
+      // UI drawer
+      function draw() {
+        UIMan.draw();
+        requestAnimationFrame(draw);
+      }
+      requestAnimationFrame(draw);
+      
+    </script>
+  </body>
+</html>

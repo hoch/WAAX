@@ -40,6 +40,7 @@ Requirements: **Google Chrome 24+** on any platform(Win/OSX/Linux).
   * [Rezobass][11]
   * [Samplr][12]
   * [Custom Visualizer][13]
+  * [Simple UIManagement][14]
 
 _Adjust your volume setting before clicking. It might be loud!_
 
@@ -48,6 +49,7 @@ _Adjust your volume setting before clicking. It might be loud!_
 [11]: http://hoch.github.com/waax/examples/rezobass.html
 [12]: http://hoch.github.com/waax/examples/samplr.html
 [13]: http://hoch.github.com/waax/examples/visualizer.html
+[14]: http://hoch.github.com/waax/examples/uimanager.html
 
 Usage
 -----

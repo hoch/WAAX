@@ -15,10 +15,22 @@ WX.Oscil = function(json) {
         type: "sine",
         gain: 1.0
       }
+    },
+    modulationTarget: {
+      enumerable: true,
+      writable: true,
+      value: {
+        frequency: null,
+        gain: null
+      }
     }
   });
   this._oscil.connect(this._outputGain);
   this._oscil.noteOn(0);
+  // declare modulation targets
+  this.modulationTarget.frequency = this._oscil.frequency;
+  this.modulationTarget.gain = this._outputGain.gain;
+  // default behavior
   this.params = this._defaults;
   if (typeof json === "object") {
     this.params = json;
