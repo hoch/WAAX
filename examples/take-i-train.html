@@ -10,7 +10,7 @@
       var cvs = document.getElementById("wx-uiPanel");
 
       var it = new WX.ImpTrain({ frequency:7 });
-      var lp = new WX.LPRez({ cutoff:440, q:12, a:2.0, d:1.0, s:0.5, r:2.0 });
+      var lp = new WX.LPRez({ cutoff:440, Q:12, a:2.0, d:1.0, s:0.5, r:2.0 });
       var wf = new WX.Waveform({ style:{ width:2 } });
       WX.DAC.db = -18;
       it.to(lp).to(WX.DAC);
