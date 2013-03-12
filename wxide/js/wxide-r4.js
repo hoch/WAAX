@@ -251,6 +251,9 @@
       case 'a-menu-ex-uimanager':
         loadExample('../examples/uimanager.html');
         break;
+      case 'a-menu-ex-itrain':
+        loadExample('../examples/take-i-train.html');
+        break;
     }
   });
 
