@@ -53,6 +53,7 @@ Requirements: **Google Chrome 24+** on any platform(Win/OSX/Linux).
   * [WAAX does THX][10]
   * [Rezobass][11]
   * [Samplr][12]
+  * [Take the I train](http://hoch.github.com/waax/examples/take-i-train.html)
   * [Custom Visualizer][13]
   * [Simple GUI][14]
 
@@ -157,7 +158,7 @@ Units: Generators, Processors and Analyzers
 As WAAX is in early stages of development, there are several components (which are yet to be released publicly) to be incorporated into this library in the near future. I am currently expanding its sonic vocabulary by adding more units to the library. The followings are a basic set of units as the first milestone. A detailed documentation of each unit will be available soon.
 
 ### Generators
-`WX.Oscil` `WX.Noise` `WX.Sampler` `WX.LFO`
+`WX.Oscil` `WX.Noise` `WX.Sampler` `WX.LFO` `WX.ImpTrain`
 
 ### Processors
 `WX.ADSR` `WX.LPRez` `WX.TwinDelay` `WX.ConVerb` `WX.Comp` `WX.C2`
