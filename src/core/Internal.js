@@ -1,15 +1,6 @@
-/**
- * @title Internal.js
- * @description some classes used inside of units or modules:
- *              DualLevelDetector
- *              RingBuffer
- */
+// Internal.js
 
-
-/**
- * @class Internal:DualLevelDetector
- * @description program-dependent level detector for dynamic processing
- */
+// Internal:DualLevelDetector
 WX.Internal.DualLevelDetector = function() {
   Object.defineProperties(this, {
     _fs: {
@@ -52,11 +43,6 @@ WX.Internal.DualLevelDetector = function() {
 };
 
 WX.Internal.DualLevelDetector.prototype = Object.create(null, {
-
-  /**
-   * attack
-   * @param {float} value attack in seconds
-   */
   attack: {
     enumerable: true,
     get: function() {
@@ -66,11 +52,6 @@ WX.Internal.DualLevelDetector.prototype = Object.create(null, {
       this._attackFast = 1 - Math.exp(-1.0 / (value * this._fs));
     }
   },
-
-  /**
-   * release
-   * @param {float} value release in seconds
-   */
   release: {
     enumerable: true,
     get: function() {
@@ -80,11 +61,6 @@ WX.Internal.DualLevelDetector.prototype = Object.create(null, {
       this._releaseFast = 1 - Math.exp(-1.0 / (value * this._fs));
     }
   },
-
-  /**
-   * reset
-   * @description fall back to default setting
-   */
   reset: {
     enumerable: false,
     value: function() {
@@ -96,12 +72,6 @@ WX.Internal.DualLevelDetector.prototype = Object.create(null, {
       this._levelSlow = 0.0;
     }
   },
-
-  /**
-   * process and return tracked level
-   * @type {float} input value
-   * @return {float} output value
-   */
   process: {
       value: function(input) {
         // slow detector first
@@ -123,14 +93,7 @@ WX.Internal.DualLevelDetector.prototype = Object.create(null, {
     }
 });
 
-
-
-/**
- * @class Internal:RingBuffer
- * @description ring buffer with block write for faster data drawing
- * @param {int} blockSize write block size (default = 512)
- * @param {int} blockNum number of block in power of 2 (default = 8)
- */
+// RingBuffer
 WX.Internal.RingBuffer = function(blockSize, blockNum) {
   // pre sanity check
   var bs = (blockSize || 512);
@@ -168,12 +131,6 @@ WX.Internal.RingBuffer = function(blockSize, blockNum) {
 };
 
 WX.Internal.RingBuffer.prototype = Object.create(null, {
-
-  /**
-   * writeBlock
-   * @description writing sample frame into buffer
-   * @param {array} block(Float32Array) to write in
-   */
   writeBlock: {
     enumerable: true,
     value: function(array) {
@@ -190,26 +147,19 @@ WX.Internal.RingBuffer.prototype = Object.create(null, {
       // update read pointer
       this._reader = this._writer;
     }
+  },
+  copyBuffertoArray: {
+    enumerable: true,
+    value: function(array) {
+      var i = 0,
+          b = this._bufferSize,
+          r = this._reader;
+      while (i < b) {
+        array[i++] = this._buffer[r++];
+        if (r == b) {
+          r = 0;
+        }
+      }
+    }
   }
-
-  /**
-   * copyBuffertoArray
-   * @description fetching data from buffer to external array
-   * @param {array} array(Float32Array) to update
-   * @note THIS NEEDS TO BE FIXED.
-   */
-  // copyBuffertoArray: {
-  //   enumerable: true,
-  //   value: function(array) {
-  //     var i = 0,
-  //         b = this._bufferSize,
-  //         r = this._reader;
-  //     while (i < b) {
-  //       array[i++] = this._buffer[r++];
-  //       if (r == b) {
-  //         r = 0;
-  //       }
-  //     }
-  //   }
-  // }
 });

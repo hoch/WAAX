@@ -80,32 +80,34 @@ WX.ADSR.prototype = Object.create(WX.Unit.Processor.prototype, {
     enumerable: true,
     get: function() {
       return this._running;
+    },
+    set: function() {
+      return;
     }
   },
   noteOn: {
-    value: function() {
-      var now = WX._context.currentTime,
+    value: function(time) {
+      var t = (time || WX.now),
           g = this._inputGain.gain;
       // cancel previous state
-      g.cancelScheduledValues(now);
-      g.setValueAtTime(g.value, now);
+      g.cancelScheduledValues(t);
+      g.setValueAtTime(g.value, t);
+      g.linearRampToValueAtTime(0.0, t);
       // schedule event for attack, decay and sustain
-      g.linearRampToValueAtTime(0.0, now);
-      g.linearRampToValueAtTime(1.0, now + this._a);
-      g.linearRampToValueAtTime(this._s, now + this._a + this._d);
+      g.linearRampToValueAtTime(1.0, t + this._a);
+      g.linearRampToValueAtTime(this._s, t + this._a + this._d);
       this._running = true;
     }
   },
   noteOff: {
-    value: function(interval) {
-      var now = WX._context.currentTime,
-          later = now + (interval || 0),
+    value: function(time) {
+      var t = (time || WX.now),
           g = this._inputGain.gain;
       // cancel progress and force it into release phase
-      g.cancelScheduledValues(later);
-      g.setValueAtTime(g.value, now);
+      g.cancelScheduledValues(t);
+      g.setValueAtTime(g.value, t);
       // start release phase
-      g.linearRampToValueAtTime(0.0, later + this._r);
+      g.linearRampToValueAtTime(0.0, t + this._r);
       this._running = false;
     }
   }

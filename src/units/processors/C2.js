@@ -38,9 +38,7 @@ WX.C2 = function(json) {
     _processor: {
       enumerable: false,
       writable: false,
-      value: WX._context.createScriptProcessor(
-          256, 2, 2
-        )
+      value: WX._context.createScriptProcessor(256, 2, 2)
     },
     _defaults: {
       value: {
