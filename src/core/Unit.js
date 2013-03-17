@@ -1,5 +1,6 @@
 /**
- * Unit.Common
+ * @class WX.Unit.Common
+ * @classdesc a base class for WAAX units
  */
 WX.Unit.Common = function() {
   Object.defineProperties(this, {
@@ -11,7 +12,15 @@ WX.Unit.Common = function() {
   });
 };
 
+
 WX.Unit.Common.prototype = Object.create(null, {
+
+  /**
+   * gets/sets unit label. (types)
+   * @memberOf WX.Unit.Common
+   * @param {string} set unit type label (setter)
+   * @returns {string} label of unit (getter)
+   */
   label: {
     enumerable: false,
     get: function() {
@@ -21,6 +30,13 @@ WX.Unit.Common.prototype = Object.create(null, {
       this._label = type;
     }
   },
+
+  /**
+   * gets/sets parameters of units.
+   * @memberOf WX.Unit.Common
+   * @param {json} parameters as json (setter)
+   * @returns {json} parameters as json (getter)
+   */
   params: {
     enumerable: false,
     get: function() {
@@ -45,6 +61,12 @@ WX.Unit.Common.prototype = Object.create(null, {
       }
     }
   },
+
+  /**
+   * returns unit as string
+   * @memberOf WX.Unit.Common
+   * @returns {string} unit as stringified json
+   */
   toString: {
     value: function() {
       var s = this.label;

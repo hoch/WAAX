@@ -144,34 +144,34 @@ WX.LPRez.prototype = Object.create(WX.Unit.Processor.prototype, {
     }
   },
   noteOn: {
-    value: function() {
-      var now = WX._context.currentTime,
+    value: function(time) {
+      var t = WX.now + (time || 0),
           f1 = this._lpf1.frequency,
           f2 = this._lpf2.frequency;
       // reset envelopes
-      f1.cancelScheduledValues(now);
-      f1.setValueAtTime(this._cutoff, now);
-      f2.cancelScheduledValues(now);
-      f2.setValueAtTime(this._cutoff, now);
+      f1.cancelScheduledValues(t);
+      f1.setValueAtTime(this._cutoff, t);
+      f2.cancelScheduledValues(t);
+      f2.setValueAtTime(this._cutoff, t);
       // start attack and decay
-      f1.linearRampToValueAtTime(this._cutoff + this._range, now + this._a);
-      f1.linearRampToValueAtTime(this._cutoff + this._range * this._s, now + this._a + this._d);
-      f2.linearRampToValueAtTime(this._cutoff + this._range, now + this._a);
-      f2.linearRampToValueAtTime(this._cutoff + this._range * this._s, now + this._a + this._d);
+      f1.linearRampToValueAtTime(this._cutoff + this._range, t + this._a);
+      f1.linearRampToValueAtTime(this._cutoff + this._range * this._s, t + this._a + this._d);
+      f2.linearRampToValueAtTime(this._cutoff + this._range, t + this._a);
+      f2.linearRampToValueAtTime(this._cutoff + this._range * this._s, t + this._a + this._d);
       this._running = true;
     }
   },
   noteOff: {
     value: function(interval) {
-      var now = WX._context.currentTime,
-          later = now + (interval || 0),
+      var t = WX.now,
+          later = WX.now + (interval || 0),
           f1 = this._lpf1.frequency,
           f2 = this._lpf2.frequency;
       // forced stopping
       f1.cancelScheduledValues(later);
-      f1.setValueAtTime(f1.value, now);
+      f1.setValueAtTime(f1.value, t);
       f2.cancelScheduledValues(later);
-      f2.setValueAtTime(f2.value, now);
+      f2.setValueAtTime(f2.value, t);
       // start release phase
       f1.linearRampToValueAtTime(this._cutoff, later + this._r);
       f2.linearRampToValueAtTime(this._cutoff, later + this._r);

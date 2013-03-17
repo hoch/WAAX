@@ -1,8 +1,5 @@
+// creating white noise buffer source
 (function() {
-
-  /**
-   * creating white noise buffer source
-   */
   var sr = WX._context.sampleRate,
       l = sr * 5,
       wn = new Float32Array(l);
