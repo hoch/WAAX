@@ -4,3 +4,6 @@ notes.md
 update-waax
 compile-waax
 compiler.jar
+ignore/
+out/
+getdoc-waax
