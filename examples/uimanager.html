@@ -5,6 +5,7 @@
   </head>
   <body>
     <h1>UIManager + UISliderH</h1>
+    <canvas id="canvas-wx-waveform" width="750px" height="360px"></canvas>
     <div id="uiPanel"></div>
     <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
     <script>
@@ -23,7 +24,7 @@
         adsr.noteOn(next);
         adsr.noteOff(next + 0.05);
       }
-      var l = new WX.Loop(hit, 0, 0.5);
+      var l = new WX.Loop(hit, 0, 0.25);
       l.start();
 
       // waveform drawer

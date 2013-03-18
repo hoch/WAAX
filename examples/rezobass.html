@@ -4,20 +4,20 @@
   </head>
   <body>
     <h1>RezoBass!!</h1>
-    <canvas id="canvas-wx-waveform" width="600px" height="255px"></canvas>
+    <canvas id="canvas-wx-waveform" width="700px" height="255px"></canvas>
     <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
     <script>
       // creating units
       var osc1 = new WX.Oscil({ type:2, gain:0.4 }),
           osc2 = new WX.Oscil({ type:1, gain:0.4 }),
           adsr = new WX.ADSR({ a:0.005, d:0.03, s:0.2, r:0.1 }),
-          rezz = new WX.LPRez({ a:0.05, d:0.015, s:0.5, r:0.05, range:4000, Q:9 }),
+          rezz = new WX.LPRez({ a:0.05, d:0.015, s:0.5, r:0.05, range:4000, Q:10 }),
           pong = new WX.TwinDelay({ 
             delayTimeLeft:0.360, delayTimeRight:0.240, 
             feedbackLeft:0.4, feedbackRight:0.25,
-            crosstalk: 0.2, mix:0.2 
+            crosstalk: 0.2, mix:0.1 
           }),
-          verb = new WX.ConVerb({ mix:0.01 }),
+          verb = new WX.ConVerb({ mix:0.05 }),
           comp = new WX.Comp({ threshold: -4, ratio: 2, gain: 4 }),
           wf = new WX.Waveform({ style:{ width:2 } });
             
@@ -36,49 +36,38 @@
       var sli = [0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1];
    
       // stepper  
-      function step() {
+      function step(next) {
         var f = WX.pitch2freq(pit[playhead] + 48);
         rezz.cutoff = f * 1.5;
         // glide or not?
         if(sli[playhead] == 0) {
           osc1.frequency = f;
           osc2.frequency = f * 0.5;
-          rezz.noteOn();
+          rezz.noteOn(next);
         } else {
           osc1.glide(f, glideTime);
           osc2.glide(f * 0.5, glideTime);
-          rezz.noteOff(gridDur);
+          rezz.noteOff(next + gridDur);
         }
         // trigger a note
         adsr.gain = acc[playhead] + 1 * 0.5;
-        adsr.noteOn();
-        adsr.noteOff(gridDur);          
+        adsr.noteOn(next);
+        adsr.noteOff(next + gridDur);          
         // check playhead and wrap it as needed
         playhead = ++playhead > 15 ? 0 : playhead;
       }     
       
       // looping step
-      var previous = 0.0, elapsed = 0.0, gridDurMS = gridDur * 1000;
-      function loop(timestamp) {
-        var delta = timestamp - previous;
-        elapsed += delta;
-        if (elapsed > gridDurMS) {
-          elapsed -= gridDurMS;
-          step();
-        }
-        previous = timestamp;
-        requestAnimationFrame(loop);
-      }
+      var l = new WX.Loop(step, 0, gridDur);
+      l.start();
 
       // draw visualization
       function draw() {
         requestAnimationFrame(draw);
         wf.draw();
       }
-      
-      // inititate
-      requestAnimationFrame(loop);
       requestAnimationFrame(draw);
+      
     </script>
   </body>
 </html>
