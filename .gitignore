@@ -6,4 +6,4 @@ compile-waax
 compiler.jar
 ignore/
 out/
-getdoc-waax
+gendoc-waax
