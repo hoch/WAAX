@@ -1,37 +1,37 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" href="../src/ui/static/UI.css">
   </head>
   <body>
-    <h1>UIManager (experimental...)</h1>
-    <canvas id="wx-uiPanel" width="400" height="400"></canvas>
+    <h1>UIManager + UISliderH</h1>
+    <div id="uiPanel"></div>
     <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
     <script>
-      var osc = new WX.Oscil();
-      osc.to(WX.DAC);
+      var osc = new WX.Oscil({ type:2, frequency:60, gain:1 });
+      var adsr = new WX.ADSR({ a:0.01, d:0.03, s:0.1, r:0.001 });
+      var wf = new WX.Waveform({ style:{ width:2 } });
+      WX.DAC.db = -6;
+      osc.to(adsr).to(WX.DAC);
+      adsr.to(wf);
       
-      // canvas and context
-      var cvs = document.getElementById("wx-uiPanel");
-      var ctx = cvs.getContext('2d');
+      var panel = document.getElementById("uiPanel");
+      var s = new WX.UISliderH({ targetDiv:panel, label:"Frequency", x:10, y:10, offset:60, scale:1000, value:440 });
+      s.target = osc.modulationTarget.frequency;
       
-      var UIMan = new UIManager(ctx);
-      var s1 = new UISlider({ label:"GAIN", x:10, y:10, width:300, height:30, 
-                             scale:1, offset:0, defaultValue:0.3 }),
-          s2 = new UISlider({ label:"FREQUENCY", x:10, y:50, width:300, height:30, 
-                             scale:2000, offset: 60, defaultValue:120 });
-      UIMan.addElement(s1, s2);
-      
-      // modulation mapping
-      s1.target = osc.modulationTarget.gain;
-      s2.target = osc.modulationTarget.frequency;
-      
-      // UI drawer
+      function hit(next, i) {
+        adsr.noteOn(next);
+        adsr.noteOff(next + 0.05);
+      }
+      var l = new WX.Loop(hit, 0, 0.5);
+      l.start();
+
+      // waveform drawer
       function draw() {
-        UIMan.draw();
+        wf.draw();
         requestAnimationFrame(draw);
       }
       requestAnimationFrame(draw);
-      
     </script>
   </body>
 </html>

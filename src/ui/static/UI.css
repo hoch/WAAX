@@ -1,0 +1,44 @@
+#ui-panel {
+    width: 600px;
+    height: 300px;
+    position: relative;
+    z-index: 50;
+}
+
+.wx-slider-bg {
+    background: url("SliderH.png") no-repeat;
+}
+
+.wx-slider-container {
+    position: relative;
+    width: 200px;
+    height: 40px;
+    z-index: 100;
+    -webkit-user-select: none;
+}
+
+.wx-slider-groove {
+    width: 200px;
+    height: 20px;
+    z-index: 101;
+}
+
+.wx-slider-label {
+    width: 194px;
+    height: 14px;
+    font-size: 12px;
+    font-family: Helvetica, serif;
+    text-align: center;
+    padding: 3px 6px;
+    z-index: 101;
+}
+
+.wx-slider-handle {
+    background-position: -200px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    z-index: 102;
+}
