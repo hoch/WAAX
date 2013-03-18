@@ -3,11 +3,8 @@
  */
 WX.Spectrum = function(json) {
   WX.Unit.Analyzer.call(this);
+  this.label += "Spectrum";
   Object.defineProperties(this, {
-    _canvas: {
-      writable: true,
-      value: null
-    },
     _context2D: {
       writable: true,
       value: null
@@ -20,81 +17,60 @@ WX.Spectrum = function(json) {
       writable: true,
       value: false
     },
+    _autoClear: {
+      writable: true,
+      value: true
+    },
     _defaults: {
       value: {
-        canvas: "canvas-wx-spectrum",
-        style: {
-          color: "#0f0",
-          bgcolor: "#000",
-          width: 1.0,
-          timeSmoothing: 0
-        }
       }
     }
   });
-  // stuffs
+  // handling parameters
   this.params = this._defaults;
   if (typeof json === "object") {
     this.params = json;
   }
-  this.label += "Spectrum";
 };
 
 WX.Spectrum.prototype = Object.create(WX.Unit.Analyzer.prototype, {
-  canvas: {
+  _updateSize: {
+    value: function() {
+      this._unitX = this._context2D.canvas.width / this._buffer.length;
+      this._scaleY = this._context2D.canvas.height;
+    }
+  },
+  context: {
     enumerable: true,
     get: function() {
-      return this._canvas;
+      return this._context2D;
     },
-    set: function(canvasId) {
-      this._canvas = document.getElementById(canvasId);
-      if (this._canvas === null) {
-        WX.error(this, "no valid canvas DOM.");
-        return;
+    set: function(ctx) {
+      if (ctx === undefined || ctx === null) {
+        WX.error(this, "invalid drawing context.");
+      } else {
+        // TODO: check if ctx is valid context
+        this._context2D = ctx;
+        this._updateSize();
       }
-      this._context2D = this._canvas.getContext('2d');
-      // flip vertically
-      // this._context2D.scale(1,-1);
-      this.update();
-    }
-  },
-  update: {
-    value: function() {
-      this._unitX = this._canvas.width / this._buffer.length;
-      this._scaleY = this._canvas.height;
-    }
-  },
-  style: {
-    get: function() {
-      if (this._context2D === null) {
-        WX.error(this, "no context2D exists.");
-        return;
-      }
-      var s = {
-        color: this._context2D.strokeStyle,
-        width: this._context2D.lineWidth,
-        bgcolor: this._canvas.style.backgroundColor,
-        timeSmoothing: this._analyzer.timeSmoothingConstant
-      };
-      return s;
-    },
-    set: function(json) {
-      if (typeof json !== "object") {
-        WX.error(this, "invalid JSON.");
-        return;
-      }
-      this._context2D.strokeStyle = json.color || "#0f0";
-      this._context2D.lineWidth = json.width || 1.0;
-      this._canvas.style.backgroundColor = json.bgcolor || "#000";
-      this._analyzer.timeSmoothingConstant = json.timeSmoothing || 0.0;
     }
   },
   pause: {
+    enumerable: true,
     get: function() {
       return this._pause;
     },
     set: function(bool) {
       this._pause = bool;
+    }
+  },
+  autoClear: {
+    enumerable: true,
+    get: function() {
+      return this._autoClear;
+    },
+    set: function(bool) {
+      this._autoClear = bool;
     }
   },
   draw: {
@@ -104,9 +80,11 @@ WX.Spectrum.prototype = Object.create(WX.Unit.Analyzer.prototype, {
       } else {
         this._analyzer.getByteFrequencyData(this._buffer);
         var c = this._context2D;
-        c.clearRect(0, 0, this._canvas.width, this._canvas.height);
+        if (this._autoClear) {
+          c.clearRect(0, 0, c.canvas.width, c.canvas.height);
+        }
         c.beginPath();
-        c.moveTo(0, this._buffer[0]);
+        c.moveTo(0, (1.0 - this._buffer[i]/255) * this._scaleY);
         for(var i = 1, b = this._buffer.length; i < b; ++i) {
           c.lineTo(i * this._unitX, (1.0 - this._buffer[i]/255) * this._scaleY);
         }

@@ -4,36 +4,38 @@
   </head>
   <body>
     <h1>Take the I train!</h1>
-    <canvas id="canvas-wx-waveform" width="600" height="300"></canvas>
+    <canvas id="wx-waveform" width="600" height="300"></canvas>
     <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
     <script>
-      var cvs = document.getElementById("wx-uiPanel");
-
+      // audio graph
       var it = new WX.ImpTrain({ frequency:7 });
       var lp = new WX.LPRez({ cutoff:440, Q:12, a:2.0, d:1.0, s:0.5, r:2.0 });
-      var wf = new WX.Waveform({ style:{ width:2 } });
-      WX.DAC.db = -18;
       it.to(lp).to(WX.DAC);
+      WX.DAC.db = -18;
+
+      // visualization
+      var cvs = document.getElementById("wx-waveform");
+      var ctx = cvs.getContext('2d');
+      var wf = new WX.Waveform({ context:ctx });
       lp.to(wf);
-      
-      // loop
-      function loop() {
+
+      // sweeper
+      function sweep(next, i) {
         lp.cutoff = WX.random2f(80, 1500);
         lp.Q = WX.random2f(15, 25);
-        lp.noteOn();
-        lp.noteOff(3.0);
-        setTimeout(function() {
-          loop(); 
-        }, 5000);
+        lp.noteOn(next);
+        lp.noteOff(next + 3.0);
       }
-      loop();
-            
+
+      // looping step
+      var l = new WX.Loop(sweep, 0, 5.0);
+      l.start();
+
       // drawer
-      function draw() {
+      (function draw() {
         wf.draw();
         requestAnimationFrame(draw);
-      }
-      requestAnimationFrame(draw);
+      })();
     </script>
   </body>
 </html>
