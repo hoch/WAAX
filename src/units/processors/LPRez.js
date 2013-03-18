@@ -145,36 +145,38 @@ WX.LPRez.prototype = Object.create(WX.Unit.Processor.prototype, {
   },
   noteOn: {
     value: function(time) {
-      var t = WX.now + (time || 0),
+      var t = (time || WX.now),
           f1 = this._lpf1.frequency,
           f2 = this._lpf2.frequency;
       // reset envelopes
       f1.cancelScheduledValues(t);
-      f1.setValueAtTime(this._cutoff, t);
+      f1.setValueAtTime(f1.value, t);
+      f1.linearRampToValueAtTime(this._cutoff, t);
       f2.cancelScheduledValues(t);
-      f2.setValueAtTime(this._cutoff, t);
+      f2.setValueAtTime(f2.value, t);
+      f2.linearRampToValueAtTime(this._cutoff, t);
       // start attack and decay
-      f1.linearRampToValueAtTime(this._cutoff + this._range, t + this._a);
-      f1.linearRampToValueAtTime(this._cutoff + this._range * this._s, t + this._a + this._d);
-      f2.linearRampToValueAtTime(this._cutoff + this._range, t + this._a);
-      f2.linearRampToValueAtTime(this._cutoff + this._range * this._s, t + this._a + this._d);
+      var p = this._cutoff + this._range;
+      f1.linearRampToValueAtTime(p, t + this._a);
+      f1.linearRampToValueAtTime(p * this._s, t + this._a + this._d);
+      f2.linearRampToValueAtTime(p, t + this._a);
+      f2.linearRampToValueAtTime(p * this._s, t + this._a + this._d);
       this._running = true;
     }
   },
   noteOff: {
-    value: function(interval) {
-      var t = WX.now,
-          later = WX.now + (interval || 0),
+    value: function(time) {
+      var t = (time || WX.now),
           f1 = this._lpf1.frequency,
           f2 = this._lpf2.frequency;
       // forced stopping
-      f1.cancelScheduledValues(later);
+      f1.cancelScheduledValues(t);
       f1.setValueAtTime(f1.value, t);
-      f2.cancelScheduledValues(later);
+      f2.cancelScheduledValues(t);
       f2.setValueAtTime(f2.value, t);
       // start release phase
-      f1.linearRampToValueAtTime(this._cutoff, later + this._r);
-      f2.linearRampToValueAtTime(this._cutoff, later + this._r);
+      f1.linearRampToValueAtTime(this._cutoff, t + this._r);
+      f2.linearRampToValueAtTime(this._cutoff, t + this._r);
       this._running = false;
     }
   }

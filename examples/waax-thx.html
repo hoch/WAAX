@@ -5,7 +5,7 @@
   <body>
     <h1>WAAX does THX!!</h1>
     <!-- this is the target canvas for visualization -->
-    <canvas id="canvas-wx-spectrum" width="650px" height="255px"></canvas>
+    <canvas id="wx-spectrum" width="650px" height="255px"></canvas>
     <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
     <script>
       /**
@@ -27,7 +27,6 @@
       // compression with the default setting with doubled makeup gain
       var comp = new WX.Comp({ gain:2 });
       // NOTE: the default target canvas is "canvas-wx-spectrum"
-      var sp = new WX.Spectrum({ style:{ color:"#f66" } });
       // array for saw oscillators
       var saws = [];
       for(var i = 0; i < 30; ++i) {
@@ -38,17 +37,21 @@
       }
       // connect: reverb => compressor => master out
       verb.to(comp).to(WX.DAC);
-      // master 
-      comp.to(sp);
       // lower the master volume for your safety
       WX.DAC.db = -24;
       
+      // visualization
+      var cvs = document.getElementById("wx-spectrum");
+      var ctx = cvs.getContext('2d');
+      var sp = new WX.Spectrum( { context:ctx, style:{ color:"#f66" } });
+      // connect compressor to visualizer
+      comp.to(sp);
+
       // visualization driver
-      function draw() {
-        requestAnimationFrame(draw);
+      (function draw() {
         sp.draw();
-      }
-      draw();
+        requestAnimationFrame(draw);
+      })();
       
       // start gliding!
       for(var i = 0; i < 30; ++i) {
