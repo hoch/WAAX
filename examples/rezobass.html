@@ -55,7 +55,7 @@
         adsr.noteOn(next);
         adsr.noteOff(next + gridDur);          
         // check playhead and wrap it as needed
-        playhead = ++playhead > 15 ? 0 : playhead;
+        playhead = ++playhead % 16;
       }     
       
       // looping step
