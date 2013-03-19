@@ -9,9 +9,9 @@
     <script>
       // audio graph
       var it = new WX.ImpTrain({ frequency:7 });
-      var lp = new WX.LPRez({ cutoff:440, Q:12, a:2.0, d:1.0, s:0.5, r:2.0 });
+      var lp = new WX.LPRez({ cutoff:120, Q:20, a:2.0, d:1.0, s:0.5, r:2.0 });
       it.to(lp).to(WX.DAC);
-      WX.DAC.db = -18;
+      WX.DAC.db = -12;
 
       // visualization
       var cvs = document.getElementById("wx-waveform");
@@ -21,10 +21,10 @@
 
       // sweeper
       function sweep(next, i) {
-        lp.cutoff = WX.random2f(80, 1500);
+        lp.cutoff = WX.random2f(50, 5000);
         lp.Q = WX.random2f(15, 25);
         lp.noteOn(next);
-        lp.noteOff(next + 3.0);
+        lp.noteOff(next + 2.0);
       }
 
       // looping step
