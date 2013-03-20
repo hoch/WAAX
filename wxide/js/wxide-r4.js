@@ -16,6 +16,75 @@
   var previewId = document.getElementById('d-preview');
 
   /**
+   * example list
+   */
+  var exs = [
+    {
+      id: "a-menu-ex-default",
+      text: "Hello WAAX!",
+      url: "../examples/hellowaax.html"
+    },
+    {
+      id: "a-menu-ex-thx",
+      text: "WAAX does THX",
+      url: "../examples/waax-thx.html"
+    },
+    {
+      id: "a-menu-ex-rezobass",
+      text: "RezoBass",
+      url: "../examples/rezobass.html"
+    },
+    {
+      id: "a-menu-ex-samplr",
+      text: "Samplr",
+      url: "../examples/samplr.html"
+    },
+    {
+      id: "a-menu-ex-itrain",
+      text: "Take the I train",
+      url: "../examples/take-i-train.html"
+    },
+    {
+      id: "a-menu-ex-visualizer",
+      text: "Visualizer",
+      url: "../examples/visualizer.html"
+    },
+    {
+      id: "a-menu-ex-uimanager",
+      text: "Simple GUI",
+      url: "../examples/uimanager.html"
+    },
+    { id: "divider" },
+    {
+      id: "a-menu-ex-wx7",
+      text: "WX7 FM Synth",
+      url: null
+    },
+    {
+      id: "a-menu-ex-wpc60",
+      text: "WPC-60",
+      url: null
+    },
+    {
+      id: "a-menu-ex-winimoog",
+      text: "Winimoog",
+      url: null
+    },
+    {
+      id: "a-menu-ex-wb303",
+      text: "WB-303 Bassline",
+      url: null
+    },
+    { id: "divider" },
+    {
+      id: "a-menu-ex-devmode",
+      text: "DevMode",
+      url: "../examples/devmode.html",
+      active: true
+    }
+  ];
+
+  /**
    * functions
    */
   // editor: resizeCodeArea
@@ -92,23 +161,28 @@
     localStorage.wxide = JSON.stringify(editor.getValue());
     setStatusText("Buffer saved to cache.");
   }
+  function injectCode(codes) {
+    var iframe = document.createElement('iframe');
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = '0';
+    iframe.id = 'wxi-injection';
+    previewId.appendChild(iframe);
+    var content = iframe.contentDocument || iframe.contentWindow.document;
+    content.open();
+    content.write(codes);
+    content.close();
+  }
   // injection: update
   function update() {
     setStatusText("Updating...");
     killSpawned();
     var codes = editor.getValue();
+    /* use esprima for code validation (disabled for performance reason)
     if (validate(codes)) {
-      var iframe = document.createElement('iframe');
-      iframe.style.width = '100%';
-      iframe.style.height = '100%';
-      iframe.style.border = '0';
-      iframe.id = 'wxi-injection';
-      previewId.appendChild(iframe);
-      var content = iframe.contentDocument || iframe.contentWindow.document;
-      content.open();
-      content.write(codes);
-      content.close();
-    }
+      injectCode(codes);
+    }*/
+    injectCode(codes);
     setStatusText("Updated.");
   }
   // injection: validate through esprima
@@ -168,12 +242,27 @@
   function browserCheck() {
     if (/chrome/.test(navigator.userAgent.toLowerCase()) === false) {
       alert("Sorry. Your browser is not compatible with WAAX. Use Chrome 24+ to use WAAX.");
-      throw "[WX.ERROR] Incompatible browser.";
+      throw "[WXIDE] ERROR: Incompatible browser.";
     } else {
       var version = parseInt(window.navigator.appVersion.match(/Chrome\/(.*?) /)[1], 10);
       if (version < 24) {
         alert("Sorry. Chrome 24+ is required to use WAAX.");
-        throw "[WX.ERROR] Outdated Chrome.";
+        throw "[WXIDE] ERROR: Outdated Chrome.";
+      }
+    }
+  }
+  // build examples
+  function buildExamples() {
+    var list = $('#l-examples');
+    for(var i = 0, l = exs.length; i < l; ++i) {
+      if (exs[i].id === "divider") {
+        list.append('<li class="divider"></li>');
+      } else {
+        if (exs[i].url !== null) {
+          list.append('<li><a id="' + exs[i].id + '">' + exs[i].text + '</a><li>');
+        } else {
+          list.append('<li class="disabled"><a id="' + exs[i].id + '">' + exs[i].text + '</a><li>');
+        }
       }
     }
   }
@@ -227,35 +316,37 @@
   /**
    * load examples with dropdown menu
    */
-  $('#l-examples > li > a').click(function(evt) {
-    var elId = $(this)[0].id;
-    switch (elId) {
-      case 'a-menu-ex-default':
-        loadExample('../examples/hellowaax.html');
-        break;
-      case 'a-menu-ex-thx':
-        loadExample('../examples/waax-thx.html');
-        break;
-      case 'a-menu-ex-rezobass':
-        loadExample('../examples/rezobass.html');
-        break;
-      case 'a-menu-ex-samplr':
-        loadExample('../examples/samplr.html');
-        break;
-      case 'a-menu-ex-visualizer':
-        loadExample('../examples/visualizer.html');
-        break;
-      case 'a-menu-ex-devmode':
-        loadExample('../examples/devmode.html');
-        break;
-      case 'a-menu-ex-uimanager':
-        loadExample('../examples/uimanager.html');
-        break;
-      case 'a-menu-ex-itrain':
-        loadExample('../examples/take-i-train.html');
-        break;
-    }
-  });
+  function bindExamples() {
+    $('#l-examples > li > a').click(function(evt) {
+      var elId = $(this)[0].id;
+      switch (elId) {
+        case 'a-menu-ex-default':
+          loadExample('../examples/hellowaax.html');
+          break;
+        case 'a-menu-ex-thx':
+          loadExample('../examples/waax-thx.html');
+          break;
+        case 'a-menu-ex-rezobass':
+          loadExample('../examples/rezobass.html');
+          break;
+        case 'a-menu-ex-samplr':
+          loadExample('../examples/samplr.html');
+          break;
+        case 'a-menu-ex-visualizer':
+          loadExample('../examples/visualizer.html');
+          break;
+        case 'a-menu-ex-devmode':
+          loadExample('../examples/devmode.html');
+          break;
+        case 'a-menu-ex-uimanager':
+          loadExample('../examples/uimanager.html');
+          break;
+        case 'a-menu-ex-itrain':
+          loadExample('../examples/take-i-train.html');
+          break;
+      }
+    });
+  }
 
   /**
    * other event listeners
@@ -320,6 +411,9 @@
     });
     // resize codemirror
     resizeCodeArea();
+    // build example list
+    buildExamples();
+    bindExamples();
     // load from local storage (if available)
     if(!loadFromCache()) {
       loadExample('../examples/hellowaax.html');
