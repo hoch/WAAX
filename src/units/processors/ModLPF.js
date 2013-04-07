@@ -71,7 +71,7 @@ WX.ModLPF = function(json) {
   }
 };
 
-WX.LPRez.prototype = Object.create(WX.Unit.Processor.prototype, {
+WX.ModLPF.prototype = Object.create(WX.Unit.Processor.prototype, {
   cutoff: {
     enumerable: true,
     get: function() {
