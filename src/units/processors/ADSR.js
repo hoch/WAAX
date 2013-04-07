@@ -31,7 +31,7 @@ WX.ADSR = function(json) {
         d: 0.015,
         s: 0.3,
         r: 0.05,
-        gain: 0.0
+        gain: 1.0
       }
     }
   });

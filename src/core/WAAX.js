@@ -22,14 +22,15 @@
  * WAAX(Web Audio API eXtension) name space
  * @namespace WX
  * @version 0
- * @revision 4
+ * @revision 5
+ * @note final exploration revision
  */
 var WX = WX || Object.create(null, {
   // library version/revision info
   _version: {
     value: {
       number: 0,
-      revision: 4
+      revision: 5
     }
   },
   // audio context
