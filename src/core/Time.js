@@ -32,7 +32,7 @@ WX.Loop = function(callback, repetition, interval) {
     },
     // look-ahead window in seconds for each checkup
     _ahead: {
-      value: 0.5
+      value: 1.0
     },
     // looping mode: finite or infinite
     _infinite: {
