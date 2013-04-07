@@ -9,6 +9,7 @@
 
 WX.C2 = function(json) {
   WX.Unit.Processor.call(this);
+  this.label += "C2";
   Object.defineProperties(this, {
     _threshold: {
       enumerable: false,
@@ -63,7 +64,6 @@ WX.C2 = function(json) {
   if (typeof json === "object") {
     this.params = json;
   }
-  this.label += "C2";
 };
 
 WX.C2.prototype = Object.create(WX.Unit.Processor.prototype, {

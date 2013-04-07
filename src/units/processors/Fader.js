@@ -3,6 +3,7 @@
  */
 WX.Fader = function(json) {
   WX.Unit.Processor.call(this);
+  this.label += "Fader";
   Object.defineProperties(this, {
     _muted: {
       enumerable: false,
@@ -16,8 +17,10 @@ WX.Fader = function(json) {
     }
   });
   this._inputGain.connect(this._outputGain);
-  this.params = json || this._defaults;
-  this.label += "Fader";
+  this.params = this._defaults;
+  if (typeof json === "object") {
+    this.params = json;
+  }
 };
 
 WX.Fader.prototype = Object.create(WX.Unit.Processor.prototype, {

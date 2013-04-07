@@ -1,4 +1,6 @@
+// UIManager
 WX.UIManager = Object.create(null, {
+  // UI status and event listener references
   selected: {
     writable: true,
     value: null
@@ -14,5 +16,9 @@ WX.UIManager = Object.create(null, {
   onReleased: {
     writable: true,
     value: null
+  },
+  // radian 2 degree factor
+  rad2degFactor: {
+    value: 180/Math.PI
   }
 });

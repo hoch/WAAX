@@ -6,6 +6,7 @@
 
 WX.LFO = function(json) {
   WX.Unit.Generator.call(this);
+  this.label += "LFO";
   Object.defineProperties(this, {
     _lfo: {
       enumerable: false,
@@ -27,7 +28,6 @@ WX.LFO = function(json) {
   if (typeof json === "object") {
     this.params = json;
   }
-  this.label += "LFO";
 };
 
 WX.LFO.prototype = Object.create(WX.Unit.Generator.prototype, {

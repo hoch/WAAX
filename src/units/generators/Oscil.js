@@ -26,10 +26,10 @@ WX.Oscil = function(json) {
     }
   });
   this._oscil.connect(this._outputGain);
-  this._oscil.noteOn(0);
-  // declare modulation targets
-  this.modulationTarget.frequency = this._oscil.frequency;
-  this.modulationTarget.gain = this._outputGain.gain;
+  this._oscil.start(0);
+  // declare modulation targets (not exposed in r5)
+  // this.modulationTarget.frequency = this._oscil.frequency;
+  // this.modulationTarget.gain = this._outputGain.gain;
   // default behavior
   this.params = this._defaults;
   if (typeof json === "object") {

@@ -1,44 +1,116 @@
-#ui-panel {
+#wx-gui-panel {
     width: 600px;
     height: 300px;
     position: relative;
     z-index: 50;
 }
 
-.wx-slider-bg {
-    background: url("SliderH.png") no-repeat;
+
+/* wx-gui:light texture map */
+.wx-gui-light {
+    background: url("gui-light.png?version=27") no-repeat;
 }
 
-.wx-slider-container {
-    position: relative;
-    width: 200px;
-    height: 40px;
+/* wx-sliderH */
+.wx-sliderH-container {
+    position: absolute;
+    width: 216px;
+    height: 38px;
     z-index: 100;
     -webkit-user-select: none;
 }
-
-.wx-slider-groove {
-    width: 200px;
-    height: 20px;
+.wx-sliderH-placeholder {
+    width: 216px;
+    height: 18px;
+    background-position: -18px 0;
     z-index: 101;
 }
-
-.wx-slider-label {
-    width: 194px;
-    height: 14px;
+.wx-sliderH-label {
+    width: 216px;
+    height: 20px;
+    line-height: 20px;
     font-size: 12px;
     font-family: Helvetica, serif;
     text-align: center;
-    padding: 3px 6px;
     z-index: 101;
 }
-
-.wx-slider-handle {
-    background-position: -200px;
+.wx-sliderH-control {
+    background-position: -235px 0;
     position: absolute;
     top: 0;
     left: 0;
-    width: 20px;
+    width: 18px;
+    height: 19px;
+    z-index: 102;
+}
+
+/* wx-sliderV */
+.wx-sliderV-container {
+    position: absolute;
+    width: 18px;
+    height: 144px;
+    z-index: 100;
+    -webkit-user-select: none;
+}
+.wx-sliderV-placeholder {
+    width: 18px;
+    height: 144px;
+    background-position: 0 0;
+    z-index: 101;
+}
+.wx-sliderV-label {
+    width: 18px;
     height: 20px;
+    line-height: 20px;
+    font-size: 9px;
+    font-family: Helvetica, serif;
+    text-align: right;
+    z-index: 101;
+}
+.wx-sliderV-control {
+    background-position: 1px -144px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 18px;
+    z-index: 102;
+}
+
+/* wx-knob */
+.wx-knob-container {
+    position: absolute;
+    width: 72px;
+    height: 92px;
+    z-index: 100;
+    -webkit-user-select: none;
+}
+.wx-knob-placeholder {
+    width: 72px;
+    height: 72px;
+    background-position: -18px -18px;
+    z-index: 101;
+}
+.wx-knob-label {
+    width: 72px;
+    height: 20px;
+    font-size: 12px;
+    line-height: 20px;
+    font-family: Helvetica, serif;
+    text-align: center;
+    z-index: 101;
+    color: #fff;
+    background-color: #555;
+    border-radius: 6px;
+    box-shadow: inset 0 1px 2px #222;
+}
+.wx-knob-control {
+    background-position: -90px -18px;
+    -webkit-transform-origin: 37.5px 37.5px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 72px;
+    height: 72px;
     z-index: 102;
 }

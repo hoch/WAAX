@@ -8,6 +8,7 @@
 
 WX.Comp = function(json) {
   WX.Unit.Processor.call(this);
+  this.label += "Comp";
   Object.defineProperties(this, {
     _comp: {
       enumerable: false,
@@ -32,7 +33,6 @@ WX.Comp = function(json) {
   if (typeof json === "object") {
     this.params = json;
   }
-  this.label += "Comp";
 };
 
 WX.Comp.prototype = Object.create(WX.Unit.Processor.prototype, {

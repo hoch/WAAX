@@ -7,34 +7,34 @@
     <canvas id="wx-waveform" width="600" height="300"></canvas>
     <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
     <script>
-      // audio graph
-      var it = new WX.ImpTrain({ frequency:7 });
-      var lp = new WX.LPRez({ cutoff:120, Q:20, a:2.0, d:1.0, s:0.5, r:2.0 });
-      it.to(lp).to(WX.DAC);
+      // audio graph: impulse train followed by LPF with resonance
+      var imp = new WX.ImpTrain({ frequency:7 });
+      var lpf = new WX.ModLPF({ cutoff:120, Q:20, a:2.0, d:1.0, s:0.5, r:2.0 });
+      imp.to(lpf).to(WX.DAC);
       WX.DAC.db = -12;
 
-      // visualization
-      var cvs = document.getElementById("wx-waveform");
-      var ctx = cvs.getContext('2d');
-      var wf = new WX.Waveform({ context:ctx });
-      lp.to(wf);
+      // visualization fetching from lpf
+      var canvas = document.getElementById("wx-waveform");
+      var context2D = canvas.getContext('2d');
+      var waveform = new WX.Waveform({ context:context2D });
+      lpf.to(waveform);
 
       // sweeper
       function sweep(next, i) {
-        lp.cutoff = WX.random2f(50, 5000);
-        lp.Q = WX.random2f(15, 25);
-        lp.noteOn(next);
-        lp.noteOff(next + 2.0);
+        lpf.cutoff = WX.random2f(50, 5000);
+        lpf.Q = WX.random2f(15, 25);
+        lpf.noteOn(next);
+        lpf.noteOff(next + 2.0);
       }
 
-      // looping step
+      // looping
       var l = new WX.Loop(sweep, 0, 5.0);
       l.start();
 
       // drawer
       (function draw() {
-        wf.draw();
         requestAnimationFrame(draw);
+        waveform.draw();
       })();
     </script>
   </body>

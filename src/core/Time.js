@@ -1,22 +1,3 @@
-/*
-(setTimeout)
-checkup                 ahead
-+----------------------->
-+---|-------+-|---------+|----------|-----------+
-   |         |          |          |
-   interval (of music loop)
-
-// example 
-function hey(next, i) {
-    // schedule note
-    adsr.noteOn(next);
-}
-
-// repeat 16 times with 0.05 seconds of interval
-var l = new WX.Loop(hey, 16, 0.05);
-l.start();
-*/
-
 /**
  * Loop object for sample-accurate looping
  * @param {function} callback callback function reference
@@ -125,8 +106,27 @@ WX.Loop.prototype = Object.create(null, {
 
 });
 
-/*
-WX.Tempo = function(bpm) {
 
-};
+/* informative note:
+
+<setTimeout>
+checkup                 ahead
++----------------------->
+            +----------------------->
+                        +-----------------------> 
++---|-------+-|---------+|----------+-----------+
+    |         |          |          |
+    <interval of music loop>
+
+
+// trigger function
+function hey(next, i) {
+    // schedule note
+    adsr.noteOn(next);
+}
+
+// repeat 16 times with 0.05 seconds of interval
+var l = new WX.Loop(hey, 16, 0.05);
+l.start();
+
 */

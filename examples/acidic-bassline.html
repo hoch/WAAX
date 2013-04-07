@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Example: Acidic Bassline</h1>
+    <canvas id="wx-waveform" width="700px" height="255px"></canvas>
+    <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
+    <script>
+      // creating units
+      var osc1 = new WX.Oscil({ type:2, gain:0.4 }),
+          osc2 = new WX.Oscil({ type:1, gain:0.4 }),
+          adsr = new WX.ADSR({ a:0.005, d:0.03, s:0.2, r:0.1 }),
+          rezz = new WX.ModLPF({ a:0.05, d:0.015, s:0.5, r:0.05, range:4000, Q:10 }),
+          pong = new WX.TwinDelay({ 
+            delayTimeLeft:0.360, delayTimeRight:0.240, 
+            feedbackLeft:0.4, feedbackRight:0.25,
+            crosstalk: 0.2, mix:0.1 
+          }),
+          verb = new WX.ConVerb({ mix:0.05 }),
+          comp = new WX.Comp({ threshold: -4, ratio: 2, gain: 4 });
+      
+      // patching one-liner
+      WX.link(osc1, rezz, adsr, verb, pong, comp, WX.DAC);
+      // adding another oscillator for fatness
+      osc2.to(rezz);
+      // set master level
+      WX.DAC.db = -18;
+      
+      // visualization
+      var canvas = document.getElementById("wx-waveform");
+      var context2D = canvas.getContext('2d');
+      var waveform = new WX.Waveform({ context:context2D });
+      comp.to(waveform);
+      
+      // some vars and scores for pitches, accent, slide
+      var gridDur = 0.240, glideTime = 0.180, playhead = 0;
+      var pit = [3, 0, 5, 0, 3, 0, 2, 1, 0, 0, 8, 0, 6, 0, 7, 0];
+      var acc = [1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0];
+      var sli = [0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1];
+   
+      // stepper
+      function step(next) {
+        var f = WX.pitch2freq(pit[playhead] + 48);
+        rezz.cutoff = f * 1.5;
+        // glide or not?
+        if(sli[playhead] == 0) {
+          osc1.frequency = f;
+          osc2.frequency = f * 0.5;
+          rezz.noteOn(next);
+        } else {
+          osc1.glide(f, glideTime);
+          osc2.glide(f * 0.5, glideTime);
+          rezz.noteOff(next + gridDur);
+        }
+        // trigger a note
+        adsr.gain = acc[playhead] + 1 * 0.5;
+        adsr.noteOn(next);
+        adsr.noteOff(next + gridDur);          
+        // check playhead and wrap it as needed
+        playhead = ++playhead % 16;
+      }     
+      
+      // looping step
+      var l = new WX.Loop(step, 0, gridDur);
+      l.start();
+
+      // initiate visualization
+      (function draw() {
+        requestAnimationFrame(draw);
+        waveform.draw();
+      })();      
+    </script>
+  </body>
+</html>
