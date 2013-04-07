@@ -10,25 +10,42 @@
     <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
     <script>
       // an oscillator
-      var osc = new WX.Oscil({ type:2, frequency:344, gain:0.8 });
-      osc.to(WX.DAC);
+      var osc = new WX.Oscil({ type:2, frequency:344, gain:0.8 }),
+          adsr = new WX.ADSR({ a:2.0, d:2.0, s:0.5, r:4.0, gain:1.0 });
+      osc.to(adsr).to(WX.DAC);
       WX.DAC.db = -18;
       
       // waveform visualization 
       var canvas = document.getElementById("wx-waveform");
       var context2D = canvas.getContext('2d');
       var waveform = new WX.Waveform({ context: context2D });
-      osc.to(waveform);
+      adsr.to(waveform);
       context2D.lineWidth = 2;
 
       // GUI: horizontal slider
       var panel = document.getElementById("uiPanel");
-      var s1 = new WX.UISliderH({ targetDiv:panel, label:"Frequency", x:10, y:10, offset:60, scale:1000, value:440 });
-      var s2 = new WX.UISliderH({ targetDiv:panel, label:"Gain", x:10, y:50, value: 0.3 });
+      var s1 = new WX.UISliderH({ 
+        targetDiv:panel, label:"Frequency", 
+        x:10, y:500, offset:60, scale:1000, value:440 
+      });
+      var s2 = new WX.UISliderH({ 
+        targetDiv:panel, label:"Gain", 
+        x:10, y:550, value: 0.3 
+      });
 
       // mapping GUI components to parameter (temporary solution for r5)
-      s1.target = osc.modulationTarget.frequency;
-      s2.target = osc.modulationTarget.gain;
+      s1.target = osc._oscil.frequency;
+      s2.target = osc._outputGain.gain;
+
+      // shoot
+      function shoot(next, i) {
+        adsr.noteOn(next);
+        adsr.noteOff(next + 4.0);
+      }
+
+      // looping
+      var l = new WX.Loop(shoot, 0, 8.5);
+      l.start();
 
       // waveform drawer
       (function draw() {
