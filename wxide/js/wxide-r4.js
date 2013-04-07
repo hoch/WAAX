@@ -20,39 +20,39 @@
    */
   var exs = [
     {
-      id: "a-menu-ex-default",
+      id: "a-menu-ex-0",
       text: "Hello WAAX!",
       url: "../examples/hello-waax.html"
     },
     {
-      id: "a-menu-ex-thx",
+      id: "a-menu-ex-1",
       text: "WAAX does THX",
       url: "../examples/waax-does-thx.html"
     },
     {
-      id: "a-menu-ex-rezobass",
+      id: "a-menu-ex-2",
       text: "Acidic Bassline",
       url: "../examples/acidic-bassline.html"
     },
     {
-      id: "a-menu-ex-samplr",
+      id: "a-menu-ex-3",
       text: "Simple Drum Sampler",
       url: "../examples/simple-drum-sampler.html"
     },
     {
-      id: "a-menu-ex-itrain",
+      id: "a-menu-ex-4",
       text: "Take the I train",
       url: "../examples/take-i-train.html"
     },
     {
-      id: "a-menu-ex-visualizer",
+      id: "a-menu-ex-5",
       text: "Custom Visualizer",
       url: "../examples/visualizer.html"
     },
     {
-      id: "a-menu-ex-uimanager",
-      text: "UI components",
-      url: "../examples/uimanager.html"
+      id: "a-menu-ex-6",
+      text: "WAAX GUI (pilot)",
+      url: "../examples/ui-manager.html"
     },
     { id: "divider" },
     {
