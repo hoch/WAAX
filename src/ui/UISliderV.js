@@ -1,8 +1,8 @@
 /**
- * @class WX.UISliderH
+ * @class WX.UISliderV
  * @param {json} json value, offset, scale, default value
  */
-WX.UISliderH = function(json) {
+WX.UISliderV = function(json) {
   Object.defineProperties(this, {
     _container: {
       value: document.createElement("div")
@@ -54,15 +54,15 @@ WX.UISliderH = function(json) {
   this._rect = this._placeholder.getBoundingClientRect();
   this._params.val = this._params.defaultVal;
   // infer value from default value
-  this._pos.x = (this._params.val - this._params.offset) / this._params.scale * (this._rect.width - 18);
+  this._pos.y = (this._params.val - this._params.offset) / this._params.scale * (this._rect.height - 18);
   // capping between 0~(width-18); size of control
-  this._pos.x = Math.min(this._rect.width - 18, Math.max(0, this._pos.x));
-  this._control.style.left = this._pos.x + "px";
+  this._pos.y = Math.min(this._rect.height - 18, Math.max(0, this._pos.x));
+  this._control.style.top = this._pos.y + "px";
   // return a handle for this slider
   return this;
 };
 
-WX.UISliderH.prototype = Object.create(null, {
+WX.UISliderV.prototype = Object.create(null, {
   _build: {
     value: function(json) {
       // compositing DOM
@@ -78,10 +78,10 @@ WX.UISliderH.prototype = Object.create(null, {
       // styling
       this._container.style.left = json.x + "px";
       this._container.style.top = json.y + "px";
-      this._container.className = "wx-sliderH-container";
-      this._placeholder.className = "wx-sliderH-placeholder wx-gui-light";
-      this._control.className = "wx-sliderH-control wx-gui-light";
-      this._label.className = "wx-sliderH-label";
+      this._container.className = "wx-sliderV-container";
+      this._placeholder.className = "wx-sliderV-placeholder wx-gui-light";
+      this._control.className = "wx-sliderV-control wx-gui-light";
+      this._label.className = "wx-sliderV-label";
       this._label.textContent = json.label;
       // attaching event listener
       var me = this;
@@ -94,7 +94,7 @@ WX.UISliderH.prototype = Object.create(null, {
     value: function(event) {
       event.preventDefault();
       // storing previous x
-      this._prev.x = event.clientX - this._rect.left;
+      this._prev.y = event.clientY - this._rect.top;
       // caching function references
       var me = this;
       WX.UIManager.selected = me;
@@ -111,20 +111,20 @@ WX.UISliderH.prototype = Object.create(null, {
   _controlDragged: {
     value: function(event) {
       event.preventDefault();
-      var x = event.clientX - this._rect.left;
+      //var x = event.clientX - this._rect.left;
       var y = event.clientY - this._rect.top;
-      var dx = x - this._prev.x;
+      //var dx = x - this._prev.x;
       var dy = y - this._prev.y;
-      this._pos.x += dx;
-      // this._pos.y += dy;
-      this._pos.x = Math.min(this._rect.width - 18, this._pos.x);
-      this._pos.x = Math.max(0, this._pos.x);
-      this._control.style.left = this._pos.x + "px";
-      this._prev.x = x;
-      // this._prev.y = y;
+      //this._pos.x += dx;
+      this._pos.y += dy;
+      this._pos.y = Math.min(this._rect.height - 18, this._pos.y);
+      this._pos.y = Math.max(0, this._pos.y);
+      this._control.style.top = this._pos.y + "px";
+      //this._prev.x = x;
+      this._prev.y = y;
       // calculate value
-      this._params.val = (this._pos.x / (this._rect.width - 18)) * this._params.scale + this._params.offset;
-      this._label.textContent = this._params.val.toFixed(2);
+      this._params.val = (this._pos.y / (this._rect.height - 18)) * this._params.scale + this._params.offset;
+      // this._label.textContent = this._params.val.toFixed(2);
       // setting parameter
       if (this._target) {
         this._target.setValueAtTime(this._params.val, 0);

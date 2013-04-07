@@ -3,15 +3,15 @@
   <head>
   </head>
   <body>
-    <h1>RezoBass!!</h1>
+    <h1>Example: Acidic Bassline</h1>
     <canvas id="wx-waveform" width="700px" height="255px"></canvas>
     <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
     <script>
-      // audiograph
+      // creating units
       var osc1 = new WX.Oscil({ type:2, gain:0.4 }),
           osc2 = new WX.Oscil({ type:1, gain:0.4 }),
           adsr = new WX.ADSR({ a:0.005, d:0.03, s:0.2, r:0.1 }),
-          rezz = new WX.LPRez({ a:0.05, d:0.015, s:0.5, r:0.05, range:4000, Q:10 }),
+          rezz = new WX.ModLPF({ a:0.05, d:0.015, s:0.5, r:0.05, range:4000, Q:10 }),
           pong = new WX.TwinDelay({ 
             delayTimeLeft:0.360, delayTimeRight:0.240, 
             feedbackLeft:0.4, feedbackRight:0.25,
@@ -19,16 +19,19 @@
           }),
           verb = new WX.ConVerb({ mix:0.05 }),
           comp = new WX.Comp({ threshold: -4, ratio: 2, gain: 4 });
+      
+      // patching one-liner
       WX.link(osc1, rezz, adsr, verb, pong, comp, WX.DAC);
+      // adding another oscillator for fatness
       osc2.to(rezz);
       // set master level
       WX.DAC.db = -18;
       
       // visualization
-      var cvs = document.getElementById("wx-waveform");
-      var ctx = cvs.getContext('2d');
-      var wf = new WX.Waveform({ context:ctx });
-      comp.to(wf);
+      var canvas = document.getElementById("wx-waveform");
+      var context2D = canvas.getContext('2d');
+      var waveform = new WX.Waveform({ context:context2D });
+      comp.to(waveform);
       
       // some vars and scores for pitches, accent, slide
       var gridDur = 0.240, glideTime = 0.180, playhead = 0;
@@ -65,7 +68,7 @@
       // initiate visualization
       (function draw() {
         requestAnimationFrame(draw);
-        wf.draw();
+        waveform.draw();
       })();      
     </script>
   </body>

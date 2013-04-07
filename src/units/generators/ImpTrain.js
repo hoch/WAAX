@@ -1,5 +1,7 @@
 /**
  * @class ImpTrain
+ * @note this unit uses ScriptProcessor node. use with your own risk.
+ *       also this class is an example of a custom javascript generator unit.
  */
 WX.ImpTrain = function(json) {
   WX.Unit.Generator.call(this);

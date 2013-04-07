@@ -14,7 +14,7 @@
        * WAAX version ported by Hongchan Choi
        */
       
-      // target and initial pitches
+      // target and initial pitches for 30 oscillators
       var targets = [ 
         29.0, 87.5, 116.0, 175.0, 233.0, 350.0, 524.0, 880.0, 1048, 1760,
         29.0, 87.5, 116.0, 175.0, 233.0, 350.0, 524.0, 880.0, 1048, 1760,
@@ -22,34 +22,40 @@
       ];
       var initials = [];
       
-      // creating & setting units
+      // a convolution reverb
       var verb = new WX.ConVerb({ mix:0.025 });
+
       // compression with the default setting with doubled makeup gain
       var comp = new WX.Comp({ gain:2 });
-      // NOTE: the default target canvas is "canvas-wx-spectrum"
-      // array for saw oscillators
+
+      // array for 30 saw oscillators
       var saws = [];
       for(var i = 0; i < 30; ++i) {
         initials[i] = WX.random2f(200.0, 800.0);
         saws[i] = new WX.Oscil({ type:1, frequency:initials[i], gain:0.1 });
-        // connect all saw oscs to reverberation
+        // patching all saw oscillators to the reverb
         saws[i].to(verb);
       }
-      // connect: reverb => compressor => master out
+
+      // patching: reverb => compressor => master out
       verb.to(comp).to(WX.DAC);
+      
       // lower the master volume for your safety
       WX.DAC.db = -24;
       
-      // visualization
-      var cvs = document.getElementById("wx-spectrum");
-      var ctx = cvs.getContext('2d');
-      var sp = new WX.Spectrum( { context:ctx, style:{ color:"#f66" } });
+      // creating canvas and 2d context for visualization
+      var canvas = document.getElementById("wx-spectrum");
+      var context2D = canvas.getContext('2d');
+
+      // use Spectrum unit for rendering
+      var spectrum = new WX.Spectrum({ context:context2D });
+      
       // connect compressor to visualizer
-      comp.to(sp);
+      comp.to(spectrum);
 
       // visualization driver
       (function draw() {
-        sp.draw();
+        spectrum.draw();
         requestAnimationFrame(draw);
       })();
       

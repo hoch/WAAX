@@ -7,9 +7,9 @@
     <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
     <script>
       // a sine wave
-      var osc = new WX.Oscil();
-      // connect it to output
-      osc.to(WX.DAC);
+      var hello = new WX.Oscil({ frequency: 680 });
+      // connect it to master output(DAC) using ".to" method
+      hello.to(WX.DAC);
       // set output volume in dB
       WX.DAC.db = -24;
     </script>

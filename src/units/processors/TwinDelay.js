@@ -8,6 +8,7 @@
 
 WX.TwinDelay = function(json) {
   WX.Unit.Processor.call(this);
+  this.label += "TwinDelay";
   Object.defineProperties(this, {
     _delayL: {
       enumerable: false,
@@ -89,7 +90,6 @@ WX.TwinDelay = function(json) {
   if (typeof json === "object") {
     this.params = json;
   }
-  this.label += "TwinDelay";
 };
 
 WX.TwinDelay.prototype = Object.create(WX.Unit.Processor.prototype, {

@@ -5,7 +5,6 @@
  */
 WX.ModLPF = function(json) {
   WX.Unit.Processor.call(this);
-  this.label += "ModLPF";
   Object.defineProperties(this, {
     _lpf1: {
       enumerable: false,
@@ -69,9 +68,10 @@ WX.ModLPF = function(json) {
   if (typeof json === "object") {
     this.params = json;
   }
+  this.label += "LPRez";
 };
 
-WX.ModLPF.prototype = Object.create(WX.Unit.Processor.prototype, {
+WX.LPRez.prototype = Object.create(WX.Unit.Processor.prototype, {
   cutoff: {
     enumerable: true,
     get: function() {

@@ -6,6 +6,7 @@
 
 WX.Noise = function(json) {
   WX.Unit.Generator.call(this);
+  this.label += "Noise";
   Object.defineProperties(this, {
     _source: {
       enumerable: false,
@@ -34,7 +35,6 @@ WX.Noise = function(json) {
   if (typeof json === "object") {
     this.params = json;
   }
-  this.label += "Noise";
 };
 
 WX.Noise.prototype = Object.create(WX.Unit.Generator.prototype, {

@@ -3,6 +3,7 @@
  */
 WX.ADSR = function(json) {
   WX.Unit.Processor.call(this);
+  this.label += "ADSR";
   Object.defineProperties(this, {
     _a: {
       writable: true,
@@ -29,14 +30,16 @@ WX.ADSR = function(json) {
         a: 0.015,
         d: 0.015,
         s: 0.3,
-        r: 0.05
+        r: 0.05,
+        gain: 0.0
       }
     }
   });
   this._inputGain.connect(this._outputGain);
-  this._inputGain.gain.value = 0.0;
-  this.params = json || this._defaults;
-  this.label += "ADSR";
+  this.params = this._defaults;
+  if (typeof json === "object") {
+    this.params = json;
+  }
 };
 
 WX.ADSR.prototype = Object.create(WX.Unit.Processor.prototype, {

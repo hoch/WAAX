@@ -4,34 +4,36 @@
     <link rel="stylesheet" href="../src/ui/static/UI.css">
   </head>
   <body>
-    <h1>UIManager + UISliderH</h1>
+    <h1>UI: manager and components</h1>
     <canvas id="wx-waveform" width="750px" height="360px"></canvas>
     <div id="uiPanel"></div>
     <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
     <script>
-      // audio graph
+      // an oscillator
       var osc = new WX.Oscil({ type:2, frequency:344, gain:0.8 });
       osc.to(WX.DAC);
       WX.DAC.db = -18;
       
-      // visulaization
-      var cvs = document.getElementById("wx-waveform");
-      var ctx = cvs.getContext('2d');
-      var wf = new WX.Waveform({ context: ctx });
-      osc.to(wf);
-      ctx.lineWidth = 2;
-      
+      // waveform visualization 
+      var canvas = document.getElementById("wx-waveform");
+      var context2D = canvas.getContext('2d');
+      var waveform = new WX.Waveform({ context: context2D });
+      osc.to(waveform);
+      context2D.lineWidth = 2;
+
       // GUI: horizontal slider
       var panel = document.getElementById("uiPanel");
       var s1 = new WX.UISliderH({ targetDiv:panel, label:"Frequency", x:10, y:10, offset:60, scale:1000, value:440 });
       var s2 = new WX.UISliderH({ targetDiv:panel, label:"Gain", x:10, y:50, value: 0.3 });
+
+      // mapping GUI components to parameter (temporary solution for r5)
       s1.target = osc.modulationTarget.frequency;
       s2.target = osc.modulationTarget.gain;
 
       // waveform drawer
       (function draw() {
-        wf.draw();
         requestAnimationFrame(draw);
+        waveform.draw();
       })();
     </script>
   </body>

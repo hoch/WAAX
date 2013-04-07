@@ -22,22 +22,22 @@
     {
       id: "a-menu-ex-default",
       text: "Hello WAAX!",
-      url: "../examples/hellowaax.html"
+      url: "../examples/hello-waax.html"
     },
     {
       id: "a-menu-ex-thx",
       text: "WAAX does THX",
-      url: "../examples/waax-thx.html"
+      url: "../examples/waax-does-thx.html"
     },
     {
       id: "a-menu-ex-rezobass",
-      text: "RezoBass",
-      url: "../examples/rezobass.html"
+      text: "Acidic Bassline",
+      url: "../examples/acidic-bassline.html"
     },
     {
       id: "a-menu-ex-samplr",
-      text: "Samplr",
-      url: "../examples/samplr.html"
+      text: "Simple Drum Sampler",
+      url: "../examples/simple-drum-sampler.html"
     },
     {
       id: "a-menu-ex-itrain",
@@ -46,12 +46,12 @@
     },
     {
       id: "a-menu-ex-visualizer",
-      text: "Visualizer",
+      text: "Custom Visualizer",
       url: "../examples/visualizer.html"
     },
     {
       id: "a-menu-ex-uimanager",
-      text: "Simple GUI",
+      text: "UI components",
       url: "../examples/uimanager.html"
     },
     { id: "divider" },

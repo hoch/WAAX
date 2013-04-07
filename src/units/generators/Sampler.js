@@ -9,6 +9,7 @@
 
 WX.Sampler = function(json) {
   WX.Unit.Generator.call(this);
+  this.label += "Sampler";
   Object.defineProperties(this, {
     _buffer: {
       writable: true,
@@ -40,7 +41,6 @@ WX.Sampler = function(json) {
   if (typeof json === "object") {
     this.params = json;
   }
-  this.label += "Sampler";
 };
 
 WX.Sampler.prototype = Object.create(WX.Unit.Generator.prototype, {

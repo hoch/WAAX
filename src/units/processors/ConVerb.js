@@ -4,6 +4,7 @@
  */
 WX.ConVerb = function(json) {
   WX.Unit.Processor.call(this);
+  this.label += "ConVerb";
   Object.defineProperties(this, {
     _convolver: {
       enumerable: false,
@@ -41,7 +42,6 @@ WX.ConVerb = function(json) {
   if (typeof json === "object") {
     this.params = json;
   }
-  this.label += "ConVerb";
 };
 
 WX.ConVerb.prototype = Object.create(WX.Unit.Processor.prototype, {

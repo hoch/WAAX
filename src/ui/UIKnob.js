@@ -1,8 +1,4 @@
-/**
- * @class WX.UISliderH
- * @param {json} json value, offset, scale, default value
- */
-WX.UISliderH = function(json) {
+WX.UIKnob = function(json) {
   Object.defineProperties(this, {
     _container: {
       value: document.createElement("div")
@@ -20,19 +16,13 @@ WX.UISliderH = function(json) {
       writable: true,
       value: null
     },
-    _pos: {
+    _angle: {
       writable: true,
-      value: {
-        x: 0,
-        y: 0
-      }
+      value:  0
     },
-    _prev: {
+    _prevAngle: {
       writable: true,
-      value: {
-        x: 0,
-        y: 0
-      }
+      value: 0
     },
     _params: {
       writable: true,
@@ -53,16 +43,17 @@ WX.UISliderH = function(json) {
   // set parameters
   this._rect = this._placeholder.getBoundingClientRect();
   this._params.val = this._params.defaultVal;
-  // infer value from default value
-  this._pos.x = (this._params.val - this._params.offset) / this._params.scale * (this._rect.width - 18);
-  // capping between 0~(width-18); size of control
-  this._pos.x = Math.min(this._rect.width - 18, Math.max(0, this._pos.x));
-  this._control.style.left = this._pos.x + "px";
+  // infer angle from default value (offset for actual knob position)
+  this._angle = ((this._params.val - this._params.offset) / this._params.scale) * 270 + 45;
+  // capping value between 45~315 (PI/4 ~ PI*7/4)
+  this._angle = Math.min(315, Math.max(45, this._angle));
+  // rotate DOM
+  this._control.style.webkitTransform = "rotate(" + this._angle + "deg)";
   // return a handle for this slider
   return this;
 };
 
-WX.UISliderH.prototype = Object.create(null, {
+WX.UIKnob.prototype = Object.create(null, {
   _build: {
     value: function(json) {
       // compositing DOM
@@ -78,60 +69,67 @@ WX.UISliderH.prototype = Object.create(null, {
       // styling
       this._container.style.left = json.x + "px";
       this._container.style.top = json.y + "px";
-      this._container.className = "wx-sliderH-container";
-      this._placeholder.className = "wx-sliderH-placeholder wx-gui-light";
-      this._control.className = "wx-sliderH-control wx-gui-light";
-      this._label.className = "wx-sliderH-label";
+      this._container.className = "wx-knob-container";
+      this._placeholder.className = "wx-knob-placeholder wx-gui-light";
+      this._control.className = "wx-knob-control wx-gui-light";
+      this._label.className = "wx-knob-label";
       this._label.textContent = json.label;
       // attaching event listener
       var me = this;
       this._placeholder.addEventListener("mousedown", function(event) {
-        me._controlClicked.call(me, event);
+        me._handleClicked.call(me, event);
       }, false);
     }
   },
-  _controlClicked: {
+  _getCurrentAngle: {
+    value: function(ex, ey) {
+      var x = this._rect.left + (this._rect.width / 2.0) - ex;
+      var y = this._rect.top + (this._rect.height / 2.0) - ey;
+      var a = Math.atan2(y, x) * 180/Math.PI + 90;
+      return (a > 0) ? a : (a + 360);
+    }
+  },
+  _handleClicked: {
     value: function(event) {
       event.preventDefault();
-      // storing previous x
-      this._prev.x = event.clientX - this._rect.left;
+      // storing starting angle
+      this._prevAngle = this._getCurrentAngle(event.clientX, event.clientY);
       // caching function references
       var me = this;
       WX.UIManager.selected = me;
       WX.UIManager.onDragged = function(event) {
-        me._controlDragged.call(me, event);
+        me._handleDragged.call(me, event);
       };
       WX.UIManager.onReleased = function(event) {
-        me._controlReleased.call(me, event);
+        me._handleReleased.call(me, event);
       };
       window.addEventListener("mousemove", WX.UIManager.onDragged, false);
       window.addEventListener("mouseup", WX.UIManager.onReleased, false);
     }
   },
-  _controlDragged: {
+  _handleDragged: {
     value: function(event) {
       event.preventDefault();
-      var x = event.clientX - this._rect.left;
-      var y = event.clientY - this._rect.top;
-      var dx = x - this._prev.x;
-      var dy = y - this._prev.y;
-      this._pos.x += dx;
-      // this._pos.y += dy;
-      this._pos.x = Math.min(this._rect.width - 18, this._pos.x);
-      this._pos.x = Math.max(0, this._pos.x);
-      this._control.style.left = this._pos.x + "px";
-      this._prev.x = x;
-      // this._prev.y = y;
+      var a = this._getCurrentAngle(event.clientX, event.clientY);
+      var delta = a - this._prevAngle;
+      // if delta is moving too much, ignore it
+      if (delta > 180 || delta < -180) {
+        return;
+      }
+      this._angle += delta;
+      this._angle = Math.min(315, Math.max(45, this._angle));
+      this._control.style.webkitTransform = "rotate(" + this._angle + "deg)";
       // calculate value
-      this._params.val = (this._pos.x / (this._rect.width - 18)) * this._params.scale + this._params.offset;
+      this._params.val = (this._angle - 45) / 270 * this._params.scale + this._params.offset;
       this._label.textContent = this._params.val.toFixed(2);
+      this._prevAngle = a;
       // setting parameter
       if (this._target) {
         this._target.setValueAtTime(this._params.val, 0);
       }
     }
   },
-  _controlReleased: {
+  _handleReleased: {
     value: function(event) {
       event.preventDefault();
       window.removeEventListener("mousemove", WX.UIManager.onDragged, false);
