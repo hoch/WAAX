@@ -55,7 +55,7 @@
       url: "../examples/ui-manager.html"
     },
     { id: "divider" },
-    {
+    { 
       id: "a-menu-ex-wx7",
       text: "WX7 FM Synth",
       url: null
@@ -319,32 +319,40 @@
   function bindExamples() {
     $('#l-examples > li > a').click(function(evt) {
       var elId = $(this)[0].id;
-      switch (elId) {
-        case 'a-menu-ex-default':
-          loadExample('../examples/hellowaax.html');
-          break;
-        case 'a-menu-ex-thx':
-          loadExample('../examples/waax-thx.html');
-          break;
-        case 'a-menu-ex-rezobass':
-          loadExample('../examples/rezobass.html');
-          break;
-        case 'a-menu-ex-samplr':
-          loadExample('../examples/samplr.html');
-          break;
-        case 'a-menu-ex-visualizer':
-          loadExample('../examples/visualizer.html');
-          break;
-        case 'a-menu-ex-devmode':
-          loadExample('../examples/devmode.html');
-          break;
-        case 'a-menu-ex-uimanager':
-          loadExample('../examples/uimanager.html');
-          break;
-        case 'a-menu-ex-itrain':
-          loadExample('../examples/take-i-train.html');
-          break;
+      // find elID from exs.id
+      // load corresponding url
+      for(var i = 0, l = exs.length; i < l; i++) {
+        if (exs[i].id == elId) {
+          loadExample(exs[i].url);
+          return;
+        }
       }
+      // switch (elId) {
+      //   case 'a-menu-ex-default':
+      //     loadExample('../examples/hellowaax.html');
+      //     break;
+      //   case 'a-menu-ex-thx':
+      //     loadExample('../examples/waax-thx.html');
+      //     break;
+      //   case 'a-menu-ex-rezobass':
+      //     loadExample('../examples/rezobass.html');
+      //     break;
+      //   case 'a-menu-ex-samplr':
+      //     loadExample('../examples/samplr.html');
+      //     break;
+      //   case 'a-menu-ex-visualizer':
+      //     loadExample('../examples/visualizer.html');
+      //     break;
+      //   case 'a-menu-ex-devmode':
+      //     loadExample('../examples/devmode.html');
+      //     break;
+      //   case 'a-menu-ex-uimanager':
+      //     loadExample('../examples/uimanager.html');
+      //     break;
+      //   case 'a-menu-ex-itrain':
+      //     loadExample('../examples/take-i-train.html');
+      //     break;
+      // }
     });
   }
 
@@ -416,7 +424,7 @@
     bindExamples();
     // load from local storage (if available)
     if(!loadFromCache()) {
-      loadExample('../examples/hellowaax.html');
+      loadExample(exs[0].url);
     }
     setStatusText("Ready. (r4)");
   });
