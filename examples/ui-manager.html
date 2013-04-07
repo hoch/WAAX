@@ -11,19 +11,19 @@
     <script>
       // an oscillator
       var osc = new WX.Oscil({ type:2, frequency:344, gain:0.8 }),
-          adsr = new WX.ADSR({ a:2.0, d:2.0, s:0.5, r:4.0, gain:1.0 });
+          adsr = new WX.ADSR({ a:0.01, d:0.005, s:0.2, r:0.001});
       osc.to(adsr).to(WX.DAC);
-      WX.DAC.db = -18;
+      WX.DAC.db = -12;
       
       // waveform visualization 
-      var canvas = document.getElementById("wx-waveform");
+      var canvas = document.getElementById("wx-canvas");
       var context2D = canvas.getContext('2d');
       var waveform = new WX.Waveform({ context: context2D });
       adsr.to(waveform);
       context2D.lineWidth = 2;
 
       // GUI: horizontal slider
-      var panel = document.getElementById("uiPanel");
+      var panel = document.getElementById("wx-uipanel");
       var s1 = new WX.UISliderH({ 
         targetDiv:panel, label:"Frequency", 
         x:10, y:500, offset:60, scale:1000, value:440 
@@ -40,11 +40,11 @@
       // shoot
       function shoot(next, i) {
         adsr.noteOn(next);
-        adsr.noteOff(next + 4.0);
+        adsr.noteOff(next + 0.02);
       }
 
       // looping
-      var l = new WX.Loop(shoot, 0, 8.5);
+      var l = new WX.Loop(shoot, 0, 1.0);
       l.start();
 
       // waveform drawer

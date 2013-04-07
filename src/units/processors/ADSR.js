@@ -36,6 +36,7 @@ WX.ADSR = function(json) {
     }
   });
   this._inputGain.connect(this._outputGain);
+  this._inputGain.gain.value = 0.0;
   this.params = this._defaults;
   if (typeof json === "object") {
     this.params = json;
@@ -94,11 +95,11 @@ WX.ADSR.prototype = Object.create(WX.Unit.Processor.prototype, {
           g = this._inputGain.gain;
       // cancel previous state
       g.cancelScheduledValues(t);
-      g.setValueAtTime(g.value, t);
-      g.linearRampToValueAtTime(0.0, t);
+      g.setValueAtTime(0.0, t);
       // schedule event for attack, decay and sustain
       g.linearRampToValueAtTime(1.0, t + this._a);
-      g.linearRampToValueAtTime(this._s, t + this._a + this._d);
+      g.setTargetValueAtTime(this._s, t + this._a, this._d);
+      // v(t) = V1 + (V0 - V1) * exp(-(t - T0) / timeConstant)
       this._running = true;
     }
   },
@@ -108,9 +109,10 @@ WX.ADSR.prototype = Object.create(WX.Unit.Processor.prototype, {
           g = this._inputGain.gain;
       // cancel progress and force it into release phase
       g.cancelScheduledValues(t);
-      g.setValueAtTime(g.value, t);
+      // this doesn't work: can't get future value of audioparam
+      // g.setValueAtTime(g.value, t); 
       // start release phase
-      g.linearRampToValueAtTime(0.0, t + this._r);
+      g.setTargetValueAtTime(0.0, t, this._r);
       this._running = false;
     }
   }

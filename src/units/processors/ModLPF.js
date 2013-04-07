@@ -5,6 +5,7 @@
  */
 WX.ModLPF = function(json) {
   WX.Unit.Processor.call(this);
+  this.label += "ModLPF";
   Object.defineProperties(this, {
     _lpf1: {
       enumerable: false,
@@ -68,7 +69,6 @@ WX.ModLPF = function(json) {
   if (typeof json === "object") {
     this.params = json;
   }
-  this.label += "LPRez";
 };
 
 WX.LPRez.prototype = Object.create(WX.Unit.Processor.prototype, {
@@ -158,9 +158,9 @@ WX.LPRez.prototype = Object.create(WX.Unit.Processor.prototype, {
       // start attack and decay
       var p = this._cutoff + this._range;
       f1.linearRampToValueAtTime(p, t + this._a);
-      f1.linearRampToValueAtTime(p * this._s, t + this._a + this._d);
+      f1.setTargetValueAtTime(p * this._s, t + this._a, this._d);
       f2.linearRampToValueAtTime(p, t + this._a);
-      f2.linearRampToValueAtTime(p * this._s, t + this._a + this._d);
+      f2.setTargetValueAtTime(p * this._s, t + this._a, this._d);
       this._running = true;
     }
   },
@@ -171,12 +171,12 @@ WX.LPRez.prototype = Object.create(WX.Unit.Processor.prototype, {
           f2 = this._lpf2.frequency;
       // forced stopping
       f1.cancelScheduledValues(t);
-      f1.setValueAtTime(f1.value, t);
+      // f1.setValueAtTime(f1.value, t);
       f2.cancelScheduledValues(t);
-      f2.setValueAtTime(f2.value, t);
+      // f2.setValueAtTime(f2.value, t);
       // start release phase
-      f1.linearRampToValueAtTime(this._cutoff, t + this._r);
-      f2.linearRampToValueAtTime(this._cutoff, t + this._r);
+      f1.setTargetValueAtTime(this._cutoff, t, this._r);
+      f2.setTargetValueAtTime(this._cutoff, t, this._r);
       this._running = false;
     }
   }
