@@ -16,7 +16,7 @@
       WX.DAC.db = -12;
       
       // waveform visualization 
-      var canvas = document.getElementById("wx-canvas");
+      var canvas = document.getElementById("wx-waveform");
       var context2D = canvas.getContext('2d');
       var waveform = new WX.Waveform({ context:context2D });
       adsr.to(waveform);
