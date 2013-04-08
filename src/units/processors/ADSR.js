@@ -13,13 +13,21 @@ WX.ADSR = function(json) {
       writable: true,
       value: 0.015
     },
+    _tauDecay: {
+      writable: true,
+      value: -0.015 / Math.log(0.001)
+    },
     _s: {
       writable: true,
       value: 0.35
     },
     _r: {
       writable: true,
-      value: 0.015
+      value: 0.05
+    },
+    _tauRelease: {
+      writable: true,
+      value: -0.05 / Math.log(0.001)
     },
     _running: {
       writable: true,
@@ -60,6 +68,7 @@ WX.ADSR.prototype = Object.create(WX.Unit.Processor.prototype, {
     },
     set: function(value) {
       this._d = value;
+      this._tauDecay = -this._d / Math.log(0.001);
     }
   },
   s: {
@@ -78,6 +87,7 @@ WX.ADSR.prototype = Object.create(WX.Unit.Processor.prototype, {
     },
     set: function(value) {
       this._r = value;
+      this._tauRelease = -this._r / Math.log(0.001);
     }
   },
   running: {
@@ -98,7 +108,7 @@ WX.ADSR.prototype = Object.create(WX.Unit.Processor.prototype, {
       g.setValueAtTime(0.0, t);
       // schedule event for attack, decay and sustain
       g.linearRampToValueAtTime(1.0, t + this._a);
-      g.setTargetValueAtTime(this._s, t + this._a, this._d);
+      g.setTargetValueAtTime(this._s, t + this._a, this._tauDecay);
       // v(t) = V1 + (V0 - V1) * exp(-(t - T0) / timeConstant)
       this._running = true;
     }
@@ -111,8 +121,9 @@ WX.ADSR.prototype = Object.create(WX.Unit.Processor.prototype, {
       g.cancelScheduledValues(t);
       // this doesn't work: can't get future value of audioparam
       // g.setValueAtTime(g.value, t); 
+      // calculate timeConstant for release (minimum = 0.001)
       // start release phase
-      g.setTargetValueAtTime(0.0, t, this._r);
+      g.setTargetValueAtTime(0.0, t, this._tauRelease);
       this._running = false;
     }
   }

@@ -33,6 +33,10 @@ WX.ModLPF = function(json) {
       writable: true,
       value: 0.015
     },
+    _tauDecay: {
+      writable: true,
+      value: -0.015 / Math.log(0.001)
+    },
     _s: {
       writable: true,
       value: 0.35
@@ -40,6 +44,10 @@ WX.ModLPF = function(json) {
     _r: {
       writable: true,
       value: 0.015
+    },
+    _tauRelease: {
+      writable: true,
+      value: -0.05 / Math.log(0.001)
     },
     _running: {
       writable: true,
@@ -108,6 +116,7 @@ WX.ModLPF.prototype = Object.create(WX.Unit.Processor.prototype, {
     },
     set: function(value) {
       this._d = value;
+      this._tauDecay = -this._d / Math.log(0.001);
     }
   },
   s: {
@@ -126,6 +135,7 @@ WX.ModLPF.prototype = Object.create(WX.Unit.Processor.prototype, {
     },
     set: function(value) {
       this._r = value;
+      this._tauRelease = -this._r / Math.log(0.001);
     }
   },
   running: {
@@ -158,9 +168,9 @@ WX.ModLPF.prototype = Object.create(WX.Unit.Processor.prototype, {
       // start attack and decay
       var p = this._cutoff + this._range;
       f1.linearRampToValueAtTime(p, t + this._a);
-      f1.setTargetValueAtTime(p * this._s, t + this._a, this._d);
+      f1.setTargetValueAtTime(p * this._s, t + this._a, this._tauDecay);
       f2.linearRampToValueAtTime(p, t + this._a);
-      f2.setTargetValueAtTime(p * this._s, t + this._a, this._d);
+      f2.setTargetValueAtTime(p * this._s, t + this._a, this._tauDecay);
       this._running = true;
     }
   },
@@ -175,8 +185,8 @@ WX.ModLPF.prototype = Object.create(WX.Unit.Processor.prototype, {
       f2.cancelScheduledValues(t);
       // f2.setValueAtTime(f2.value, t);
       // start release phase
-      f1.setTargetValueAtTime(this._cutoff, t, this._r);
-      f2.setTargetValueAtTime(this._cutoff, t, this._r);
+      f1.setTargetValueAtTime(this._cutoff, t, this._tauRelease);
+      f2.setTargetValueAtTime(this._cutoff, t, this._tauRelease);
       this._running = false;
     }
   }
