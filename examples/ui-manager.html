@@ -6,7 +6,7 @@
   <body>
     <h1>UI: manager and components</h1>
     <canvas id="wx-waveform" width="750px" height="360px"></canvas>
-    <div id="uiPanel"></div>
+    <div id="wx-uipanel"></div>
     <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
     <script>
       // an oscillator
@@ -16,9 +16,9 @@
       WX.DAC.db = -12;
       
       // waveform visualization 
-      var canvas = document.getElementById("wx-canvas");
+      var canvas = document.getElementById("wx-waveform");
       var context2D = canvas.getContext('2d');
-      var waveform = new WX.Waveform({ context: context2D });
+      var waveform = new WX.Waveform({ context:context2D });
       adsr.to(waveform);
       context2D.lineWidth = 2;
 
