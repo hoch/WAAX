@@ -11,18 +11,18 @@
     <script>
       // an oscillator
       var osc = new WX.Oscil({ type:2, frequency:344, gain:0.8 }),
-          adsr = new WX.ADSR({ a:0.01, d:0.005, s:0.2, r:0.001});
+          adsr = new WX.ADSR({ a:0.2, d:0.4, s:0.5, r:1.5});
       osc.to(adsr).to(WX.DAC);
       WX.DAC.db = -12;
       
       // waveform visualization 
-      var canvas = document.getElementById("wx-waveform");
+      var canvas = document.getElementById("wx-canvas");
       var context2D = canvas.getContext('2d');
       var waveform = new WX.Waveform({ context:context2D });
       adsr.to(waveform);
       context2D.lineWidth = 2;
 
-      // GUI: horizontal slider
+      // GUI: sliders and knobs
       var panel = document.getElementById("wx-uipanel");
       var s1 = new WX.UISliderH({ 
         targetDiv:panel, label:"Frequency", 
@@ -32,19 +32,39 @@
         targetDiv:panel, label:"Gain", 
         x:10, y:550, value: 0.3 
       });
+      var ka = new WX.UIKnob({ 
+        targetDiv:panel, label:"Attack", 
+        x:250, y:485, offset: 0.001, scale: 0.5, value: 0.2
+      });
+      var kd = new WX.UIKnob({ 
+        targetDiv:panel, label:"Decay", 
+        x:330, y:485, offset:0.001, scale: 0.5, value: 0.4
+      });
+      var ks = new WX.UIKnob({ 
+        targetDiv:panel, label:"Sustain", 
+        x:410, y:485, value: 0.5 
+      });
+      var kr = new WX.UIKnob({ 
+        targetDiv:panel, label:"Release", 
+        x:490, y:485, offset:0.01, scale:2.0, value: 1.5
+      });
 
       // mapping GUI components to parameter (temporary solution for r5)
       s1.target = osc._oscil.frequency;
       s2.target = osc._outputGain.gain;
-
+      ka.setTargetValue(adsr, "a");
+      kd.setTargetValue(adsr, "d");
+      ks.setTargetValue(adsr, "s");
+      kr.setTargetValue(adsr, "r");
+    
       // shoot
       function shoot(next, i) {
         adsr.noteOn(next);
-        adsr.noteOff(next + 0.02);
+        adsr.noteOff(next + 2.0);
       }
 
       // looping
-      var l = new WX.Loop(shoot, 0, 1.0);
+      var l = new WX.Loop(shoot, 0, 4.0);
       l.start();
 
       // waveform drawer

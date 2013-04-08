@@ -46,6 +46,10 @@ WX.UISliderV = function(json) {
     _target: {
       writable: true,
       value: null
+    },
+     _targetValue: {
+      writable: true,
+      value: null
     }
   });
   // build slider
@@ -129,6 +133,9 @@ WX.UISliderV.prototype = Object.create(null, {
       if (this._target) {
         this._target.setValueAtTime(this._params.val, 0);
       }
+      if (this._targetValue) {
+        this._targetValue.object[this._targetValue.property] = this._params.val;
+      }
     }
   },
   _controlReleased: {
@@ -151,6 +158,14 @@ WX.UISliderV.prototype = Object.create(null, {
     },
     get: function() {
       return this._target;
+    }
+  },
+  setTargetValue: {
+    value: function(obj, prop) {
+      this._targetValue = {
+        object: obj,
+        property: prop
+      };
     }
   }
 });
