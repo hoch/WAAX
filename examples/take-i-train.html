@@ -4,7 +4,7 @@
   </head>
   <body>
     <h1>Take the I train!</h1>
-    <canvas id="wx-waveform" width="600" height="300"></canvas>
+    <canvas id="wx-waveform" width="700" height="300"></canvas>
     <script src="http://hoch.github.com/waax/build/WAAX.min.js"></script>
     <script>
       // audio graph: impulse train followed by LPF with resonance
@@ -14,8 +14,9 @@
       WX.DAC.db = -18;
 
       // visualization fetching from lpf
-      var canvas = document.getElementById("wx-canvas");
+      var canvas = document.getElementById("wx-waveform");
       var context2D = canvas.getContext('2d');
+      context2D.lineWidth = 2.0;
       var waveform = new WX.Waveform({ context:context2D });
       lpf.to(waveform);
 
