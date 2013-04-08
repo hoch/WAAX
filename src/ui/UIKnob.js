@@ -36,6 +36,10 @@ WX.UIKnob = function(json) {
     _target: {
       writable: true,
       value: null
+    },
+    _targetValue: {
+      writable: true,
+      value: null
     }
   });
   // build slider
@@ -127,6 +131,9 @@ WX.UIKnob.prototype = Object.create(null, {
       if (this._target) {
         this._target.setValueAtTime(this._params.val, 0);
       }
+      if (this._targetValue) {
+        this._targetValue.object[this._targetValue.property] = this._params.val;
+      }
     }
   },
   _handleReleased: {
@@ -140,15 +147,25 @@ WX.UIKnob.prototype = Object.create(null, {
       WX.UIManager.onReleased = null;
     }
   },
-  getValue: function() {
-    return this._params.val;
-  },
   target: {
     set: function(audioParam) {
       this._target = audioParam;
     },
     get: function() {
       return this._target;
+    }
+  },
+  getValue: {
+    value: function() {
+      return this._params.val;
+    }
+  },
+  setTargetValue: {
+    value: function(obj, prop) {
+      this._targetValue = {
+        object: obj,
+        property: prop
+      };
     }
   }
 });
