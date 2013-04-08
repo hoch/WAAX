@@ -9,26 +9,24 @@
     <script>
       // audio graph: impulse train followed by LPF with resonance
       var imp = new WX.ImpTrain({ frequency:7 });
-      var lpf = new WX.ModLPF({ cutoff:120, Q:20, a:2.0, d:1.0, s:0.5, r:2.0 });
+      var lpf = new WX.ModLPF({ cutoff:500, Q:20, range:2500, a:1.4, d:1.0, s:1.0, r:0.7 });
       imp.to(lpf).to(WX.DAC);
-      WX.DAC.db = -12;
+      WX.DAC.db = -18;
 
       // visualization fetching from lpf
-      var canvas = document.getElementById("wx-waveform");
+      var canvas = document.getElementById("wx-canvas");
       var context2D = canvas.getContext('2d');
       var waveform = new WX.Waveform({ context:context2D });
       lpf.to(waveform);
 
       // sweeper
       function sweep(next, i) {
-        lpf.cutoff = WX.random2f(50, 5000);
-        lpf.Q = WX.random2f(15, 25);
         lpf.noteOn(next);
-        lpf.noteOff(next + 2.0);
+        lpf.noteOff(next + 1.5);
       }
 
       // looping
-      var l = new WX.Loop(sweep, 0, 5.0);
+      var l = new WX.Loop(sweep, 0, 4.1);
       l.start();
 
       // drawer
