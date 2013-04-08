@@ -150,11 +150,11 @@ WX.ModLPF.prototype = Object.create(WX.Unit.Processor.prototype, {
           f2 = this._lpf2.frequency;
       // reset envelopes
       f1.cancelScheduledValues(t);
-      f1.setValueAtTime(f1.value, t);
-      f1.linearRampToValueAtTime(this._cutoff, t);
+      f1.setValueAtTime(this._cutoff, t);
+      // f1.linearRampToValueAtTime(this._cutoff, t);
       f2.cancelScheduledValues(t);
-      f2.setValueAtTime(f2.value, t);
-      f2.linearRampToValueAtTime(this._cutoff, t);
+      f2.setValueAtTime(this._cutoff, t);
+      // f2.linearRampToValueAtTime(this._cutoff, t);
       // start attack and decay
       var p = this._cutoff + this._range;
       f1.linearRampToValueAtTime(p, t + this._a);
