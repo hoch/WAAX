@@ -55,7 +55,7 @@
       url: "../examples/ui-manager.html"
     },
     { id: "divider" },
-    { 
+    {
       id: "a-menu-ex-wx7",
       text: "WX7 FM Synth",
       url: null

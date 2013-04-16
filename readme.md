@@ -15,7 +15,7 @@ WX.link(saw, lpf, env, vrb, WX.DAC);
 sqr.to(lpf);
 ```
 
-**Table of Contents
+**Table of Contents**
 
 * [Introduction](#indroduction)
 * [Demo](#demo)
@@ -30,14 +30,13 @@ sqr.to(lpf);
 Introduction
 ------------
 
-WAAX is an experimental JavaScript library built on top of [Web Audio API][1] in Chrome. With **music creation and performance** in mind, it offers the higher level of functionality than basic building blocks of Web Audio API.
+WAAX is an experimental JavaScript library built on top of [Web Audio API][1] in Chrome. (FireFox and Safari only have the partial support at the moment.) With **music creation and performance** in mind, it offers the higher level of functionality than basic building blocks of Web Audio API.
 
 The goal of this project is 1) to facilitate experiments and iterations of web-based audio programming and 2) to hide audio-specific chores from web developers who are not familiar with audio programming.
 
 The facade of API is strongly inspired by [THREE.js][2] and [ChucK][3]: Three.js is one of WebGL JavaScript libraries being used most for web-based 3D graphics. ChucK is an experimental audio programming language being actively developed and used by computer music communities such as [PLOrk][4](Princeton Laptop Orchestra) and [SLOrk][5](Stanford Laptop Orchestra).
 
 As this library is in early stages of development, it currently demonstrates minimum set of features, however, it will embrace more elements as it grows: ready-made instruments, comprehensive timebase system (in conjunction with Web MIDI API), and musical interconnection between multiple Chrome clients.
-
 
 [1]: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html "Web Audio API: W3C Editor's Draft"
 [2]: https://github.com/mrdoob/three.js/ "THREE.js: Github Repo"
@@ -50,24 +49,24 @@ Demo
 ----
 Requirements: **Google Chrome 24+** on any platform(Win/OSX/Linux).
 
- * **[mini-IDE][6]** (it includes all the example below)
+ * **[mini-IDE][6]** (which includes all the example below)
   * [Hello WAAX][15] 
   * [WAAX does THX][10]
-  * [Rezobass][11]
-  * [Samplr][12]
+  * [Acidic Bassline][11]
+  * [Simple Drum Sampler][12]
   * [Take the I train](http://hoch.github.com/waax/examples/take-i-train.html)
   * [Custom Visualizer][13]
-  * [Simple GUI][14]
+  * [WAAX GUI (pilot)][14]
 
 _Adjust your volume setting before clicking. It might be loud!_
 
 [6]: http://hoch.github.com/waax/examples/editor.html
-[10]: http://hoch.github.com/waax/examples/waax-thx.html
-[11]: http://hoch.github.com/waax/examples/rezobass.html
-[12]: http://hoch.github.com/waax/examples/samplr.html
-[13]: http://hoch.github.com/waax/examples/visualizer.html
-[14]: http://hoch.github.com/waax/examples/uimanager.html
-[15]: http://hoch.github.com/waax/examples/hellowaax.html
+[10]: http://hoch.github.com/waax/examples/waax-does-thx.html
+[11]: http://hoch.github.com/waax/examples/acidic-bassline.html
+[12]: http://hoch.github.com/waax/examples/simple-drum-sampler.html
+[13]: http://hoch.github.com/waax/examples/take-i-train.html
+[14]: http://hoch.github.com/waax/examples/ui-manager.html
+[15]: http://hoch.github.com/waax/examples/hello-waax.html
 
 
 Usages
@@ -75,15 +74,15 @@ Usages
 
 ### Creating Units
 
-Like the _node_ in Web Audio API, WAAX has its own atomic object called **unit**. It is conceptually identical to 'unit generator' of other audio programming environments and consists of more than 2 nodes in general.
+Like the _node_ in Web Audio API, WAAX has its own atomic object called **unit**. It is conceptually identical to the 'unit generator' of other audio programming environments.
 
 ```javascript
-// creating WAAX units
+// creating a sampler and a compressor units
 var kick = new WX.Sampler({ source: "kd.wav", basePitch: 60 }),
     comp = new WX.Comp();
 ```
 
-A unit can be created with an object of initial parameters, or it can be set with default parameters when it is created without any argument.
+A unit can be created with initial parameters, or it can be set with default parameters when created with no argument.
 
 
 ### Making Connections
@@ -91,10 +90,11 @@ A unit can be created with an object of initial parameters, or it can be set wit
 ```javascript
 // connecting units with .to() method
 kick.to(comp).to(WX.DAC);
-// connecting units with WX.link() method
+// equivalent to the above
 WX.link(kick, comp, WX.DAC);
 ```
-As shown above, the connection between several WAAX units can be achieved by chaining `.to()` method. `WX.DAC` is the master channel of WAAX system. 
+
+As shown above, the connection between several WAAX units can be achieved by chaining `.to()` methods. Alternatively, the `WX.link()` method can be used to build an audiograph out of multiple units. `WX.DAC` is the master output of WAAX system.
 
 ```javascript
 // native Web Audio API node
@@ -105,10 +105,12 @@ kick.connect(node);
 node.connect(comp._inlet);
 ```
 
-The connection from a WAAX unit to Web Audio API node can be done by `.connect()` method, which is the same method in Web Audio API, but the connection from a node to a unit should be done manually with `._inlet` node from a unit.
+The connection from a WAAX unit to Web Audio API node can be done by `.connect()` method, which is the same method in Web Audio API, but the connection from a node to a unit should be done manually with `._inlet` node from a unit. This enables to use the library in conjunction with plain Web Audio API codes.
 
 
-### Setting Parameters
+### Setting Parameters 
+
+_note: this will be changed in the next revision._
 
 ```javascript
 comp.threshold = -12;
@@ -121,7 +123,7 @@ console.log(kick.params);
 >>> { source:"kd2.wav", basePitch:48 }
 ```
 
-All the parameters of a unit is accessible by simply setting or getting values. Alternatively, passing an object with parameters into `.params` is also possible. Getting available parameters from a unit can be done by printing out `.params` as well.
+All the parameters of a unit is accessible by simply setting or getting values. Alternatively, passing a javascript object literal with parameters into `.params` is also possible. Getting available parameters from a unit can be done by printing out `.params` as well.
 
 
 ### Visualization
@@ -141,18 +143,18 @@ Using a set of units called _Analyzers_, visualizing waveforms and spectrum can 
 ### GUI
 
 ```javascript
-// GUI manager singleton using cavnvas:context2D
-var UIMan = new UIManager(context2D);
-// a slider
-var mySlider = new UISlider({ label:"GAIN", x:10, y:10, width:300, height:30,
-                              scale:1, offset:0, defaultValue:0.3 });
-// add slider to the manager
-UIMan.addElement(mySlider);
-// set modulation mapping to an WAAX oscillator
-mySlider.target = osc.modulationTarget.gain;
+// div for UI panel
+var panel = document.getElementById("wx-uipanel");
+// a knob
+var ka = new WX.UIKnob({ 
+  targetDiv:panel, label:"Attack", 
+  x:250, y:485, offset: 0.001, scale: 0.5, value: 0.2
+});
+// targeting an attack parameter in an ADSR unit
+ka.setTargetValue(adsr, "a");
 ```
 
-The basic GUI interaction is possible with a simple GUI manager provided by WAAX. Currently it only offers a slider element, but button, knob and 2D pad will be added to the UI element collection. WAAX units have "modulationTarget" that can be connected to modulation source such as a GUI slider with a single line of code. Note that the animation loop is required to run the 2D canvas. See the GUI example above to see how it works.
+The basic GUI interaction is implemented in the current revision (r5): vertical/horizontal slider, and a knob. WAAX units have "modulation targets" that can be controlled by various modulation sources such as GUI components or even other units simply by putting a single line of code.
 
 
 Units: Generators, Processors and Analyzers
@@ -163,13 +165,13 @@ As WAAX is in early stages of development, there are several components (which a
 `WX.Oscil` `WX.Noise` `WX.Sampler` `WX.LFO` `WX.ImpTrain`
 
 ### Processors
-`WX.ADSR` `WX.LPRez` `WX.TwinDelay` `WX.ConVerb` `WX.Comp` `WX.C2`
+`WX.ADSR` `WX.ModLPF` `WX.TwinDelay` `WX.ConVerb` `WX.Comp` `WX.C2`
 
 ### Analyzers
 `WX.Waveform` `WX.Spectrum` `WX.Visualizer` 
 
 ### GUI
-`UIManager` `UISlider`
+`UISliderH` `UISliderV` `UIKnob`
 
 ### Utilities
 `WX.random2` `WX.random2f` `WX.db2lin` `WX.lin2db` `WX.pitch2freq` `WX.freq2pitch`
