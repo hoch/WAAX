@@ -1,6 +1,21 @@
-WAAX (Web Audio API eXtension)
-------------------------------
-**JavaScript library for music and audio programming on Chrome** - Check out [mini-IDE][6]!
+WAAX (Web Audio API eXtension) - [miniIDE][6]
+---------------------------------------------
+**JavaScript library for music and audio programming on Chrome**
+
+```javascript
+// creating units
+var saw = new WX.Oscil({ type:"sawtooth" }),
+    sqr = new WX.Oscil({ type:"square" }),
+    lpf = new WX.ModLPF({ cutoff:2500, Q:12 }),
+    env = new WX.ADSR({ a:0.001, d:0.002, s:0.3, r:0.1 }),
+    vrb = new WX.ConVerb({ source:"ir/hall.wav", mix:0.3 });
+// building an audiograph
+WX.link(saw, lpf, env, vrb, WX.DAC);
+// connecting units
+sqr.to(lpf);
+```
+
+**Table of Contents
 
 * [Introduction](#indroduction)
 * [Demo](#demo)
@@ -10,19 +25,6 @@ WAAX (Web Audio API eXtension)
   * [Setting Parameters](#setting-parameters)
   * [Visualization](#visualization) 
   * [GUI](#gui)
-
-```javascript
-// creating units
-var saw = new WX.Oscil({ type:2 }),
-    sqr = new WX.Oscil({ type:1 }),
-    lpf = new WX.LPRez({ range:4000, Q:12 }),
-    env = new WX.ADSR({ a:0.001, d:0.002, s:0.3, r:0.1 }),
-    vrb = new WX.ConVerb({ source:"ir/hall.wav", mix:0.3 });
-// building an audiograph
-WX.link(saw, lpf ,env, vrb ,WX.DAC);
-// connecting units
-sqr.to(lpf);
-```
 
 
 Introduction
