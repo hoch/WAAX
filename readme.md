@@ -141,6 +141,21 @@ wf.draw();
 
 Using a set of units called _Analyzers_, visualizing waveforms and spectrum can be achieved instantly. The visual content will be automatically resized according to the size of the target canvas DOM element.
 
+### Sample-accurate Looping
+
+```javascript
+// playNote function
+function playNote(next) {
+  adsr.noteOn(next);
+  adsr.noteOff(next + 1.0);
+}
+// looping playNote() infinitely every 3 seconds
+var myLoop = new WX.Loop(playNote, 0, 3.0);
+myLoop.start();
+```
+
+Triggering events with super-accurate timing is a quite involved task on the web browsers due to the nature of `setTimeout()` or `setInterval()` function. However, the `WX.Loop()` object provides the sample-accurate looping mechanism. (The detailed description of the mechanism can be found [here](http://www.html5rocks.com/en/tutorials/audio/scheduling/).)
+
 
 ### GUI : [Example][14]
 
