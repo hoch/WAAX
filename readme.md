@@ -205,6 +205,6 @@ There are several components (which are yet to be released publicly) to be incor
 
 Contact and License
 -------------------
-This project is initiated and managed by hoch([Hongchan Choi][9]). Please refer LICENSE file (MIT License) for more info.
+This project is initiated and managed by hoch([Hongchan Choi][9]) at [CCRMA/Stanford University](https://ccrma.stanford.edu/). Please refer LICENSE file (MIT License) for more info.
 
 [9]: https://ccrma.stanford.edu/~hongchan/
