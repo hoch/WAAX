@@ -57,7 +57,7 @@ Requirements: **Google Chrome 20+** on any platform (Win/OSX/Linux). You can che
   * [WAAX does THX][10]
   * [Acidic Bassline][11]
   * [Simple Drum Sampler][12]
-  * [Take the I train](http://hoch.github.com/waax/examples/take-i-train.html)
+  * [Take the I train][16]
   * [Custom Visualizer][13]
   * [WAAX GUI (pilot)][14]
 
@@ -67,9 +67,10 @@ _Adjust your volume setting before clicking. It might be loud!_
 [10]: http://hoch.github.com/waax/examples/waax-does-thx.html
 [11]: http://hoch.github.com/waax/examples/acidic-bassline.html
 [12]: http://hoch.github.com/waax/examples/simple-drum-sampler.html
-[13]: http://hoch.github.com/waax/examples/take-i-train.html
+[13]: http://hoch.github.com/waax/examples/visualizer.html
 [14]: http://hoch.github.com/waax/examples/ui-manager.html
 [15]: http://hoch.github.com/waax/examples/hello-waax.html
+[16]: http://hoch.github.com/waax/examples/take-i-train.html
 
 
 Usages
@@ -129,7 +130,7 @@ console.log(kick.params);
 All the parameters of a unit is accessible by simply setting or getting values. Alternatively, passing a javascript object literal with parameters into `.params` is also possible. Getting available parameters from a unit can be done by printing out `.params` as well.
 
 
-### Visualization
+### Visualization : [Example][12]
 
 ```javascript
 // creating waveform display with target canvas ID
@@ -143,7 +144,7 @@ wf.draw();
 Using a set of units called _Analyzers_, visualizing waveforms and spectrum can be achieved instantly. The visual content will be automatically resized according to the size of the target canvas DOM element.
 
 
-### GUI
+### GUI : [Example][14]
 
 ```javascript
 // div for UI panel
