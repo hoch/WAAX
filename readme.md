@@ -155,7 +155,7 @@ var myLoop = new WX.Loop(playNote, 0, 3.0);
 myLoop.start();
 ```
 
-Triggering events with super-accurate timing is a quite involved task on the web browsers due to the nature of `setTimeout()` or `setInterval()` function. However, the `WX.Loop()` object provides the sample-accurate looping mechanism. (The detailed description of the mechanism can be found [here](http://www.html5rocks.com/en/tutorials/audio/scheduling/).)
+Triggering events with super-accurate timing is a quite involved task on the web browsers due to the nature of `setTimeout()` or `setInterval()` function. However, the `WX.Loop()` object provides the sample-accurate looping mechanism. The API for sample-accurate event management is the key objective of this library and it will be expanded to accommodate more complex musical forms. (The detailed description of the scheduling mechanism can be found [here](http://www.html5rocks.com/en/tutorials/audio/scheduling/).)
 
 
 ### GUI : [Example][14]
