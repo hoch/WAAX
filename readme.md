@@ -31,9 +31,9 @@ sqr.to(lpf);
 Introduction
 ------------
 
-WAAX is an experimental JavaScript library built on top of [Web Audio API][1] in Chrome. With **music creation and performance** in mind, it offers the higher level of functionality than basic building blocks of Web Audio API.
+WAAX is an experimental JavaScript library built on top of [Web Audio API][1] in Chrome. With **music creation and production** in mind, it is designed to offer the higher level of functionality than basic building blocks of Web Audio API.
 
-The goal of this project is 1) to facilitate experiments and iterations of web-based audio programming and 2) to hide audio-specific chores from web developers who are not familiar with audio programming.
+The goal of this project is 1) to facilitate experiments and iterations of web-based audio programming and 2) to hide audio-specific chores from web developers who are not familiar with audio programming. This library is designed to be used with other JavaScript APIs available on modern web browsers.
 
 The facade of API is strongly inspired by [THREE.js][2] and [ChucK][3]: Three.js is one of WebGL JavaScript libraries widely being used for web-based 3D graphics. ChucK is an experimental audio programming language being actively developed and used by computer music communities such as [PLOrk][4](Princeton Laptop Orchestra) and [SLOrk][5](Stanford Laptop Orchestra).
 
