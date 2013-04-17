@@ -78,15 +78,13 @@ Usages
 
 ### Creating Units
 
-Like the _node_ in Web Audio API, WAAX has its own atomic object called **unit**. It is conceptually identical to the 'unit generator' of other audio programming environments.
-
 ```javascript
 // creating a sampler and a compressor units
 var kick = new WX.Sampler({ source: "kd.wav", basePitch: 60 }),
     comp = new WX.Comp();
 ```
 
-A unit can be created with initial parameters, or it can be set with default parameters when created with no argument.
+Like the _node_ in Web Audio API, WAAX has its own atomic object called **unit**. It is conceptually identical to the 'unit generator' of other audio programming environments. A unit can be created with initial parameters, or it can be set with default parameters when created with no argument.
 
 
 ### Making Connections
