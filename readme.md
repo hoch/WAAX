@@ -38,7 +38,7 @@ The facade of API is strongly inspired by [THREE.js][2] and [ChucK][3]: Three.js
 
 As this library is in early stages of development, it currently demonstrates minimum set of features, however, it will embrace more elements as it grows: ready-made instruments, comprehensive timebase system (in conjunction with Web MIDI API), and musical interconnection between multiple Chrome clients.
 
-_NOTE_: As time of writing, [FireFox has recently started implementing Web Audio API][20] and it's partially available in the Nightly Build. Safari also has the implementation of Web Audio API but it is slightly outdated compared to the one in Chrome. You can check the availability in different web browsers [here](http://caniuse.com/audio-api).)
+_NOTE_: As time of writing, [FireFox has recently started implementing Web Audio API][20] and it's partially available in the Nightly Build. Safari also has the implementation of Web Audio API but it is slightly outdated compared to the one in Chrome.)
 
 [1]: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html "Web Audio API: W3C Editor's Draft"
 [2]: https://github.com/mrdoob/three.js/ "THREE.js: Github Repo"
@@ -50,9 +50,9 @@ _NOTE_: As time of writing, [FireFox has recently started implementing Web Audio
 
 Demo
 ----
-Requirements: **Google Chrome 24+** on any platform(Win/OSX/Linux).
+Requirements: **Google Chrome 20+** on any platform (Win/OSX/Linux). You can check the availability of the API in different web browsers [here](http://caniuse.com/audio-api).
 
- * **[mini-IDE][6]** (which includes all the example below)
+ * **[mini-IDE][6]** (which includes all the examples below)
   * [Hello WAAX][15] 
   * [WAAX does THX][10]
   * [Acidic Bassline][11]
@@ -162,7 +162,7 @@ The basic GUI interaction is implemented in the current revision (r5): vertical/
 
 Units: Generators, Processors and Analyzers
 -------------------------------------------
-As WAAX is in early stages of development, there are several components (which are yet to be released publicly) to be incorporated into this library in the near future. I am currently expanding its sonic vocabulary by adding more units to the library. The followings are a basic set of units as the first milestone. A detailed documentation of each unit will be available soon.
+As WAAX is in early stages of development, there are several components (which are yet to be released publicly) to be incorporated into this library in the near future. I am currently expanding its sonic vocabulary by adding more units to the library. The followings are a basic set of units as the first milestone. A detailed documentation for various units will be available soon.
 
 ### Generators
 `WX.Oscil` `WX.Noise` `WX.Sampler` `WX.LFO` `WX.ImpTrain`
