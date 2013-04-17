@@ -24,6 +24,7 @@ sqr.to(lpf);
   * [Making Connections](#making-connections)
   * [Setting Parameters](#setting-parameters)
   * [Visualization](#visualization) 
+  * [Sample-accurate Looping](#sample-accurate-looping) 
   * [GUI](#gui)
 
 
