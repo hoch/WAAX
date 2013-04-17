@@ -38,13 +38,14 @@ The facade of API is strongly inspired by [THREE.js][2] and [ChucK][3]: Three.js
 
 As this library is in early stages of development, it currently demonstrates minimum set of features, however, it will embrace more elements as it grows: ready-made instruments, comprehensive timebase system (in conjunction with Web MIDI API), and musical interconnection between multiple Chrome clients.
 
-_NOTE_: As time of writing, [FireFox has recently started implementing Web Audio API][https://hacks.mozilla.org/2013/02/webrtc-enabled-h-264mp3-support-in-win-7-on-by-default-metro-ui-for-windows-8-more-firefox-development-highlights/] and it's partially available in the Nightly Build. Safari also has the implementation of Web Audio API but it is slightly outdated compared to the one in Chrome. You can check the availability in different web browsers [here][http://caniuse.com/audio-api].)
+_NOTE_: As time of writing, [FireFox has recently started implementing Web Audio API][20] and it's partially available in the Nightly Build. Safari also has the implementation of Web Audio API but it is slightly outdated compared to the one in Chrome. You can check the availability in different web browsers [here][http://caniuse.com/audio-api].)
 
 [1]: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html "Web Audio API: W3C Editor's Draft"
 [2]: https://github.com/mrdoob/three.js/ "THREE.js: Github Repo"
 [3]: http://chuck.cs.princeton.edu/
 [4]: http://plork.cs.princeton.edu/
 [5]: http://slork.stanford.edu/
+[20]: https://hacks.mozilla.org/2013/02/webrtc-enabled-h-264mp3-support-in-win-7-on-by-default-metro-ui-for-windows-8-more-firefox-development-highlights/
 
 
 Demo
