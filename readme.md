@@ -189,7 +189,7 @@ As WAAX is in early stages of development, there are several components (which a
 `WX.Waveform` `WX.Spectrum` `WX.Visualizer` 
 
 ### GUI
-`UISliderH` `UISliderV` `UIKnob`
+`WX.UISliderH` `WX.UISliderV` `WX.UIKnob`
 
 ### Utilities
 `WX.random2` `WX.random2f` `WX.db2lin` `WX.lin2db` `WX.pitch2freq` `WX.freq2pitch`
