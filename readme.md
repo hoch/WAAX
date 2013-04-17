@@ -30,13 +30,15 @@ sqr.to(lpf);
 Introduction
 ------------
 
-WAAX is an experimental JavaScript library built on top of [Web Audio API][1] in Chrome. (FireFox and Safari only have the partial support at the moment.) With **music creation and performance** in mind, it offers the higher level of functionality than basic building blocks of Web Audio API.
+WAAX is an experimental JavaScript library built on top of [Web Audio API][1] in Chrome. With **music creation and performance** in mind, it offers the higher level of functionality than basic building blocks of Web Audio API.
 
 The goal of this project is 1) to facilitate experiments and iterations of web-based audio programming and 2) to hide audio-specific chores from web developers who are not familiar with audio programming.
 
 The facade of API is strongly inspired by [THREE.js][2] and [ChucK][3]: Three.js is one of WebGL JavaScript libraries being used most for web-based 3D graphics. ChucK is an experimental audio programming language being actively developed and used by computer music communities such as [PLOrk][4](Princeton Laptop Orchestra) and [SLOrk][5](Stanford Laptop Orchestra).
 
 As this library is in early stages of development, it currently demonstrates minimum set of features, however, it will embrace more elements as it grows: ready-made instruments, comprehensive timebase system (in conjunction with Web MIDI API), and musical interconnection between multiple Chrome clients.
+
+_NOTE_: As time of writing, [FireFox has recently started implementing Web Audio API][https://hacks.mozilla.org/2013/02/webrtc-enabled-h-264mp3-support-in-win-7-on-by-default-metro-ui-for-windows-8-more-firefox-development-highlights/] and it's partially available in the Nightly Build. Safari also has the implementation of Web Audio API but it is slightly outdated compared to the one in Chrome. You can check the availability in different web browsers [here][http://caniuse.com/audio-api].)
 
 [1]: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html "Web Audio API: W3C Editor's Draft"
 [2]: https://github.com/mrdoob/three.js/ "THREE.js: Github Repo"
