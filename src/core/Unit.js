@@ -96,6 +96,8 @@ WX.Unit.Generator = function() {
   });
   this._outputGain.connect(this._outlet);
   this.label += WX.Types.Generator;
+  // NOTE: exp feature
+  WX.bindParam.call(this, "mgain", this._outputGain.gain);
 };
 
 WX.Unit.Generator.prototype = Object.create(WX.Unit.Common.prototype, {
@@ -178,6 +180,8 @@ WX.Unit.Processor = function() {
   this._inlet.connect(this._inputGain);
   this._outputGain.connect(this._outlet);
   this.label += WX.Types.Processor;
+  // NOTE: exp feature
+  WX.bindParam.call(this, "mgain", this._outputGain.gain);
 };
 
 WX.Unit.Processor.prototype = Object.create(WX.Unit.Common.prototype, {
@@ -260,9 +264,15 @@ WX.Unit.Analyzer = function() {
   this._inlet.connect(this._inputGain);
   this._inputGain.connect(this._analyzer);
   this.label += WX.Types.Analyzer;
+  // NOTE: exp feature
+  this.xBuild();
 };
 
 WX.Unit.Analyzer.prototype = Object.create(WX.Unit.Common.prototype, {
+  // NOTE: this is experimental feature
+  xBuild: function() {
+    WX.bindParam.call(this, "mgain", this._inputGain.gain);
+  },
   // NOTE: this gain is pre-node gain
   gain: {
     enumerable: true,
@@ -295,6 +305,48 @@ WX.Unit.Analyzer.prototype = Object.create(WX.Unit.Common.prototype, {
   }
 });
 
+/**
+ * TODO: context setter: need to be moved to somewhere
+ */
+WX._at = null;
+WX.at = function(moment, fn) {
+    WX._at = moment + WX.now;
+    fn.call();
+    WX._at = null;
+};
+
+/**
+ * TODO: bind parameters
+ */
+WX.bindParam = function(name, targetParam) {
+  var t = this[name + "_"] = targetParam;
+  // add function name
+  this[name] = function(val, dur, type) {
+    // when undefined
+    if (val === undefined) {
+        return t.value;
+    }
+    // setup starting moment
+    var m = (WX._at) ? WX._at : WX.now;
+    // branching upon args
+    switch(type) {
+      case undefined:
+        t.setValueAtTime(val, m);
+        break;
+      case "line":
+        // time: endTime
+        t.linearRampToValueAtTime(val, m + dur);
+        break;
+      case "expo":
+        t.exponentialRampToValueAtTime(val, m + dur);
+        break;
+      default:
+        t.setValueAtTime(val, m);
+        break;
+    }
+    return this;
+  };
+};
 
 /**
  * unit linker and cutter helper functions

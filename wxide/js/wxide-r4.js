@@ -54,6 +54,11 @@
       text: "WAAX GUI (pilot)",
       url: "../examples/ui-manager.html"
     },
+    {
+      id: "a-menu-ex-7",
+      text: "Timeline",
+      url: "../examples/timeline.html"
+    },
     { id: "divider" },
     {
       id: "a-menu-ex-wx7",
