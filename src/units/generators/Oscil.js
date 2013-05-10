@@ -36,6 +36,8 @@ WX.Oscil = function(json) {
     this.params = json;
   }
   this.label += "Oscil";
+  // exp feature
+  WX.bindParam.call(this, "mfreq", this._oscil.frequency);
 };
 
 WX.Oscil.prototype = Object.create(WX.Unit.Generator.prototype, {
