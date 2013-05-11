@@ -264,15 +264,11 @@ WX.Unit.Analyzer = function() {
   this._inlet.connect(this._inputGain);
   this._inputGain.connect(this._analyzer);
   this.label += WX.Types.Analyzer;
-  // NOTE: exp feature
-  this.xBuild();
+  // NOTE: this is experimental feature
+  WX.bindParam.call(this, "mgain", this._inputGain.gain);
 };
 
 WX.Unit.Analyzer.prototype = Object.create(WX.Unit.Common.prototype, {
-  // NOTE: this is experimental feature
-  xBuild: function() {
-    WX.bindParam.call(this, "mgain", this._inputGain.gain);
-  },
   // NOTE: this gain is pre-node gain
   gain: {
     enumerable: true,
