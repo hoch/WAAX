@@ -12,8 +12,18 @@ WX.LPF = function(json) {
       writable: false,
       value: WX._context.createBiquadFilter()
     },
+    _cutoff: {
+      writable: true,
+      value: 1000
+    },
+    _Q: {
+      writable: true,
+      value: 10
+    },
     _defaults: {
       value: {
+        cutoff: 1000,
+        Q: 10
       }
     }
   });
@@ -30,4 +40,24 @@ WX.LPF = function(json) {
 };
 
 WX.LPF.prototype = Object.create(WX.Unit.Processor.prototype, {
+  cutoff: {
+    enumerable: true,
+    get: function() {
+      return this._cutoff;
+    },
+    set: function(value) {
+      this._cutoff = value;
+    }
+  },
+  Q: {
+    enumerable: true,
+    get: function() {
+      return this._Q;
+    },
+    set: function(value) {
+      this._Q = value;
+      this._lpf1.Q.value = this._Q;
+      this._lpf2.Q.value = this._Q;
+    }
+  }
 });
