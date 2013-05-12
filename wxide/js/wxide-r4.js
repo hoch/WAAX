@@ -56,7 +56,7 @@
     },
     {
       id: "a-menu-ex-7",
-      text: "Timeline",
+      text: "Timeline (pilot)",
       url: "../examples/timeline.html"
     },
     { id: "divider" },
