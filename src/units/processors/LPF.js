@@ -43,21 +43,19 @@ WX.LPF.prototype = Object.create(WX.Unit.Processor.prototype, {
   cutoff: {
     enumerable: true,
     get: function() {
-      return this._cutoff;
+      return this._lpf.frequency.value;
     },
     set: function(value) {
-      this._cutoff = value;
+      this._lpf.frequency.value = value;
     }
   },
   Q: {
     enumerable: true,
     get: function() {
-      return this._Q;
+      return this._lpf.Q.value;
     },
     set: function(value) {
-      this._Q = value;
-      this._lpf1.Q.value = this._Q;
-      this._lpf2.Q.value = this._Q;
+      this._lpf.Q.value = this._Q;
     }
   }
 });
