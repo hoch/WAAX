@@ -8,7 +8,7 @@
 
 /* wx-gui:light texture map */
 .wx-gui-light {
-    background: url("gui-light.png?version=27") no-repeat;
+    background: url("https://raw.github.com/hoch/waax/master/src/ui/static/gui-light.png") no-repeat;
 }
 
 /* wx-sliderH */
