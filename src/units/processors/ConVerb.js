@@ -24,11 +24,11 @@ WX.ConVerb = function(json) {
     _url: {
       enumerable: false,
       writable: true,
-      value: "../data/ir/hall.wav"
+      value: null
     },
     _defaults: {
       value: {
-        source: "../data/ir/hall.wav",
+        source: null,
         mix: 0.25
       }
     }
@@ -38,11 +38,10 @@ WX.ConVerb = function(json) {
   this._convolver.connect(this._wet);
   this._dry.connect(this._outputGain);
   this._wet.connect(this._outputGain);
-  // this.params = this._defaults;
+  this.params = this._defaults;
   if (typeof json === "object") {
     this.params = json;
   }
-  this.mix = 0.25;
 };
 
 WX.ConVerb.prototype = Object.create(WX.Unit.Processor.prototype, {
@@ -52,7 +51,7 @@ WX.ConVerb.prototype = Object.create(WX.Unit.Processor.prototype, {
       return this._url;
     },
     set: function(url) {
-      if (url === undefined) {
+      if (url === undefined || url === null) {
         WX.error(this, "invalid IR file path.");
         return false;
       }
