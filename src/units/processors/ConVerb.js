@@ -62,6 +62,7 @@ WX.ConVerb.prototype = Object.create(WX.Unit.Processor.prototype, {
       xhr.onload = function() {
         try {
           me._convolver.buffer = WX._context.createBuffer(xhr.response, true);
+          WX.info(me, "loaded: " + url);
         } catch(error) {
           WX.error(me, "file loading error: " + url + " (" + error.message + ")");
         }
