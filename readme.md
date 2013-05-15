@@ -50,7 +50,7 @@ _NOTE_: As time of writing, [FireFox has recently started implementing Web Audio
 [5]: http://slork.stanford.edu/
 [20]: https://hacks.mozilla.org/2013/02/webrtc-enabled-h-264mp3-support-in-win-7-on-by-default-metro-ui-for-windows-8-more-firefox-development-highlights/
 [21]: https://github.com/hoch/waax/raw/master/etc/nime2013-choi-waax-r3.pdf
-[22]:
+[22]: https://ccrma.stanford.edu/~hongchan/
 
 
 Demo
