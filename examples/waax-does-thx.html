@@ -32,7 +32,7 @@
       var saws = [];
       for(var i = 0; i < 30; ++i) {
         initials[i] = WX.random2f(200.0, 800.0);
-        saws[i] = new WX.Oscil({ type:1, frequency:initials[i], gain:0.1 });
+        saws[i] = new WX.Oscil({ type:"sawtooth", frequency:initials[i], gain:0.1 });
         // patching all saw oscillators to the reverb
         saws[i].to(verb);
       }
