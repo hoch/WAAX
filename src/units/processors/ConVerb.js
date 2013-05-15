@@ -38,7 +38,7 @@ WX.ConVerb = function(json) {
   this._convolver.connect(this._wet);
   this._dry.connect(this._outputGain);
   this._wet.connect(this._outputGain);
-  this.params = this._defaults;
+  //this.params = this._defaults;
   if (typeof json === "object") {
     this.params = json;
   }
