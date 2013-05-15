@@ -76,7 +76,29 @@ WX.Oscil.prototype = Object.create(WX.Unit.Generator.prototype, {
     },
     set: function(value) {
       // TODO: sanity check for type
-      this._oscil.type = value;
+      if (value === undefined) {
+        return;
+      }
+      // shim for legacy enum support
+      var t;
+      switch(value) {
+        case "sine":
+          t = 0;
+          break;
+        case "square":
+          t = 1;
+          break;
+        case "sawtooth":
+          t = 2;
+          break;
+        case "triangle":
+          t = 3;
+          break;
+        default:
+          t = 0;
+          break;
+      }
+      this._oscil.type = t;
     }
   }
 });
