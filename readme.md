@@ -1,5 +1,7 @@
-WAAX (Web Audio API eXtension) : [mini-IDE][6] : [NIME 2013 Paper][21]
+WAAX (Web Audio API eXtension)
 ---------------------------------------------
+## [mini-IDE][6] : [NIME 2013 Paper][21]
+
 **JavaScript library for music and audio programming on Chrome (r5)**
 
 ```javascript
