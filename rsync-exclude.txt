@@ -1,0 +1,10 @@
+.git
+.gitignore
+LICENSE
+compiler.jar 
+ignore       
+readme.md   
+gendoc-waax  
+notes.md     
+ideas.md     
+out

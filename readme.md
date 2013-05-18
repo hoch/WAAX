@@ -1,23 +1,18 @@
 WAAX (Web Audio API eXtension)
----------------------------------------------
+------------------------------
 **JavaScript library for music and audio programming on Chrome (r5)**
-#### [WX-IDE][6] | [NIME 2013 Paper][21] | [CCRMA Talk 2013][22]
 
-```javascript
-// creating units
-var saw = new WX.Oscil({ type:"sawtooth" }),
-    sqr = new WX.Oscil({ type:"square" }),
-    lpf = new WX.ModLPF({ cutoff:2500, Q:12 }),
-    env = new WX.ADSR({ a:0.001, d:0.002, s:0.3, r:0.1 }),
-    vrb = new WX.ConVerb({ source:"ir/hall.wav", mix:0.3 });
-// building an audiograph
-WX.link(saw, lpf, env, vrb, WX.DAC);
-// connecting units
-sqr.to(lpf);
-```
+**NOTE**
+Currently I am working on the documentation which you will not find in this project repository. Sorry for your inconvenience and I will update the project as soon as possible.
+
+This project is still in the early stage, thus I do not recommend to use this for the serious production until it reaches revision 10. If you find anything awkward or problematic, please feel free to contact me.
+
+**Quick links**
+* [WX-IDE][6] 
+* [NIME 2013 Paper][21] 
+* [CCRMA Colloquium 2013 Slides][22]
 
 **Table of Contents**
-
 * [Introduction](#indroduction)
 * [Demo](#demo)
 * [Usages](#usages)
@@ -31,6 +26,19 @@ sqr.to(lpf);
 
 Introduction
 ------------
+
+```javascript
+// creating units
+var saw = new WX.Oscil({ type:"sawtooth" }),
+    sqr = new WX.Oscil({ type:"square" }),
+    lpf = new WX.ModLPF({ cutoff:2500, Q:12 }),
+    env = new WX.ADSR({ a:0.001, d:0.002, s:0.3, r:0.1 }),
+    vrb = new WX.ConVerb({ source:"ir/hall.wav", mix:0.3 });
+// building an audiograph
+WX.link(saw, lpf, env, vrb, WX.DAC);
+// connecting units
+sqr.to(lpf);
+```
 
 WAAX is an experimental JavaScript library built on top of [Web Audio API][1] in Chrome. With **music creation and production** in mind, it is designed to offer the higher level of functionality than basic building blocks of Web Audio API.
 
@@ -49,7 +57,7 @@ _NOTE_: As time of writing, [FireFox has recently started implementing Web Audio
 [5]: http://slork.stanford.edu/
 [20]: https://hacks.mozilla.org/2013/02/webrtc-enabled-h-264mp3-support-in-win-7-on-by-default-metro-ui-for-windows-8-more-firefox-development-highlights/
 [21]: https://github.com/hoch/waax/raw/master/etc/nime2013-choi-waax-r3.pdf
-[22]: https://ccrma.stanford.edu/~hongchan/
+[22]: https://ccrma.stanford.edu/~hongchan/waax/
 
 
 Demo
@@ -186,7 +194,7 @@ As WAAX is in early stages of development, there are several components (which a
 `WX.Oscil` `WX.Noise` `WX.Sampler` `WX.LFO` `WX.ImpTrain`
 
 ### Processors
-`WX.ADSR` `WX.ModLPF` `WX.TwinDelay` `WX.ConVerb` `WX.Comp` `WX.C2`
+`WX.ADSR` `WX.ModLPF` `WX.LPF` `WX.TwinDelay` `WX.ConVerb` `WX.Comp` `WX.C2`
 
 ### Analyzers
 `WX.Waveform` `WX.Spectrum` `WX.Visualizer` 
@@ -196,14 +204,6 @@ As WAAX is in early stages of development, there are several components (which a
 
 ### Utilities
 `WX.random2` `WX.random2f` `WX.db2lin` `WX.lin2db` `WX.pitch2freq` `WX.freq2pitch`
-
-
-Futurework
-----------
-There are several components (which are yet to be released publicly) to be incorporated into this library in the near future. One of these components is [WebRTC][7], the new web technology that enables a peer-to-peer connection between browsers. It realizes the idea of real time collaboration by interconnecting multiple clients without complicated server-side programming. The other one is [Web MIDI API][8] that empowers the browser to access local MIDI devices (i.e. USB-MIDI keyboards and controllers)
-
-[7]: http://dev.w3.org/2011/webrtc/editor/webrtc.html#rtcdatachannel
-[8]: http://webaudio.github.com/web-midi-api/
 
 
 Contact and License
