@@ -6,7 +6,7 @@ WAAX (Web Audio API eXtension)
 
 Currently I am working on the _documentation_ which you will not find in the current repository. Sorry for your inconvenience and I will update the project as soon as possible. 
 
-This project is still in the early stage, thus I do not recommend to use this for the serious production until it reaches revision 10. If you find anything awkward or problematic, please feel free to contact me.
+This project is still in the early stage, thus I do not recommend to use this for the serious production until it reaches revision 10. If you find anything awkward or problematic, please submit the issue [here][23].
 
 ### Quick links ###
 * [WX-IDE][6] 
@@ -49,7 +49,7 @@ The facade of API is strongly inspired by [THREE.js][2] and [ChucK][3]: Three.js
 
 As this library is in early stages of development, it currently demonstrates minimum set of features, however, it will embrace more elements as it grows: ready-made instruments, comprehensive timebase system (in conjunction with Web MIDI API), and musical interconnection between multiple Chrome clients.
 
-_NOTE_: As time of writing, [FireFox has recently started implementing Web Audio API][20] and it's partially available in the Nightly Build. Safari also has the implementation of Web Audio API but it is slightly outdated compared to the one in Chrome.)
+[FireFox has recently started implementing Web Audio API][20] and it's partially available in the Nightly Build. Safari also has the implementation of Web Audio API but it is slightly outdated compared to the one in Chrome.)
 
 [1]: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html "Web Audio API: W3C Editor's Draft"
 [2]: https://github.com/mrdoob/three.js/ "THREE.js: Github Repo"
@@ -59,6 +59,7 @@ _NOTE_: As time of writing, [FireFox has recently started implementing Web Audio
 [20]: https://hacks.mozilla.org/2013/02/webrtc-enabled-h-264mp3-support-in-win-7-on-by-default-metro-ui-for-windows-8-more-firefox-development-highlights/
 [21]: https://github.com/hoch/waax/raw/master/etc/nime2013-choi-waax-r3.pdf
 [22]: https://ccrma.stanford.edu/~hongchan/waax/
+[23]: https://github.com/hoch/waax/issues
 
 
 Demo
