@@ -10,7 +10,7 @@
     o = new WX.Oscil();
     m = new WX.Oscil();
     o.to(WX.DAC);
-    WX.DAC = -12;
+    WX.DAC.db = -12;
     
     // modulation
     m.connect(o.mfreq_);
