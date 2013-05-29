@@ -83,15 +83,19 @@ WX.Oscil.prototype = Object.create(WX.Unit.Generator.prototype, {
       var t;
       switch(value) {
         case "sine":
+        case 0:
           t = 0;
           break;
         case "square":
+        case 1:
           t = 1;
           break;
         case "sawtooth":
+        case 2:
           t = 2;
           break;
         case "triangle":
+        case 3:
           t = 3;
           break;
         default:
