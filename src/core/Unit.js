@@ -1,360 +1,217 @@
 /**
- * @class WX.Unit.Common
- * @classdesc a base class for WAAX units
+ * unit.js: unit builder
  */
-WX.Unit.Common = function() {
-  Object.defineProperties(this, {
-    _label: {
-      value: WX.Types.Unit,
-      enumerable: false,
-      writable: true
-    }
-  });
-};
 
-
-WX.Unit.Common.prototype = Object.create(null, {
-
-  /**
-   * gets/sets unit label. (types)
-   * @memberOf WX.Unit.Common
-   * @param {string} set unit type label (setter)
-   * @returns {string} label of unit (getter)
-   */
-  label: {
-    enumerable: false,
-    get: function() {
-      return this._label;
-    },
-    set: function(type) {
-      this._label = type;
-    }
-  },
-
-  /**
-   * gets/sets parameters of units.
-   * @memberOf WX.Unit.Common
-   * @param {json} parameters as json (setter)
-   * @returns {json} parameters as json (getter)
-   */
-  params: {
-    enumerable: false,
-    get: function() {
-      var tmp = Object.create(null);
-      // this iterates enumerables only
-      for(var p in this) {
-        tmp[p] = this[p];
-      }
-      return tmp;
-    },
-    set: function(json) {
-      if (typeof json !== "object") {
-        WX.error(this, "invalid JSON.");
-      }
-      for(var p in json) {
-        if (this[p] !== undefined) {
-          this[p] = json[p];
+/**
+ * wx._unit: unit builder container
+ */
+wx._unit = (function () {
+  return {
+    // extend prototype with maintaining the label
+    // TODO: add support for multiple sources
+    extend: function (target, source) {
+      for (var m in source) {
+        if (m === "label") {
+          target[m] = source[m] + "." + target[m];
         } else {
-          // otherwise do nothing and iterate next parameter
-          WX.warn(this, p + " is not an available property.");
+          target[m] = source[m];
         }
       }
+    },
+    // bind parameter for elegant audio param control
+    bindParameter: function (name, targetParam) {
+      var t = this[name + "_"] = targetParam;
+      // add parameter (but actualy method) to the object
+      this[name] = function (val, moment, type) {
+        // when undefined
+        if (val === undefined) {
+          return t.value;
+        }
+        // check moment
+        var m = (moment || wx.now);
+        // var endTime = startTime + (moment || 0);
+        // branching upon args
+        switch (type) {
+          case "line":
+          case "l":
+            t.linearRampToValueAtTime(val, m);
+            break;
+          case "expo":
+          case "x":
+            // to avoid exception due to zero
+            var v = (val === 0.0) ? 0.0001 : val;
+            t.exponentialRampToValueAtTime(v, m);
+            break;
+          case "target":
+          case "t":
+            if (m.length == 2 && (m[1] - m[0]) > 0.0) {
+              // TODO: pre-calculate the base. (target to 80dB)
+              var tau = -(m[1] - m[0]) / Math.log(0.001);
+              t.setTargetValueAtTime(val, m[0], tau);
+            } else {
+              wx._log.warn("invalid timespan for target mode.", this);
+            }
+            break;
+          default:
+          case undefined:
+            t.cancelScheduledValues(m);
+            t.setValueAtTime(val, m);
+            break;
+        }
+        return this;
+      };
+    },
+    // factory: register unit name into wx namespace
+    factory: function(args) {
+      args.map(function(n) {
+        if (wx[n.name]) {
+          wx._log.warn("unit name already exists. (" + n.name + ")", null);
+        } else {
+          wx[n.name] = function(options) {
+            return new n.ref(options);
+          };
+        }
+      });
     }
-  },
-
-  /**
-   * returns unit as string
-   * @memberOf WX.Unit.Common
-   * @returns {string} unit as stringified json
-   */
-  toString: {
-    value: function() {
-      var s = this.label;
-      s += " <pre>" + JSON.stringify(this.params, null, 2) + "</pre>";
-      return s;
-    }
-  }
-});
+  };
+})();
 
 
 /**
- * Unit.Generator
+ * unit prototype:abstract
  */
-WX.Unit.Generator = function() {
-  WX.Unit.Common.call(this);
-  Object.defineProperties(this, {
-    _outputGain: {
-      value: WX._context.createGain()
-    },
-    _outlet: {
-      value: WX._context.createGain()
-    },
-    _active: {
-      value: true,
-      writable: true
+wx._unit.abstract = {
+  // merging parameters with default params
+  _initializeParams: function (opt, def) {
+    var s = {};
+    // copy props from defaults
+    for (var d in def) {
+      s[d] = def[d];
     }
-  });
-  this._outputGain.connect(this._outlet);
-  this.label += WX.Types.Generator;
-  // NOTE: exp feature
-  WX.bindParam.call(this, "mgain", this._outputGain.gain);
+    // overwrite value from options
+    for (var o in opt) {
+      s[o] = opt[o];
+    }
+    this.params(s);
+  },
+  // assign parameters
+  params: function (opt) {
+    if (opt) {
+      for (var p in opt) {
+        switch (typeof this[p]) {
+          case "function":
+            this[p](opt[p]);
+            break;
+          case "number":
+            this[p] = opt[p];
+            break;
+          default:
+          case undefined:
+            wx._log.warn("invalid parameters.");
+            break;
+        }
+      }
+    } else {
+      wx._log.warn("invalid parameter.");
+    }
+  },
+  to: function (unit) {
+    this._outlet.connect(unit._inlet);
+    return unit;
+  },
+  connect: function (node) {
+    this._outlet.connect(node);
+  },
+  control: function (audioparam) {
+    this._outlet.connect(audioparam);
+  },
+  cut: function () {
+    this._outlet.disconnect();
+  }
 };
 
-WX.Unit.Generator.prototype = Object.create(WX.Unit.Common.prototype, {
-  to: {
-    value: function(unit) {
-      if (Object.prototype.toString.call(unit._inlet) === "[object GainNode]") {
-        this._outlet.connect(unit._inlet);
-        return unit;
-      } else {
-        WX.error(this, "invalid inlet node in target unit.");
-      }
-    }
+
+/**
+ * abstract: generator
+ */
+wx._unit.generator = function () {
+  this._active = true;
+  this._outputGain = wx.context.createGain();
+  this._outlet = wx.context.createGain();
+  this._outputGain.connect(this._outlet);
+  wx._unit.bindParameter.call(this, "gain", this._outputGain.gain);
+};
+
+wx._unit.generator.prototype = {
+  label: "u.gen",
+  on: function () {
+    this._status = true;
+    this._outputGain.connect(this._outlet);
   },
-  cut: {
-    value: function() {
-      this._outlet.disconnect();
-    }
-  },
-  connect: {
-    value: function(node) {
-      // TODO: sanity check?
-      this._outlet.connect(node);
-    }
-  },
-  gain: {
-    enumerable: true,
-    get: function() {
-      return this._outputGain.gain.value;
-    },
-    set: function(value) {
-      this._outputGain.gain.value = value;
-    }
-  },
-  active: {
-    enumerable: true,
-    get: function() {
-      return this._active;
-    },
-    set: function(bool) {
-      // sanity check
-      if (typeof bool !== "boolean") {
-        return;
-      }
-      // flip it
-      this._active = bool;
-      // do things
-      if (this._active) {
-        this._outputGain.connect(this._outlet);
-      } else {
-        this._outputGain.disconnect();
-      }
-    }
+  off: function () {
+    this._status = false;
+    this._outputGain.disconnect();
   }
-});
+};
+wx._unit.extend(wx._unit.generator.prototype, wx._unit.abstract);
 
 
 /**
- * Unit.Processor
+ * abstract: processor
  */
-WX.Unit.Processor = function() {
-  WX.Unit.Common.call(this);
-  Object.defineProperties(this, {
-    _inlet: {
-      value: WX._context.createGain()
-    },
-    _inputGain: {
-      value: WX._context.createGain()
-    },
-    _outputGain: {
-      value: WX._context.createGain()
-    },
-    _outlet: {
-      value: WX._context.createGain()
-    },
-    _bypass: {
-      value: false,
-      writable: true
-    }
-  });
+wx._unit.processor = function () {
+  this._active = true;
+  this._inlet = wx.context.createGain();
+  this._inputGain = wx.context.createGain();
+  this._outputGain = wx.context.createGain();
+  this._outlet = wx.context.createGain();
   this._inlet.connect(this._inputGain);
   this._outputGain.connect(this._outlet);
-  this.label += WX.Types.Processor;
-  // NOTE: exp feature
-  WX.bindParam.call(this, "mgain", this._outputGain.gain);
+  wx._unit.bindParameter.call(this, "gain", this._outputGain.gain);
 };
 
-WX.Unit.Processor.prototype = Object.create(WX.Unit.Common.prototype, {
-  to: {
-    value: function(unit) {
-      if (Object.prototype.toString.call(unit._inlet) === "[object GainNode]") {
-        this._outlet.connect(unit._inlet);
-        return unit;
-      } else {
-        WX.error(this, "invalid inlet node in target unit.");
-      }
+wx._unit.processor.prototype = {
+  label: "u.pro",
+  bypass: function (bool) {
+    if (typeof bool !== "boolean") {
+      return;
     }
-  },
-  cut: {
-    value: function() {
-      this._outlet.disconnect();
-    }
-  },
-  connect: {
-    value: function(node) {
-      // TODO: sanity check?
-      this._outlet.connect(node);
-    }
-  },
-  gain: {
-    enumerable: true,
-    get: function() {
-      return this._outputGain.gain.value;
-    },
-    set: function(value) {
-      this._outputGain.gain.value = value;
-    }
-  },
-  bypass: {
-    enumerable: true,
-    get: function() {
-      return this._bypass;
-    },
-    set: function(bool) {
-      // sanity check
-      if (typeof bool !== "boolean") {
-        return;
-      }
-      // flip it
-      this._bypass = bool;
-      // do things
-      if (this._bypass) {
-        this._outputGain.disconnect();
-        this._inlet.connect(this._outlet);
-      } else {
-        this._inlet.disconnect();
-        this._inlet.connect(this._inputGain);
-        this._outputGain.connect(this._outlet);
-      }
+    this._active = !bool;
+    if (bool) {
+      this._inlet.disconnect();
+      this._outputGain.disconnect();
+      this._inlet.connect(this._outlet);
+    } else {
+      this._inlet.disconnect();
+      this._inlet.connect(this._inputGain);
+      this._outputGain.connect(this._outlet);
     }
   }
-});
+};
+wx._unit.extend(wx._unit.processor.prototype, wx._unit.abstract);
 
 
 /**
- * Unit.Analyzer
+ * abstract: analyzer
  */
-WX.Unit.Analyzer = function() {
-  WX.Unit.Common.call(this);
-  Object.defineProperties(this, {
-    _inlet: {
-      value: WX._context.createGain()
-    },
-    _inputGain: {
-      value: WX._context.createGain()
-    },
-    _analyzer: {
-      value: WX._context.createAnalyser()
-    },
-    _active: {
-      value: true,
-      writable: true
-    }
-  });
+wx._unit.analyzer = function () {
+  this._active = true;
+  this._inlet = wx.context.createGain();
+  this._inputGain = wx.context.createGain();
+  this._analyzer = wx.context.createAnalyzer();
   this._inlet.connect(this._inputGain);
   this._inputGain.connect(this._analyzer);
-  this.label += WX.Types.Analyzer;
-  // NOTE: this is experimental feature
-  WX.bindParam.call(this, "mgain", this._inputGain.gain);
+  wx._unit.bindParameter.call(this, "inputGain", this._inputGain.gain);
 };
 
-WX.Unit.Analyzer.prototype = Object.create(WX.Unit.Common.prototype, {
-  // NOTE: this gain is pre-node gain
-  gain: {
-    enumerable: true,
-    get: function() {
-      return this._inputGain.gain.value;
-    },
-    set: function(value) {
-      this._inputGain.gain.value = value;
-    }
+wx._unit.analyzer.prototype = {
+  label: "u.ana",
+  on: function () {
+    this._status = true;
+    this._inlet.connect(this._inputGain);
   },
-  active: {
-    enumerable: true,
-    get: function() {
-      return this._active;
-    },
-    set: function(bool) {
-      // sanity check
-      if (typeof bool !== "boolean") {
-        return;
-      }
-      // flip it
-      this._active = bool;
-      // do things
-      if (this._active) {
-        this._inlet.connect(this._inputGain);
-      } else {
-        this._inlet.disconnect();
-      }
-    }
-  }
-});
-
-/**
- * TODO: context setter: need to be moved to somewhere
- */
-WX._at = null;
-WX.at = function(moment, fn) {
-    WX._at = moment + WX.now;
-    fn.call();
-    WX._at = null;
-};
-
-/**
- * TODO: bind parameters
- */
-WX.bindParam = function(name, targetParam) {
-  var t = this[name + "_"] = targetParam;
-  // add function name
-  this[name] = function(val, dur, type) {
-    // when undefined
-    if (val === undefined) {
-        return t.value;
-    }
-    // setup starting moment
-    var m = (WX._at) ? WX._at : WX.now;
-    // branching upon args
-    switch(type) {
-      case undefined:
-        t.setValueAtTime(val, m);
-        break;
-      case "line":
-        // time: endTime
-        t.linearRampToValueAtTime(val, m + dur);
-        break;
-      case "expo":
-        t.exponentialRampToValueAtTime(val, m + dur);
-        break;
-      default:
-        t.setValueAtTime(val, m);
-        break;
-    }
-    return this;
-  };
-};
-
-/**
- * unit linker and cutter helper functions
- */
-WX.link = function() {
-  for(var i = arguments.length-1; i >= 1; --i) {
-    arguments[i-1].to(arguments[i]);
-  }
-};
-
-WX.cut = function() {
-  for(var i = arguments.length-1; i >= 0; --i) {
-    arguments[i].cut();
+  off: function () {
+    this._status = false;
+    this._inlet.disconnect();
   }
 };

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# set path
+pushd ~/a/waax
+
+# launch compiler
+java -jar compiler.jar --warning_level=VERBOSE\
+
+# core
+--js=src/core/monkey.js \
+--js=src/core/waax.js \
+--js=src/core/utils.js \
+--js=src/core/builtin.js \
+--js=src/core/units.js \
+
+# unit-analyzer
+
+
+# unit-generator
+--js=src/unit/generator/oscil.js \
+
+# unit-processor
+--js=src/unit/processor/fader.js \
+
+# core-bootstrap
+--js=src/core/bootstrap.js \
+
+# final output
+--js_output_file=build/waax.min.js
+
+# revert path
+popd

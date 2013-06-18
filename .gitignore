@@ -1,10 +1,5 @@
 .DS_Store
-gitup
 notes.md
 ideas.md
-update-waax
-compile-waax
-compiler.jar
+push-waax
 ignore/
-out/
-gendoc-waax
