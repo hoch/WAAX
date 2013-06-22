@@ -1,20 +1,20 @@
 /**
- * wx.oscil
+ * WX.oscil
  */
-wx._unit.oscil = function (options) {
+WX._unit.oscil = function (options) {
   // initiate generator wrapper : pre-build
-  wx._unit.generator.call(this);
+  WX._unit.generator.call(this);
   // build unit
-  this._osc = wx.context.createOscillator();
+  this._osc = WX.context.createOscillator();
   this._osc.connect(this._outputGain);
   this._osc.start(0);
-  wx._unit.bindParameter.call(this, "freq", this._osc.frequency);
-  wx._unit.bindParameter.call(this, "detune", this._osc.detune);
+  WX._unit.bindAudioParam.call(this, "freq", this._osc.frequency);
+  WX._unit.bindAudioParam.call(this, "detune", this._osc.detune);
   // handling initial parameter : post-build
   this._initializeParams(options, this._default);
 };
 
-wx._unit.oscil.prototype = {
+WX._unit.oscil.prototype = {
   label: "oscil",
   _default: {
     type: "sine",
@@ -54,6 +54,9 @@ wx._unit.oscil.prototype = {
     } else {
       this._osc.type = t;
     }
+  },
+  stop: function(moment) {
+    this._osc.stop(moment);
   }
 };
-wx._unit.extend(wx._unit.oscil.prototype, wx._unit.generator.prototype);
+WX._unit.extend(WX._unit.oscil.prototype, WX._unit.generator.prototype);

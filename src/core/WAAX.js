@@ -3,9 +3,9 @@
  */
 
 /**
- * namespace wx
+ * namespace WX
  */
-wx = (function () {
+WX = (function () {
   var _version = "r8";
   var _ctx = new AudioContext();
   var _ignore_ = function () {

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Test r8</h1>
+    
+    <!-- lib r8 -->   
+    <script src="../src/core/Monkey.js"></script>
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Utils.js"></script>
+    <script src="../src/core/Builtin.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/generator/Oscil.js"></script>
+    <script src="../src/generator/Fmop.js"></script>
+    <script src="../src/generator/Noise.js"></script>
+    <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/Sampler.js"></script>
+    <script src="../src/generator/Step.js"></script>
+    <script src="../src/processor/Fader.js"></script>
+    <script src="../src/processor/ADSR.js"></script>
+    <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Comp.js"></script>
+    <script src="../src/processor/Converb.js"></script>
+    <script src="../src/core/Boot.js"></script>
+    
+    <!-- test code -->
+    <script>
+
+      /**
+       * ex1: impulse train + pingpong
+       * : to test feedback => merger => merger problem
+       */
+      function ex1() {
+        var i = WX.ITrain({ gain:1.0, freq:5 });
+        var pp = WX.Pingpong({ feedback:0.5, crosstalk:0.2 });
+        WX.DAC.db(-6);
+
+        i.to(pp).connect(WX.DAC._outputGain);
+        
+        // tryout: merger => merger problem
+        // pp.to(WX.DAC); // CRASH!!
+        // pp.connect(WX.DAC._outputGain); // OK
+        // pp.connect(WX.DAC._merger); // CRASH!!
+        // pp._delayL.connect(WX.DAC._merger, 0, 0); // OK
+        // pp._delayR.connect(WX.DAC._merger, 0, 1); // OK
+        // pp._merger.connect(WX.DAC._merger); // CRASH!!!
+      }
+
+      /**
+       * ex2: impulse => lprez => pingpong
+       * : just a random ear candy
+       */
+      function ex2() {
+        var i = WX.ITrain({ gain:1.0, freq:9 });
+        var f = WX.Filter({ cutoff:2500, Q:12 });
+        var v = WX.Converb({ mix: 0.8 });
+        var d = WX.Pingpong({ 
+          delayTimeLeft: 0.600, delayTimeRight: 0.450, 
+          feedbackLeft: 0.3, feedbackRight: 0.5,
+          crosstalk: 0.25 });
+        i.to(f).to(v).to(d).connect(WX.DAC._outputGain);
+
+        function sweep() {
+          var t1 = WX.now + 4, 
+              t2 = WX.now + 8;
+          f
+            .cutoff(125).Q(12)
+            .cutoff(2500 + Math.random() * 4000, t1, "x").Q(36, t1, "l")
+            .cutoff(125, t2, "x").Q(12, t2, "l");
+          setTimeout(sweep, 8000);
+        }
+
+        sweep();        
+      }
+
+      /**
+       * ex3: monophonic ADSR
+       */
+      function ex3() {
+        var o = WX.Oscil({ type: "saw", detune:-5 });
+        var o2 = WX.Oscil({ type: "saw", detune:3 });
+        var env = WX.ADSR();
+        var c = WX.Comp({ threshold:-20, ratio:8, makeup:6});
+        var v = WX.Converb({ source:"../data/ir/small.wav", mix:0.5 });
+        o.to(env).to(c).to(v).to(WX.DAC);
+        o2.to(env);
+        env.adsr(0.0001, 0.005, 0.8, 0.05);
+        //env.adsr(0.5, 0.5, 0.4, 0.5);
+        
+        var keymap = [];
+
+        window.addEventListener("keydown", function(e) {
+          if (e.which < 48 || e.which > 57) {
+            return;
+          }
+          if (keymap[e.which]) {
+            return;
+          } else {
+            keymap[e.which] = true;  
+          }
+          var f0 = WX.pitch2freq(e.which - 47 + 24); 
+          o.freq(f0 * 2);
+          o2.freq(f0);
+          env.gain((e.which - 47)/10);
+          env.noteOn();
+        });
+        window.addEventListener("keyup", function(e) {
+          if (e.which < 48 || e.which > 57) {
+            return;
+          }
+          keymap[e.which] = false;
+          env.noteOff();
+        });
+      }
+
+      /**
+       * ex4: compressor
+       */
+      function ex4() {
+        var s = WX.Sampler({ source:"../data/samples/snare-0.wav" });
+        var c = WX.Comp();
+        s.to(c).to(WX.DAC);
+
+        var i = 0;
+        function roll() {
+          i++;
+          var t1 = WX.now + 0.5, t2 = WX.now + 1.5;
+          c.threshold(-12 - i*2, t1).makeup(0.0 + i, t1);
+          s.start(60, t1).stop(t2);
+          if (i < 16) {
+            setTimeout(roll, 75);
+          }
+        }
+        setTimeout(roll, 1000);
+      }
+
+      /**
+       * step function and filter modulation
+       */
+      function ex5() {
+        var saw = WX.Oscil({ freq:220, type:"saw", gain:0.5 }),
+            stp1 = WX.Step({ gain:0 }),
+            enva = WX.ADSR();
+        saw.to(enva).to(WX.DAC);
+        stp1.control(saw.freq_);
+        
+        enva.adsr(0.01, 0.01, 0.8, 1.0);
+
+        // these two are identical
+        
+        // using Step modulation (numbers added target's parameter)
+        // target's parameter => offset
+        // step's gain => scale
+        stp1
+          .gain(220, 1.0)
+          .gain(660, 2.0)
+          .gain(1540, 3.0);
+        
+        // using plain AudioParam
+        // saw
+        //   .freq(440, 1.0)
+        //   .freq(880, 2.0)
+        //   .freq(1760, 3.0);
+
+        enva
+          .noteOn().noteOff(4.5);
+      }
+
+
+      /**
+       * ex6: Fmop piano
+       */
+      function ex6() {
+        var v = WX.Converb({ mix:0.2 });
+        v.to(WX.DAC);
+
+        function go(f) {
+          var fm = WX.Fmop({ freq:f, gain:0.15, modIndex:0.1 });
+              env = WX.ADSR();
+          fm.to(env).to(v);
+          env.adsr(0.001, 0.07, 0.4, 1.0);      
+          fm
+            .harmRatio(2)
+            .modIndex(4).modIndex(0.1, WX.now+1.5, "x")
+            .stop(WX.now+2.0);
+          env
+            .noteOn().noteOff(WX.now+1.0);
+        };
+        
+        window.addEventListener("keydown", function(e) {
+          if (e.which < 48 || e.which > 57) {
+            return;
+          }
+          var f0 = WX.pitch2freq(e.which - 49 + 48);
+          go(f0);
+        });  
+      }
+      
+      //ex1();
+      //ex2();
+      //ex3();
+      //ex4();
+      //ex5();
+      ex6();
+      
+
+    </script>
+  </body>
+</html>

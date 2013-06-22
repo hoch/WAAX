@@ -1,32 +1,32 @@
 #!/bin/bash
 
+# starting
+echo "[wx] starting compilation..."
+
 # set path
 pushd ~/a/waax
 
 # launch compiler
-java -jar compiler.jar --warning_level=VERBOSE\
-
-# core
---js=src/core/monkey.js \
---js=src/core/waax.js \
---js=src/core/utils.js \
---js=src/core/builtin.js \
---js=src/core/units.js \
-
-# unit-analyzer
-
-
-# unit-generator
---js=src/unit/generator/oscil.js \
-
-# unit-processor
---js=src/unit/processor/fader.js \
-
-# core-bootstrap
---js=src/core/bootstrap.js \
-
-# final output
+java -jar compiler.jar --language_in ECMASCRIPT5 \
+--js=src/core/Monkey.js \
+--js=src/core/WAAX.js \
+--js=src/core/Utils.js \
+--js=src/core/Builtin.js \
+--js=src/core/Unit.js \
+--js=src/generator/Oscil.js \
+--js=src/generator/Fmop.js \
+--js=src/generator/Noise.js \
+--js=src/generator/ITrain.js \
+--js=src/processor/Fader.js \
+--js=src/processor/Filter.js \
+--js=src/processor/Comp.js \
+--js=src/processor/Pingpong.js \
+--js=src/processor/Converb.js \
+--js=src/core/Boot.js \
 --js_output_file=build/waax.min.js
 
 # revert path
 popd
+
+# confirm
+echo "[wx] completed."

@@ -2,10 +2,11 @@
  * utils.js: log, math and other utilities
  */
 
+
 /**
- * wx._log: log utils
+ * WX._log: log utils
  */
-wx._log = (function () {
+WX._log = (function () {
   var _prefix = "[wx] ",
       _prefix_info = "[wx:info] ",
       _prefix_warn = "[wx:warn] ",
@@ -47,7 +48,7 @@ wx._log = (function () {
 /**
  * math lib
  */
-Object.defineProperties(wx, {
+Object.defineProperties(WX, {
   PI: {
     value: Math. PI
   },
@@ -102,3 +103,36 @@ Object.defineProperties(wx, {
     }
   }
 });
+
+
+/**
+ * WX._loadBuffer
+ * @desc fetching array buffer via XHR with oncomplete callback
+ * @param unit target unit { _url, _ready, _buffer }
+ */
+WX._loadBuffer = function(url, oncomplete) {
+  if (url === undefined || url === null) {
+    WX._log.error("xhr failed (invalid url): " + url);
+    // xhr failed
+    return false;
+  }
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url, true);
+  xhr.responseType = "arraybuffer";
+  xhr.onload = function() {
+    try {
+      var b = WX.context.createBuffer(xhr.response, false);
+      oncomplete({
+        url: url,
+        buffer: b,
+        status: true
+      });
+      WX._log.post("loaded: " + url + " (" + b.numberOfChannels + "ch)");
+    } catch(error) {
+      WX._log.error("xhr failed (" + error.message + "): " + url);
+    }
+  };
+  xhr.send();
+  // xhr is done
+  return true;
+};

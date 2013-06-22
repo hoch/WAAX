@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>White Noise</h1>
+    <script src="../build/waax.min.js"></script>
+    <script>
+      n = WX.Noise({
+        gain: 0.75,
+        rate: 1
+      });
+      p = WX.Noise({
+        gain: 0.25,
+        rate: 0.01
+      });
+      l = WX.Fader();
+      r = WX.Fader();
+      n.to(l).to(WX.DAC);
+      p.to(r).to(WX.DAC);
+      
+      l.panner(-0.75);
+      r.panner(0.75);
+
+      // score
+      n
+        .gain(0.5, 2.0, "l")
+        .gain(0.0, 4.0, "l")
+        .rate(0.01, 4.0, "x")
+        .stop(4.0);
+      p
+        .gain(0.0, 2.0, "l")
+        .gain(0.5, 4.0, "l")
+        .gain(0.0, 6.0, "l")
+        .rate(1.0, 6.0, "x")
+        .stop(6.0);
+    </script>
+  </body>
+</html>

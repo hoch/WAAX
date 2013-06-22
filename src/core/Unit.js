@@ -3,9 +3,9 @@
  */
 
 /**
- * wx._unit: unit builder container
+ * WX._unit: unit builder container
  */
-wx._unit = (function () {
+WX._unit = (function () {
   return {
     // extend prototype with maintaining the label
     // TODO: add support for multiple sources
@@ -18,8 +18,8 @@ wx._unit = (function () {
         }
       }
     },
-    // bind parameter for elegant audio param control
-    bindParameter: function (name, targetParam) {
+    // bind audio param for unified control
+    bindAudioParam: function (name, targetParam) {
       var t = this[name + "_"] = targetParam;
       // add parameter (but actualy method) to the object
       this[name] = function (val, moment, type) {
@@ -28,7 +28,7 @@ wx._unit = (function () {
           return t.value;
         }
         // check moment
-        var m = (moment || wx.now);
+        var m = (moment || WX.now);
         // var endTime = startTime + (moment || 0);
         // branching upon args
         switch (type) {
@@ -49,7 +49,7 @@ wx._unit = (function () {
               var tau = -(m[1] - m[0]) / Math.log(0.001);
               t.setTargetValueAtTime(val, m[0], tau);
             } else {
-              wx._log.warn("invalid timespan for target mode.", this);
+              WX._log.warn("invalid timespan for target mode.", this);
             }
             break;
           default:
@@ -61,13 +61,16 @@ wx._unit = (function () {
         return this;
       };
     },
+    // bind normal param for unified control
+    bindParam: function(name, moment) {
+    },
     // factory: register unit name into wx namespace
     factory: function(args) {
       args.map(function(n) {
-        if (wx[n.name]) {
-          wx._log.warn("unit name already exists. (" + n.name + ")", null);
+        if (WX[n.name]) {
+          WX._log.warn("unit name already exists. (" + n.name + ")", null);
         } else {
-          wx[n.name] = function(options) {
+          WX[n.name] = function(options) {
             return new n.ref(options);
           };
         }
@@ -80,7 +83,7 @@ wx._unit = (function () {
 /**
  * unit prototype:abstract
  */
-wx._unit.abstract = {
+WX._unit.abstract = {
   // merging parameters with default params
   _initializeParams: function (opt, def) {
     var s = {};
@@ -107,12 +110,12 @@ wx._unit.abstract = {
             break;
           default:
           case undefined:
-            wx._log.warn("invalid parameters.");
+            WX._log.warn("invalid parameters.");
             break;
         }
       }
     } else {
-      wx._log.warn("invalid parameter.");
+      WX._log.warn("invalid parameter.");
     }
   },
   to: function (unit) {
@@ -130,19 +133,17 @@ wx._unit.abstract = {
   }
 };
 
-
 /**
  * abstract: generator
  */
-wx._unit.generator = function () {
+WX._unit.generator = function () {
   this._active = true;
-  this._outputGain = wx.context.createGain();
-  this._outlet = wx.context.createGain();
+  this._outputGain = WX.context.createGain();
+  this._outlet = WX.context.createGain();
   this._outputGain.connect(this._outlet);
-  wx._unit.bindParameter.call(this, "gain", this._outputGain.gain);
+  WX._unit.bindAudioParam.call(this, "gain", this._outputGain.gain);
 };
-
-wx._unit.generator.prototype = {
+WX._unit.generator.prototype = {
   label: "u.gen",
   on: function () {
     this._status = true;
@@ -153,24 +154,23 @@ wx._unit.generator.prototype = {
     this._outputGain.disconnect();
   }
 };
-wx._unit.extend(wx._unit.generator.prototype, wx._unit.abstract);
+WX._unit.extend(WX._unit.generator.prototype, WX._unit.abstract);
 
 
 /**
  * abstract: processor
  */
-wx._unit.processor = function () {
+WX._unit.processor = function () {
   this._active = true;
-  this._inlet = wx.context.createGain();
-  this._inputGain = wx.context.createGain();
-  this._outputGain = wx.context.createGain();
-  this._outlet = wx.context.createGain();
+  this._inlet = WX.context.createGain();
+  this._inputGain = WX.context.createGain();
+  this._outputGain = WX.context.createGain();
+  this._outlet = WX.context.createGain();
   this._inlet.connect(this._inputGain);
   this._outputGain.connect(this._outlet);
-  wx._unit.bindParameter.call(this, "gain", this._outputGain.gain);
+  WX._unit.bindAudioParam.call(this, "gain", this._outputGain.gain);
 };
-
-wx._unit.processor.prototype = {
+WX._unit.processor.prototype = {
   label: "u.pro",
   bypass: function (bool) {
     if (typeof bool !== "boolean") {
@@ -188,23 +188,22 @@ wx._unit.processor.prototype = {
     }
   }
 };
-wx._unit.extend(wx._unit.processor.prototype, wx._unit.abstract);
+WX._unit.extend(WX._unit.processor.prototype, WX._unit.abstract);
 
 
 /**
  * abstract: analyzer
  */
-wx._unit.analyzer = function () {
+WX._unit.analyzer = function () {
   this._active = true;
-  this._inlet = wx.context.createGain();
-  this._inputGain = wx.context.createGain();
-  this._analyzer = wx.context.createAnalyzer();
+  this._inlet = WX.context.createGain();
+  this._inputGain = WX.context.createGain();
+  this._analyzer = WX.context.createAnalyzer();
   this._inlet.connect(this._inputGain);
   this._inputGain.connect(this._analyzer);
-  wx._unit.bindParameter.call(this, "inputGain", this._inputGain.gain);
+  WX._unit.bindAudioParam.call(this, "inputGain", this._inputGain.gain);
 };
-
-wx._unit.analyzer.prototype = {
+WX._unit.analyzer.prototype = {
   label: "u.ana",
   on: function () {
     this._status = true;
