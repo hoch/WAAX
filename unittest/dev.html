@@ -15,12 +15,16 @@
     <script src="../src/generator/Fmop.js"></script>
     <script src="../src/generator/Noise.js"></script>
     <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/ITrain2.js"></script>
     <script src="../src/generator/Sampler.js"></script>
     <script src="../src/generator/Step.js"></script>
     <script src="../src/processor/Fader.js"></script>
     <script src="../src/processor/ADSR.js"></script>
     <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Formant.js"></script>
+    <script src="../src/processor/FormantV.js"></script>
     <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Chorus.js"></script>
     <script src="../src/processor/Comp.js"></script>
     <script src="../src/processor/Converb.js"></script>
     <script src="../src/core/Boot.js"></script>
@@ -35,14 +39,13 @@
       function ex1() {
         var i = WX.ITrain({ gain:1.0, freq:5 });
         var pp = WX.Pingpong({ feedback:0.5, crosstalk:0.2 });
-        WX.DAC.db(-6);
 
-        i.to(pp).connect(WX.DAC._outputGain);
+        //i.to(pp).connect(WX.DAC._outputGain);
         
         // tryout: merger => merger problem
-        // pp.to(WX.DAC); // CRASH!!
+        pp.to(WX.DAC); // CRASH!!
         // pp.connect(WX.DAC._outputGain); // OK
-        // pp.connect(WX.DAC._merger); // CRASH!!
+        //pp.connect(WX.DAC._merger); // CRASH!!
         // pp._delayL.connect(WX.DAC._merger, 0, 0); // OK
         // pp._delayR.connect(WX.DAC._merger, 0, 1); // OK
         // pp._merger.connect(WX.DAC._merger); // CRASH!!!
@@ -53,14 +56,15 @@
        * : just a random ear candy
        */
       function ex2() {
-        var i = WX.ITrain({ gain:1.0, freq:9 });
+        var i = WX.ITrain2({ gain:1.0, freq:9 });
         var f = WX.Filter({ cutoff:2500, Q:12 });
         var v = WX.Converb({ mix: 0.8 });
         var d = WX.Pingpong({ 
           delayTimeLeft: 0.600, delayTimeRight: 0.450, 
           feedbackLeft: 0.3, feedbackRight: 0.5,
           crosstalk: 0.25 });
-        i.to(f).to(v).to(d).connect(WX.DAC._outputGain);
+        //i.to(f).to(v).to(d).connect(WX.DAC._outputGain);
+        i.to(f).to(v).to(d).to(WX.DAC);
 
         function sweep() {
           var t1 = WX.now + 4, 
@@ -177,13 +181,19 @@
         v.to(WX.DAC);
 
         function go(f) {
-          var fm = WX.Fmop({ freq:f, gain:0.15, modIndex:0.1 });
+          var fm1 = WX.Fmop({ freq:f, gain:0.1, modIndex:0.1 });
+              fm2 = WX.Fmop({ freq:f*2, gain:0.05, modIndex:0.5 });
               env = WX.ADSR();
-          fm.to(env).to(v);
-          env.adsr(0.001, 0.07, 0.4, 1.0);      
-          fm
+          fm1.to(env).to(v);
+          fm2.to(env);
+          env.adsr(0.001, 0.07, 0.3, 1.0);      
+          fm1
             .harmRatio(2)
             .modIndex(4).modIndex(0.1, WX.now+1.5, "x")
+            .stop(WX.now+2.0);
+          fm2
+            .harmRatio(2)
+            .modIndex(8).modIndex(0.5, WX.now+1.5, "x")
             .stop(WX.now+2.0);
           env
             .noteOn().noteOff(WX.now+1.0);
@@ -198,13 +208,109 @@
         });  
       }
       
+
+      // ex7: a-e-i-o-u
+      function ex7() {
+        
+        var lfo = WX.Oscil({ freq:6, gain:0.7 });
+        var s = WX.Oscil({ type:"saw", gain: 0.7 });
+        var form = WX.Formant();
+        lfo.control(s.freq_);
+        s.to(form).to(WX.DAC);
+
+        var mel = [36, 38, 40, 41, 43].map(WX.pitch2freq);
+        var tau = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0].map(function(i) { return WX.now + i; });
+
+        s
+          .freq(mel[0], tau[0])
+          .freq(mel[0], tau[1]-0.1).freq(mel[1], tau[1], "x")
+          .freq(mel[1], tau[2]-0.1).freq(mel[2], tau[2], "x")
+          .freq(mel[2], tau[3]-0.1).freq(mel[3], tau[3], "x")
+          .freq(mel[3], tau[4]-0.1).freq(mel[4], tau[4], "x")
+          .freq(mel[4], tau[5]-0.1);
+        form
+          .vowel("a", tau[0])
+          .vowel("a", tau[1]-0.1).vowel("e", tau[1], "x")
+          .vowel("e", tau[2]-0.1).vowel("i", tau[2], "x")
+          .vowel("i", tau[3]-0.1).vowel("o", tau[3], "x")
+          .vowel("o", tau[4]-0.1).vowel("u", tau[4], "x")
+          .vowel("u", tau[5]-0.1);
+        form
+          .gain(1.0, tau[5]-0.1)
+          .gain(0.0, tau[5], "l");  
+      }
+
+
+      // ex8: vector controlled formant
+      function ex8() {
+        var lfo = WX.Oscil({ freq:8, gain:0.7 });
+        var s = WX.Oscil({ type:"saw", gain: 0.7 });
+        var form = WX.FormantV();
+        lfo.control(s.freq_);
+        s.to(form).to(WX.DAC);
+
+        var mel = [36, 38, 40, 41, 43, 45, 47, 49].map(WX.pitch2freq);
+        var tau = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0].map(function(i) { return WX.now + i; });
+
+        s
+          .freq(mel[0], tau[0]);
+
+        function move() {
+          var t = Math.PI * 2 * Math.random();
+          form.setPosition(Math.cos(t), Math.sin(t), 0.5);
+          s
+            .freq(mel[WX.random2(0, 7)], WX.now + 0.5, "x")
+            .gain(WX.random2f(0.5, 0.9), WX.now + 0.5, "l");
+          lfo
+            .freq(WX.random2f(5, 10), WX.now + 0.5, "x")
+            .gain(WX.random2f(0.7, 1.4), WX.now + 0.5, "l");
+          setTimeout(move, 500);
+        }
+        move();
+      }
+
+
+      // ex9: wavetable(periodicwave)-based impulse train
+      function ex9() {
+        var it1 = WX.ITrain({ gain: 0.5 });
+        var it2 = WX.ITrain2({ gain: 0.0 });
+        it1.to(WX.DAC);
+        it2.to(WX.DAC);
+      }
+
+
+      // ex10: Jon Dattoro's Chrous in stereo
+      function ex10() {
+        var sp = WX.Sampler({ source:"../data/samples/cleangtr.wav", loop: true, gain: 1.8 });
+        var c = WX.Chorus();
+        var v = WX.Converb({ mix: 0.25 });
+        sp.to(c).to(v).to(WX.DAC);
+
+        setTimeout(function() {
+          sp.start(60, 0);
+          var t1 = sp._buffer.duration + WX.now;
+          var t2 = sp._buffer.duration * 2 + WX.now;
+          var t3 = sp._buffer.duration * 3 + WX.now;
+          c
+            .mix(0.0)
+            .mix(1.0, t1)
+            .blend(0.7071, t2).feedforward(1.0, t2).feedback(0.7071, t2);
+          v
+            .gain(1.0, t3 - 1.0)
+            .gain(0.0, t3, "l");
+        }, 1000);
+      }
+    
       //ex1();
       //ex2();
       //ex3();
       //ex4();
       //ex5();
-      ex6();
-      
+      //ex6();
+      //ex7();
+      ex8();
+      //ex9();
+      //ex10();
 
     </script>
   </body>

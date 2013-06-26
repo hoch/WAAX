@@ -8,7 +8,7 @@ WX._unit.fader = function (options) {
   this._inverter = WX.context.createGain();
   this._left = WX.context.createGain();
   this._right = WX.context.createGain();
-  this._merger = WX.context.createChannelMerger(2);
+  this._merger = WX.context.createChannelMerger();
   this._inputGain.connect(this._inverter);
   this._inverter.connect(this._left);
   this._inverter.connect(this._right);

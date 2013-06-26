@@ -11,6 +11,7 @@ WX._unit.sampler = function (options) {
   this._basePitch = 60;
   this._ready = false;
   this._url = null;
+  this._loop = false;
   // callback in constructor
   var me = this;
   this._oncomplete = function(obj) {
@@ -27,7 +28,8 @@ WX._unit.sampler = function (options) {
 WX._unit.sampler.prototype = {
   label: "sampler",
   _default: {
-    basePitch: 60
+    basePitch: 60,
+    loop: false
   },
   source: function(url) {
     if (url) {
@@ -43,10 +45,16 @@ WX._unit.sampler.prototype = {
       return this._basePitch;
     }
   },
+  loop: function(bool) {
+    this._loop = bool;
+  },
   start: function(pitch, moment) {
     // TODO: checking ready status!
     this._player = WX.context.createBufferSource();
     this._player.buffer = this._buffer;
+    if (this._loop) {
+      this._player.loop = 1;
+    }
     this._player.connect(this._outputGain);
     // NOTE: calculate pitch and play the sound
     // (2 ^ (semitones change/12) = rate

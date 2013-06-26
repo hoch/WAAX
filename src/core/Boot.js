@@ -16,13 +16,17 @@
     { name: "Fmop", ref: WX._unit.fmop },
     { name: "Noise", ref: WX._unit.noise },
     { name: "ITrain", ref: WX._unit.itrain },
+    { name: "ITrain2", ref: WX._unit.itrain2 },
     { name: "Sampler", ref: WX._unit.sampler },
     { name: "Step", ref: WX._unit.step },
     // processors
     { name: "Fader", ref: WX._unit.fader },
     { name: "ADSR", ref: WX._unit.adsr },
     { name: "Filter", ref: WX._unit.filter },
+    { name: "Formant", ref: WX._unit.formant },
+    { name: "FormantV", ref: WX._unit.formantv },
     { name: "Pingpong", ref: WX._unit.pingpong },
+    { name: "Chorus", ref: WX._unit.chorus },
     { name: "Comp", ref: WX._unit.comp },
     { name: "Converb", ref: WX._unit.converb }
     // analyzers

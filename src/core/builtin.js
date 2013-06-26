@@ -24,6 +24,16 @@
   }
   WX._builtin.impulse.getChannelData(0).set(it, 0);
 
+  // impulse wavetable (for wavetable or PeriodicWave)
+  var it2 = new Float32Array(4096);
+  var it3 = new Float32Array(4096);
+  for (var a = 0; a < 4096; ++a) {
+    it2[a] = 1.0;
+    it3[a] = 0.0;
+  }
+  // TODO: it'll be replace with PeriodicWave
+  WX._builtin.impulseWavelet = WX.context.createWaveTable(it2, it3);
+
   // step function (sr samples of 1.0)
   var st = new Float32Array(sr);
   WX._builtin.step = WX.context.createBuffer(1, sr, sr);
