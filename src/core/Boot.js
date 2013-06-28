@@ -53,12 +53,14 @@
     { name: "Step", ref: WX._unit.step },
     // processors
     { name: "Fader", ref: WX._unit.fader },
+    { name: "Spatter", ref: WX._unit.spatter },
     { name: "ADSR", ref: WX._unit.adsr },
     { name: "Filter", ref: WX._unit.filter },
     { name: "Formant", ref: WX._unit.formant },
     { name: "FormantV", ref: WX._unit.formantv },
     { name: "Pingpong", ref: WX._unit.pingpong },
     { name: "Chorus", ref: WX._unit.chorus },
+    { name: "Phasor", ref: WX._unit.phasor },
     { name: "Comp", ref: WX._unit.comp },
     { name: "Converb", ref: WX._unit.converb }
     // analyzers

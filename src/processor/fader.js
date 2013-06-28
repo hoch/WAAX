@@ -38,15 +38,18 @@ WX._unit.fader = function (options) {
   WX._unit.processor.call(this);
   // building
   this._inverter = WX.context.createGain();
+  var splitter = WX.context.createChannelSplitter();
+  var merger = WX.context.createChannelMerger();
   this._left = WX.context.createGain();
   this._right = WX.context.createGain();
-  this._merger = WX.context.createChannelMerger();
+  // connection
   this._inputGain.connect(this._inverter);
-  this._inverter.connect(this._left);
-  this._inverter.connect(this._right);
-  this._left.connect(this._merger, 0, 0);
-  this._right.connect(this._merger, 0, 1);
-  this._merger.connect(this._outputGain);
+  this._inverter.connect(splitter);
+  splitter.connect(this._left, 0, 0);
+  splitter.connect(this._right, 1, 0);
+  this._left.connect(merger, 0, 0);
+  this._right.connect(merger, 0, 1);
+  merger.connect(this._outputGain);
   this._position = 0.0;
   // bind parameter
   WX._unit.bindAudioParam.call(this, "inputGain", this._inputGain.gain);

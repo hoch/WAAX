@@ -31,11 +31,11 @@
 
 
 /**
- * WX.Chrous
+ * WX.Phasor
+ * : implements Chris' idea on multiple notches with modulating center freq
  */
 
-// TODO: add control for LFO, rate, depth
-WX._unit.chorus = function (options) {
+WX._unit.phasor = function (options) {
   // pre-building: processor wrapper
   WX._unit.processor.call(this);
   // building phase
@@ -43,86 +43,64 @@ WX._unit.chorus = function (options) {
   var merger = WX.context.createChannelMerger();
   this._dry = WX.context.createGain();
   this._wet = WX.context.createGain();
-  // left stream
-  this._sL = WX.context.createGain();
-  this._delayVL = WX.context.createDelay();
-  this._delayFL = WX.context.createDelay();
-  this._fbL = WX.context.createGain();
-  this._ffL = WX.context.createGain();
-  this._blendL = WX.context.createGain();
-  // right stream
-  this._sR = WX.context.createGain();
-  this._delayVR = WX.context.createDelay();
-  this._delayFR = WX.context.createDelay();
-  this._fbR = WX.context.createGain();
-  this._ffR = WX.context.createGain();
-  this._blendR = WX.context.createGain();
-  // left connection
-  splitter.connect(this._sL, 0, 0);
-  this._sL.connect(this._delayFL);
-  this._sL.connect(this._delayVL);
-  this._delayFL.connect(this._fbL);
-  this._fbL.connect(this._sL);
-  this._delayVL.connect(this._ffL);
-  this._delayVL.connect(merger, 0, 0);
-  this._blendL.connect(merger, 0, 0);
-  // right connection
-  splitter.connect(this._sR, 1, 0);
-  this._sR.connect(this._delayFR);
-  this._sR.connect(this._delayVR);
-  this._delayFR.connect(this._fbR);
-  this._fbR.connect(this._sR);
-  this._delayVR.connect(this._ffR);
-  this._delayVR.connect(merger, 0, 1);
-  this._blendR.connect(merger, 0, 1);
+  // notches
+  var maxNotch = 12;
+  var baseFreq = 60;
+  var spacing = 10;
+  this._notch = [];
+  for (var i = 0; i < maxNotch; ++i) {
+    this._notch[i] = WX.context.createBiquadFilter();
+    this._notch[i].type = "notch";
+    this._notch[i].frequency = baseFreq + spacing * Math.pow(2, i);
+    // console.log(baseFreq + spacing * Math.pow(2, i));
+  }
+  // split stereo
+  splitter.connect(this._notch[0], 0, 0);
+  splitter.connect(this._notch[1], 1, 0);
+  for (var j = 0; j < maxNotch - 2; j += 2) {
+    this._notch[j].connect(this._notch[j+2]);
+    this._notch[j+1].connect(this._notch[j+3]);
+  }
+  this._notch[maxNotch-2].connect(merger, 0, 0);
+  this._notch[maxNotch-1].connect(merger, 0, 1);
   merger.connect(this._wet);
   // delayTime modulation
   this._lfo = WX.context.createOscillator();
-  this._lfo.type = "triangle";
   this._depthL = WX.context.createGain();
   this._depthR = WX.context.createGain();
-  this._lfo.frequency.value = 0.18;
-  this._depthL.gain.value = 0.010;
-  this._depthR.gain.value = -0.011;
+  this._lfo.type = "triangle";
   this._lfo.start(0);
+  this._lfo.frequency.value = 2.1;
+  this._depthL.gain.value = 200.0;
+  this._depthR.gain.value = -200.0;
   this._lfo.connect(this._depthL);
   this._lfo.connect(this._depthR);
-  this._depthL.connect(this._delayVL.delayTime);
-  this._depthR.connect(this._delayVR.delayTime);
-  this._delayVL.delayTime.value = 0.017;
-  this._delayFL.delayTime.value = 0.011;
-  this._delayVR.delayTime.value = 0.013;
-  this._delayFR.delayTime.value = 0.019;
+  for (var k = 0; k < maxNotch; ++k) {
+    if (k % 2 === 0) {
+      this._depthL.connect(this._notch[k].frequency);
+    } else {
+      this._depthR.connect(this._notch[k].frequency);
+    }
+  }
   // mix level control
   this._inputGain.connect(splitter);
   this._inputGain.connect(this._dry);
   this._dry.connect(this._outputGain);
   this._wet.connect(this._outputGain);
   // post-building: parameter binding
-  WX._unit.bindAudioParam.call(this, "lfoFreq", this._lfo.frequency);
-  WX._unit.bindAudioParam.call(this, "lfoDepthLeft", this._depthL.gain);
-  WX._unit.bindAudioParam.call(this, "lfoDepthRight", this._depthR.gain);
-  WX._unit.bindAudioParam.call(this, "feedbackLeft", this._fbL.gain);
-  WX._unit.bindAudioParam.call(this, "feedbackRight", this._fbR.gain);
-  WX._unit.bindAudioParam.call(this, "feedforwardLeft", this._ffL.gain);
-  WX._unit.bindAudioParam.call(this, "feedforwardRight", this._ffR.gain);
-  WX._unit.bindAudioParam.call(this, "blendLeft", this._blendL.gain);
-  WX._unit.bindAudioParam.call(this, "blendRight", this._blendR.gain);
   WX._unit.bindAudioParam.call(this, "dry", this._dry.gain);
   WX._unit.bindAudioParam.call(this, "wet", this._wet.gain);
   // handling initial parameter : post-build
   this._initializeParams(options, this._default);
 };
 
-WX._unit.chorus.prototype = {
+WX._unit.phasor.prototype = {
   // this label will be appended automatically
-  label: "chorus",
+  label: "phasor",
   _default: {
-    feedback: 0.1,
-    feedforward: 0.70701,
-    blend: 1.0,
     mix: 0.8
   },
+  /*
   rate: function (value, moment, type) {
     if (value !== undefined) {
       // value should be normalized 0~1
@@ -168,6 +146,7 @@ WX._unit.chorus.prototype = {
       return [this.blendLeft(), this.blendRight()];
     }
   },
+  */
   mix: function (value, moment, type) {
     if (value !== undefined) {
       return this
@@ -179,4 +158,4 @@ WX._unit.chorus.prototype = {
   }
 };
 
-WX._unit.extend(WX._unit.chorus.prototype, WX._unit.processor.prototype);
+WX._unit.extend(WX._unit.phasor.prototype, WX._unit.processor.prototype);

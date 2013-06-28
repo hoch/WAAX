@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Test r8</h1>
+    
+    <!-- lib r8 -->   
+    <script src="../src/core/Monkey.js"></script>
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Utils.js"></script>
+    <script src="../src/core/Builtin.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/generator/Oscil.js"></script>
+    <script src="../src/generator/Fmop.js"></script>
+    <script src="../src/generator/Noise.js"></script>
+    <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/ITrain2.js"></script>
+    <script src="../src/generator/Sampler.js"></script>
+    <script src="../src/generator/Step.js"></script>
+    <script src="../src/processor/Fader.js"></script>
+    <script src="../src/processor/Spatter.js"></script>
+    <script src="../src/processor/ADSR.js"></script>
+    <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Formant.js"></script>
+    <script src="../src/processor/FormantV.js"></script>
+    <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Chorus.js"></script>
+    <script src="../src/processor/Phasor.js"></script>
+    <script src="../src/processor/Comp.js"></script>
+    <script src="../src/processor/Converb.js"></script>
+    <script src="../src/core/Boot.js"></script>
+    
+    <!-- test code -->
+    <script>
+
+      // ex1: phasor(notches) in stereo
+      function ex1 () {
+        var sp = WX.Sampler({ source:"../data/samples/cleangtr.wav", loop: true, gain: 1.0 });
+        var p = WX.Phasor({ mix:1.0 } );
+        var cmp = WX.Comp({ threshold:-24, ratio:8, makeup:4 });
+        sp.to(p).to(cmp).to(WX.DAC);
+
+        setTimeout(function() {
+          sp.start(60, 0);
+          p
+            .mix(0.0)
+            .mix(0.8, WX.now + 5);
+          cmp
+            .makeup(8, WX.now + 5);
+        }, 1000);
+      }
+
+
+      // ex2: spatter, HRTF panning
+      //function ex2 () {
+        
+        var v = WX.Converb({ mix: 0.1 });
+        var f = WX.Filter({ cutoff: 7000, Q:1.5 });
+        v.to(f).to(WX.DAC);
+        
+        function Stream (opt) {
+          // ugens
+          this.n = WX.Noise({ gain: 1.0 });
+          this.f1 = WX.Filter({ 
+            type: "bandpass", 
+            cutoff: opt.freq * 0.9999, 
+            Q: opt.Q,
+            gain: opt.gain
+          });
+          this.f2 = WX.Filter({ 
+            type: "bandpass", 
+            cutoff: opt.freq * 1.0001, 
+            Q: opt.Q,
+            gain: opt.gain
+          });
+          this.s = WX.Spatter();
+          this.n.to(this.f1).to(this.f2).to(this.s).to(v);
+          // params
+          this.speed = opt.speed;
+          this.cartPos = {};
+          this.polarPos = { 
+            x: 1.0,
+            y: Math.PI * 2 * Math.random(),
+            z: Math.PI * 2 * Math.random()
+          };
+          this.convert();
+          this.n.gain(0.0).gain(2.0, 2.0, "l");
+        }
+
+        Stream.prototype.convert = function() {
+          var p = this.polarPos;
+          this.cartPos.x = p.x * Math.sin(p.y) * Math.cos(p.z);
+          this.cartPos.y = p.x * Math.cos(p.y);
+          this.cartPos.z = p.x * Math.sin(p.y) * Math.sin(p.z);
+        }
+
+        Stream.prototype.move = function() {
+          this.polarPos.z += this.speed;
+          //this.polarPos.y += this.speed;
+          if (this.polarPos.z > Math.PI) {
+            this.polarPos.z = Math.PI;
+            this.speed *= -1;
+          } else if (this.polarPos.z < 0.0) {
+            this.polarPos.z = 0.0;
+            this.speed *= -1;
+          }
+          this.convert();
+          this.s.panner(this.cartPos);
+        }
+
+        Stream.prototype.freq = function(f) {
+          this.f1.cutoff(f * 0.9999);
+          this.f2.cutoff(f * 1.0001);
+        }
+
+        var s = [];
+        var maxStream = 36;
+        var curve = 1.2;
+        var fund = 120;
+        var rFactor = 2;
+        var rat = fund / rFactor;
+        for (var i = 0; i < maxStream; ++i) {
+          s[i] = new Stream({ 
+            freq: fund + rat * Math.pow(2, i),
+            Q: 36 + 48 * 1 / Math.pow(1.1, i), 
+            gain: 1 / Math.pow(1.2, i),
+            speed: (Math.random() - 0.5) * 0.25
+          });
+          // console.log(1 / Math.pow(1.2, i));
+        }
+
+        function rotate() {
+          for (var i = 0; i < maxStream; ++i) {
+            s[i].move();
+          }
+          setTimeout(rotate, 200);
+        }
+        rotate();
+
+        function changeFund(f) {
+          fund = f;
+          rat = fund / Math.pow(2, rFactor);
+          for (var i = 0; i < maxStream; ++i) {
+            s[i].f1.cutoff(fund + rat * Math.pow(2, i) * 0.9999, WX.now+0.02, "x");
+            s[i].f2.cutoff(fund + rat * Math.pow(2, i) * 1.0001, WX.now+0.02, "x");
+          }
+        }
+
+        function changeRat(r) {
+          rFactor = r;
+          rat = fund / Math.pow(2, rFactor);
+          for (var i = 0; i < maxStream; ++i) {
+            s[i].f1.cutoff(fund + rat * Math.pow(2, i) * 0.9999, WX.now+0.02, "x");
+            s[i].f2.cutoff(fund + rat * Math.pow(2, i) * 1.0001, WX.now+0.02, "x");
+          }
+        }
+
+        function changeGain(f) {
+          for (var i = 0; i < maxStream; ++i) {
+            s[i].f1.gain(1 / Math.pow(f, i), WX.now+0.02, "l");
+            s[i].f2.gain(1 / Math.pow(f, i), WX.now+0.02, "l");
+          }
+        }
+
+        function changeQ(q) {
+          for (var i = 0; i < maxStream; ++i) {
+            s[i].f1.Q(36 + 48 * 1 / Math.pow(q, i), WX.now+0.02, "l");
+            s[i].f2.Q(36 + 48 * 1 / Math.pow(q, i), WX.now+0.02, "l");
+          }
+        }
+
+
+      //}
+  
+      // ex1();
+      //ex2();
+
+    </script>
+  </body>
+</html>

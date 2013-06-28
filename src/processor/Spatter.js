@@ -31,45 +31,54 @@
 
 
 /**
- * WX.Filter
+ * WX.Spatter
+ * - PannerNode abstraction, phase inverter, delay, panning
  */
-WX._unit.filter = function (options) {
-  // pre-building: processor wrapper
+WX._unit.spatter = function (options) {
+  // pre-building
   WX._unit.processor.call(this);
-  // building phase
-  this._filter = WX.context.createBiquadFilter();
-  this._inputGain.connect(this._filter);
-  this._filter.connect(this._outputGain);
-  this._filter.type = "lowpass";
-  // post-building: parameter binding
-  WX._unit.bindAudioParam.call(this, "cutoff", this._filter.frequency);
-  WX._unit.bindAudioParam.call(this, "Q", this._filter.Q);
-  WX._unit.bindAudioParam.call(this, "detune", this._filter.detune);
-  // NOTE: this overriding processor-default gain method with filter's
-  // which uses "dB" metric
-  // NOTE: this is not working
-  //WX._unit.bindAudioParam.call(this, "gain", this._filter.gain);
+  // building
+  this._inverter = WX.context.createGain();
+  this._delay = WX.context.createDelay();
+  this._panner = WX.context.createPanner();
+  // connection
+  this._inputGain.connect(this._inverter);
+  this._inverter.connect(this._delay);
+  this._delay.connect(this._panner);
+  this._panner.connect(this._outputGain);
+  // setting params
+  this._delay.delayTime = 0.010;
+  this._position = { x:0.0, y:1.0, z:0.0 };
+  // bind parameter
+  WX._unit.bindAudioParam.call(this, "delayTime", this._delay.delayTime);
   // handling initial parameter : post-build
   this._initializeParams(options, this._default);
 };
 
-WX._unit.filter.prototype = {
-  // this label will be appended automatically
-  label: "filter",
+WX._unit.spatter.prototype = {
+  label: "spatter",
   _default: {
-    cutoff: 1000,
-    Q: 1
+    panner: { x:0.0 , y:1.0 , z:0.0 },
+    gain: 1.0
   },
-  // type
-  type: function (type) {
-    if (type !== undefined) {
-      // TODO: need a switch for shortcuts
-      this._filter.type = type;
+  invert: function(bool, moment) {
+    if (typeof bool === "boolean") {
+      var phi = (bool) ? -1.0 : 1.0;
+      this._inverter.gain.setValueAtTime(phi, (moment || WX.now));
       return this;
     } else {
-      return this._filter.type;
+      return (this._inverter.gain.value == -1.0) ? true : false;
+    }
+  },
+  panner: function(vec3) {
+    if (vec3 !== undefined) {
+      this._panner.setPosition(vec3.x, vec3.y, vec3.z);
+      this._position = vec3;
+      return this;
+    } else {
+      return this._position;
     }
   }
 };
 
-WX._unit.extend(WX._unit.filter.prototype, WX._unit.processor.prototype);
+WX._unit.extend(WX._unit.spatter.prototype, WX._unit.processor.prototype);
