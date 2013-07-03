@@ -3,26 +3,20 @@
   <head>
   </head>
   <body>
-    <h1>White Noise</h1>
+    <h1>Swoosh Noise</h1>
     <script src="../build/waax.min.js"></script>
     <script>
-      n = WX.Noise({
-        gain: 0.75,
-        rate: 1
-      });
-      p = WX.Noise({
-        gain: 0.25,
-        rate: 0.01
-      });
-      l = WX.Fader();
-      r = WX.Fader();
+      // Units
+      var n = WX.Noise({ gain: 0.75, rate: 1 }), 
+          p = WX.Noise({ gain: 0.25, rate: 0.01 }),
+          l = WX.Fader({ type: "mono", panner: -0.75, db: -3 }),
+          r = WX.Fader({ type: "mono", panner: 0.75, db: -3 });
+
+      // connection
       n.to(l).to(WX.DAC);
       p.to(r).to(WX.DAC);
       
-      l.panner(-0.75);
-      r.panner(0.75);
-
-      // score
+      // development
       n
         .gain(0.5, 2.0, "l")
         .gain(0.0, 4.0, "l")

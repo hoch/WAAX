@@ -35,8 +35,7 @@
     <script>
 
       // ex1: phasor(notches) in stereo
-      function ex1 () {
-        var sp = WX.Sampler({ source:"../data/samples/cleangtr.wav", loop: true, gain: 1.0 });
+      function ex1 () {var sp = WX.Sampler({ source:"../data/samples/cleangtr.wav", loop: true, gain: 1.0 });
         var p = WX.Phasor({ mix:1.0 } );
         var cmp = WX.Comp({ threshold:-24, ratio:8, makeup:4 });
         sp.to(p).to(cmp).to(WX.DAC);
@@ -49,6 +48,7 @@
           cmp
             .makeup(8, WX.now + 5);
         }, 1000);
+        
       }
 
 

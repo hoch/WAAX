@@ -31,24 +31,19 @@
 
 
 /**
- * Boot.js: the last step - initializing, building units...
+ * Boot.js
+ * @file the last step: initializing, routing prototype units to factory.
  */
 (function () {
-  // TODO: does it have to check "document.ready"?
-  // - some GUI stuffs require target DIVs to be present
-
-  // splash message
-  WX._log.post("waax (" + WX.version + ")");
-  WX._log.verbose(true);
 
   // inject units into the namespace
+  WX._log.info("building unit factory...");
   WX._unit.factory([
     // generators
     { name: "Oscil", ref: WX._unit.oscil },
     { name: "Fmop", ref: WX._unit.fmop },
     { name: "Noise", ref: WX._unit.noise },
     { name: "ITrain", ref: WX._unit.itrain },
-    { name: "ITrain2", ref: WX._unit.itrain2 },
     { name: "Sampler", ref: WX._unit.sampler },
     { name: "Step", ref: WX._unit.step },
     // processors
@@ -62,8 +57,12 @@
     { name: "Chorus", ref: WX._unit.chorus },
     { name: "Phasor", ref: WX._unit.phasor },
     { name: "Comp", ref: WX._unit.comp },
-    { name: "Converb", ref: WX._unit.converb }
+    { name: "Converb", ref: WX._unit.converb },
     // analyzers
+    { name: "Waveform", ref: WX._unit.waveform },
+    { name: "Spectrum", ref: WX._unit.spectrum },
+    // midi
+    { name: "Streamer", ref: WX.streamer }
   ]);
 
   // create master fader
@@ -71,4 +70,9 @@
   WX.DAC = WX.Fader();
   WX.DAC.connect(WX.context.destination);
   WX._log.info("master fader created. (WX.DAC)");
+
+  // splash message and shut logging off
+  WX._log.post("waax (" + WX.version + ") is ready.");
+  WX._log.verbose(false);
+
 })();

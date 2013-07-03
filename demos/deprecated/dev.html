@@ -15,7 +15,6 @@
     <script src="../src/generator/Fmop.js"></script>
     <script src="../src/generator/Noise.js"></script>
     <script src="../src/generator/ITrain.js"></script>
-    <script src="../src/generator/ITrain2.js"></script>
     <script src="../src/generator/Sampler.js"></script>
     <script src="../src/generator/Step.js"></script>
     <script src="../src/processor/Fader.js"></script>
@@ -34,37 +33,17 @@
     <script>
 
       /**
-       * ex1: impulse train + pingpong
-       * : to test feedback => merger => merger problem
-       */
-      function ex1() {
-        var i = WX.ITrain({ gain:1.0, freq:5 });
-        var pp = WX.Pingpong({ feedback:0.5, crosstalk:0.2 });
-
-        //i.to(pp).connect(WX.DAC._outputGain);
-        
-        // tryout: merger => merger problem
-        pp.to(WX.DAC); // CRASH!!
-        // pp.connect(WX.DAC._outputGain); // OK
-        //pp.connect(WX.DAC._merger); // CRASH!!
-        // pp._delayL.connect(WX.DAC._merger, 0, 0); // OK
-        // pp._delayR.connect(WX.DAC._merger, 0, 1); // OK
-        // pp._merger.connect(WX.DAC._merger); // CRASH!!!
-      }
-
-      /**
        * ex2: impulse => lprez => pingpong
-       * : just a random ear candy
+       * : beautified impulse 
        */
       function ex2() {
-        var i = WX.ITrain2({ gain:1.0, freq:9 });
+        var i = WX.ITrain({ gain:1.0, freq:9 });
         var f = WX.Filter({ cutoff:2500, Q:12 });
         var v = WX.Converb({ mix: 0.8 });
         var d = WX.Pingpong({ 
           delayTimeLeft: 0.600, delayTimeRight: 0.450, 
           feedbackLeft: 0.3, feedbackRight: 0.5,
           crosstalk: 0.25 });
-        //i.to(f).to(v).to(d).connect(WX.DAC._outputGain);
         i.to(f).to(v).to(d).to(WX.DAC);
 
         function sweep() {
@@ -80,6 +59,7 @@
         sweep();        
       }
 
+
       /**
        * ex3: monophonic ADSR
        */
@@ -92,7 +72,6 @@
         o.to(env).to(c).to(v).to(WX.DAC);
         o2.to(env);
         env.adsr(0.0001, 0.005, 0.8, 0.05);
-        //env.adsr(0.5, 0.5, 0.4, 0.5);
         
         var keymap = [];
 
@@ -145,23 +124,24 @@
        * step function and filter modulation
        */
       function ex5() {
-        var saw = WX.Oscil({ freq:220, type:"saw", gain:0.5 }),
+        var saw = WX.Oscil({ freq:220, type:"saw", gain:0.25 }),
             stp1 = WX.Step({ gain:0 }),
             enva = WX.ADSR();
+        WX.DAC.type("mono");
         saw.to(enva).to(WX.DAC);
         stp1.control(saw.freq_);
-        
+
         enva.adsr(0.01, 0.01, 0.8, 1.0);
 
-        // these two are identical
+        // these two are identical!
         
         // using Step modulation (numbers added target's parameter)
         // target's parameter => offset
         // step's gain => scale
         stp1
-          .gain(220, 1.0)
-          .gain(660, 2.0)
-          .gain(1540, 3.0);
+          .gain(220, WX.now+1.0)
+          .gain(660, WX.now+2.0)
+          .gain(1540, WX.now+3.0);
         
         // using plain AudioParam
         // saw
@@ -170,7 +150,7 @@
         //   .freq(1760, 3.0);
 
         enva
-          .noteOn().noteOff(4.5);
+          .noteOn().noteOff(WX.now+4.5);
       }
 
 
@@ -213,14 +193,15 @@
       // ex7: a-e-i-o-u
       function ex7() {
         
-        var lfo = WX.Oscil({ freq:6, gain:0.7 });
+        var lfo = WX.Oscil({ freq:5, gain:4.0 });
         var s = WX.Oscil({ type:"saw", gain: 0.7 });
         var form = WX.Formant();
+        WX.DAC.type("mono");
         lfo.control(s.freq_);
         s.to(form).to(WX.DAC);
 
         var mel = [36, 38, 40, 41, 43].map(WX.pitch2freq);
-        var tau = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0].map(function(i) { return WX.now + i; });
+        var tau = [0.0, 2.0, 4.0, 6.0, 8.0, 10.0].map(function(i) { return WX.now + i; });
 
         s
           .freq(mel[0], tau[0])
@@ -244,11 +225,12 @@
 
       // ex8: vector controlled formant
       function ex8() {
-        var lfo = WX.Oscil({ freq:8, gain:0.7 });
-        var s = WX.Oscil({ type:"saw", gain: 0.7 });
+        var lfo = WX.Oscil({ freq:4, gain:5.0 });
+        var s = WX.Oscil({ type:"saw", gain: 0.9 });
         var form = WX.FormantV();
+        WX.DAC.type("mono");
         lfo.control(s.freq_);
-        s.to(form).to(WX.DAC);
+        s.to(form).to(WX.DAC);        
 
         var mel = [36, 38, 40, 41, 43, 45, 47, 49].map(WX.pitch2freq);
         var tau = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0].map(function(i) { return WX.now + i; });
@@ -268,15 +250,6 @@
           setTimeout(move, 500);
         }
         move();
-      }
-
-
-      // ex9: wavetable(periodicwave)-based impulse train
-      function ex9() {
-        var it1 = WX.ITrain({ gain: 0.5 });
-        var it2 = WX.ITrain2({ gain: 0.0 });
-        it1.to(WX.DAC);
-        it2.to(WX.DAC);
       }
 
 
@@ -301,7 +274,7 @@
             .gain(0.0, t3, "l");
         }, 1000);
       }
-    
+
       //ex1();
       //ex2();
       //ex3();
@@ -309,8 +282,7 @@
       //ex5();
       //ex6();
       //ex7();
-      ex8();
-      //ex9();
+      //ex8();
       //ex10();
 
     </script>

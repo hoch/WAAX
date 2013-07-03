@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Pink!</h1>
+
+    <canvas id="wf" width="800" height="300"></canvas>
+    <canvas id="sp" width="800" height="300"></canvas>
+    
+    <!-- lib r8 -->   
+    <script src="../src/core/Monkey.js"></script>
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Utils.js"></script>
+    <script src="../src/core/Builtin.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/generator/Oscil.js"></script>
+    <script src="../src/generator/Fmop.js"></script>
+    <script src="../src/generator/Noise.js"></script>
+    <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/Sampler.js"></script>
+    <script src="../src/generator/Step.js"></script>
+    <script src="../src/processor/Fader.js"></script>
+    <script src="../src/processor/Spatter.js"></script>
+    <script src="../src/processor/ADSR.js"></script>
+    <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Formant.js"></script>
+    <script src="../src/processor/FormantV.js"></script>
+    <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Chorus.js"></script>
+    <script src="../src/processor/Phasor.js"></script>
+    <script src="../src/processor/Comp.js"></script>
+    <script src="../src/processor/Converb.js"></script>
+    <script src="../src/analyzer/Waveform.js"></script>
+    <script src="../src/analyzer/Spectrum.js"></script>
+    <script src="../src/core/Boot.js"></script>
+    
+    <!-- test code -->
+    <script>
+      var cvs1 = document.getElementById('wf');
+      var ctx1 = cvs1.getContext('2d');
+      ctx1.lineWidth = 1.0;
+      ctx1.strokeStyle = "#66f";
+
+      var cvs2 = document.getElementById('sp');
+      var ctx2 = cvs2.getContext('2d');
+      ctx2.lineWidth = 1.0;
+      ctx2.strokeStyle = "#66f";
+
+      var n = WX.Noise({ rate:1.0, gain:1.0 }),
+          p = WX.Sampler({ source:"../data/testtones/pink.wav", loop:true }),
+          v1 = WX.Spectrum({ context:ctx1 }),
+          v2 = WX.Spectrum({ context:ctx2 });
+
+      setTimeout(function() {
+        p.start(60);
+      }, 1000);
+
+      var num = 4;
+      s = [];
+      prm = [[60, -6], [125, -9], [250, -12], [500, -15], [1000, -18], [2000, -21]];
+      for (var i = 0; i < num; i++) {
+        s[i] = WX.context.createBiquadFilter();
+        s[i].type = "highshelf";
+        s[i].frequency.value = prm[i][0];
+        s[i].gain.value = prm[i][1];
+      }
+      for (i = 0; i < num - 1; i++) {
+        s[i].connect(s[i+1]);
+      }
+      n.connect(s[0]);
+      s[num-1].connect(WX.DAC._inlet);
+      s[num-1].connect(v1._inlet);
+
+      function bq(bq, f, g) {
+        bq.frequency.value = f;
+        bq.gain.value = g;
+      }
+
+      p.to(v2);
+      p.to(WX.DAC);
+      WX.DAC.db(-12);
+      WX.DAC.type("mono");
+
+      // initiate draw
+      function draw() {
+        requestAnimationFrame(draw);
+        v1.draw();
+        v2.draw();
+      }
+      draw();
+
+    </script>
+
+  </body>
+</html>

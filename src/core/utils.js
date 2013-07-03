@@ -44,7 +44,7 @@ WX._log = (function () {
       _prefix_info = "[wx:info] ",
       _prefix_warn = "[wx:warn] ",
       _prefix_err = "[wx:err] ";
-  var _verbose = false;
+  var _verbose = true;
   function _compose(prefix, msg, ref) {
     var m = prefix + msg;
     if (ref && ref.label) {
@@ -99,7 +99,7 @@ Object.defineProperties(WX, {
   },
 
   /**
-   * epsilon, equivalent to Math.PI * 2
+   * epsilon, equivalent to Number.MIN_VALUE
    * @memberOf WX
    * @type {float}
    */
@@ -176,7 +176,8 @@ Object.defineProperties(WX, {
    */
   freq2pitch: {
     value: function(freq) {
-      return Math.floor(69 + 12 * Math.log(freq / 440.0) / Math.log(2));
+      // Math.log(2) = 0.6931471805599453
+      return Math.floor(69 + 12 * Math.log(freq / 440.0) / 0.6931471805599453);
     }
   },
 
@@ -190,7 +191,8 @@ Object.defineProperties(WX, {
   lin2db: {
     value: function(amp) {
       // if below -100dB, set to -100dB to prevent taking log of zero
-      return 20.0 * (amp > 0.00001 ? (Math.log(amp) / Math.LN10): -5.0);
+      // Math.LN10 = 2.302585092994046
+      return 20.0 * (amp > 0.00001 ? (Math.log(amp) / 2.302585092994046): -5.0);
     }
   },
 

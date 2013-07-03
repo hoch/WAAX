@@ -46,7 +46,7 @@ WX._unit.phasor = function (options) {
   // notches
   var maxNotch = 12;
   var baseFreq = 60;
-  var spacing = 10;
+  var spacing = baseFreq / 4;
   this._notch = [];
   for (var i = 0; i < maxNotch; ++i) {
     this._notch[i] = WX.context.createBiquadFilter();
@@ -70,7 +70,7 @@ WX._unit.phasor = function (options) {
   this._depthR = WX.context.createGain();
   this._lfo.type = "triangle";
   this._lfo.start(0);
-  this._lfo.frequency.value = 2.1;
+  this._lfo.frequency.value = 4.0;
   this._depthL.gain.value = 200.0;
   this._depthR.gain.value = -200.0;
   this._lfo.connect(this._depthL);

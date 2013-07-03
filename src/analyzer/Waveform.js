@@ -31,75 +31,77 @@
 
 
 /**
- * WX.oscil : WX.Oscil
- * @file abstraction on native multi-waveform oscillator node
- * @param {float} freq frequency
- * @param {float} detune detune
- * @param {string} type waveform type: "sine/sin", "sawtooth/saw", 
- *                      "square/sqr", "triangle/tri"
+ * WX.waveform : WX.Waveform
+ * @file waveform drawer
  */
-WX._unit.oscil = function (options) {
-  // initiate generator wrapper : pre-build
-  WX._unit.generator.call(this);
+WX._unit.waveform = function (options) {
+  // initiate analyzer wrapper : pre-build
+  WX._unit.analyzer.call(this);
   // build unit
-  this._osc = WX.context.createOscillator();
-  this._osc.connect(this._outputGain);
-  this._osc.start(0);
-  WX._unit.bindAudioParam.call(this, "freq", this._osc.frequency);
-  WX._unit.bindAudioParam.call(this, "detune", this._osc.detune);
+  this._context2D = null;
+  this._buffer = new Uint8Array(this._analyzer.frequencyBinCount);
+  this._pause = false;
+  this._autoclear = true;
   // handling initial parameter : post-build
   this._initializeParams(options, this._default);
 };
 
-WX._unit.oscil.prototype = {
-  label: "oscil",
+WX._unit.waveform.prototype = {
+  label: "waveform",
   _default: {
-    type: "sine",
-    freq: 440,
-    gain: 1.0,
-    detune: 0.0
   },
-  type: function (waveform) {
-    var t;
-    switch (waveform) {
-      case "sine":
-      case "sin":
-      case 0:
-        t = 0;
-        break;
-      case "square":
-      case "sqr":
-      case 1:
-        t = 1;
-        break;
-      case "sawtooth":
-      case "saw":
-      case 2:
-        t = 2;
-        break;
-      case "triangle":
-      case "tri":
-      case 3:
-        t = 3;
-        break;
-      case undefined:
-        t = -1;
-        break;
-    }
-    if (t == -1) {
-      return this._osc.type;
+
+  _updateSize: function() {
+    this._unitX = this._context2D.canvas.width / this._buffer.length;
+    this._scaleY = this._context2D.canvas.height;
+  },
+
+  context: function(ctx) {
+    if (ctx === undefined) {
+      return this._context2D;
     } else {
-      this._osc.type = t;
+      if (ctx.constructor.name !== "CanvasRenderingContext2D") {
+        WX.error(this, "invalid drawing context.");
+      } else {
+        this._context2D = ctx;
+        this._updateSize();
+      }
     }
   },
 
-  /**
-   * stops generation.
-   * @param  {float} moment when to stop (in second)
-   */
-  stop: function(moment) {
-    this._osc.stop(moment);
+  pause: function(bool) {
+    if (typeof bool === 'undefined') {
+      return this._pause;
+    } else {
+      this._pause = bool;
+    }
+  },
+
+  autoClear: function(bool) {
+    if (typeof bool === 'undefined') {
+      return this._autoclear;
+    } else {
+      this._autoclear = bool;
+    }
+  },
+
+  draw: function() {
+    if (this._pause) {
+      return;
+    } else {
+      this._analyzer.getByteTimeDomainData(this._buffer);
+      var c = this._context2D;
+      if (this._autoclear) {
+        c.clearRect(0, 0, c.canvas.width, c.canvas.height);
+      }
+      c.beginPath();
+      c.moveTo(0, (1.0 - this._buffer[0]/255) * this._scaleY);
+      for(var i = 1, b = this._buffer.length; i < b; ++i) {
+        c.lineTo(i * this._unitX, (1.0 - this._buffer[i]/255) * this._scaleY);
+      }
+      c.stroke();
+    }
   }
 };
 
-WX._unit.extend(WX._unit.oscil.prototype, WX._unit.generator.prototype);
+WX._unit.extend(WX._unit.waveform.prototype, WX._unit.generator.prototype);

@@ -23,6 +23,7 @@
       //r = WX.Fader();
       o.to(l).to(WX.DAC);
       p.to(r).to(WX.DAC);
+      WX.DAC.type("mono");
 
       l.panner(0.0);
       r.panner(1.0);

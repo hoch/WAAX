@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>FM e-piano</h1>
+    <script src="../build/waax.min.js"></script>
+    <script>
+      // master verb and a bit of panning
+      var cho = WX.Chorus();
+      var vrb = WX.Converb({ mix:0.3 });
+      cho.to(vrb).to(WX.DAC);
+      WX.DAC.panner(0.25);
+
+      function onset(fund) {
+        // dynamic node creation
+        var fm1 = WX.Fmop({ freq:fund, gain:0.2, modIndex:0.1 });
+            fm2 = WX.Fmop({ freq:fund*2, gain:0.1, modIndex:0.5 });
+            env = WX.ADSR();
+        env.adsr(0.001, 0.07, 0.4, 1.0);
+
+        // connection
+        fm1.to(env).to(cho);
+        fm2.to(env);
+
+        // trigger note with parameter enveloping
+        fm1
+          .harmRatio(2)
+          .modIndex(4).modIndex(0.1, WX.now+1.5, "x")
+          .stop(WX.now+2.0);
+        fm2
+          .harmRatio(2)
+          .modIndex(8).modIndex(0.5, WX.now+1.5, "x")
+          .stop(WX.now+2.0);
+        env
+          .noteOn().noteOff(WX.now+1.0);
+      };
+        
+      // key input handler
+      window.addEventListener("keydown", function(e) {
+        var kc = e.keyCode;
+        if (kc < 48 || kc > 57) {
+          return;
+        }
+        onset(WX.pitch2freq(kc - 1));
+      });
+    </script>
+  </body>
+</html>

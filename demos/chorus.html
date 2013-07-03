@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Chorus</h1>
+    <script src="../build/waax.min.js"></script>
+    <script>
+      // units
+      var gtr = WX.Sampler({ source:"../data/samples/cleangtr.wav", loop: true, gain: 1.8 }),
+          cho = WX.Chorus(),
+          vrb = WX.Converb({ mix: 0.25 });
+
+      // connection
+      gtr.to(cho).to(vrb).to(WX.DAC);
+
+      // wait for sample loading
+      setTimeout(function() {
+        // set timeline
+        var d = gtr.duration(),
+            t1 = d + WX.now,
+            t2 = d * 2 + WX.now,
+            t3 = d * 3 + WX.now;
+        // start
+        gtr.start(60, 0);
+        // 0s: no effect, 1s: standard chorus, 2s: hard(white) chorus
+        cho
+          .mix(0.0)
+          .mix(1.0, t1)
+          .blend(0.7071, t2).feedforward(1.0, t2).feedback(0.7071, t2);
+        vrb
+          .gain(1.0, t3 - 1.0)
+          .gain(0.0, t3, "l");
+      }, 1000);
+    </script>
+  </body>
+</html>

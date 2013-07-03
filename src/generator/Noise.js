@@ -31,7 +31,10 @@
 
 
 /**
- * WX.noise
+ * WX.noise : WX.Noise
+ * @file buffer-source based white noise generator. for other types of 
+ *       noise, use this with WX.Shelves unit.
+ * @param {float} rate playback speed of noise buffer.
  */
 WX._unit.noise = function (options) {
   // initiate generator wrapper : pre-build
@@ -39,10 +42,11 @@ WX._unit.noise = function (options) {
   // build unit
   this._noise = WX.context.createBufferSource();
   this._noise.connect(this._outputGain);
-  this._noise.buffer = WX._builtin.whitenoise;
+  this._noise.buffer = WX._builtin.whiteNoise;
   this._noise.loop = 1;
   this._noise.loopStart = Math.random() * this._noise.buffer.duration;
   this._noise.start(0);
+  // binding parameter
   WX._unit.bindAudioParam.call(this, "rate", this._noise.playbackRate);
   // handling initial parameter : post-build
   this._initializeParams(options, this._default);
@@ -54,11 +58,14 @@ WX._unit.noise.prototype = {
     type: "white",
     gain: 1.0
   },
-  type: function (noisetype) {
-    // TODO: pink/brown noise
-  },
+
+  /**
+   * stops generation. (returns nothing and the unit becomes unusable.)
+   * @param  {float} moment when to stop.
+   */
   stop: function (moment) {
     this._noise.stop(moment);
   }
 };
+
 WX._unit.extend(WX._unit.noise.prototype, WX._unit.generator.prototype);

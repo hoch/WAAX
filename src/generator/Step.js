@@ -31,19 +31,21 @@
 
 
 /**
- * WX.Step
- * note: it is using buffersouce, but it can be replaced with the new wavetable node
+ * WX.step : WX.Step
+ * @file generates DC offset from pre-built buffer source
+ * @see Builtin.js
  */
 WX._unit.step = function (options) {
   // pre-building: initiate generator wrapper
   WX._unit.generator.call(this);
-  // building: phase
+  // building
   this._step = WX.context.createBufferSource();
-  this._step.buffer = WX._builtin.step;
-  this._step.loop = 1;
-  this._step.loopEnd = 1.0;
+  this._step.buffer = WX._builtin.dcOffset;
   this._step.connect(this._outputGain);
   this._step.start(0);
+  // internal initialization
+  this._step.loop = 1;
+  this._step.loopEnd = 1.0;
   // post-building: handling initial parameter
   this._initializeParams(options, this._default);
 };
@@ -53,6 +55,11 @@ WX._unit.step.prototype = {
   _default: {
     gain: 1.0
   },
+
+  /**
+   * stops generation. (returns nothing.)
+   * @param  {float} moment stop time in second. stops immediately when the time is undefined.
+   */
   stop: function (moment) {
     this._step.stop(moment || WX.now);
   }

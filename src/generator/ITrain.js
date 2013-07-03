@@ -31,38 +31,42 @@
 
 
 /**
- * WX.itrain
- * note: it is using buffersouce, but it can be replaced with the new wavetable node
+ * WX.itrain : WX.ITrain
+ * @file impulse train generator
+ * @param {float} freq frequency of impulse train
+ * @param {float} detune frequency detune of impulse train
  */
 WX._unit.itrain = function (options) {
-  // pre-building: initiate generator wrapper
+  // pre-building: mixin prototype
   WX._unit.generator.call(this);
-  // building: phase
-  this._impulse = WX.context.createBufferSource();
+  // building
+  this._impulse = WX.context.createOscillator();
   this._impulse.connect(this._outputGain);
-  this._impulse.buffer = WX._builtin.impulse;
-  this._impulse.loop = 1;
-  this._impulse.loopEnd = 1.0;
-  this._frequency = 1; // 1Hz
+  // TODO: will be replaced with PeriodicWave
+  if (typeof this._impulse.setWaveTable === 'undefined') {
+    this._impulse.setPeriodicWave(WX._builtin.impulse);
+  } else {
+    this._impulse.setWaveTable(WX._builtin.impulse);
+  }
   this._impulse.start(0);
-  // post-building: handling initial parameter
+  // audio param binding
+  WX._unit.bindAudioParam.call(this, "freq", this._impulse.frequency);
+  WX._unit.bindAudioParam.call(this, "detune", this._impulse.detune);
+  // post-building: initialize parameter
   this._initializeParams(options, this._default);
 };
 
 WX._unit.itrain.prototype = {
   label: "itrain",
   _default: {
+    freq: 1,
     gain: 1.0
   },
-  freq: function (frequency) {
-    if (frequency) {
-      this._frequency = (frequency < 0.1) ? 0.1 : frequency;
-      this._impulse.loopEnd = 1.0 / this._frequency;
-      return this;
-    } else {
-      return this._frequency;
-    }
-  },
+
+  /**
+   * stops generation. (and returns nothing.)
+   * @param  {float} moment stop time in second. stops immediately when the time is undefined.
+   */
   stop: function (moment) {
     this._impulse.stop(moment || WX.now);
   }

@@ -43,6 +43,7 @@ WX._unit = (function () {
     // TODO: add support for multiple sources
     extend: function (target, source) {
       for (var m in source) {
+        // append label to target with "."
         if (m === "label") {
           target[m] = source[m] + "." + target[m];
         } else {
@@ -50,19 +51,44 @@ WX._unit = (function () {
         }
       }
     },
-    // bind audio param for unified control
+
+    /**
+     * bindAudioParam
+     * @desc unified parameter control method, the core of r8
+     *
+     * @usage
+     * WX._unit.bindAudioParam("name", target_audio_param)
+     *
+     * @example
+     * freq_                returns target AudioParam object for custom control.
+     * freq()               returns current freq parameter value.
+     * freq(60)             set freq parameter value to 60 immediately (at WX.now)
+     * freq(60, 1.0)        set freq parameter value to 60 at 1.0 Audio Context time.
+     * freq(60, 1.0, "l")   runs linear ramp to 60 at 1.0 Audio Context time.
+     * freq(60, 1.0, "x")   runs exponential ramp to 60 at 1.0 Audio Context time.
+     *
+     * @note
+     * Currently this method is being added on runtime to the instance itself,
+     * not the prototype. This should be added into its prototype for the optimum
+     * performance.
+     */
     bindAudioParam: function (name, targetParam) {
       var t = this[name + "_"] = targetParam;
-      // add parameter (but actualy method) to the object
+      // add parameter (but actually method) to the object
       this[name] = function (val, moment, type) {
         // when undefined
-        if (val === undefined) {
+        if (typeof val === 'undefined') {
           return t.value;
         }
-        // check moment
+        // check moment: time context feature should be implemented here.
         var m = (moment || WX.now);
-        // var endTime = startTime + (moment || 0);
-        // branching upon args
+        // check type: set param immediately when type is undefined.
+        if (typeof type === 'undefined') {
+          t.cancelScheduledValues(m);
+          t.setValueAtTime(val, m);
+          return this;
+        }
+        // otherwise, branch upon types
         switch (type) {
           case "line":
           case "l":
@@ -71,9 +97,10 @@ WX._unit = (function () {
           case "expo":
           case "x":
             // to avoid exception due to zero
-            var v = (val === 0.0) ? 0.0001 : val;
+            val = (val === 0.0) ? 0.0001 : val;
             t.exponentialRampToValueAtTime(v, m);
             break;
+          /*
           case "target":
           case "t":
             if (m.length == 2 && (m[1] - m[0]) > 0.0) {
@@ -84,18 +111,21 @@ WX._unit = (function () {
               WX._log.warn("invalid timespan for target mode.", this);
             }
             break;
+          */
           default:
-          case undefined:
-            t.cancelScheduledValues(m);
-            t.setValueAtTime(val, m);
+            WX._log.warn("invalid transition type. (use 'l' or 'x')", this);
             break;
         }
         return this;
       };
     },
+
     // bind normal param for unified control
+    /*
     bindParam: function(name, moment) {
     },
+    */
+
     // factory: register unit name into wx namespace
     factory: function(args) {
       args.map(function(n) {
@@ -151,13 +181,25 @@ WX._unit.abstract = {
     }
   },
   to: function (unit) {
+    if (unit.label.substr(0, 2) !== "u.") {
+      WX._log.error("invalid argument. (must be WAAX Unit)", this);
+      return;
+    }
     this._outlet.connect(unit._inlet);
     return unit;
   },
   connect: function (node) {
+    if (node.constructor.name.substr(-4) !== "Node") {
+      WX._log.error("invalid argument. (must be Node)", this);
+      return;
+    }
     this._outlet.connect(node);
   },
   control: function (audioparam) {
+    if (audioparam.constructor.name !== "AudioParam") {
+      WX._log.error("invalid argument. (must be AudioParam)", this);
+      return;
+    }
     this._outlet.connect(audioparam);
   },
   cut: function () {
@@ -175,17 +217,27 @@ WX._unit.generator = function () {
   this._outputGain.connect(this._outlet);
   WX._unit.bindAudioParam.call(this, "gain", this._outputGain.gain);
 };
+
 WX._unit.generator.prototype = {
   label: "u.gen",
+
+  /**
+   * activate unit. (unit-generator-specific)
+   */
   on: function () {
     this._status = true;
     this._outputGain.connect(this._outlet);
   },
+
+  /**
+   * deactivate unit. (take out of audio graph)
+   */
   off: function () {
     this._status = false;
     this._outputGain.disconnect();
   }
 };
+
 WX._unit.extend(WX._unit.generator.prototype, WX._unit.abstract);
 
 
@@ -202,8 +254,14 @@ WX._unit.processor = function () {
   this._outputGain.connect(this._outlet);
   WX._unit.bindAudioParam.call(this, "gain", this._outputGain.gain);
 };
+
 WX._unit.processor.prototype = {
   label: "u.pro",
+
+  /**
+   * bypass core audio graph (unit-processor-specific)
+   * @param  {boolean} bool bypass processing when true.
+   */
   bypass: function (bool) {
     if (typeof bool !== "boolean") {
       return;
@@ -220,6 +278,7 @@ WX._unit.processor.prototype = {
     }
   }
 };
+
 WX._unit.extend(WX._unit.processor.prototype, WX._unit.abstract);
 
 
@@ -230,19 +289,44 @@ WX._unit.analyzer = function () {
   this._active = true;
   this._inlet = WX.context.createGain();
   this._inputGain = WX.context.createGain();
-  this._analyzer = WX.context.createAnalyzer();
+  this._analyzer = WX.context.createAnalyser();
   this._inlet.connect(this._inputGain);
   this._inputGain.connect(this._analyzer);
   WX._unit.bindAudioParam.call(this, "inputGain", this._inputGain.gain);
 };
+
 WX._unit.analyzer.prototype = {
   label: "u.ana",
+
+  // merging parameters with default params
+  _initializeParams: function (opt, def) {
+    var s = {};
+    // copy props from defaults
+    for (var d in def) {
+      s[d] = def[d];
+    }
+    // overwrite value from options
+    for (var o in opt) {
+      s[o] = opt[o];
+    }
+    this.params(s);
+  },
+
+  /**
+   * activate unit. (unit-generator-specific)
+   */
   on: function () {
     this._status = true;
     this._inlet.connect(this._inputGain);
   },
+
+  /**
+   * deactivate unit. (take out of audio graph)
+   */
   off: function () {
     this._status = false;
     this._inlet.disconnect();
   }
 };
+
+// WX._unit.extend(WX._unit.analyzer.prototype, WX._unit.abstract);

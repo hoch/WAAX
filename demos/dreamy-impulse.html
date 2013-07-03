@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Dreamy Impulse</h1>
+    <script src="../build/waax.min.js"></script>
+    <script>
+      // units
+      var i = WX.ITrain({ gain:1.0, freq:9 }),
+          f = WX.Filter({ cutoff:2500, Q:12 }),
+          v = WX.Converb({ mix: 0.8 }),
+          d = WX.Pingpong({ 
+            delayTimeLeft: 0.600, delayTimeRight: 0.450, 
+            feedbackLeft: 0.3, feedbackRight: 0.5,
+            crosstalk: 0.25 
+          });
+
+      // connection
+      i.to(f).to(v).to(d).to(WX.DAC);
+
+      // dream on
+      function dream() {
+        var t1 = WX.now + 4, 
+            t2 = WX.now + 8;
+        f
+          .cutoff(125).Q(12)
+          .cutoff(2500 + Math.random() * 4000, t1, "x").Q(36, t1, "l")
+          .cutoff(125, t2, "x").Q(12, t2, "l");
+        setTimeout(dream, 8000);
+      }
+      dream();
+    </script>
+  </body>
+</html>

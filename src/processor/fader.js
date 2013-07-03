@@ -31,22 +31,27 @@
 
 
 /**
- * WX.Fader
+ * WX.fader : WX.Fader
+ * @file fader abstraction. supports mono and stereo (default) channel. 
+ * @param {string} type "stereo (default)" or "mono" according to the incoming source.
+ * @param {float} panner stereo panner. 0.0 (hard left) ~ 1.0 (hard right)
+ * @param {float} gain fader gain in linear amplitude
+ * @param {float} db fader gain in decibels
+ * @param {boolean} mute mutes fader when true
+ * @param {boolean} invert inverts signal when true
  */
 WX._unit.fader = function (options) {
   // pre-building
   WX._unit.processor.call(this);
   // building
   this._inverter = WX.context.createGain();
-  var splitter = WX.context.createChannelSplitter();
-  var merger = WX.context.createChannelMerger();
+  this._splitter = WX.context.createChannelSplitter(2);
   this._left = WX.context.createGain();
   this._right = WX.context.createGain();
+  var merger = WX.context.createChannelMerger(2);
   // connection
   this._inputGain.connect(this._inverter);
-  this._inverter.connect(splitter);
-  splitter.connect(this._left, 0, 0);
-  splitter.connect(this._right, 1, 0);
+  this._inverter.connect(this._splitter);
   this._left.connect(merger, 0, 0);
   this._right.connect(merger, 0, 1);
   merger.connect(this._outputGain);
@@ -60,12 +65,21 @@ WX._unit.fader = function (options) {
 };
 
 WX._unit.fader.prototype = {
+
   label: "fader",
   _default: {
+    type: "stereo",
     panner: 0.5,
     gain: 1.0
   },
-  // method definition
+
+  /**
+   * set/get signal volume in decibels
+   * @param  {float} decibel signal volume in decibels
+   * @param  {float} moment target time
+   * @param  {string} type transition type ("step", "linear", "exponential")
+   * @return {float} signal volume in decibels (with no arguments)
+   */
   db: function (decibel, moment, type) {
     if (decibel !== undefined) {
       return this.gain(WX.db2lin(decibel), moment, type);
@@ -73,21 +87,14 @@ WX._unit.fader.prototype = {
       return WX.lin2db(this.gain());
     }
   },
+
+
   mute: function (bool, moment) {
     if (typeof bool === "boolean") {
       var amp = (bool) ? 0.0 : 1.0;
       return this.inputGain(amp, moment);
     } else {
       return (this.inputGain() === 0.0) ? true : false;
-    }
-  },
-  invert: function(bool, moment) {
-    if (typeof bool === "boolean") {
-      var phi = (bool) ? -1.0 : 1.0;
-      this._inverter.gain.setValueAtTime(phi, (moment || WX.now));
-      return this;
-    } else {
-      return (this._inverter.gain.value == -1.0) ? true : false;
     }
   },
   panner: function(pos, moment, type) {
@@ -100,6 +107,27 @@ WX._unit.fader.prototype = {
       return this;
     } else {
       return this._position;
+    }
+  },
+  invert: function(bool, moment) {
+    if (typeof bool === "boolean") {
+      var phi = (bool) ? -1.0 : 1.0;
+      this._inverter.gain.setValueAtTime(phi, (moment || WX.now));
+      return this;
+    } else {
+      return (this._inverter.gain.value == -1.0) ? true : false;
+    }
+  },
+  type: function(type) {
+    // reset connection
+    this._splitter.disconnect();
+    // create connections
+    if (type === "stereo") {
+      this._splitter.connect(this._left, 0, 0);
+      this._splitter.connect(this._right, 1, 0);
+    } else {
+      this._splitter.connect(this._left, 0, 0);
+      this._splitter.connect(this._right, 0, 0);
     }
   }
 };

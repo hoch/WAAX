@@ -32,7 +32,7 @@
 
 /**
  * WAAX.js
- * @file WAAX library primer, the name space
+ * @file WAAX library primer, the namespace
  * @author hoch (Hongchan Choi)
  * @version R8
  */

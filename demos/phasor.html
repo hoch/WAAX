@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Phasor</h1>
+    <script src="../build/waax.min.js"></script>
+    <script>
+      // units
+      var gtr = WX.Sampler({ source:"../data/samples/cleangtr.wav", loop: true, gain: 1.0 }),
+          pha = WX.Phasor(),
+          cmp = WX.Comp({ threshold:-12, ratio:8, makeup:4 });
+
+      // connection
+      gtr.to(pha).to(cmp).to(WX.DAC);
+
+      // wait for sample loading
+      setTimeout(function() {
+        // set timeline
+        var d = gtr.duration(),
+            t1 = d + WX.now;
+
+        // start
+        gtr.start(60, 0);
+        // 0s: no effect, 1s: standard phasing
+        pha
+          .mix(0.0)
+          .mix(0.8, t1);
+        cmp
+          .makeup(8, t1)
+          .gain(0.0, t2);
+      }, 1000);
+    </script>
+  </body>
+</html>

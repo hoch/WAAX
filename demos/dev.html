@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Dev Mode r8</h1>    
+    <!-- lib r8 -->   
+    <script src="../src/core/Monkey.js"></script>
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Utils.js"></script>
+    <script src="../src/core/Builtin.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/generator/Oscil.js"></script>
+    <script src="../src/generator/Fmop.js"></script>
+    <script src="../src/generator/Noise.js"></script>
+    <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/Sampler.js"></script>
+    <script src="../src/generator/Step.js"></script>
+    <script src="../src/processor/Fader.js"></script>
+    <script src="../src/processor/Spatter.js"></script>
+    <script src="../src/processor/ADSR.js"></script>
+    <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Formant.js"></script>
+    <script src="../src/processor/FormantV.js"></script>
+    <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Chorus.js"></script>
+    <script src="../src/processor/Phasor.js"></script>
+    <script src="../src/processor/Comp.js"></script>
+    <script src="../src/processor/Converb.js"></script>
+    <script src="../src/analyzer/Waveform.js"></script>
+    <script src="../src/analyzer/Spectrum.js"></script>
+    <script src="../src/midi/Streamer.js"></script>
+    <script src="../src/core/Boot.js"></script>
+    
+    <!-- test code -->
+    <script>
+      // some synth
+      var s1 = WX.Oscil({ type: "saw", detune:-5 }),
+          s2 = WX.Oscil({ type: "saw", detune:3 }),
+          env = WX.ADSR(),
+          cmp = WX.Comp({ threshold:-20, ratio:8, makeup:6 }),
+          vrb = WX.Converb({ source:"../data/ir/small.wav", mix:0.5 });
+
+      // connection
+      s1.to(env).to(cmp).to(vrb).to(WX.DAC);
+      s2.to(env);
+      env.adsr(0.0001, 0.005, 0.8, 0.05);
+
+      // creating streamer
+      var stream1 = WX.Streamer(1);
+      var stream2 = WX.Streamer(3);
+
+      // stream 1: drumpad
+      stream1.onNoteOn = function (pitch, velocity) {
+        console.log("1 ON", pitch, velocity);
+      }
+      stream1.onNoteOff = function (pitch, velocity) {
+        console.log("1 OFF", pitch, velocity);
+      }
+      stream1.onControlChange = function (ctrlno, value) {
+        console.log("1 CTRL", ctrlno, value);
+      }
+      stream1.onAfterTouch = function (value) {
+        console.log("1 AFTC", value);
+      }
+      stream1.onPitchWheel = function (wheel) {
+        console.log("1 PTWL", wheel);
+      }
+
+      // stream 2: nocturn keyboard
+      stream2.onNoteOn = function (pitch, velocity) {
+        // console.log("2 ON", pitch, velocity);
+        var fund = WX.pitch2freq(pitch);
+        var peak = velocity / 127;
+        s1.freq(fund * 2);
+        s2.freq(fund);
+        env.gain(peak);
+        env.noteOn();
+      }
+      stream2.onNoteOff = function (pitch, velocity) {
+        // console.log("2 OFF", pitch, velocity);
+        env.noteOff();
+      }
+      stream2.onControlChange = function (ctrlno, value) {
+        console.log("2 CTRL", ctrlno, value);
+        // 73, 72, 91, 92
+        // 71 : verb
+        // 74 : comp (0~1 => -4 ~ -36)
+        switch (ctrlno) {
+          case 73:
+            env.attack((value/127)*0.5 + 0.0001);
+            break;
+          case 72:
+            env.decay((value/127)*0.5 + 0.0001);
+            break;
+          case 91:
+            env.sustain((value/127) * 0.009 + 0.001);
+            break;
+          case 92:
+            env.release((value/127)*3.0 + 0.05);
+            break;
+          case 74:
+            cmp
+              .threshold((value/127)*(-48), WX.now+0.05, "l")
+              .makeup((value/127)*24, WX.now+0.05, "l");
+            break;
+          case 71:
+            vrb.mix(value/127, WX.now+0.05, "l");
+            break;
+        };
+      }
+      stream2.onAfterTouch = function (value) {
+        console.log("2 AFTC", value);
+      }
+      stream2.onPitchWheel = function (wheel) {
+        console.log("2 PTWL", wheel);
+      }
+    </script>
+  </body>
+</html>

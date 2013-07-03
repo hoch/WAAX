@@ -3,7 +3,7 @@
   <head>
   </head>
   <body>
-    <h1>3 Saws</h1>
+    <h1>Wide Saws</h1>
     <script src="../build/waax.min.js"></script>
     <script>
       // 3 saws
@@ -15,6 +15,7 @@
           f3 = WX.Fader({ panner: 0.5 }),
           v = WX.Converb({ mix: 0.7 });
 
+      WX.DAC.type("mono");
       o.to(f1).to(v);
       p.to(f2).to(v);
       q.to(f3).to(v);
@@ -46,6 +47,7 @@
       WX.DAC
         .gain(0.0)
         .gain(1.0, 0.8);
+
     </script>
   </body>
 </html>

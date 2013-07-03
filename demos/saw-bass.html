@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Saw Bass</h1>
+    <p>Use 1 ~ 0 to play.</p>
+    <script src="../build/waax.min.js"></script>
+    <script>
+      // unit
+      var s1 = WX.Oscil({ type: "saw", detune:-5 }),
+          s2 = WX.Oscil({ type: "saw", detune:3 }),
+          env = WX.ADSR(),
+          cmp = WX.Comp({ threshold:-20, ratio:8, makeup:6 }),
+          vrb = WX.Converb({ source:"../data/ir/small.wav", mix:0.5 });
+
+      // connection
+      s1.to(env).to(cmp).to(vrb).to(WX.DAC);
+      s2.to(env);
+      env.adsr(0.0001, 0.005, 0.8, 0.05);
+
+      // key input handling
+      var keymap = [];
+      window.addEventListener("keydown", function(e) {
+        var kc = e.which;
+        if (kc < 48 || kc > 57) {
+          return;
+        }
+        if (keymap[kc]) {
+          return;
+        } else {
+          keymap[kc] = true;  
+        }
+        var fund = WX.pitch2freq(kc - 23); 
+        s1.freq(fund * 2);
+        s2.freq(fund);
+        env.gain((kc - 47) / 10);
+        env.noteOn();
+      });
+      window.addEventListener("keyup", function(e) {
+        var kc = e.which;
+        if (kc < 48 || kc > 57) {
+          return;
+        }
+        keymap[kc] = false;
+        env.noteOff();
+      });
+    </script>
+  </body>
+</html>

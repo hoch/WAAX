@@ -31,9 +31,9 @@
 
 
 /**
- * WX.Sampler
+ * WX.sampler : WX.Sampler
+ * @file a buffer source abstraction, dynamic buffer source player
  */
-
 WX._unit.sampler = function (options) {
   // initiate generator wrapper : pre-build
   WX._unit.generator.call(this);
@@ -44,7 +44,7 @@ WX._unit.sampler = function (options) {
   this._ready = false;
   this._url = null;
   this._loop = false;
-  // callback in constructor
+  // oncomplete callback for XHR file loader
   var me = this;
   this._oncomplete = function(obj) {
     me._url = obj.url;
@@ -77,6 +77,9 @@ WX._unit.sampler.prototype = {
       return this._basePitch;
     }
   },
+  duration: function() {
+    return this._buffer.duration;
+  },
   loop: function(bool) {
     this._loop = bool;
   },
@@ -94,6 +97,7 @@ WX._unit.sampler.prototype = {
       var rate = Math.pow(2, (pitch - this._basePitch) / 12);
       this._player.playbackRate.setValueAtTime(rate, (moment || WX.now));
     }
+    // TODO: take care of (undefined, undefined)
     this._player.start(moment || WX.now);
     return this;
   },

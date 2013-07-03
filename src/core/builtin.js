@@ -31,46 +31,51 @@
 
 
 /**
- * builtin.js: pre-build noise, impulse train, step func
+ * Builtin.js: pre-build noise, impulse train, step func
+ * @file pre-build necessary assets; white noise, impulse, step(DC offset) and more
  */
 (function() {
-  // builtin namespace
+
+  WX._log.info("building assets...");
+
+  // namespace: builtin 
   WX._builtin = {};
-  var sr = WX.context.sampleRate,
-      l = sr * 10;
 
-  // creating white noise buffer source
-  var wn = new Float32Array(l);
-  WX._builtin.whitenoise = WX.context.createBuffer(1, l, sr);
-  for(var i = 0; i < l; ++i) {
-    wn[i] = Math.random() * 2.0 - 1;
+  // creating white noise buffer (10s) : Noise.js
+  var bufferLength = WX.context.sampleRate * 10;
+  var whiteNoise = new Float32Array(bufferLength);
+  WX._builtin.whiteNoise = WX.context.createBuffer(1, bufferLength, WX.context.sampleRate);
+  for(var i = 0; i < bufferLength; ++i) {
+    // gaussian white noise
+    // http://www.musicdsp.org/showone.php?id=113
+    var r1 = Math.random(), r2 = Math.random();
+    if (r1 === 0.0) {
+      r1 = WX.EPS;
+    }
+    whiteNoise[i] = Math.sqrt(-2.0 * Math.log(r1)) * Math.cos(2.0 * Math.PI * r2);
   }
-  WX._builtin.whitenoise.getChannelData(0).set(wn, 0);
+  WX._builtin.whiteNoise.getChannelData(0).set(whiteNoise, 0);
 
-  // creating impulse
-  var it = new Float32Array(l);
-  WX._builtin.impulse = WX.context.createBuffer(1, l, sr);
-  it[0] = 1.0;
-  for(var j = 1; j < l; ++j) {
-    it[j] = 0;
+  // DC offset of 1 second for step function: Step.js
+  var dcOffset = new Float32Array(WX.context.sampleRate);
+  WX._builtin.dcOffset = WX.context.createBuffer(1, WX.context.sampleRate, WX.context.sampleRate);
+  for(i = 0; i < WX.context.sampleRate; ++i) {
+    dcOffset[i] = 1.0;
   }
-  WX._builtin.impulse.getChannelData(0).set(it, 0);
+  WX._builtin.dcOffset.getChannelData(0).set(dcOffset, 0);
 
-  // impulse wavetable (for wavetable or PeriodicWave)
-  var it2 = new Float32Array(4096);
-  var it3 = new Float32Array(4096);
-  for (var a = 0; a < 4096; ++a) {
-    it2[a] = 1.0;
-    it3[a] = 0.0;
+  // impulse periodic wave : ITrain.js
+  var binSize = 4096;
+  var mag = new Float32Array(binSize);
+  var phase = new Float32Array(binSize);
+  for (i = 0; i < binSize; ++i) {
+    mag[i] = 1.0;
+    phase[i] = 0.0;
   }
   // TODO: it'll be replace with PeriodicWave
-  WX._builtin.impulseWavelet = WX.context.createWaveTable(it2, it3);
-
-  // step function (sr samples of 1.0)
-  var st = new Float32Array(sr);
-  WX._builtin.step = WX.context.createBuffer(1, sr, sr);
-  for(var k = 0; k < sr; ++k) {
-    st[k] = 1.0;
+  if (typeof WX.context.createWaveTable === 'undefined') {
+    WX._builtin.impulse = WX.context.createPeriodicWave(mag, phase);
+  } else {
+    WX._builtin.impulse = WX.context.createWaveTable(mag, phase);
   }
-  WX._builtin.step.getChannelData(0).set(st, 0);
 })();

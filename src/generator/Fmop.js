@@ -31,7 +31,8 @@
 
 
 /**
- * WX.Fmop: FM Operator unit (oscil=>oscil)
+ * WX.fmop: WX.Fmop
+ * @file single FM Operator (2 oscillators)
  */
 WX._unit.fmop = function (options) {
   // initiate generator wrapper : pre-build

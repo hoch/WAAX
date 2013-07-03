@@ -17,10 +17,10 @@ java -jar compiler.jar --language_in ECMASCRIPT5 \
 --js=src/generator/Fmop.js \
 --js=src/generator/Noise.js \
 --js=src/generator/ITrain.js \
---js=src/generator/ITrain2.js \
 --js=src/generator/Sampler.js \
 --js=src/generator/Step.js \
 --js=src/processor/Fader.js \
+--js=src/processor/Spatter.js \
 --js=src/processor/ADSR.js \
 --js=src/processor/Filter.js \
 --js=src/processor/Formant.js \
@@ -30,6 +30,9 @@ java -jar compiler.jar --language_in ECMASCRIPT5 \
 --js=src/processor/Comp.js \
 --js=src/processor/Pingpong.js \
 --js=src/processor/Converb.js \
+--js=src/analyzer/Waveform.js \
+--js=src/analyzer/Spectrum.js \
+--js=src/midi/Streamer.js \
 --js=src/core/Boot.js \
 --js_output_file=build/waax.min.js
 
