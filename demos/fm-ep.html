@@ -4,20 +4,59 @@
   </head>
   <body>
     <h1>FM e-piano</h1>
-    <script src="../build/waax.min.js"></script>
+    <!-- lib r8 -->   
+    <script src="../src/core/Monkey.js"></script>
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Utils.js"></script>
+    <script src="../src/core/Builtin.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/generator/Oscil.js"></script>
+    <script src="../src/generator/Fmop.js"></script>
+    <script src="../src/generator/Noise.js"></script>
+    <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/Sampler.js"></script>
+    <script src="../src/generator/Step.js"></script>
+    <script src="../src/processor/Fader.js"></script>
+    <script src="../src/processor/Spatter.js"></script>
+    <script src="../src/processor/ADSR.js"></script>
+    <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Filterbank.js"></script>
+    <script src="../src/processor/Formant.js"></script>
+    <script src="../src/processor/FormantV.js"></script>
+    <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Chorus.js"></script>
+    <script src="../src/processor/Phasor.js"></script>
+    <script src="../src/processor/Comp.js"></script>
+    <script src="../src/processor/Converb.js"></script>
+    <script src="../src/analyzer/Waveform.js"></script>
+    <script src="../src/analyzer/Spectrum.js"></script>
+    <script src="../src/core/Boot.js"></script>
+    <!-- Ktrl -->
+    <script src="../lib/Ktrl.js"></script>
     <script>
       // master verb and a bit of panning
-      var cho = WX.Chorus();
-      var vrb = WX.Converb({ mix:0.3 });
-      cho.to(vrb).to(WX.DAC);
+      var cho = WX.Chorus({ mix:0.1 });
+      var pp = WX.Pingpong({ mix:0.1, 
+        delayTimeLeft: 0.160, delayTimeRight: 0.480,
+        feedbackLeft: 0.5, feedbackRight: 0.25
+      });
+      var vrb = WX.Converb({ mix:0.4 });
+      cho.to(pp).to(vrb).to(WX.DAC);
       WX.DAC.panner(0.25);
 
-      function onset(fund) {
+      var HR = 2;
+      var MI1 = 8;
+      var BAL = 0.5;
+      var SUS = 0.4;
+      var REL = 1.0;
+      
+      function onset(pitch, velo) {
         // dynamic node creation
-        var fm1 = WX.Fmop({ freq:fund, gain:0.2, modIndex:0.1 });
-            fm2 = WX.Fmop({ freq:fund*2, gain:0.1, modIndex:0.5 });
+        var fund = WX.pitch2freq(pitch);
+        var fm1 = WX.Fmop({ freq:fund, gain:1 - BAL , modIndex:0.1 });
+            fm2 = WX.Fmop({ freq:fund * 2, gain:BAL, modIndex:0.5 });
             env = WX.ADSR();
-        env.adsr(0.001, 0.07, 0.4, 1.0);
+        env.adsr(0.001, 0.07, SUS, REL);
 
         // connection
         fm1.to(env).to(cho);
@@ -25,15 +64,16 @@
 
         // trigger note with parameter enveloping
         fm1
-          .harmRatio(2)
-          .modIndex(4).modIndex(0.1, WX.now+1.5, "x")
+          .harmRatio(HR)
+          .modIndex(MI1).modIndex(0.1, WX.now+1.5, "x")
           .stop(WX.now+2.0);
         fm2
-          .harmRatio(2)
-          .modIndex(8).modIndex(0.5, WX.now+1.5, "x")
+          .harmRatio(HR)
+          .modIndex(MI1 * 0.5).modIndex(0.5, WX.now+1.5, "x")
           .stop(WX.now+2.0);
         env
-          .noteOn().noteOff(WX.now+1.0);
+          .gain(velo).noteOn().noteOff(WX.now+1.0);
+        console.log(WX.context.activeSourceCount);
       };
         
       // key input handler
@@ -43,6 +83,62 @@
           return;
         }
         onset(WX.pitch2freq(kc - 1));
+      });
+
+      // creates a MIDI target
+      var t = Ktrl.createTarget("mySynth");
+      // activate!
+      t.activate();
+
+      // define user-action for incoming MIDI message
+      t.onData(function (midimessage) {
+        // parse MIDI data with the utility
+        var data = Ktrl.parse(midimessage);
+        //console.log(t.label, data);
+        switch (data.type) {
+          case "noteon":
+            MI1 = Ktrl.scale(Ktrl.CurveSquared(data.velocity), 1, 10); 
+            onset(data.pitch, Ktrl.scale(Ktrl.CurveSquared(data.velocity), 0, 1.5));
+            break;
+          case "controlchange":
+            switch (data.control) {
+              case 7:
+                HR = ~~Ktrl.scale(Ktrl.CurveLinear(data.value), 1, 6);
+                break;
+              case 10:
+                BAL = Ktrl.scale(Ktrl.CurveLinear(data.value));
+                break;
+              case 74:
+                SUS = Ktrl.scale(Ktrl.CurveLinear(data.value), 0.01, 0.5);
+                break;
+              case 71:
+                break;
+                REL = Ktrl.scale(Ktrl.CurveLinear(data.value), 0.01, 2.0);
+              case 73:
+                cho.mix(Ktrl.scale(Ktrl.CurveLinear(data.value), 0.3, 0.7), WX.now+0.05);
+                break;
+              case 72:
+                pp.mix(Ktrl.scale(Ktrl.CurveLinear(data.value), 0, 0.5), WX.now+0.05);
+                break;
+              case 91:
+                DEL = Ktrl.scale(Ktrl.CurveLinear(data.value), 0.160, 0.480);
+                pp.delayTimeRight(DEL, WX.now+0.1, "l");
+                pp.delayTimeLeft(DEL * 3, WX.now+0.1, "l");
+                break;
+              case 92:
+                vrb.mix(Ktrl.scale(Ktrl.CurveLinear(data.value)), WX.now+0.05);
+                //WX.DAC.gain(Ktrl.scale(Ktrl.CurveLinear(data.value), 0, 1), WX.now+0.1, "l");
+                break;
+              
+            }
+            break;
+        }
+      });
+
+      // routes sources and targets when the system is ready
+      Ktrl.ready(function () {
+        Ktrl.report();
+        Ktrl.routeAllToTarget(t);
       });
     </script>
   </body>

@@ -51,6 +51,7 @@
     { name: "Spatter", ref: WX._unit.spatter },
     { name: "ADSR", ref: WX._unit.adsr },
     { name: "Filter", ref: WX._unit.filter },
+    { name: "Filterbank", ref: WX._unit.filterbank },
     { name: "Formant", ref: WX._unit.formant },
     { name: "FormantV", ref: WX._unit.formantv },
     { name: "Pingpong", ref: WX._unit.pingpong },

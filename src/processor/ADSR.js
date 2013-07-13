@@ -44,6 +44,7 @@ WX._unit.adsr = function (options) {
   this._release = 0.05;
   this._releaseTau = this._release / this._tau;
   this._sustainOnset = 0.0;
+  this._isRunning = false;
   // bind parameter
   WX._unit.bindAudioParam.call(this, "envelope", this._inputGain.gain);
   // handling initial parameter : post-build
@@ -61,8 +62,8 @@ WX._unit.adsr.prototype = {
     attack: 0.015,
     decay: 0.015,
     sustain: 0.3,
-    release: 0.05,
-    gain: 1.0
+    release: 0.05
+    //gain: 1.0
   },
   // methods
   attack: function (value) {
@@ -107,17 +108,22 @@ WX._unit.adsr.prototype = {
         g = this._inputGain.gain;
     this._sustainOnset = t + this._attack + this._decay;
     g.cancelScheduledValues(t);
-    g.setValueAtTime(0.0, t);
+    g.setValueAtTime(g.value, t); // this only works when t = now;
+    //g.setValueAtTime(0.0, t); // this will produce pop with previous release env
     g.linearRampToValueAtTime(1.0, t + this._attack);
     g.exponentialRampToValueAtTime(this._sustain, this._sustainOnset);
+    this._isRunning = true;
     return this;
   },
   noteOff: function(moment) {
     var t = (moment || WX.now),
         g = this._inputGain.gain;
-    t = (t > this._sustainOnset) ? t : this._sustainOnset;
-    //g.cancelScheduledValues(t); // ?
-    g.setTargetValueAtTime(0.0, t, this._releaseTau);
+    // if the moment is before decay ends, release it after decay
+    //t = (t > this._sustainOnset) ? t : this._sustainOnset;
+    g.cancelScheduledValues(t); // ?
+    g.setValueAtTime(g.value, t); // this only works when t = now;
+    g.setTargetValueAtTime(0.0000001, t, this._releaseTau);
+    this._isRunning = false;
     return this;
   }
 };

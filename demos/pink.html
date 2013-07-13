@@ -5,8 +5,10 @@
   <body>
     <h1>Pink!</h1>
 
-    <canvas id="wf" width="800" height="300"></canvas>
-    <canvas id="sp" width="800" height="300"></canvas>
+    <canvas id="wf" width="900" height="600"></canvas>
+
+    <input id="rolloff" type="range" min="-18" max="-3" step="0.5" value="-3" style="width: 400px;">
+    <div id="sliderlabel"></div>
     
     <!-- lib r8 -->   
     <script src="../src/core/Monkey.js"></script>
@@ -37,58 +39,104 @@
     
     <!-- test code -->
     <script>
-      var cvs1 = document.getElementById('wf');
-      var ctx1 = cvs1.getContext('2d');
-      ctx1.lineWidth = 1.0;
-      ctx1.strokeStyle = "#66f";
-
-      var cvs2 = document.getElementById('sp');
-      var ctx2 = cvs2.getContext('2d');
-      ctx2.lineWidth = 1.0;
-      ctx2.strokeStyle = "#66f";
+      var cvs = document.getElementById('wf');
+      var ctx = cvs.getContext('2d');
+      ctx.lineWidth = 1.0;
+      var strokeStyle1 = "rgba(255, 0, 0, 0.5)",
+          strokeStyle2 = "rgba(0, 255, 0, 0.5)";
 
       var n = WX.Noise({ rate:1.0, gain:1.0 }),
-          p = WX.Sampler({ source:"../data/testtones/pink.wav", loop:true }),
-          v1 = WX.Spectrum({ context:ctx1 }),
-          v2 = WX.Spectrum({ context:ctx2 });
+          p = WX.Sampler({ source:"../data/samples/pink.wav", loop:true }),
+          sin = WX.Oscil(),
+          v1 = WX.Spectrum({ context:ctx, autoClear:false, smoothingFactor:0.85, grid:true }),
+          v2 = WX.Spectrum({ context:ctx, autoClear:false, smoothingFactor:0.99 });
 
       setTimeout(function() {
         p.start(60);
       }, 1000);
 
-      var num = 4;
       s = [];
-      prm = [[60, -6], [125, -9], [250, -12], [500, -15], [1000, -18], [2000, -21]];
+      // hand-tuned pinky filter 
+       //prm = [[10, 0], [200, -6], [800, -7.5], [4000, -6.5], [13000, -3.5], [22900, -50]];
+      prm = [[1000, 0], [2000, -6], [8000, -7.5], [4000, -6.5], [13000, -3.5], [22900, -50]];
+      //prm = [[1, 0], [50, -6], [500, -7.5], [5000, -6.5], [10000, -3.5], [20000, -50]];
+      var num = prm.length;
       for (var i = 0; i < num; i++) {
         s[i] = WX.context.createBiquadFilter();
         s[i].type = "highshelf";
-        s[i].frequency.value = prm[i][0];
-        s[i].gain.value = prm[i][1];
+        s[i].frequency.setValueAtTime(prm[i][0], WX.now);
+        s[i].gain.setValueAtTime(prm[i][1], WX.now);
       }
       for (i = 0; i < num - 1; i++) {
         s[i].connect(s[i+1]);
       }
+
+      // NOTE: this makes a pop
+      function setSlope (gain) {
+        for (var i = 0; i < num - 1; i++) {
+          //s[i].frequency.value = freq;
+          s[i].gain.linearRampToValueAtTime(gain, WX.now+0.1);
+        }
+      }
+      var slider = document.getElementById('rolloff');
+      var label = document.getElementById('sliderlabel');
+      slider.onchange = function () {
+        setSlope(slider.value);
+        label.textContent = slider.value + "dB";
+      };
+
+      var toggle = false;
+      function ab() {
+        toggle = !toggle;
+        n.gain(toggle ? 1.0 : 0.0);
+        p.gain(toggle ? 0.0 : 1.0);
+      }
+
+      function all() {
+        n.gain(1.0);
+        p.gain(1.0);
+      }
+      
+      // notch = WX.context.createBiquadFilter();
+      // notch.type = "notch";
+      // notch.frequency.value = 22000;
+      // notch.Q.value = 0.25;
+      
       n.connect(s[0]);
+      // s[num-1].connect(notch);
+      // notch.connect(WX.DAC._inlet);
+      // notch.connect(v1._inlet);
+
       s[num-1].connect(WX.DAC._inlet);
       s[num-1].connect(v1._inlet);
-
-      function bq(bq, f, g) {
-        bq.frequency.value = f;
-        bq.gain.value = g;
-      }
 
       p.to(v2);
       p.to(WX.DAC);
       WX.DAC.db(-12);
       WX.DAC.type("mono");
 
+      // p
+      //   .gain(1.0)
+      //   .gain(0.0, 4.0)
+      //   .gain(1.0, 8.0);
+      // n
+      //   .gain(0.0)
+      //   .gain(1.0, 4.0)
+      //   .gain(0.0, 8.0)
+      //   .gain(1.0, 12.0);
+
       // initiate draw
       function draw() {
         requestAnimationFrame(draw);
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.strokeStyle = strokeStyle1;
         v1.draw();
+        ctx.strokeStyle = strokeStyle2;
         v2.draw();
       }
       draw();
+
+      ab();
 
     </script>
 

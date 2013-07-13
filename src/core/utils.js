@@ -154,6 +154,12 @@ Object.defineProperties(WX, {
     }
   },
 
+  clamp: {
+    value: function(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+  },
+
   /**
    * converts a MIDI pitch to frequency(Hz)
    * @memberOf WX

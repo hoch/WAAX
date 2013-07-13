@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>MIDI Noise Drone</h1>    
+
+    <canvas id="sp" width="800" height="600"></canvas>
+
+    <!-- lib r8 -->   
+    <script src="../src/core/Monkey.js"></script>
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Utils.js"></script>
+    <script src="../src/core/Builtin.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/generator/Oscil.js"></script>
+    <script src="../src/generator/Fmop.js"></script>
+    <script src="../src/generator/Noise.js"></script>
+    <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/Sampler.js"></script>
+    <script src="../src/generator/Step.js"></script>
+    <script src="../src/processor/Fader.js"></script>
+    <script src="../src/processor/Spatter.js"></script>
+    <script src="../src/processor/ADSR.js"></script>
+    <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Filterbank.js"></script>
+    <script src="../src/processor/Formant.js"></script>
+    <script src="../src/processor/FormantV.js"></script>
+    <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Chorus.js"></script>
+    <script src="../src/processor/Phasor.js"></script>
+    <script src="../src/processor/Comp.js"></script>
+    <script src="../src/processor/Converb.js"></script>
+    <script src="../src/analyzer/Waveform.js"></script>
+    <script src="../src/analyzer/Spectrum.js"></script>
+    <script src="../src/core/Boot.js"></script>
+    <!-- Ktrl -->
+    <script src="../lib/Ktrl.js"></script>
+    <!-- test code -->
+    <script>
+      var cvs = document.getElementById('sp');
+      var ctx = cvs.getContext('2d');
+      var dmp = document.getElementById('preset');
+
+      var source = WX.Noise();
+      //var source = WX.Sampler({ source:"../data/samples/fables-aesop.ogg", loop:true, gain: 2.0 });
+      var bank = WX.Filterbank();
+      var adsr = WX.ADSR();
+      var cho = WX.Chorus({ mix: 0.5 });
+      var vrb = WX.Converb({ mix: 0.5 });
+      var sp = WX.Spectrum({ context:ctx, smoothingFactor:0.8, grid:true });
+
+      source.to(bank).to(adsr).to(cho).to(vrb).to(WX.DAC);
+      adsr.to(sp);
+
+      adsr.adsr(1.0, 1.0, 0.5, 2.0);
+      //WX.DAC.type("mono");
+
+      var env = adsr.envelope_;
+
+      setTimeout(function() {
+        source.start();
+      }, 1000);
+
+      // initiate draw
+      function draw() {
+        requestAnimationFrame(draw);
+        sp.draw();
+      }
+      draw();
+      
+      // creates a MIDI target
+      var t = Ktrl.createTarget("mySynth");
+      // activate!
+      t.activate();
+
+      // monophonic behavior
+      var keyPressed = [];
+      function checkPressedKey () {
+        for (var i = 0; i < 128; i++) {
+          if (keyPressed[i]) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      // define user-action for incoming MIDI message
+      t.onData(function (midimessage) {
+        // parse MIDI data with the utility
+        var data = Ktrl.parse(midimessage);
+        //console.log(t.label, data);
+        switch (data.type) {
+          case "noteon":
+            bank.pitch(data.pitch);
+            adsr.noteOn();
+            keyPressed[data.pitch] = true;
+            break;
+          case "noteoff":
+            keyPressed[data.pitch] = false;
+            if (!checkPressedKey()) {
+              adsr.noteOff();
+            }
+            break;
+          case "controlchange":
+            switch (data.control) {
+              case 1:
+                bank.chord(~~Ktrl.scale(Ktrl.CurveLinear(data.value), 1, 4.99));
+                break;
+              case 7:
+                bank.width(Ktrl.scale(Ktrl.CurveLinear(data.value)));
+                break;
+              case 10:
+                bank.slope(Ktrl.scale(Ktrl.CurveLinear(data.value)));
+                break;
+              case 74:
+                bank.detune(Ktrl.scale(Ktrl.CurveSquared(data.value)));
+                break;
+              case 71:
+                bank.gain(Ktrl.scale(Ktrl.CurveLinear(data.value)), WX.now + 0.04, "l");
+                break;
+            }
+            break;
+          case "programchange":
+            switch (data.program) {
+            }
+        }
+      });
+
+      // routes sources and targets when the system is ready
+      Ktrl.ready(function () {
+        Ktrl.report();
+        Ktrl.routeAllToTarget(t);
+      });
+    </script>
+  </body>
+</html>

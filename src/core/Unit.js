@@ -98,7 +98,7 @@ WX._unit = (function () {
           case "x":
             // to avoid exception due to zero
             val = (val === 0.0) ? 0.0001 : val;
-            t.exponentialRampToValueAtTime(v, m);
+            t.exponentialRampToValueAtTime(val, m);
             break;
           /*
           case "target":
