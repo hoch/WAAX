@@ -57,9 +57,9 @@ As this library is in early stages of development, it currently demonstrates min
 [4]: http://plork.cs.princeton.edu/
 [5]: http://slork.stanford.edu/
 [20]: https://hacks.mozilla.org/2013/02/webrtc-enabled-h-264mp3-support-in-win-7-on-by-default-metro-ui-for-windows-8-more-firefox-development-highlights/
-[21]: https://github.com/hoch/waax/raw/master/etc/nime2013-choi-waax-r3.pdf
-[22]: https://ccrma.stanford.edu/~hongchan/waax/
-[23]: https://github.com/hoch/waax/issues
+[21]: https://github.com/hoch/WAAX/raw/master/etc/nime2013-choi-waax-r3.pdf
+[22]: https://ccrma.stanford.edu/~hongchan/WAAX/
+[23]: https://github.com/hoch/WAAX/issues
 
 
 Demo
@@ -77,14 +77,14 @@ Requirements: **Google Chrome 20+** on any platform (Win/OSX/Linux). You can che
 
 _Adjust your volume setting before clicking. It might be loud!_
 
-[6]: http://hoch.github.com/waax/examples/editor.html
-[10]: http://hoch.github.com/waax/examples/waax-does-thx.html
-[11]: http://hoch.github.com/waax/examples/acidic-bassline.html
-[12]: http://hoch.github.com/waax/examples/simple-drum-sampler.html
-[13]: http://hoch.github.com/waax/examples/visualizer.html
-[14]: http://hoch.github.com/waax/examples/ui-manager.html
-[15]: http://hoch.github.com/waax/examples/hello-waax.html
-[16]: http://hoch.github.com/waax/examples/take-i-train.html
+[6]: http://hoch.github.com/WAAX/examples/editor.html
+[10]: http://hoch.github.com/WAAX/examples/waax-does-thx.html
+[11]: http://hoch.github.com/WAAX/examples/acidic-bassline.html
+[12]: http://hoch.github.com/WAAX/examples/simple-drum-sampler.html
+[13]: http://hoch.github.com/WAAX/examples/visualizer.html
+[14]: http://hoch.github.com/WAAX/examples/ui-manager.html
+[15]: http://hoch.github.com/WAAX/examples/hello-waax.html
+[16]: http://hoch.github.com/WAAX/examples/take-i-train.html
 
 
 Usages
