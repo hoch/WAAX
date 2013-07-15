@@ -38,7 +38,7 @@
 
   WX._log.info("building assets...");
 
-  // namespace: builtin 
+  // namespace: builtin
   WX._builtin = {};
 
   // creating white noise buffer (10s) : Noise.js

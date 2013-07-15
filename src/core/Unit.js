@@ -128,11 +128,11 @@ WX._unit = (function () {
 
     // factory: register unit name into wx namespace
     factory: function(args) {
-      args.map(function(n) {
+      args.map(function (n) {
         if (WX[n.name]) {
           WX._log.warn("unit name already exists. (" + n.name + ")", null);
         } else {
-          WX[n.name] = function(options) {
+          WX[n.name] = function (options) {
             return new n.ref(options);
           };
         }

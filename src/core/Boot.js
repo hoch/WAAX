@@ -61,9 +61,7 @@
     { name: "Converb", ref: WX._unit.converb },
     // analyzers
     { name: "Waveform", ref: WX._unit.waveform },
-    { name: "Spectrum", ref: WX._unit.spectrum },
-    // midi
-    { name: "Streamer", ref: WX.streamer }
+    { name: "Spectrum", ref: WX._unit.spectrum }
   ]);
 
   // create master fader
