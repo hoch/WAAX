@@ -35,6 +35,11 @@
  * : implements Chris' idea on multiple notches with modulating center freq
  */
 
+// parameter: spacing
+// parameter: mix
+// parameter: lfo freq = rate
+// parameter: lfo freq = depth
+
 WX._unit.phasor = function (options) {
   // pre-building: processor wrapper
   WX._unit.processor.call(this);
@@ -46,12 +51,11 @@ WX._unit.phasor = function (options) {
   // notches
   var maxNotch = 12;
   var baseFreq = 60;
-  var spacing = baseFreq / 4;
   this._notch = [];
   for (var i = 0; i < maxNotch; ++i) {
     this._notch[i] = WX.context.createBiquadFilter();
     this._notch[i].type = "notch";
-    this._notch[i].frequency = baseFreq + spacing * Math.pow(2, i);
+    this._notch[i].frequency = baseFreq + Math.pow(2, i);
     // console.log(baseFreq + spacing * Math.pow(2, i));
   }
   // split stereo
@@ -88,6 +92,9 @@ WX._unit.phasor = function (options) {
   this._dry.connect(this._outputGain);
   this._wet.connect(this._outputGain);
   // post-building: parameter binding
+  WX._unit.bindAudioParam.call(this, "lfoFreq", this._lfo.frequency);
+  WX._unit.bindAudioParam.call(this, "lfoDepthLeft", this._depthL.gain);
+  WX._unit.bindAudioParam.call(this, "lfoDepthRight", this._depthR.gain);
   WX._unit.bindAudioParam.call(this, "dry", this._dry.gain);
   WX._unit.bindAudioParam.call(this, "wet", this._wet.gain);
   // handling initial parameter : post-build
@@ -100,7 +107,6 @@ WX._unit.phasor.prototype = {
   _default: {
     mix: 0.8
   },
-  /*
   rate: function (value, moment, type) {
     if (value !== undefined) {
       // value should be normalized 0~1
@@ -119,6 +125,7 @@ WX._unit.phasor.prototype = {
       return [this.lfoDepthLeft(), this.lfoDepthRight()];
     }
   },
+  /*
   feedback: function (value, moment, type) {
     if (value !== undefined) {
       return this

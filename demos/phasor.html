@@ -1,35 +1,56 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link href="../lib/Ktrl/UI.css" rel="stylesheet" type="text/css">
   </head>
   <body>
     <h1>Phasor</h1>
+
+    <div class="ktrl-container" id="container"></div>
+
     <script src="../build/waax.min.js"></script>
+    <script src="../lib/Ktrl/UI.js"></script>
     <script>
-      // units
-      var gtr = WX.Sampler({ source:"../data/samples/cleangtr.wav", loop: true, gain: 1.0 }),
-          pha = WX.Phasor(),
-          cmp = WX.Comp({ threshold:-12, ratio:8, makeup:4 });
+      var gtr = WX.Sampler({ source:"../data/samples/cleangtr.wav", loop: true, gain: 1.8 }),
+          pha = WX.Phasor();
 
       // connection
-      gtr.to(pha).to(cmp).to(WX.DAC);
-
-      // wait for sample loading
+      gtr.to(pha).to(WX.DAC);
       setTimeout(function() {
-        // set timeline
-        var d = gtr.duration(),
-            t1 = d + WX.now;
-
-        // start
         gtr.start(60, 0);
-        // 0s: no effect, 1s: standard phasing
-        pha
-          .mix(0.0)
-          .mix(0.8, t1);
-        cmp
-          .makeup(8, t1)
-          .gain(0.0, t2);
       }, 1000);
+
+      var mixSlider = new SliderView("container");
+      var mixControl = new Control(mixSlider, "Phasor Mix", "-", 0.2, 0.0, 1.0);
+      // var blendSlider = new SliderView("container");
+      // var blendControl = new Control(blendSlider, "Blend", "-", 0.7071, 0.0, 1.0);
+      // var ffSlider = new SliderView("container");
+      // var ffControl = new Control(ffSlider, "Feedforward", "-", 1.0, 0.0, 0.99);
+      // var fbSlider = new SliderView("container");
+      // var fbControl = new Control(fbSlider, "Feedback", "-", 0.7071, 0.0, 0.99);
+      var rateSlider = new SliderView("container");
+      var rateControl = new Control(rateSlider, "LFO Rate", "-", 0.5, 0.0, 1.0);
+      var depthSlider = new SliderView("container");
+      var depthControl = new Control(depthSlider, "LFO Depth", "-", 0.5, 0.0, 1.0);
+
+      mixControl.onchange = function (value) {
+        pha.mix(value, WX.now + 0.02, "l");
+      }
+      // blendControl.onchange = function (value) {
+      //   cho.blend(value, WX.now + 0.02, "l");
+      // }
+      // ffControl.onchange = function (value) {
+      //   cho.feedforward(value, WX.now + 0.02, "l");
+      // }
+      // fbControl.onchange = function (value) {
+      //   cho.feedback(value, WX.now + 0.02, "l");
+      // }
+      rateControl.onchange = function (value) {
+        pha.rate(value, WX.now + 0.02, "l");
+      }
+      depthControl.onchange = function (value) {
+        pha.depth(value, WX.now + 0.02, "l");
+      }
     </script>
   </body>
 </html>
