@@ -110,7 +110,7 @@ WX._unit.phasor.prototype = {
   rate: function (value, moment, type) {
     if (value !== undefined) {
       // value should be normalized 0~1
-      return this.lfoFreq((value * 29 + 1)*0.01, moment, type);
+      return this.lfoFreq((value * 26 + 4), moment, type);
     } else {
       return this.lfoFreq();
     }
@@ -119,8 +119,8 @@ WX._unit.phasor.prototype = {
     if (value !== undefined) {
       // value should be normalized 0~1
       return this
-        .lfoDepthLeft(value, moment, type)
-        .lfoDepthRight(-value, moment, type);
+        .lfoDepthLeft(value * 200, moment, type)
+        .lfoDepthRight(value * -200, moment, type);
     } else {
       return [this.lfoDepthLeft(), this.lfoDepthRight()];
     }
