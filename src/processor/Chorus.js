@@ -78,7 +78,7 @@ WX._unit.chorus = function (options) {
   merger.connect(this._wet);
   // delayTime modulation
   this._lfo = WX.context.createOscillator();
-  this._lfo.type = "triangle";
+  this._lfo.type = "sine";
   this._depthL = WX.context.createGain();
   this._depthR = WX.context.createGain();
   this._lfo.frequency.value = 0.18;
@@ -126,7 +126,7 @@ WX._unit.chorus.prototype = {
   rate: function (value, moment, type) {
     if (value !== undefined) {
       // value should be normalized 0~1
-      return this.lfoFreq((value * 29 + 1)*0.01, moment, type);
+      return this.lfoFreq((value * 29 + 1) * 0.01, moment, type);
     } else {
       return this.lfoFreq();
     }
@@ -135,8 +135,8 @@ WX._unit.chorus.prototype = {
     if (value !== undefined) {
       // value should be normalized 0~1
       return this
-        .lfoDepthLeft(value, moment, type)
-        .lfoDepthRight(-value, moment, type);
+        .lfoDepthLeft(value * 0.05, moment, type)
+        .lfoDepthRight(-value * 0.05, moment, type);
     } else {
       return [this.lfoDepthLeft(), this.lfoDepthRight()];
     }

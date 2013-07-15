@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link href="../lib/Ktrl/UI.css" rel="stylesheet" type="text/css">
   </head>
   <body>
     <h1>Dev Mode r8</h1>    
+
+    <div class="ktrl-container" id="container">
+    </div>
+
     <!-- lib r8 -->   
     <script src="../src/core/WAAX.js"></script>
     <script src="../src/core/Utils.js"></script>
@@ -29,10 +34,52 @@
     <script src="../src/analyzer/Waveform.js"></script>
     <script src="../src/analyzer/Spectrum.js"></script>
     <script src="../src/core/Boot.js"></script>
+
+    <script src="../lib/Ktrl/UI.js"></script>
     
     <!-- test code -->
     <script>
 
+      var gtr = WX.Sampler({ source:"../data/samples/cleangtr.wav", loop: true, gain: 1.8 }),
+          cho = WX.Chorus();
+
+      // connection
+      gtr.to(cho).to(WX.DAC);
+      setTimeout(function() {
+        gtr.start(60, 0);
+      }, 1000);
+
+      var mixSlider = new SliderView("container");
+      var mixControl = new Control(mixSlider, "Chrous Mix", "-", 0.2, 0.0, 1.0);
+      var blendSlider = new SliderView("container");
+      var blendControl = new Control(blendSlider, "Blend", "-", 0.7071, 0.0, 1.0);
+      var ffSlider = new SliderView("container");
+      var ffControl = new Control(ffSlider, "Feedforward", "-", 1.0, 0.0, 0.99);
+      var fbSlider = new SliderView("container");
+      var fbControl = new Control(fbSlider, "Feedback", "-", 0.7071, 0.0, 0.99);
+      var rateSlider = new SliderView("container");
+      var rateControl = new Control(rateSlider, "LFO Rate", "-", 0.5, 0.0, 1.0);
+      var depthSlider = new SliderView("container");
+      var depthControl = new Control(depthSlider, "LFO Depth", "-", 0.5, 0.0, 1.0);
+
+      mixControl.onchange = function (value) {
+        cho.mix(value, WX.now + 0.02, "l");
+      }
+      blendControl.onchange = function (value) {
+        cho.blend(value, WX.now + 0.02, "l");
+      }
+      ffControl.onchange = function (value) {
+        cho.feedforward(value, WX.now + 0.02, "l");
+      }
+      fbControl.onchange = function (value) {
+        cho.feedback(value, WX.now + 0.02, "l");
+      }
+      rateControl.onchange = function (value) {
+        cho.rate(value, WX.now + 0.02, "l");
+      }
+      depthControl.onchange = function (value) {
+        cho.depth(value, WX.now + 0.02, "l");
+      }
 
     </script>
   </body>
