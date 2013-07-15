@@ -41,7 +41,7 @@
 // namespace WX 
 WX = (function () {
   var _version = "r8";
-  var _ctx = new AudioContext();
+  var _ctx = new webkitAudioContext();
   var _ignore_ = function () {
     return;
   };
