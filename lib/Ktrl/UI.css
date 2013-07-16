@@ -81,3 +81,15 @@ body {
     background: #3196CC;
     border-right: 6px solid #fff;
 }
+
+select {
+    border: 1px solid #A2A2A2;
+    padding: 12px 10px 12px 10px;
+    width: 120px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    height: 30px;
+    }
+select > option {
+    text-transform: uppercase;
+}

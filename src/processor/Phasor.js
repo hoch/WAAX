@@ -49,24 +49,24 @@ WX._unit.phasor = function (options) {
   this._dry = WX.context.createGain();
   this._wet = WX.context.createGain();
   // notches
-  var maxNotch = 12;
-  var baseFreq = 60;
+  this._maxNotch = 12;
+  this._baseFreq = 60;
+  this._spacing = 2;
   this._notch = [];
-  for (var i = 0; i < maxNotch; ++i) {
+  for (var i = 0; i < this._maxNotch; ++i) {
     this._notch[i] = WX.context.createBiquadFilter();
     this._notch[i].type = "notch";
-    this._notch[i].frequency = baseFreq + Math.pow(2, i);
-    // console.log(baseFreq + spacing * Math.pow(2, i));
+    this._notch[i].frequency = this._baseFreq + Math.pow(this._spacing, i);
   }
   // split stereo
   splitter.connect(this._notch[0], 0, 0);
   splitter.connect(this._notch[1], 1, 0);
-  for (var j = 0; j < maxNotch - 2; j += 2) {
+  for (var j = 0; j < this._maxNotch - 2; j += 2) {
     this._notch[j].connect(this._notch[j+2]);
     this._notch[j+1].connect(this._notch[j+3]);
   }
-  this._notch[maxNotch-2].connect(merger, 0, 0);
-  this._notch[maxNotch-1].connect(merger, 0, 1);
+  this._notch[this._maxNotch-2].connect(merger, 0, 0);
+  this._notch[this._maxNotch-1].connect(merger, 0, 1);
   merger.connect(this._wet);
   // delayTime modulation
   this._lfo = WX.context.createOscillator();
@@ -79,7 +79,7 @@ WX._unit.phasor = function (options) {
   this._depthR.gain.value = -200.0;
   this._lfo.connect(this._depthL);
   this._lfo.connect(this._depthR);
-  for (var k = 0; k < maxNotch; ++k) {
+  for (var k = 0; k < this._maxNotch; ++k) {
     if (k % 2 === 0) {
       this._depthL.connect(this._notch[k].frequency);
     } else {
@@ -110,7 +110,7 @@ WX._unit.phasor.prototype = {
   rate: function (value, moment, type) {
     if (value !== undefined) {
       // value should be normalized 0~1
-      return this.lfoFreq((value * 26 + 4), moment, type);
+      return this.lfoFreq((value * 4 + 2), moment, type);
     } else {
       return this.lfoFreq();
     }
@@ -125,35 +125,18 @@ WX._unit.phasor.prototype = {
       return [this.lfoDepthLeft(), this.lfoDepthRight()];
     }
   },
-  /*
-  feedback: function (value, moment, type) {
-    if (value !== undefined) {
-      return this
-        .feedbackLeft(-value, moment, type)
-        .feedbackRight(-value, moment, type);
-    } else {
-      return [this.feedbackLeft(), this.feedbackRight()];
+  base: function (value, moment) {
+    this._baseFreq = value;
+    for (var i = 0; i < this._maxNotch; ++i) {
+      this._notch[i].frequency.setTargetAtTime(this._baseFreq + Math.pow(this._spacing, i), moment, 0.04);
     }
   },
-  feedforward: function (value, moment, type) {
-    if (value !== undefined) {
-      return this
-        .feedforwardLeft(value, moment, type)
-        .feedforwardRight(value, moment, type);
-    } else {
-      return [this.feedforwardLeft(), this.feedforwardRight()];
+  space: function (value, moment) {
+    this._spacing = value;
+    for (var i = 0; i < this._maxNotch; ++i) {
+      this._notch[i].frequency.setTargetAtTime(this._baseFreq + Math.pow(this._spacing, i), moment, 0.04);
     }
   },
-  blend: function(value, moment, type) {
-    if (value !== undefined) {
-      return this
-        .blendLeft(value, moment, type)
-        .blendRight(value, moment, type);
-    } else {
-      return [this.blendLeft(), this.blendRight()];
-    }
-  },
-  */
   mix: function (value, moment, type) {
     if (value !== undefined) {
       return this

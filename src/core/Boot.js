@@ -50,6 +50,7 @@
     { name: "Fader", ref: WX._unit.fader },
     { name: "Spatter", ref: WX._unit.spatter },
     { name: "ADSR", ref: WX._unit.adsr },
+    { name: "AHR", ref: WX._unit.ahr },
     { name: "Filter", ref: WX._unit.filter },
     { name: "Filterbank", ref: WX._unit.filterbank },
     { name: "Formant", ref: WX._unit.formant },
