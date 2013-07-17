@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="../lib/Ktrl/UI-r2.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <h1>UI Design</h1>    
+
+    <div class="ui-container" id="sliderSection" style="width:750px">
+      <h2 class="ui-container-title">Sliders</h2>
+    </div>
+
+    <div class="ui-container" id="buttonSection" style="width:750px">
+      <h2 class="ui-container-title">Buttons</h2>
+    </div>
+
+    <script src="../lib/Ktrl/UI-r2.js"></script>
+    
+    <!-- test code -->
+    <script>
+
+      var sliderSection = document.getElementById('sliderSection');
+      var buttonSection = document.getElementById('buttonSection');
+
+      var options1 = { container: sliderSection, logScale: true, precision: 2 };
+      var options2 = { container: sliderSection, precision: 4 };
+      var options3 = { container: buttonSection };
+
+      var c1 = new UI.SliderController("Frequency", "Hz", 440.0, 60.0, 2000.0, options1);
+      var c2 = new UI.SliderController("Gain", "", 0.2, 0.0, 1.0, options2);
+      var c3 = new UI.SliderController("Gain", "dB", -6.0, -80.0, 0.0, options2);
+      var c4 = new UI.SliderController("Mix", "", 0.2, 0.0, 1.0, options2);
+
+      var t1 = new UI.ToggleController("Bypass", false, options3);
+      var t2 = new UI.ToggleController("Solo", false, options3);
+      var t3 = new UI.ToggleController("Nice", false, options3);
+      var t4 = new UI.ToggleController("Great", false, options3);
+
+    </script>
+  </body>
+</html>

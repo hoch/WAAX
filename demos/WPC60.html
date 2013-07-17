@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link href="../lib/Ktrl/UI.css" rel="stylesheet" type="text/css">
+    <link href="../lib/Ktrl/UI-r2.css" rel="stylesheet" type="text/css">
+    <link href="style/WPC60.css" rel="stylesheet" type="text/css">
   </head>
   <body>
     <h1>DR Prototyping</h1>    
+    <div style="margin: 0 0 10px 0;">
+      <button class="pad-button" id="pad-1">PAD 1</button>
+      <button class="pad-button" id="pad-2">PAD 2</button>
+    </div>
 
-    <select name="presets" id="dropdown">
-      <option value="1">Preset 1</option>
-      <option value="2">Preset 2</option>
-      <option value="3">Preset 3</option>
-    </select>
+    <div class="ui-container" id="section" style="width:750px">
+      <h2 class="ui-container-title" id="title">Pad</h2>
 
-    <div class="ktrl-container" id="container" style="width:750px">
+      <div class="quick-loader">
+        <div id="filename" class="quick-loader-filename">Loading...</div>
+        <div class="arrows-right">
+          <button class="quick-loader-arrow" id="prev">PREV</button><button class="quick-loader-arrow" id="next">NEXT</button>
+        </div>
+      </div>
+
     </div>
 
     <!-- lib r8 -->   
@@ -42,202 +50,214 @@
     <script src="../src/analyzer/Spectrum.js"></script>
     <script src="../src/core/Boot.js"></script>
     <script src="../lib/Ktrl/Ktrl.js"></script>
-    <script src="../lib/Ktrl/UI.js"></script>
+    <script src="../lib/Ktrl/UI-r2.js"></script>
     
     <!-- test code -->
-    <script>    
+    <script>
 
-    var DRVoice = (function (WX) {
+    function DrummerPad (path, filenames) {
 
-      var buffer = null;
-      var bufferReady = false;
+      this._currentBufferIndex = 0;
+      this._buffers = [];
+      this._path = path;
+      this._filenames = filenames;
 
-      var attack = 0.01;
-      var hold = 0.05;
-      var release = 0.1;
-      var pitch = 60;
-      var basePitch = 60;
+      this._attack = 0.005;
+      this._hold = 0.010;
+      this._release = 0.75;
+      this._tune = 0.0;
 
-      var output = WX.context.createGain();
+      this._output = WX.context.createGain();
 
-      function setSource (url) {
-        WX._loadBuffer(url, function (obj) {
-          buffer = obj.buffer;
-          bufferReady = true;
-        });
-      }
+      this.loadAssets();
+    }
 
-      function noteOn (intensity, moment) {
+    DrummerPad.prototype = {
+
+      to: function (unit) {
+        this._output.connect(unit._inlet);
+        return unit;
+      },
+
+      loadAssets: function () {
+        // quite hacky.. need some elegant solution
+        for (var i = 0; i < this._filenames.length; i++) {
+          if (i === this._filenames.length - 1) {
+            WX._loadBuffers(this._path + this._filenames[i], this._buffers, i, this.onloaded.bind(this));
+          } else {
+            WX._loadBuffers(this._path + this._filenames[i], this._buffers, i);
+          }
+        }
+      },
+
+      noteOn: function (intensity, moment) {
         var source = WX.context.createBufferSource();
         var env = WX.context.createGain();
         source.connect(env);
-        env.connect(output);
+        env.connect(this._output);
 
-        source.buffer = buffer;
+        source.buffer = this._buffers[this._currentBufferIndex];
         moment = (moment || WX.now);
-        var prate = Math.pow(2, (pitch - basePitch) / 12);
+        var prate = Math.pow(2, this._tune / 1200);
         source.playbackRate.setValueAtTime(prate, moment);
 
         source.start(moment);
-        // source.playbackRate.setValueAtTime(prate, moment);
-        // source.playbackRate.linearRampToValueAtTime(prate + intensity, moment + attack);
-        // source.playbackRate.setValueAtTime(prate + intensity, moment + attack + hold);
-        // source.playbackRate.exponentialRampToValueAtTime(prate, moment + attack + hold + release);
         env.gain.setValueAtTime(0.0, moment);
-        env.gain.linearRampToValueAtTime(intensity, moment + attack);
-        env.gain.setValueAtTime(intensity, moment + attack + hold);
-        env.gain.exponentialRampToValueAtTime(0.0, moment + attack + hold + release);
-        source.stop(moment + attack + hold + release);
-      }
+        env.gain.linearRampToValueAtTime(intensity, moment + this._attack);
+        env.gain.setValueAtTime(intensity, moment + this._attack + this._hold);
+        env.gain.exponentialRampToValueAtTime(0.0, moment + this._attack + this._hold + this._release);
+        source.stop(moment + this._attack + this._hold + this._release);
+      },
 
-      function to (unit) {
-        output.connect(unit._inlet);
-        return unit;
-      }
+      setCurrentBuffer: function (index) {
+        this._currentBufferIndex = index;
+        return this.getCurrentFilename();
+      },
 
-      function setPitch (value) {
-        pitch = value;
-      }
+      changeBufferByIndexDelta: function (delta) {
+        this._currentBufferIndex = WX.clamp(
+          this._currentBufferIndex + delta, 
+          0, 
+          this._buffers.length - 1
+        );
+        return this.getCurrentFilename();
+      },
 
-      function setAttack (value) {
-        attack = value;
-      }
+      getCurrentFilename: function () {
+        return this._filenames[this._currentBufferIndex];
+      },
 
-      function setHold (value) {
-        hold = value;
-      }
+      setTune: function (value) {
+        this._tune = value;
+      },
 
-      function setRelease (value) {
-        release = value;
-      }
+      setAttack: function (value) {
+        this._attack = value;
+      },
 
-      return {
-        setSource: setSource,
-        noteOn: noteOn,
-        to: to,
-        setPitch: setPitch,
-        setAttack: setAttack,
-        setHold: setHold,
-        setRelease: setRelease
-      }
+      setHold: function (value) {
+        this._hold = value;
+      },
 
-    })(WX);
+      setRelease: function (value) {
+        this._release = value;
+      },
 
-    DRVoice.setSource("../data/samples/snare-1.wav");
+      getParameters: function () {
+        return {
+          tune: this._tune,
+          attack: this._attack,
+          hold: this._hold,
+          release: this._release
+        };
+      },
 
+      onloaded: function () {
+        this._currentBufferIndex = 0;
+        this.getCurrentFilename();
+        WX._log.post("DrummerPad loaded. (current: " + this.getCurrentFilename() + ")");
+        filename.textContent = "Loaded.";
+      },
+    }
+
+    var pathSD = "../data/wpc/sd/";
+    var filenamesSD = [ 
+      "sd1.wav", "sd2.wav", "sd3.wav", "sd4.wav", "sd5.wav",
+      "sd6.wav", "sd7.wav", "sd8.wav", "sd9.wav", "sd10.wav"
+    ];
+    var pathKD = "../data/wpc/kd/";
+    var filenamesKD = [ 
+      "kd1.wav", "kd2.wav", "kd3.wav", "kd4.wav", "kd5.wav",
+      "kd6.wav", "kd7.wav", "kd8.wav", "kd9.wav", "kd10.wav"
+    ];
+
+
+    var sdPad = new DrummerPad(pathSD, filenamesSD);
+    var kdPad = new DrummerPad(pathKD, filenamesKD);
+
+    
     // static elements (channel)
-    var cmp = WX.Comp();
-    var cho = WX.Chorus({ mix:0.0 });
-    var vrb = WX.Converb({ mix:0.0 });
+    sdPad.to(WX.DAC);
+    kdPad.to(WX.DAC);
+
+    var pads = [];
+    pads.push(sdPad);
+    pads.push(kdPad);
+    var currentPad = 0;
+
+    var section = document.getElementById('section');
+
+    var options1 = { container: section, precision: 0.5 };
+    var options2 = { container: section, precision: 4 };
+
+    // get values from pad0
+    var prms = pads[currentPad].getParameters();
       
-    DRVoice.to(cmp).to(cho).to(vrb).to(WX.DAC);
-      
-    var pitchSlider = new SliderView("container", 1);
-    var pitchControl = new Control(pitchSlider, "Pitch", "-", 60, 48, 72);
-    var attSlider = new SliderView("container", 4);
-    var attControl = new Control(attSlider, "Attack", "s", 0.01, 0.001, 0.100);
-    var holdSlider = new SliderView("container", 4);
-    var holdControl = new Control(holdSlider, "Hold", "s", 0.05, 0.001, 0.100);
-    var relSlider = new SliderView("container", 4);
-    var relControl = new Control(relSlider, "Release", "s", 0.1, 0.001, 2.0, true);
-    var threSlider = new SliderView("container", 2);
-    var threControl = new Control(threSlider, "Threshold", "dB", -8, -36, 0.0);
-    var makeupSlider = new SliderView("container", 2);
-    var makeupControl = new Control(makeupSlider, "Makeup", "dB", 0.0, 0.0, 12.0);
-    var choSlider = new SliderView("container", 2);
-    var choControl = new Control(choSlider, "Chorus", "-", 0.0, 0.0, 1.0);
-    var verbSlider = new SliderView("container", 2);
-    var verbControl = new Control(verbSlider, "Reverb", "-", 0.0, 0.0, 1.0);
+    var pitCon = new UI.SliderController("Tune", "cents", prms.tune, -1200, 1200, options1);
+    var attCon = new UI.SliderController("Attack", "s", prms.attack, 0.001, 0.100, options2);
+    var hldCon = new UI.SliderController("Hold", "s", prms.hold, 0.001, 0.500, options2);
+    var relCon = new UI.SliderController("Release", "s", prms.release, 0.001, 2.0, options2);
     
-    pitchControl.onchange = function (value) {
-      DRVoice.setPitch(value);
+    pitCon.onchange = function (value) {
+      pads[currentPad].setTune(value);
     }
-    attControl.onchange = function (value) {
-      DRVoice.setAttack(value);
+    attCon.onchange = function (value) {
+      pads[currentPad].setAttack(value);
     }
-    holdControl.onchange = function (value) {
-      DRVoice.setHold(value);
+    hldCon.onchange = function (value) {
+      pads[currentPad].setHold(value);
     }
-    relControl.onchange = function (value) {
-      DRVoice.setRelease(value);
-    }
-    threControl.onchange = function (value) {
-      cmp.threshold(value, WX.now+0.02, "l");
-    }
-    makeupControl.onchange = function (value) {
-      cmp.makeup(value, WX.now+0.02, "l");
-    }
-    choControl.onchange = function (value) {
-      cho.mix(value, WX.now+0.02, "l");
-    }
-    verbControl.onchange = function (value) {
-      vrb.mix(value, WX.now+0.02, "l");
+    relCon.onchange = function (value) {
+      pads[currentPad].setRelease(value);
     }
 
-    pitchControl.setValue(61.0);
-    attControl.setValue(0.003);
-    holdControl.setValue(0.045);
-    relControl.setValue(0.06);
-    threControl.setValue(-4);
-    makeupControl.setValue(4.0);
-    choControl.setValue(0.0);
-    verbControl.setValue(0.0);
+    function updateAllViews () {
+      var prms = pads[currentPad].getParameters();
+      pitCon.setValue(prms.tune);
+      attCon.setValue(prms.attack);
+      hldCon.setValue(prms.hold);
+      relCon.setValue(prms.release);
+    }
+    
+    var title = document.getElementById('title');    
+    var prev = document.getElementById('prev');
+    var next = document.getElementById('next');
+    var filename = document.getElementById('filename');
+    prev.addEventListener('mousedown', function () {
+      filename.textContent = pads[currentPad].changeBufferByIndexDelta(-1);
+    });
+    next.addEventListener('mousedown', function () {
+      filename.textContent = pads[currentPad].changeBufferByIndexDelta(1);
+    });
 
-    var routeMap = {
-      7: [pitchControl],
-      10: [attControl],
-      74: [holdControl],
-      71: [relControl]
+    var btnPad1 = document.getElementById('pad-1');
+    var btnPad2 = document.getElementById('pad-2');
+    btnPad1.onmousedown = function () {
+      currentPad = 0;
+      title.textContent = "Snare Drum";
+      updateAllViews();
     };
-
-    // controlCallback => MIDILearn ready
-    // get control number => change routemap => stop MIDI learn
-    
-    var targetControl = null;
-    var MIDILearnMode = false;
-
-    function startMIDILearn (which) {
-      MIDILearnMode = true;
-      targetControl = which;
-    }
-    function endMIDILearn () {
-      MIDILearnMode = false; 
-      if (targetControl) {
-        targetControl.targetView.toggleMIDILearn();
-        targetControl = null;
-      }
-    }
+    btnPad2.onmousedown = function () {
+      currentPad = 1;
+      title.textContent = "Kick Drum";
+      updateAllViews();
+    };
+    currentPad = 0;
+    title.textContent = "Snare Drum";
 
     var targetWPC60 = Ktrl.createTarget("WPC60");
     targetWPC60.onData(function (midimessage) {
       var data = Ktrl.parse(midimessage);
-      //console.log(targetWPC60.label, data);
+      // console.log(targetWPC60.label, data);
       switch (data.type) {
         case "noteon":
-          DRVoice.noteOn(Ktrl.CurveCubed(data.velocity), WX.now);
-          break;
-        case "controlchange":
-          if (MIDILearnMode && targetControl) {
-            // find and delete targetControl from routeMap
-            for (var r in routeMap) {
-              var idx = routeMap[r].indexOf(targetControl);
-              if (idx !== -1) {
-                routeMap[r].splice(idx, 1);    
-              }
-            }
-            // and add to map on new cc number
-            if (typeof routeMap[data.control] === 'undefined') {
-              routeMap[data.control] = new Array();
-            } 
-            routeMap[data.control].push(targetControl);
-            endMIDILearn();
-          } else {
-            if (routeMap[data.control]) {
-              var targets = routeMap[data.control];
-              for (var i = 0; i < targets.length; ++i) {
-                targets[i].setNormValue(Ktrl.CurveLinear(data.value));
-              }
-            }  
+          switch (data.pitch) {
+            case 48: case 52:
+              kdPad.noteOn(Ktrl.CurveCubed(data.velocity), WX.now);
+              break;
+            case 54: case 58:
+              sdPad.noteOn(Ktrl.CurveCubed(data.velocity), WX.now);
+              break;
           }
           break;
       }
@@ -247,43 +267,9 @@
       Ktrl.routeAllToTarget(targetWPC60);
       targetWPC60.activate();
     });
-
-    var dd = document.getElementById('dropdown');
-    dd.onchange = function (e) {    
-      switch (e.target.value) {
-        case "1":
-          pitchControl.setValue(61.0);
-          attControl.setValue(0.003);
-          holdControl.setValue(0.045);
-          relControl.setValue(0.06);
-          threControl.setValue(-4);
-          makeupControl.setValue(4.0);
-          choControl.setValue(0.0);
-          verbControl.setValue(0.0);
-          break;
-        case "2":
-          pitchControl.setValue(60.0);
-          attControl.setValue(0.001);
-          holdControl.setValue(0.1);
-          relControl.setValue(0.001);
-          threControl.setValue(-12);
-          makeupControl.setValue(6.0);
-          choControl.setValue(0.5);
-          verbControl.setValue(0.9);
-          break;
-        case "3":
-          pitchControl.setValue(48.0);
-          attControl.setValue(0.1);
-          holdControl.setValue(0.3);
-          relControl.setValue(1.5);
-          threControl.setValue(-2);
-          makeupControl.setValue(2.0);
-          choControl.setValue(0.9);
-          verbControl.setValue(0.0);
-          break;
-      }
-    }
-
+     
+    
+    
     </script>
   </body>
 </html>

@@ -1,0 +1,129 @@
+body {
+  background: #EEE;
+  margin: 20px;
+  padding: 10px 0;
+  -webkit-user-select: none;
+}
+
+.ui-container {
+  box-shadow: 0 0 3px #aaa;
+  border-radius: 10px;
+  padding: 6px;
+  margin-bottom: 20px;
+}
+.ui-container-title {
+  font-family: "DroidSansMono", monospace;
+  font-size: 14px;
+  margin: 5px 5px 0 5px;
+  padding: 5px;
+  background-color: #ddd;
+  border-radius: 5px;
+}
+
+/* ---------- ui-slider-view ---------- */
+.ui-slider-view {
+  display: inline-block;
+  font-family: "DroidSansMono", monospace;
+  overflow: hidden;
+  margin: 10px;   
+}
+.ui-slider-touchable {
+  cursor: move;
+  -webkit-touch-callout: none;
+}
+.ui-slider-display {
+  height: 30px;
+  position: relative;
+}
+.ui-slider-value { 
+  color: #000;
+  display: inline-block;
+  font-size: 24px;
+  line-height: 30px;
+  overflow: hidden;
+}
+.ui-slider-unit {
+  font-size: 11px;
+  color: #999;
+  position: absolute;
+  bottom: 2px;
+  right: 0;
+  text-align: right;
+}
+.ui-slider-bar {
+  height: 4px;
+  background: #A7A7A7;
+  overflow: hidden;
+}
+.ui-slider-handle {
+  height: 4px;
+  background: #3196CC;
+  border-right: 0 solid #fff;
+}
+.ui-slider-label {
+  font-size: 11px;
+  height: 24px;
+  line-height: 24px;
+  color: #5F5F5f;
+}
+
+
+/* ---------- ui-toggle-view ---------- */
+.ui-toggle-view {
+  display: inline-block;
+  font-family: "DroidSansMono", monospace;
+  overflow: hidden;
+  margin: 10px;   
+}
+.ui-toggle-touchable {
+  cursor: pointer;
+  -webkit-touch-callout: none;
+}
+.ui-toggle-led {
+  margin-right: 5px;
+  background: #A7A7A7;
+  display: inline-block;
+}
+.ui-toggle-led-highlight {
+  margin-right: 5px;
+  background: #3196CC;
+  display: inline-block;
+}
+.ui-toggle-label {
+  font-size: 11px;
+  color: #5F5F5f;
+  display: inline-block;
+}
+
+
+/* ---------- ui-dropdown-view ---------- */
+.ui-dropdown-view {
+  display: inline-block;
+  font-family: "DroidSansMono", monospace;
+  overflow: hidden;
+  margin: 10px;
+}
+.ui-dropdown-label {
+  line-height: 20px;
+  font-size: 11px;
+  color: #5F5F5f;
+  display: inline-block;
+}
+.ui-dropdown-arrow {
+  font-size: 11px;
+  color: #5F5F5f;
+  display: inline-block;
+}
+
+
+select {
+  border: 1px solid #A2A2A2;
+  padding: 12px 10px 12px 10px;
+  width: 120px;
+  cursor: pointer;
+  margin-bottom: 15px;
+  height: 30px;
+  }
+select > option {
+  text-transform: uppercase;
+}
