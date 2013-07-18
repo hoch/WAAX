@@ -1,3 +1,4 @@
+/*----- UI-light.css: light-colored theme -----*/
 body {
   background: #EEE;
   margin: 20px;
@@ -118,34 +119,70 @@ body {
 }
 
 
-/* ---------- ui-dropdown-view ---------- */
-.ui-dropdown-view {
+/* ---------- ui-list-view ---------- */
+.ui-list-view {
   display: inline-block;
+  position: relative;
   font-family: "DroidSansMono", monospace;
-  overflow: hidden;
   margin: 10px;
+  padding: 4px;
 }
-.ui-dropdown-label {
-  line-height: 20px;
-  font-size: 11px;
-  color: #5F5F5f;
-  display: inline-block;
+.ui-list-display {
+  position: relative;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  background-color: #fff;
+  line-height: 24px;
 }
-.ui-dropdown-arrow {
-  font-size: 11px;
-  color: #5F5F5f;
-  display: inline-block;
-}
-
-
-select {
-  border: 1px solid #A2A2A2;
-  padding: 12px 10px 12px 10px;
-  width: 120px;
+.ui-list-value {
+  padding-left: 5px;
+  font-size: 12px;
+  overflow: hidden;
   cursor: pointer;
-  margin-bottom: 15px;
-  height: 30px;
-  }
-select > option {
-  text-transform: uppercase;
+}
+.ui-list-nudges {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 50px;
+  overflow: hidden;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0.25)));
+}
+.ui-list-nudge-btn {
+  display: inline-block;
+  height: 24px;
+  width: 24px;
+  text-align: center;
+  border-left: 1px solid #aaa;
+  color: #666;
+  cursor: pointer;
+}
+.ui-list-dropdown {
+  position: absolute;
+  top: 23px;
+  left: -1px;
+  display: none;
+  border: 1px solid #aaa;
+  background-color: #fff;
+  width: 100%;
+  z-index: 99;
+}
+.ui-list-dropdown ul {
+  padding: 0;
+  margin: 5px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.ui-list-item {
+  list-style: none;
+}
+.ui-list-item:hover {
+  color: #fff;
+  background-color: #3196CC;
+}
+.ui-list-label {
+  font-size: 10px;
+  height: 16px;
+  line-height: 16px;
+  color: #5F5F5f;
 }

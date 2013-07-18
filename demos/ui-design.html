@@ -1,40 +1,81 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link href="../lib/Ktrl/UI-r2.css" rel="stylesheet" type="text/css">
+    <link href="../lib/UI/UI-light.css" rel="stylesheet" type="text/css">
   </head>
   <body>
     <h1>UI Design</h1>    
 
-    <div class="ui-container" id="sliderSection" style="width:750px">
-      <h2 class="ui-container-title">Sliders</h2>
-    </div>
+    <div id="myContainer"></div>
 
-    <div class="ui-container" id="buttonSection" style="width:750px">
-      <h2 class="ui-container-title">Buttons</h2>
-    </div>
+    <!-- scripts -->
+    <script src="../lib/UI/UI.js"></script>
+    <script src="../lib/UI/UISlider.js"></script>
+    <script src="../lib/UI/UIButton.js"></script>
+    <script src="../lib/UI/UIIndexedList.js"></script>
 
-    <script src="../lib/Ktrl/UI-r2.js"></script>
-    
     <!-- test code -->
     <script>
 
-      var sliderSection = document.getElementById('sliderSection');
-      var buttonSection = document.getElementById('buttonSection');
+      // master section
+      var masterSection = UI.ControlCenter.createSection("Master Control", "myContainer");
+      var 
+      list_presets = UI.ControlCenter.createControl({
+        type: "indexed-list", name: "Preset", value: "Hello World!", 
+        data: ["Dig it", "Nice and Smooth", "Big Low", "Groovin'", "Hey DJ!"]
+      }, masterSection),
+      masterGain = UI.ControlCenter.createControl({
+        type: "slider", name: "Master", value: 0.0, min: -80.0, max: 0.0,
+        precision: 2, scale: "dB", unit: "dB"
+      }, masterSection),
+      btn_savePreset = UI.ControlCenter.createControl({
+        type: "button", name: "Save", value: false, mode: "momentary"
+      }, masterSection),
+      btn_loadPreset = UI.ControlCenter.createControl({
+        type: "button", name: "Load", value: false, mode: "momentray"
+      }, masterSection),
+      btn_mute = UI.ControlCenter.createControl({
+        type: "button", name: "Mute", value: false, mode: "toggle"
+      }, masterSection);
 
-      var options1 = { container: sliderSection, logScale: true, precision: 2 };
-      var options2 = { container: sliderSection, precision: 4 };
-      var options3 = { container: buttonSection };
+      // synth section
+      var sliderSection = UI.ControlCenter.createSection("Synth", "myContainer");
+      var 
+      list_synthPreset = UI.ControlCenter.createControl({
+        type: "indexed-list", name: "Program", value: "3 Oscs", 
+        data: ["3 Oscs", "Synced", "Big Saw", "Butter Lead", "Drony Drone"]
+      }, sliderSection),
+      slider_freq = UI.ControlCenter.createControl({
+        type: "slider", name: "Frequency", value: 440.0, min: 60.0, max: 1760.0,
+        precision: 1, scale: "log", unit: "Hz"
+      }, sliderSection),
+      slider_detune = UI.ControlCenter.createControl({
+        type: "slider", name: "Detune", value: 0, min: -1200, max: 1200.0,
+        precision: 0, scale: "linear", unit: "cents"
+      }, sliderSection),
+      slider_gain = UI.ControlCenter.createControl({
+        type: "slider", name: "Gain", value: -6, min: -80.0, max: 12.0,
+        precision: 2, scale: "linear", unit: "dB"
+      }, sliderSection);
 
-      var c1 = new UI.SliderController("Frequency", "Hz", 440.0, 60.0, 2000.0, options1);
-      var c2 = new UI.SliderController("Gain", "", 0.2, 0.0, 1.0, options2);
-      var c3 = new UI.SliderController("Gain", "dB", -6.0, -80.0, 0.0, options2);
-      var c4 = new UI.SliderController("Mix", "", 0.2, 0.0, 1.0, options2);
+      /*
+      sliderSection.addControl({});
+       */
+      
+      var miscSection = UI.ControlCenter.createSection("Misc", "myContainer");
+      var 
+      btn_preview = UI.ControlCenter.createControl({
+        type: "button", name: "Preview", value: false, mode: "momentary"
+      }, miscSection);
+      
+  
+      btn_savePreset.addAction(function () {
+        UI.ControlCenter.savePreset("myPreset");
+      });
 
-      var t1 = new UI.ToggleController("Bypass", false, options3);
-      var t2 = new UI.ToggleController("Solo", false, options3);
-      var t3 = new UI.ToggleController("Nice", false, options3);
-      var t4 = new UI.ToggleController("Great", false, options3);
+      btn_loadPreset.addAction(function () {
+        UI.ControlCenter.loadPreset("myPreset");
+      });
 
     </script>
   </body>
