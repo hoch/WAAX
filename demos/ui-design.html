@@ -17,6 +17,15 @@
     <!-- test code -->
     <script>
 
+      /* examples structure
+
+        1) build synth
+        2) build UI components
+        3) build relationship (midi => controller => action => synth)
+        4) load init parameters
+      
+       */
+
       // master section
       var masterSection = UI.ControlCenter.createSection("Master Control", "myContainer");
       var 
@@ -35,7 +44,7 @@
         type: "button", name: "Load", value: false, mode: "momentray"
       }, masterSection),
       btn_mute = UI.ControlCenter.createControl({
-        type: "button", name: "Mute", value: false, mode: "toggle"
+        type: "button", name: "Mute", value: true, mode: "toggle"
       }, masterSection);
 
       // synth section

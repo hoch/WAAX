@@ -42,7 +42,6 @@ body {
 }
 .ui-slider-touchable {
   cursor: move;
-  -webkit-touch-callout: none;
 }
 .ui-slider-display {
   height: 20px;
@@ -96,7 +95,6 @@ body {
 .ui-button-touchable {
   position: relative;
   cursor: pointer;
-  -webkit-touch-callout: none;
 }
 .ui-button-led {
   height: 10px;
