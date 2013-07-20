@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="../lib/UI/UI-light.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <h1>Dist!</h1>    
+
+    <canvas id="spectrum" width="900" height="600"></canvas>
+    <canvas id="curve" width="128" height="128"></canvas>
+    <div id="container"></div>
+    
+
+    <!-- lib r8 -->   
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Utils.js"></script>
+    <script src="../src/core/Builtin.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/generator/Oscil.js"></script>
+    <script src="../src/generator/Fmop.js"></script>
+    <script src="../src/generator/Noise.js"></script>
+    <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/Sampler.js"></script>
+    <script src="../src/generator/Step.js"></script>
+    <script src="../src/processor/Fader.js"></script>
+    <script src="../src/processor/Spatter.js"></script>
+    <script src="../src/processor/ADSR.js"></script>
+    <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Formant.js"></script>
+    <script src="../src/processor/FormantV.js"></script>
+    <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Chorus.js"></script>
+    <script src="../src/processor/Phasor.js"></script>
+    <script src="../src/processor/Comp.js"></script>
+    <script src="../src/processor/Converb.js"></script>
+    <script src="../src/analyzer/Waveform.js"></script>
+    <script src="../src/analyzer/Spectrum.js"></script>
+    <script src="../src/core/Boot.js"></script>
+    <!-- UI and MIDI -->
+    <script src="../lib/UI/UI.js"></script>
+    <script src="../lib/UI/UISlider.js"></script>
+    <script src="../lib/UI/UIButton.js"></script>
+    <script src="../lib/UI/UIIndexedList.js"></script>
+    <script src="../lib/Ktrl/Ktrl.js"></script>
+    
+    <!-- test code -->
+    <script>
+
+      var cvs = document.getElementById('spectrum');
+      var ctx = cvs.getContext('2d');
+      ctx.lineWidth = 1.0;
+      ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";
+      var v1 = WX.Spectrum({ context:ctx, smoothingFactor:0.85, grid:true });
+
+      var len = 128;
+      var curve1 = new Float32Array(len);
+      var curve2 = new Float32Array(len);
+      var curve3 = new Float32Array(len);
+
+      // controllabe curve
+      function getCurve (iter) {
+        for (var i = 0; i < len; ++i) {
+          var x = i / len;
+          for (var j = 0; j < iter; ++j) {
+            x = x * x * (3 - 2 * x);  
+          }
+          curve1[i] = x;
+        }
+      }
+      getCurve(0);
+      
+      var smp = WX.Sampler({ source:"../data/samples/fables-aesop.ogg", loop:true });
+      //var osc = WX.Oscil();
+      var fx = WX.context.createWaveShaper();
+      fx.curve = curve1;
+      //fx.oversampleType = "2x";
+
+      smp.connect(fx);
+      fx.connect(WX.DAC._inlet);
+      fx.connect(v1._inlet);
+      WX.DAC.type("mono");
+
+      setTimeout(function () {
+        smp.start(60);
+      }, 1000);
+
+      // initiate draw
+      function draw() {
+        requestAnimationFrame(draw);
+        v1.draw();
+      }
+      draw();
+
+      /**
+       * UI
+       */
+      var section = UI.ControlCenter.createSection("Control", "container");
+      slider_factor = UI.ControlCenter.createControl({
+        type: "slider", name: "Slope", value: 1, min: 1, max: 16,
+        precision: 0, scale: "linear", unit: ""
+      }, section);
+
+      slider_factor.addAction(function (value) {
+        getCurve(~~(value));
+        drawGraph();
+      });
+
+      var cvs2 = document.getElementById('curve');
+      var ctx2 = cvs2.getContext('2d');
+      ctx2.canvas.width = len;
+      ctx2.canvas.height = len;
+      ctx2.lineWidth = 1.0;
+      ctx2.strokeStyle = "#f00";
+
+      var xoffset = len / 128;
+      function drawGraph () {
+        ctx2.clearRect(0, 0, 128, 128);
+        ctx2.beginPath();
+        for (var i = 0; i < len; i++) {
+            ctx2.lineTo(i, 128 * (1.0 - curve1[i]));
+        }
+        ctx2.stroke();
+      }
+      drawGraph();
+
+
+
+    </script>
+  </body>
+</html>

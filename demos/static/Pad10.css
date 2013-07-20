@@ -1,0 +1,29 @@
+.clearfix:before, .clearfix:after {
+  content: " ";
+  display: table;
+}
+.clearfix:after {
+  clear: both;
+  margin-bottom: 15px;
+}
+
+.container {
+  width: 610px;
+  margin: 0 auto;
+}
+.c-pad {
+  margin: 0 auto;
+}
+.pad {
+  width: 110px;
+  height: 90px;
+  float: left;
+  background: #fff;
+  margin: 5px;
+  border: 1px solid #999;
+  box-shadow: 0 0 6px #bbb;
+  border-radius: 5px;
+}
+.pad-highlight {
+  background: rgba(49, 150, 204, 0.2); 
+}

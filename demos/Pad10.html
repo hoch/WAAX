@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <link href="../lib/UI/UI-light.css" rel="stylesheet" type="text/css">
+  <link href="static/Pad10.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+
+  <!-- html -->
+  <div class="container">
+    <h1>Pad10</h1>
+    <div id="s-preset"></div>
+    <div id="s-pad" class="c-pad">
+    </div>
+    <div class="clearfix"></div>
+    <div id="s-control"></div>
+    <div id="s-master"></div>
+  </div>
+
+  <!-- lib r8 -->   
+  <script src="../src/core/WAAX.js"></script>
+  <script src="../src/core/Utils.js"></script>
+  <script src="../src/core/Builtin.js"></script>
+  <script src="../src/core/Unit.js"></script>
+  <script src="../src/generator/Oscil.js"></script>
+  <script src="../src/generator/Fmop.js"></script>
+  <script src="../src/generator/Noise.js"></script>
+  <script src="../src/generator/ITrain.js"></script>
+  <script src="../src/generator/Sampler.js"></script>
+  <script src="../src/generator/Step.js"></script>
+  <script src="../src/processor/Fader.js"></script>
+  <script src="../src/processor/Spatter.js"></script>
+  <script src="../src/processor/ADSR.js"></script>
+  <script src="../src/processor/AHR.js"></script>
+  <script src="../src/processor/Filter.js"></script>
+  <script src="../src/processor/Formant.js"></script>
+  <script src="../src/processor/FormantV.js"></script>
+  <script src="../src/processor/Pingpong.js"></script>
+  <script src="../src/processor/Chorus.js"></script>
+  <script src="../src/processor/Phasor.js"></script>
+  <script src="../src/processor/Comp.js"></script>
+  <script src="../src/processor/Converb.js"></script>
+  <script src="../src/analyzer/Waveform.js"></script>
+  <script src="../src/analyzer/Spectrum.js"></script>
+  <script src="../src/core/Boot.js"></script>
+  <script src="../lib/Ktrl/Ktrl.js"></script>
+  <script src="../lib/UI/UI.js"></script>
+  <script src="../lib/UI/UISlider.js"></script>
+  <script src="../lib/UI/UIButton.js"></script>
+  <script src="../lib/UI/UIIndexedList.js"></script>
+
+  <!-- Pad10 logic -->
+  <script src="static/Pad10.js"></script>
+  
+  <!-- test code -->
+  <script>
+
+    /**
+     * UI
+     */
+    // preset manager (global)
+    var s_preset = UI.ControlCenter.createSection("Preset Manager", "s-preset");
+    var list_presets = UI.ControlCenter.createControl({
+      type: "indexed-list", name: "Preset", value: "", 
+      data: ["Untitled"],
+      exclude: true
+    }, s_preset);
+    var btn_savePreset = UI.ControlCenter.createControl({
+      type: "button", name: "Save", value: false, mode: "oneshot",
+      exclude: true
+    }, s_preset);
+    var btn_exportPreset = UI.ControlCenter.createControl({
+      type: "button", name: "Export", value: false, mode: "oneshot",
+      exclude: true
+    }, s_preset);
+
+    // pad control
+    var s_padControl = UI.ControlCenter.createSection("Control", "s-control");
+    
+    // pad control : sample
+    var ss_sample = UI.ControlCenter.createSubSection("Sample", s_padControl);
+    var btn_mute = UI.ControlCenter.createControl({
+      type: "button", name: "Mute", value: false, mode: "toggle"
+     }, ss_sample);
+    var sli_tune = UI.ControlCenter.createControl({
+      type: "slider", name: "Tune", value: 0.0, min: -1200.0, max: 1200.0,
+      precision: 0, scale: "linear", unit: "cents"
+     }, ss_sample);
+    var sli_volume = UI.ControlCenter.createControl({
+      type: "slider", name: "Volume", value: 0.0, min: -80.0, max: 0.0,
+      precision: 2, scale: "linear", unit: "dB"
+     }, ss_sample);
+    var list_samples = UI.ControlCenter.createControl({
+      type: "indexed-list", name: "Sample", value: "", 
+      data: ["pool"],
+    }, ss_sample);
+
+    // pad control : envelope
+    var ss_envelope = UI.ControlCenter.createSubSection("Envelope", s_padControl);
+    var btn_env = UI.ControlCenter.createControl({
+      type: "button", name: "Envelope", value: false, mode: "toggle"
+     }, ss_envelope);
+    var sli_att = UI.ControlCenter.createControl({
+      type: "slider", name: "Attack", value: 0.0, min: 0.0, max: 1.0,
+      precision: 4, scale: "linear", unit: "s"
+     }, ss_envelope);
+    var sli_hld = UI.ControlCenter.createControl({
+      type: "slider", name: "Hold", value: 0.05, min: 0.0, max: 1.0,
+      precision: 4, scale: "linear", unit: "s"
+     }, ss_envelope);
+    var sli_rel = UI.ControlCenter.createControl({
+      type: "slider", name: "Release", value: 1.0, min: 0.0, max: 5.0,
+      precision: 4, scale: "linear", unit: "s"
+     }, ss_envelope);
+
+    // pad control : 2 shelving filter
+    var ss_filter = UI.ControlCenter.createSubSection("Filter", s_padControl);
+    var btn_filt = UI.ControlCenter.createControl({
+      type: "button", name: "Filters", value: false, mode: "toggle"
+     }, ss_filter);
+    var sli_freq = UI.ControlCenter.createControl({
+      type: "slider", name: "Frequency", value: 2500, min: 60.0, max: 7000.0,
+      precision: 2, scale: "log", unit: "Hz"
+     }, ss_filter);
+    var sli_loshelf = UI.ControlCenter.createControl({
+      type: "slider", name: "Low Shelf", value: 0.0, min: -12.0, max: 12.0,
+      precision: 2, scale: "linear", unit: "dB"
+     }, ss_filter);
+    var sli_hishelf = UI.ControlCenter.createControl({
+      type: "slider", name: "High Shelf", value: 0.0, min: -12.0, max: 12.0,
+      precision: 2, scale: "linear", unit: "dB"
+     }, ss_filter);
+
+    // master
+    var s_master = UI.ControlCenter.createSection("Master Effects", "s-master");
+
+    // master : comp
+    var ss_comp = UI.ControlCenter.createSubSection("Compressor", s_master);
+    var btn_saturator = UI.ControlCenter.createControl({
+      type: "button", name: "Saturator", value: false, mode: "toggle"
+     }, ss_comp);
+    var btn_comp = UI.ControlCenter.createControl({
+      type: "button", name: "Comp", value: false, mode: "toggle"
+     }, ss_comp);
+    var sli_thre = UI.ControlCenter.createControl({
+      type: "slider", name: "Threshold", value: -12.0, min: -60.0, max: 0.0,
+      precision: 2, scale: "linear", unit: "dB"
+     }, ss_comp);
+    var sli_rat = UI.ControlCenter.createControl({
+      type: "slider", name: "Ratio", value: 8.0, min: 0.0, max: 20.0,
+      precision: 2, scale: "linear", unit: ""
+     }, ss_comp);
+    var sli_makeup = UI.ControlCenter.createControl({
+      type: "slider", name: "Makeup", value: 0.0, min: -12.0, max: 12.0,
+      precision: 2, scale: "linear", unit: "dB"
+     }, ss_comp);
+
+    // master : sat + verb + master gain
+    var ss_final = UI.ControlCenter.createSubSection("", s_master);
+    var sli_vrbmix = UI.ControlCenter.createControl({
+      type: "slider", name: "Reverb Mix", value: 0.0, min: 0.0, max: 1.0,
+      precision: 2, scale: "linear", unit: ""
+     }, ss_final);
+    var sli_mastergain = UI.ControlCenter.createControl({
+      type: "slider", name: "Master Gain", value: 0.0, min: 0.0, max: 1.0,
+      precision: 2, scale: "linear", unit: ""
+     }, ss_final);
+
+    /**
+     * actions
+     */
+    btn_savePreset.addAction(function () {
+    var name = window.prompt("Save preset as...");
+    UI.ControlCenter.savePreset(name);
+    // and update preset_list
+    list_presets.addListItem(name);
+    });
+
+    btn_exportPreset.addAction(function () {
+    var presets = UI.ControlCenter.exportPresets();
+    console.log(presets);
+    });
+
+    list_presets.addAction(function (value) {
+    UI.ControlCenter.loadPreset(value);
+    });
+
+    /**
+     * MIDI
+     */
+    var theInstruement = Ktrl.createTarget("Pad10");
+    theInstruement.onData(function (midimessage) {
+      var data = Ktrl.parse(midimessage);
+      switch (data.type) {
+        case "controlchange":
+          UI.ControlCenter.handleMIDILearn(data);
+          break;
+      }
+    });
+
+    Ktrl.ready(function () {
+      Ktrl.routeAllToTarget(theInstruement);
+      theInstruement.activate();
+    });
+  </script>
+ </body>
+</html>

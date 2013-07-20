@@ -1,5 +1,10 @@
-/*----- UI-light.css: light-colored theme -----*/
+/* ----- header ----- */
+@import url(http://fonts.googleapis.com/css?family=Roboto:400);
+
+/* ----- UI-light.css: light-colored theme ----- */
 body {
+  font-family: 'Roboto', sans-serif;
+  /*font-family: "DroidSansMono", monospace;*/
   background: #EEE;
   margin: 20px;
   padding: 10px 0;
@@ -7,17 +12,19 @@ body {
 }
 
 
+/* ----- modal ----- */
+
+
 /* ---------- ui-section ---------- */
 .ui-section {
   box-shadow: 0 0 3px #aaa;
   border-radius: 10px;
-  padding: 6px;
+  padding: 2px;
   margin-bottom: 20px;
 }
 .ui-section-title {
-  font-family: "DroidSansMono", monospace;
-  font-size: 14px;
-  margin: 5px;
+  font-size: 15px;
+  margin: 4px;
   padding: 5px;
   background-color: #ddd;
   border-radius: 5px;
@@ -35,9 +42,8 @@ body {
 /* ---------- ui-slider-view ---------- */
 .ui-slider-view {
   display: inline-block;
-  font-family: "DroidSansMono", monospace;
   overflow: hidden;
-  margin: 10px;
+  margin: 6px;
   padding: 5px;
 }
 .ui-slider-touchable {
@@ -50,15 +56,15 @@ body {
 .ui-slider-value { 
   color: #000;
   display: inline-block;
-  font-size: 18px;
+  font-size: 20px;
   line-height: 20px;
   overflow: hidden;
 }
 .ui-slider-unit {
-  font-size: 9px;
+  font-size: 10px;
   color: #777;
   position: absolute;
-  bottom: 2px;
+  bottom: 0;
   right: 0;
   text-align: right;
 }
@@ -73,7 +79,7 @@ body {
   border-right: 0 solid #fff;
 }
 .ui-slider-label {
-  font-size: 10px;
+  font-size: 11px;
   height: 16px;
   line-height: 16px;
   color: #5F5F5f;
@@ -83,13 +89,12 @@ body {
 /* ---------- ui-button-view ---------- */
 .ui-button-view {
   display: inline-block;
-  font-family: "DroidSansMono", monospace;
   overflow: hidden;
-  margin: 10px;
   height: 10px;
-  border: 1px solid #aaa;
+  border: 1px solid #999;
+  margin: 6px;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: 3px;
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0.125)));
 }
 .ui-button-touchable {
@@ -109,7 +114,7 @@ body {
   position: absolute;
   top: 0;
   left: 15px;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 10px;
   height: 10px;
   color: #5F5F5f;
@@ -121,20 +126,19 @@ body {
 .ui-list-view {
   display: inline-block;
   position: relative;
-  font-family: "DroidSansMono", monospace;
-  margin: 10px;
+  margin: 6px;
   padding: 4px;
 }
 .ui-list-display {
   position: relative;
-  border: 1px solid #aaa;
-  border-radius: 5px;
+  border: 1px solid #999;
+  border-radius: 3px;
   background-color: #fff;
   line-height: 24px;
 }
 .ui-list-value {
   padding-left: 5px;
-  font-size: 12px;
+  font-size: 14px;
   overflow: hidden;
   cursor: pointer;
 }
@@ -151,7 +155,7 @@ body {
   height: 24px;
   width: 24px;
   text-align: center;
-  border-left: 1px solid #aaa;
+  border-left: 1px solid #999;
   color: #666;
   cursor: pointer;
 }
@@ -160,7 +164,7 @@ body {
   top: 23px;
   left: -1px;
   display: none;
-  border: 1px solid #aaa;
+  border: 1px solid #999;
   background-color: #fff;
   width: 100%;
   z-index: 99;
@@ -168,7 +172,7 @@ body {
 .ui-list-dropdown ul {
   padding: 0;
   margin: 5px;
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
 }
 .ui-list-item {
@@ -179,7 +183,7 @@ body {
   background-color: #3196CC;
 }
 .ui-list-label {
-  font-size: 10px;
+  font-size: 11px;
   height: 16px;
   line-height: 16px;
   color: #5F5F5f;

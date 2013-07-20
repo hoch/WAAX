@@ -4,44 +4,56 @@
     <link href="../lib/UI/UI-light.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <h1>UI Design</h1>    
+    <h1>UI Design</h1>
 
     <div id="myContainer"></div>
 
     <!-- scripts -->
+    <script src="../lib/Ktrl/Ktrl.js"></script>
     <script src="../lib/UI/UI.js"></script>
     <script src="../lib/UI/UISlider.js"></script>
     <script src="../lib/UI/UIButton.js"></script>
     <script src="../lib/UI/UIIndexedList.js"></script>
 
-    <!-- test code -->
+    <!-- preset data-->
+    <script src="presets/testPresets.js"></script>
+
+    <!-- main code -->
     <script>
-
+    
       /* examples structure
-
         1) build synth
         2) build UI components
         3) build relationship (midi => controller => action => synth)
         4) load init parameters
-      
        */
+      
+      // get presets from file (should use AJAX for this?)
+      var presetList = UI.ControlCenter.importPresets(savedPresets);
+
+      // preset section
+      var presetSection = UI.ControlCenter.createSection("Preset Manager", "myContainer"); 
+      var 
+      list_presets = UI.ControlCenter.createControl({
+        type: "indexed-list", name: "Preset", value: "", 
+        data: presetList,
+        exclude: true
+      }, presetSection),
+      btn_savePreset = UI.ControlCenter.createControl({
+        type: "button", name: "Save", value: false, mode: "oneshot",
+        exclude: true
+      }, presetSection),
+      btn_exportPreset = UI.ControlCenter.createControl({
+        type: "button", name: "Export", value: false, mode: "oneshot",
+        exclude: true
+      }, presetSection);
 
       // master section
       var masterSection = UI.ControlCenter.createSection("Master Control", "myContainer");
       var 
-      list_presets = UI.ControlCenter.createControl({
-        type: "indexed-list", name: "Preset", value: "Hello World!", 
-        data: ["Dig it", "Nice and Smooth", "Big Low", "Groovin'", "Hey DJ!"]
-      }, masterSection),
       masterGain = UI.ControlCenter.createControl({
         type: "slider", name: "Master", value: 0.0, min: -80.0, max: 0.0,
-        precision: 2, scale: "dB", unit: "dB"
-      }, masterSection),
-      btn_savePreset = UI.ControlCenter.createControl({
-        type: "button", name: "Save", value: false, mode: "momentary"
-      }, masterSection),
-      btn_loadPreset = UI.ControlCenter.createControl({
-        type: "button", name: "Load", value: false, mode: "momentray"
+        precision: 2, scale: "linear", unit: "dB"
       }, masterSection),
       btn_mute = UI.ControlCenter.createControl({
         type: "button", name: "Mute", value: true, mode: "toggle"
@@ -51,8 +63,8 @@
       var sliderSection = UI.ControlCenter.createSection("Synth", "myContainer");
       var 
       list_synthPreset = UI.ControlCenter.createControl({
-        type: "indexed-list", name: "Program", value: "3 Oscs", 
-        data: ["3 Oscs", "Synced", "Big Saw", "Butter Lead", "Drony Drone"]
+        type: "indexed-list", name: "Waveform", value: "Sawtooth", 
+        data: ["Sine", "Sawtooth", "Sqaure", "Triangle", "Custom"]
       }, sliderSection),
       slider_freq = UI.ControlCenter.createControl({
         type: "slider", name: "Frequency", value: 440.0, min: 60.0, max: 1760.0,
@@ -74,18 +86,27 @@
       var miscSection = UI.ControlCenter.createSection("Misc", "myContainer");
       var 
       btn_preview = UI.ControlCenter.createControl({
-        type: "button", name: "Preview", value: false, mode: "momentary"
+        type: "button", name: "Preview", value: false, mode: "momentary",
+        exclude: true
       }, miscSection);
       
-  
+
+      // actions
       btn_savePreset.addAction(function () {
-        UI.ControlCenter.savePreset("myPreset");
+        var name = window.prompt("Save preset as...");
+        UI.ControlCenter.savePreset(name);
+        // and update preset_list
+        list_presets.addListItem(name);
       });
 
-      btn_loadPreset.addAction(function () {
-        UI.ControlCenter.loadPreset("myPreset");
+      btn_exportPreset.addAction(function () {
+        var presets = UI.ControlCenter.exportPresets();
+        console.log(presets);
       });
 
+      list_presets.addAction(function (value) {
+        UI.ControlCenter.loadPreset(value);
+      });
     </script>
   </body>
 </html>
