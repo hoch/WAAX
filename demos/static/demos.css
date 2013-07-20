@@ -1,0 +1,49 @@
+/* ----- header ----- */
+@import url(http://fonts.googleapis.com/css?family=Roboto:400);
+
+/* ----- color table ----- */
+/* #12597F, #574CFF, #3196CC, #7F4A05, #CC8831 */
+
+/* ----- demo style base ----- */
+body {
+  font-family: 'Roboto', sans-serif;
+  background: #EEE;
+  margin: 0;
+  padding: 0;
+  -webkit-user-select: none;
+}
+
+h1 {
+  background-color: #fff;
+  padding: 40px 20px 5px 30px;
+  margin: 0 0 40px 0;
+  color: #12597F;
+}
+
+.c-body-wrapper {
+  margin: 10px 20px;
+  padding: 0 10px;
+}
+
+ul.c-list-menu {
+  list-style: none;
+  margin: 10px 0;
+  padding: 5px 0 5px 15px;
+  border-left: 1px solid #3196CC;
+  border-radius: 10px;
+}
+
+ul.c-list-menu li {
+  margin: 10px 0;
+  padding: 0;
+}
+
+ul.c-list-menu a {
+  text-decoration: none;
+  color: #3196CC;
+}
+
+ul.c-list-menu a:hover {
+  text-decoration: underline;
+  color: #CC8831;
+}

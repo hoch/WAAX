@@ -1,27 +1,41 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link href="static/demos.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <h1>Demos</h1>
-    <ul>
-      <li><a href="wide-saws.html">Wide Saws</a></li>
-      <li><a href="saw-bass.html">Saw Bass</a></li>
-      <li><a href="fm-ep.html">FM e-piano</a></li>
-      <li><a href="comb-drone.html">Comb Drones</a></li>
-      <li><a href="swoosh-noise.html">Swoosh Noise</a></li>
-      <li><a href="dreamy-impulse.html">Dreamy Impulse</a></li>
-      <li><a href="vowels.html">Vowels</a></li>
-      <li><a href="gibberish.html">Gibberish (vector-control formant)</a></li>
-      <li><a href="chorus.html">Chrous on clean guitar</a></li>
-      <li><a href="phasor.html">Phasor on clean guitar</a></li>
-      <li><a href="noise-drone-midi.html">Noise Drones (w/ MIDI control)</a></li>
-      <li><a href="pink.html">Pink Noise with cascaded shelving filters</a></li>
-      <li><a href="filterbank.html">Filterbank</a></li>
-      <li><a href="ktrl-demo.html">Ktrl.js - MIDI routing example</a></li>
-    </ul>
-    <ul>
-      <li><a href="dev.html">Dev Mode (r8)</a></li>
-    </ul>
+
+    <h1>WAAX Demos</h1>
+    <div class="c-body-wrapper" id="i-container">
+      
+      <ul class="c-list-menu" id="i-menu"></ul>
+      <br>
+      <ul class="c-list-menu">
+        <li><a href="dev.html">Dev Mode</a></li>
+        <li><a href="template.html">Template</a></li>
+      </ul>
+
+    </div>
+
   </body>
+  <script>
+    // title, url (without .html)
+    var data = [
+      ["FM e-piano", "fm-ep"],
+      ["Gibberish", "gibberish"],
+      ["Filterbank", "filterbank"],
+      ["Pad10", "pad10"]
+    ]
+
+    var menu = document.getElementById('i-menu');
+    data.map(function (item) {
+      var li = document.createElement('li');
+      var a = document.createElement('a');
+      a.textContent = item[0];
+      a.href = item[1] + ".html";
+      li.appendChild(a);
+      menu.appendChild(li);
+    });
+
+  </script>
 </html>

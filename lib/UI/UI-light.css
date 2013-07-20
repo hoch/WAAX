@@ -1,18 +1,15 @@
 /* ----- header ----- */
 @import url(http://fonts.googleapis.com/css?family=Roboto:400);
 
-/* ----- UI-light.css: light-colored theme ----- */
+
+/* ----- demo style base ----- */
 body {
   font-family: 'Roboto', sans-serif;
-  /*font-family: "DroidSansMono", monospace;*/
   background: #EEE;
-  margin: 20px;
-  padding: 10px 0;
+  margin: 0;
+  padding: 0;
   -webkit-user-select: none;
 }
-
-
-/* ----- modal ----- */
 
 
 /* ---------- ui-section ---------- */
@@ -20,7 +17,7 @@ body {
   box-shadow: 0 0 3px #aaa;
   border-radius: 10px;
   padding: 2px;
-  margin-bottom: 20px;
+  margin: 20px auto;
 }
 .ui-section-title {
   font-size: 15px;
