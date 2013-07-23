@@ -275,6 +275,18 @@
 
     UI.ControlCenter.updateView(Pads.getSelectedPad());
 
+  var spaces2 = {
+    "Bright Hall": "../data/ir/bright-hall.wav",
+    "Plain Hall": "../data/ir/hall.wav",
+    "Large Room": "../data/ir/large.wav",
+    "Medium Room": "../data/ir/medium.wav",
+    "Small Room": "../data/ir/small.wav",
+    "Strong Space": "../data/ir/strong.wav",
+    "Heavy Space": "../data/ir/heavy.wav"
+  };
+
+  var bufmap = WX.BufferMap(spaces2);
+
     /**
      * MIDI
      */

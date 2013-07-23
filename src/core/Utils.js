@@ -264,7 +264,57 @@ WX._loadBuffers = function(url, buffers, index, oncomplete) {
   return true;
 };
 
-WX._recurseXHR = function (data, buffers, oncomplete) {
+
+/**
+ * create BufferMap from asset list
+ * @param {Object} assetList name:url map object
+ * @return {Object} BufferMap object
+ * @note assetList = { "name1": "url1", "name2": "url2", ... }
+ */
+WX.BufferMap = function (assetList) {
+  // internal storage
+  var _storage = {
+    list: [],
+    map: {}
+  };
+  // serialize asset list for recursion
+  var data = [], index = 0;
+  for (var name in assetList) {
+    data[index++] = [name, assetList[name]];
+  }
+  function _oncomplete () {
+    console.log("completed.");
+  }
+  // start recursion
+  WX._recurseXHR(data, _storage, 0, _oncomplete);
+
+  return {
+    getBufferByName: function (name) {
+      if (_storage.map.hasOwnProperty(name)) {
+        return _storage.map[name];
+      } else {
+        return null;
+      }
+    },
+    getBufferByIndex: function (index) {
+      if (index > -1 && index < _storage.list.length) {
+        return _storage.list[index];
+      } else {
+        return null;
+      }
+    },
+    getBufferNames: function () {
+      var names = [];
+      for (var name in _storage.map) {
+        names.push(name);
+      }
+      return names;
+    }
+  };
+};
+
+
+WX._recurseXHR = function (data, storage, iteration, oncomplete) {
   // get first key(name)/value(url) from data
   var d = data.shift();
   var name = d[0], url = d[1];
@@ -273,13 +323,15 @@ WX._recurseXHR = function (data, buffers, oncomplete) {
   xhr.responseType = "arraybuffer";
   xhr.onload = function () {
     try {
-      buffers[name] = WX.context.createBuffer(xhr.response, false);
+      var b = WX.context.createBuffer(xhr.response, false);
+      storage.list[iteration++] = b;
+      storage.map[name] = b;
       WX._log.post("loaded: " + url);
       if (data.length === 0) {
         oncomplete();
         return;
       } else {
-        WX._recurseXHR(data, buffers, oncomplete);
+        WX._recurseXHR(data, storage, iteration, oncomplete);
       }
     } catch (error) {
       WX._log.error("xhr failed (" + error.message + "): " + url);
