@@ -29,21 +29,22 @@
        */
       
       // get presets from file (should use AJAX for this?)
-      var presetList = UI.ControlCenter.importPresets(savedPresets);
+      UI.ControlCenter.importPresetBundle(myPresetBundle);
+      UI.ControlCenter.importRouteMap(myProfile.MIDIRouteMap);
 
       // preset section
       var presetSection = UI.ControlCenter.createSection("Preset Manager", "myContainer"); 
       var 
       list_presets = UI.ControlCenter.createControl({
         type: "indexed-list", name: "Preset", value: "", 
-        data: presetList,
+        data: UI.ControlCenter.getPresetList(),
         exclude: true
       }, presetSection),
       btn_savePreset = UI.ControlCenter.createControl({
         type: "button", name: "Save", value: false, mode: "oneshot",
         exclude: true
       }, presetSection),
-      btn_exportPreset = UI.ControlCenter.createControl({
+      btn_exportPresetBundle = UI.ControlCenter.createControl({
         type: "button", name: "Export", value: false, mode: "oneshot",
         exclude: true
       }, presetSection);
@@ -79,10 +80,6 @@
         precision: 2, scale: "linear", unit: "dB"
       }, sliderSection);
 
-      /*
-      sliderSection.addControl({});
-       */
-      
       var miscSection = UI.ControlCenter.createSection("Misc", "myContainer");
       var 
       btn_preview = UI.ControlCenter.createControl({
@@ -99,13 +96,31 @@
         list_presets.addListItem(name);
       });
 
-      btn_exportPreset.addAction(function () {
-        var presets = UI.ControlCenter.exportPresets();
-        console.log(presets);
+      btn_exportPresetBundle.addAction(function () {
+        var bundle = UI.ControlCenter.exportPresetBundle();
+        console.log(bundle);
       });
 
       list_presets.addAction(function (value) {
         UI.ControlCenter.loadPreset(value);
+      });
+
+      /**
+       * MIDI
+       */
+      var target = Ktrl.createTarget("test");
+      target.onData(function (midimessage) {
+        var data = Ktrl.parse(midimessage);
+        switch (data.type) {
+          case "controlchange":
+            UI.ControlCenter.handleMIDILearn(data);
+            break;
+        }
+      });
+
+      Ktrl.ready(function () {
+        Ktrl.routeAllToTarget(target);
+        target.activate();
       });
     </script>
   </body>

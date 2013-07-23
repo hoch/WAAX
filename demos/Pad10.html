@@ -17,7 +17,7 @@
     <div id="s-master"></div>
   </div>
 
-  <!-- lib r8 -->   
+  <!-- lib r8 -->
   <script src="../src/core/WAAX.js"></script>
   <script src="../src/core/Utils.js"></script>
   <script src="../src/core/Builtin.js"></script>
@@ -51,7 +51,7 @@
 
   <!-- Pad10 logic -->
   <script src="static/Pad10.js"></script>
-  
+
   <!-- test code -->
   <script>
 
@@ -59,24 +59,24 @@
      * UI
      */
     // preset manager (global)
-    var s_preset = UI.ControlCenter.createSection("Preset Manager", "s-preset");
-    var list_presets = UI.ControlCenter.createControl({
-      type: "indexed-list", name: "Preset", value: "", 
-      data: ["Untitled"],
-      exclude: true
-    }, s_preset);
-    var btn_savePreset = UI.ControlCenter.createControl({
-      type: "button", name: "Save", value: false, mode: "oneshot",
-      exclude: true
-    }, s_preset);
-    var btn_exportPreset = UI.ControlCenter.createControl({
-      type: "button", name: "Export", value: false, mode: "oneshot",
-      exclude: true
-    }, s_preset);
+    // var s_preset = UI.ControlCenter.createSection("Preset Manager", "s-preset");
+    // var list_presets = UI.ControlCenter.createControl({
+    //   type: "indexed-list", name: "Preset", value: "",
+    //   data: ["Untitled"],
+    //   exclude: true
+    // }, s_preset);
+    // var btn_savePreset = UI.ControlCenter.createControl({
+    //   type: "button", name: "Save", value: false, mode: "oneshot",
+    //   exclude: true
+    // }, s_preset);
+    // var btn_exportPreset = UI.ControlCenter.createControl({
+    //   type: "button", name: "Export", value: false, mode: "oneshot",
+    //   exclude: true
+    // }, s_preset);
 
     // pad control
     var s_padControl = UI.ControlCenter.createSection("Control", "s-control");
-    
+
     // pad control : sample
     var ss_sample = UI.ControlCenter.createSubSection("Sample", s_padControl);
     var btn_mute = UI.ControlCenter.createControl({
@@ -87,12 +87,12 @@
       precision: 0, scale: "linear", unit: "cents"
      }, ss_sample);
     var sli_volume = UI.ControlCenter.createControl({
-      type: "slider", name: "Volume", value: 0.0, min: -80.0, max: 0.0,
+      type: "slider", name: "Volume", value: 0.0, min: -80.0, max: 12.0,
       precision: 2, scale: "linear", unit: "dB"
      }, ss_sample);
     var list_samples = UI.ControlCenter.createControl({
-      type: "indexed-list", name: "Sample", value: "", 
-      data: ["pool"],
+      type: "indexed-list", name: "Sample", value: Pads.getSelectedPad().getCurrentFilename(),
+      data: Pads.getSelectedPad().getFilenames(),
     }, ss_sample);
 
     // pad control : envelope
@@ -136,11 +136,8 @@
 
     // master : comp
     var ss_comp = UI.ControlCenter.createSubSection("Compressor", s_master);
-    var btn_saturator = UI.ControlCenter.createControl({
-      type: "button", name: "Saturator", value: false, mode: "toggle"
-     }, ss_comp);
     var btn_comp = UI.ControlCenter.createControl({
-      type: "button", name: "Comp", value: false, mode: "toggle"
+      type: "button", name: "Comp", value: true, mode: "toggle"
      }, ss_comp);
     var sli_thre = UI.ControlCenter.createControl({
       type: "slider", name: "Threshold", value: -12.0, min: -60.0, max: 0.0,
@@ -151,39 +148,132 @@
       precision: 2, scale: "linear", unit: ""
      }, ss_comp);
     var sli_makeup = UI.ControlCenter.createControl({
-      type: "slider", name: "Makeup", value: 0.0, min: -12.0, max: 12.0,
+      type: "slider", name: "Makeup", value: 4.0, min: -12.0, max: 12.0,
       precision: 2, scale: "linear", unit: "dB"
      }, ss_comp);
 
     // master : sat + verb + master gain
     var ss_final = UI.ControlCenter.createSubSection("", s_master);
+    var btn_crush = UI.ControlCenter.createControl({
+      type: "button", name: "Crush", value: false, mode: "toggle"
+     }, ss_final);
     var sli_vrbmix = UI.ControlCenter.createControl({
       type: "slider", name: "Reverb Mix", value: 0.0, min: 0.0, max: 1.0,
       precision: 2, scale: "linear", unit: ""
      }, ss_final);
+    var list_irs = UI.ControlCenter.createControl({
+      type: "indexed-list", name: "Spaces", value: "",
+      data: Pads.reverb.getSpaceList(),
+    }, ss_final);
     var sli_mastergain = UI.ControlCenter.createControl({
-      type: "slider", name: "Master Gain", value: 0.0, min: 0.0, max: 1.0,
-      precision: 2, scale: "linear", unit: ""
+      type: "slider", name: "Master Gain", value: 0.0, min: -60.0, max: 12.0,
+      precision: 2, scale: "linear", unit: "dB"
      }, ss_final);
 
     /**
      * actions
      */
-    btn_savePreset.addAction(function () {
-    var name = window.prompt("Save preset as...");
-    UI.ControlCenter.savePreset(name);
-    // and update preset_list
-    list_presets.addListItem(name);
+    // btn_savePreset.addAction(function () {
+    // var name = window.prompt("Save preset as...");
+    // UI.ControlCenter.savePreset(name);
+    // // and update preset_list
+    // list_presets.addListItem(name);
+    // });
+
+    // btn_exportPreset.addAction(function () {
+    // var presets = UI.ControlCenter.exportPresets();
+    // console.log(presets);
+    // });
+
+    // list_presets.addAction(function (value) {
+    // UI.ControlCenter.loadPreset(value);
+    // });
+
+
+    btn_mute.addAction(function (value) {
+      Pads.getSelectedPad().setMute(value);
+    });
+    sli_tune.addAction(function (value) {
+      Pads.getSelectedPad().setTune(value);
+    });
+    sli_volume.addAction(function (value) {
+      Pads.getSelectedPad().setGaindB(value);
+    });
+    list_samples.addAction(function (value) {
+      Pads.getSelectedPad().setCurrentBufferByName(value);
     });
 
-    btn_exportPreset.addAction(function () {
-    var presets = UI.ControlCenter.exportPresets();
-    console.log(presets);
+    btn_env.addAction(function (value) {
+      Pads.getSelectedPad().enableEnvelope(value);
+    });
+    sli_att.addAction(function (value) {
+      Pads.getSelectedPad().setAttack(value);
+    });
+    sli_hld.addAction(function (value) {
+      Pads.getSelectedPad().setHold(value);
+    });
+    sli_rel.addAction(function (value) {
+      Pads.getSelectedPad().setRelease(value);
     });
 
-    list_presets.addAction(function (value) {
-    UI.ControlCenter.loadPreset(value);
+    btn_filt.addAction(function (value) {
+      Pads.getSelectedPad().setFilterState(value);
     });
+    sli_freq.addAction(function (value) {
+      Pads.getSelectedPad().setCrossover(value);
+    });
+    sli_loshelf.addAction(function (value) {
+      Pads.getSelectedPad().setLSGain(value);
+    });
+    sli_hishelf.addAction(function (value) {
+      Pads.getSelectedPad().setHSGain(value);
+    });
+
+    btn_comp.addAction(function (value) {
+      Pads.comp.bypass(!value);
+    });
+    sli_thre.addAction(function (value) {
+      Pads.comp.threshold(value)
+    });
+    sli_rat.addAction(function (value) {
+      Pads.comp.ratio(value);
+    });
+    sli_makeup.addAction(function (value) {
+      Pads.comp.makeup(value);
+    });
+
+    btn_crush.addAction(function (value) {
+      Pads.crush(value);
+    });
+    list_irs.addAction(function (value) {
+      Pads.reverb.setSpace(value);
+    });
+    sli_vrbmix.addAction(function (value) {
+      Pads.reverb.setAmount(value);
+    });
+
+    sli_mastergain.addAction(function (value) {
+      WX.DAC.db(value);
+    });
+
+
+    UI.ControlCenter.updateView = function (pad) {
+      var p = pad.getParams();
+      btn_mute.setValue(p.muted);
+      sli_tune.setValue(p.tune);
+      btn_env.setValue(p.envState);
+      sli_att.setValue(p.attack);
+      sli_hld.setValue(p.hold);
+      sli_rel.setValue(p.release);
+      btn_filt.setValue(p.filterState);
+      sli_freq.setValue(p.crossover);
+      sli_loshelf.setValue(p.loshelfGain);
+      sli_hishelf.setValue(p.hishelfGain);
+      list_samples.setListData(p.filenames);
+      list_samples.setIndex(p.currentBufferIndex);
+    };
+
+    UI.ControlCenter.updateView(Pads.getSelectedPad());
 
     /**
      * MIDI
@@ -192,6 +282,9 @@
     theInstruement.onData(function (midimessage) {
       var data = Ktrl.parse(midimessage);
       switch (data.type) {
+        case "noteon":
+          Pads.handleMIDINote(data);
+          break;
         case "controlchange":
           UI.ControlCenter.handleMIDILearn(data);
           break;

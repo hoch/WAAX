@@ -36,7 +36,7 @@
  */
 
 /**
- * @ignore 
+ * @ignore
  * @description internal: logging WX
  */
 WX._log = (function () {
@@ -113,7 +113,7 @@ Object.defineProperties(WX, {
    * @func
    * @param {float} min range minimum
    * @param {float} max range maximum
-   * @returns {float} 
+   * @returns {float}
    */
   random2f: {
     value: function(min, max) {
@@ -202,8 +202,8 @@ Object.defineProperties(WX, {
 
 
 /**
- * @ignore 
- * @description internal: XHR buffer loader, 
+ * @ignore
+ * @description internal: XHR buffer loader,
  * write the "oncomplete" callback accordingly
  */
 WX._loadBuffer = function(url, oncomplete) {
@@ -234,8 +234,8 @@ WX._loadBuffer = function(url, oncomplete) {
 };
 
 /**
- * @ignore 
- * @description internal: XHR buffer loader, 
+ * @ignore
+ * @description internal: XHR buffer loader,
  * write the "oncomplete" callback accordingly
  */
 WX._loadBuffers = function(url, buffers, index, oncomplete) {
@@ -261,5 +261,39 @@ WX._loadBuffers = function(url, buffers, index, oncomplete) {
   };
   xhr.send();
   // xhr is done
+  return true;
+};
+
+WX._recurseXHR = function (data, buffers, oncomplete) {
+  // get first key(name)/value(url) from data
+  var d = data.shift();
+  var name = d[0], url = d[1];
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url, true);
+  xhr.responseType = "arraybuffer";
+  xhr.onload = function () {
+    try {
+      buffers[name] = WX.context.createBuffer(xhr.response, false);
+      WX._log.post("loaded: " + url);
+      if (data.length === 0) {
+        oncomplete();
+        return;
+      } else {
+        WX._recurseXHR(data, buffers, oncomplete);
+      }
+    } catch (error) {
+      WX._log.error("xhr failed (" + error.message + "): " + url);
+    }
+  };
+  xhr.send();
+};
+
+WX._loadBufferX = function (wxobject, buffers, oncomplete) {
+  // assembling an array from wxobject
+  var data = [], index = 0;
+  for (var key in wxobject) {
+    data[index++] = [key, wxobject[key]];
+  }
+  WX._recurseXHR(data, buffers, oncomplete);
   return true;
 };

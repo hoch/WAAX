@@ -4,14 +4,14 @@
     <link href="../lib/UI/UI-light.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <h1>Dist!</h1>    
+    <h1>Dist!</h1>
 
     <canvas id="spectrum" width="900" height="600"></canvas>
     <canvas id="curve" width="128" height="128"></canvas>
     <div id="container"></div>
-    
 
-    <!-- lib r8 -->   
+
+    <!-- lib r8 -->
     <script src="../src/core/WAAX.js"></script>
     <script src="../src/core/Utils.js"></script>
     <script src="../src/core/Builtin.js"></script>
@@ -42,7 +42,7 @@
     <script src="../lib/UI/UIButton.js"></script>
     <script src="../lib/UI/UIIndexedList.js"></script>
     <script src="../lib/Ktrl/Ktrl.js"></script>
-    
+
     <!-- test code -->
     <script>
 
@@ -62,13 +62,13 @@
         for (var i = 0; i < len; ++i) {
           var x = i / len;
           for (var j = 0; j < iter; ++j) {
-            x = x * x * (3 - 2 * x);  
+            x = x * x * (3 - 2 * x);
           }
           curve1[i] = x;
         }
       }
       getCurve(0);
-      
+
       var smp = WX.Sampler({ source:"../data/samples/fables-aesop.ogg", loop:true });
       //var osc = WX.Oscil();
       var fx = WX.context.createWaveShaper();
@@ -79,6 +79,8 @@
       fx.connect(WX.DAC._inlet);
       fx.connect(v1._inlet);
       WX.DAC.type("mono");
+
+
 
       setTimeout(function () {
         smp.start(60);
