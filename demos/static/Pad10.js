@@ -1,61 +1,154 @@
-function Pad (domId, path, filenames) {
-  this._padView = domId;
-  this._buffers = [];
-
+/*
+ * @class PadCell
+ */
+var PadCell = function (targetDiv) {
+  // vars
+  this._view = targetDiv;
+  this._overlay = this._view.getElementsByClassName('pad-overlay')[0];
+  this._bufferMap = null;
+  this._ready = false;
+  // parameters: sample
   this._muted = false;
   this._tune = 0.0;
-  this._gaindB = 0.0;
-
+  this._volume = 0.0;
+  this._buffer = null;
+  this._bufferIndex = 0;
+  this._sampleName = null;
+  // parameters: envelope
   this._envState = false;
-  this._attack = 0.005;
-  this._hold = 0.010;
-  this._release = 0.75;
+  this._attack = 0.001;
+  this._hold = 0.01;
+  this._release = 1.0;
+  // build audiograph
+  this._nLSFilter = WX.context.createBiquadFilter();
+  this._nHSFilter = WX.context.createBiquadFilter();
+  this._nOutput = WX.context.createGain();
+  this._nLSFilter.connect(this._nHSFilter);
+  this._nHSFilter.connect(this._nOutput);
+  this._nFilterSwitcher = null;
+  // caching
+  this.input = this._nEnv;
+  this.output = this._nOutput;
+  // parameters: 2-filters (lo-shelf, hi-shelf)
+  this._nLSFilter.type = "lowshelf";
+  this._nHSFilter.type = "highshelf";
+  this.setFilterState(false);
+  this.setFilterFreq(2500);
+  this.setLSGain(0.0);
+  this.setHSGain(0.0);
+  // load assets!
+  this.loadBufferMap = this._loadBufferMap.bind(this);
+};
 
-  this._loshelf = WX.context.createBiquadFilter();
-  this._hishelf = WX.context.createBiquadFilter();
-  this._output = WX.context.createGain();
-  this._loshelf.connect(this._hishelf);
-  this._hishelf.connect(this._output);
+PadCell.prototype = {
+  // internal
+  _loadBufferMap: function (buffermap) {
+    this._bufferMap = buffermap;
+    this._buffer = this._bufferMap.getBufferByIndex(this._bufferIndex);
+    this._sampleName = this._bufferMap.getBufferNameByIndex(this._bufferIndex);
+    this._ready = true;
+  },
 
-  this._loshelf.type = "lowshelf";
-  this._hishelf.type = "highshelf";
-
-  this._filterState = true;
-  this._crossoverFreq = 2500;
-  this._lsGaindB = 0.0;
-  this._hsGaindB = 0.0;
-
-  this._loshelf.frequency.value = this._hishelf.frequency.value = this._crossoverFreq;
-  this._loshelf.gain.value = this._lsGaindB;
-  this._hishelf.gain.value = this._hsGaindB;
-
-  this._path = path;
-  this._filenames = filenames;
-
-  this._switchingNode = this._loshelf;
-
-  this.loadAssets();
-}
-
-Pad.prototype = {
-
+  // unit specific
+  label: "u.gen.padcell",
   to: function (unit) {
-    this._output.connect(unit._inlet);
+    this.output.connect(unit._inlet);
     return unit;
   },
-
-  loadAssets: function () {
-    // quite hacky.. need some elegant solution
-    for (var i = 0; i < this._filenames.length; i++) {
-      if (i === this._filenames.length - 1) {
-        WX._loadBuffers(this._path + this._filenames[i], this._buffers, i, this.onloaded.bind(this));
-      } else {
-        WX._loadBuffers(this._path + this._filenames[i], this._buffers, i);
-      }
-    }
-    this._currentBufferIndex = 0;
+  isReady: function () {
+    return this._ready;
   },
 
+  // sample-related
+  setSampleMute: function (bool) {
+    this._muted = bool;
+  },
+  setSampleTune: function (value) {
+    this._tune = value;
+  },
+  setSampleVolume: function (value) {
+    this._volume = value;
+  },
+  setBufferByName: function (name) {
+    this._buffer = this._bufferMap.getBufferByName(name);
+    this._bufferIndex = this._bufferMap.getBufferIndexByName(name);
+    this._sampleName = name;
+  },
+  setBufferByIndex: function (index) {
+    this._buffer = this._bufferMap.getBufferByIndex(index);
+    this._sampleName = this._bufferMap.getBufferNameByIndex(index);
+    this._bufferIndex = index;
+  },
+  setBufferByIndexDelta: function (delta) {
+    var index = WX.clamp(
+      this._bufferIndex + delta,
+      0,
+      this._bufferMap.getBufferLength() - 1
+    );
+    this.setBufferByIndex(index);
+  },
+  getSampleName: function () {
+    return this._sampleName;
+  },
+  getSampleNames: function () {
+    return this._bufferMap.getBufferNames();
+  },
+
+  // envelope-related
+  setEnvelopeState: function (bool) {
+    this._envState = bool;
+  },
+  setAttack: function (value) {
+    this._attack = value;
+  },
+  setHold: function (value) {
+    this._hold = value;
+  },
+  setRelease: function (value) {
+    this._release = value;
+  },
+
+  // filter-related
+  setFilterState: function (bool) {
+    this._filterState = bool;
+    if (this._filterState) {
+      this._nFilterSwitcher = this._nLSFilter;
+    } else {
+      this._nFilterSwitcher = this._nOutput;
+    }
+  },
+  setFilterFreq: function (value) {
+    this._filterFreq = value;
+    this._nLSFilter.frequency.value = this._filterFreq;
+    this._nHSFilter.frequency.value = this._filterFreq;
+  },
+  setLSGain: function (value) {
+    this._nLSFilter.gain.value = this._LSGain = value;
+  },
+  setHSGain: function (value) {
+    this._nHSFilter.gain.value = this._HSGain = value;
+  },
+
+  // getter
+  getParams: function () {
+    return {
+      muted: this._muted,
+      tune: this._tune,
+      volume: this._volume,
+      sampleName: this._sampleName,
+      sampleNames: this.getSampleNames(),
+      envState: this._envState,
+      attack: this._attack,
+      hold: this._hold,
+      release: this._release,
+      filterState: this._filterState,
+      filterFreq: this._filterFreq,
+      LSGain: this._LSGain,
+      HSGain: this._HSGain
+    };
+  },
+
+  // note-on
   noteOn: function (intensity, moment) {
     if (this._muted) {
       return;
@@ -63,142 +156,167 @@ Pad.prototype = {
     var source = WX.context.createBufferSource();
     var env = WX.context.createGain();
     source.connect(env);
-    env.connect(this._switchingNode);
+    env.connect(this._nFilterSwitcher);
 
-    source.buffer = this._buffers[this._currentBufferIndex];
+    console.log(this._bufferIndex);
+    source.buffer = this._bufferMap.getBufferByIndex(this._bufferIndex);
     moment = (moment || WX.now);
     var prate = Math.pow(2, this._tune / 1200);
     source.playbackRate.setValueAtTime(prate, moment);
 
     source.start(moment);
-    var gdb = WX.db2lin(this._gaindB);
+    var gvol = WX.db2lin(this._volume);
     if (this._envState) {
       env.gain.setValueAtTime(0.0, moment);
-      env.gain.linearRampToValueAtTime(gdb * intensity, moment + this._attack);
-      env.gain.setValueAtTime(gdb * intensity, moment + this._attack + this._hold);
-      env.gain.exponentialRampToValueAtTime(0.0, moment + this._attack + this._hold + this._release);
+      env.gain.linearRampToValueAtTime(gvol * intensity, moment + this._attack);
+      env.gain.setValueAtTime(gvol * intensity, moment + this._attack + this._hold);
+      env.gain.exponentialRampToValueAtTime(
+        0.0,
+        moment + this._attack + this._hold + this._release
+      );
       source.stop(moment + this._attack + this._hold + this._release);
     } else {
-      env.gain.setValueAtTime(gdb * intensity, moment);
+      env.gain.setValueAtTime(gvol * intensity, moment);
       source.stop(moment + source.buffer.duration);
     }
   },
 
-  setCurrentBuffer: function (index) {
-    this._currentBufferIndex = index;
-    return this.getCurrentFilename();
-  },
-
-  setCurrentBufferByName: function (name) {
-    var index = -1;
-    for (var i = 0; i < this._filenames.length; i++) {
-      if (this._filenames[i] === name) {
-        index = i;
-      }
-    }
-    if (i > -1) {
-      this._currentBufferIndex = index;
-    }
-    return this.getCurrentFilename();
-  },
-
-  changeBufferByIndexDelta: function (delta) {
-    this._currentBufferIndex = WX.clamp(
-      this._currentBufferIndex + delta,
-      0,
-      this._buffers.length - 1
-    );
-    return this.getCurrentFilename();
-  },
-
-  getCurrentFilename: function () {
-    return this._filenames[this._currentBufferIndex];
-  },
-
-  getFilenames: function () {
-    return this._filenames;
-  },
-
-  setMute: function (bool) {
-    this._muted = bool;
-  },
-
-  setTune: function (value) {
-    this._tune = value;
-  },
-
-  setGaindB: function (value) {
-    this._gaindB = value;
-  },
-
-  enableEnvelope: function (bool) {
-    this._envState = bool;
-  },
-
-  setAttack: function (value) {
-    this._attack = value;
-  },
-
-  setHold: function (value) {
-    this._hold = value;
-  },
-
-  setRelease: function (value) {
-    this._release = value;
-  },
-
-  setFilterState: function (bool) {
-    this._filterState = bool;
-    if (this._filterState) {
-      this._switchingNode = this._loshelf;
+  // view-related
+  highlight: function (bool) {
+    if (bool) {
+      this._view.className += " pad-highlight";
     } else {
-      this._switchingNode = this._output;
+      this._view.className = "pad";
     }
   },
-
-  setCrossover: function (value) {
-    this._crossoverFreq = value;
-    this._loshelf.frequency.value = this._hishelf.frequency.value = this._crossoverFreq;
-  },
-
-  setLSGain: function (value) {
-    this._loshelf.gain.value = this._lsGaindB = value;
-  },
-
-  setHSGain: function (value) {
-    this._hishelf.gain.value = this._hsGaindB = value;
-  },
-
-  getParams: function () {
-    return {
-      muted: this._muted,
-      tune: this._tune,
-      gain: this._gaindB,
-      filenames: this._filenames,
-      currentBufferIndex: this._currentBufferIndex,
-      envState: this._envState,
-      attack: this._attack,
-      hold: this._hold,
-      release: this._release,
-      filterState: this._filterState,
-      crossover: this._crossoverFreq,
-      loshelfGain: this._lsGaindB,
-      hishelfGain: this._hsGaindB
-    };
-  },
-
-  onloaded: function () {
-    this._currentBufferIndex = 0;
-    this.getCurrentFilename();
-    WX._log.post("DrummerPad loaded. (current: " + this.getCurrentFilename() + ")");
-    //filename.textContent = "Loaded.";
-  },
-
-  setTargetDiv: function (domId) {
-    this._view = domId;
-    // add event listeners
+  flash: function () {
+    this._overlay.className += " flash";
+    var me = this;
+    setTimeout(function () {
+      me._overlay.className = "pad-overlay";
+    }, 150);
   }
 };
+
+
+/**
+ * @class Multiverb
+ */
+
+
+
+/**
+ * Pad10 core, Singletone
+ */
+var Pad10 = (function (assets, WX, Center, window) {
+
+  // Master Class
+
+  // create 10 PadCells
+  var PadCells = [];
+  var s_pad = document.getElementById('s-pad');
+  for (var i = 0; i < 10; i++) {
+    var overlay = document.createElement('div');
+    var pad = document.createElement('div');
+    overlay.className = "pad-overlay";
+    overlay.id = "pad-overlay" + i;
+    pad.className = "pad";
+    pad.id = "pad" + i;
+    pad.appendChild(overlay);
+    s_pad.appendChild(pad);
+    PadCells[i] = new PadCell(pad);
+    PadCells[i].to(WX.DAC);
+  }
+
+  // add user interaction to PadCells
+  var cellIndex = 0;
+  var selectedCell = PadCells[cellIndex];
+  selectedCell.highlight(true);
+  s_pad.addEventListener("mousedown", function (event) {
+    var index = event.target.id.slice(11);
+    console.log(index);
+    if (index > -1 && index < 10) {
+      if (index !== cellIndex) {
+        cellIndex = index;
+        selectedCell.highlight(false);
+        selectedCell = PadCells[cellIndex];
+        selectedCell.highlight(true);
+        _onCellChangedCallback();
+      }
+      selectedCell.noteOn(1.0);
+      selectedCell.flash();
+      event.stopPropagation();
+    }
+  }, false);
+
+  // process assets
+  WX.buildBufferMap(assets.kd, function (buffermap) {
+    PadCells[0].loadBufferMap(buffermap);
+    PadCells[1].loadBufferMap(buffermap);
+  });
+  WX.buildBufferMap(assets.sd, function (buffermap) {
+    PadCells[2].loadBufferMap(buffermap);
+    PadCells[3].loadBufferMap(buffermap);
+  });
+  WX.buildBufferMap(assets.hh, function (buffermap) {
+    PadCells[4].loadBufferMap(buffermap);
+    PadCells[5].loadBufferMap(buffermap);
+  });
+  WX.buildBufferMap(assets.perc, function (buffermap) {
+    PadCells[6].loadBufferMap(buffermap);
+    PadCells[7].loadBufferMap(buffermap);
+  });
+  WX.buildBufferMap(assets.fx, function (buffermap) {
+    PadCells[8].loadBufferMap(buffermap);
+    PadCells[9].loadBufferMap(buffermap);
+  });
+
+  // onCellChangedCallback
+  var _onCellChangedCallback = null;
+  function _onCellChanged (callback) {
+    _onCellChangedCallback = callback;
+  }
+
+  // check all cells to be ready, then fire updateAllView
+  function _onReady (callback) {
+    var flag = PadCells[0].isReady();
+    for (var i = 1; i < 10; i++) {
+      flag = flag && PadCells[i].isReady();
+    }
+    if (flag) {
+      callback();
+    } else {
+      console.log("checking...");
+      setTimeout(function () {
+        _onReady(callback);
+      }, 1000);
+    }
+  }
+
+  return {
+    onCellChanged: _onCellChanged,
+    onReady: _onReady,
+    get cell () { return selectedCell; }
+    // getSampleName: function () {
+    //   // get current cell's sample list
+    //   return selectedCell.getSampleName();
+    // },
+    // getSampleNames: function () {
+    //   // get current cell's sample list
+    //   return selectedCell.getSampleNames();
+    // },
+    // setSampleByName: function (name) {
+    //   selectedCell.setBufferByName(name);
+    // }
+  };
+
+})(ASSETS, WX, UI.ControlCenter, window);
+
+
+
+
+
+/*
 
 
 function MultiVerb (spaces) {
@@ -314,7 +432,7 @@ var Pads = (function (controlCenter) {
   function T3(x) { return 4*x*x*x - 3*x; }
   function T4(x) { return 8*x*x*x*x - 8*x*x + 1; }
 
-  function createCurve() {
+  function createCurve_cheby() {
     var n = 65536;
     var n2 = n / 2;
     var curve = new Float32Array(n);
@@ -326,9 +444,21 @@ var Pads = (function (controlCenter) {
     return curve;
   }
 
+  function createCurve_softclip () {
+    var n = 65536;
+    var n2 = n / 2;
+    var curve = new Float32Array(n);
+    for (var i = 0; i < n; i++) {
+      var x = (i - n2) / n2;
+      var y = x / (1 + Math.abs(x));
+      curve[i] = y;
+    }
+    return curve;
+  }
+
   var fx = WX.context.createWaveShaper();
   // fx.curve = curve1;
-  fx.curve = createCurve();
+  fx.curve = createCurve_cheby();
   fx.oversampleType = "2x";
 
   var cmp = WX.Comp({ threshold: -12, ratio: 8, makeup: 4.0 });
@@ -421,3 +551,4 @@ var Pads = (function (controlCenter) {
   };
 
 })(UI.ControlCenter);
+*/

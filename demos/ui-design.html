@@ -20,23 +20,23 @@
 
     <!-- main code -->
     <script>
-    
+
       /* examples structure
         1) build synth
         2) build UI components
         3) build relationship (midi => controller => action => synth)
         4) load init parameters
        */
-      
+
       // get presets from file (should use AJAX for this?)
       UI.ControlCenter.importPresetBundle(myPresetBundle);
       UI.ControlCenter.importRouteMap(myProfile.MIDIRouteMap);
 
       // preset section
-      var presetSection = UI.ControlCenter.createSection("Preset Manager", "myContainer"); 
-      var 
+      var presetSection = UI.ControlCenter.createSection("Preset Manager", "myContainer");
+      var
       list_presets = UI.ControlCenter.createControl({
-        type: "indexed-list", name: "Preset", value: "", 
+        type: "indexed-list", name: "Preset", value: "",
         data: UI.ControlCenter.getPresetList(),
         exclude: true
       }, presetSection),
@@ -51,7 +51,7 @@
 
       // master section
       var masterSection = UI.ControlCenter.createSection("Master Control", "myContainer");
-      var 
+      var
       masterGain = UI.ControlCenter.createControl({
         type: "slider", name: "Master", value: 0.0, min: -80.0, max: 0.0,
         precision: 2, scale: "linear", unit: "dB"
@@ -62,9 +62,9 @@
 
       // synth section
       var sliderSection = UI.ControlCenter.createSection("Synth", "myContainer");
-      var 
+      var
       list_synthPreset = UI.ControlCenter.createControl({
-        type: "indexed-list", name: "Waveform", value: "Sawtooth", 
+        type: "indexed-list", name: "Waveform", value: "Sawtooth",
         data: ["Sine", "Sawtooth", "Sqaure", "Triangle", "Custom"]
       }, sliderSection),
       slider_freq = UI.ControlCenter.createControl({
@@ -81,12 +81,12 @@
       }, sliderSection);
 
       var miscSection = UI.ControlCenter.createSection("Misc", "myContainer");
-      var 
+      var
       btn_preview = UI.ControlCenter.createControl({
         type: "button", name: "Preview", value: false, mode: "momentary",
         exclude: true
       }, miscSection);
-      
+
 
       // actions
       btn_savePreset.addAction(function () {

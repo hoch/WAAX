@@ -271,50 +271,83 @@ WX._loadBuffers = function(url, buffers, index, oncomplete) {
  * @return {Object} BufferMap object
  * @note assetList = { "name1": "url1", "name2": "url2", ... }
  */
-WX.BufferMap = function (assetList) {
+WX.BufferMap = function () {
+
   // internal storage
-  var _storage = {
-    list: [],
-    map: {}
-  };
-  // serialize asset list for recursion
-  var data = [], index = 0;
-  for (var name in assetList) {
-    data[index++] = [name, assetList[name]];
-  }
-  function _oncomplete () {
-    console.log("completed.");
-  }
-  // start recursion
-  WX._recurseXHR(data, _storage, 0, _oncomplete);
+  // indexMap (index:name), nameMap (name:buffer)
+  // addBuffer (name, buffer)
+  // getByIndex   index => name => buffer
+  // getByName    name => buffer
+  // getNameByIndex index => name
+  // getIndexByName name => index
+  // getNames     indice => names
+
+  var _indexMap = {};
+  var _nameMap = {};
 
   return {
+    addBuffer: function (index, name, buffer) {
+      _indexMap[index] = name;
+      _nameMap[name] = buffer;
+    },
     getBufferByName: function (name) {
-      if (_storage.map.hasOwnProperty(name)) {
-        return _storage.map[name];
+      if (_nameMap.hasOwnProperty(name)) {
+        return _nameMap[name];
+      } else {
+        return null;
+      }
+    },
+    getBufferIndexByName: function (name) {
+      for (var i in _indexMap) {
+        if (_indexMap[i] === name) {
+          return i;
+        }
+      }
+      return null;
+    },
+    getBufferNameByIndex: function (index) {
+      if (_indexMap.hasOwnProperty(index)) {
+        var name = _indexMap[index];
+        return name;
       } else {
         return null;
       }
     },
     getBufferByIndex: function (index) {
-      if (index > -1 && index < _storage.list.length) {
-        return _storage.list[index];
-      } else {
-        return null;
-      }
+      var name = this.getBufferNameByIndex(index);
+      return _nameMap[name];
     },
     getBufferNames: function () {
       var names = [];
-      for (var name in _storage.map) {
+      for (var name in _nameMap) {
         names.push(name);
       }
       return names;
+    },
+    getBufferLength: function () {
+      var names = [];
+      for (var name in _nameMap) {
+        names.push(name);
+      }
+      return names.length;
     }
   };
 };
 
 
-WX._recurseXHR = function (data, storage, iteration, oncomplete) {
+WX.buildBufferMap = function (assetList, oncomplete) {
+// serialize asset list for recursion
+  var data = [], index = 0;
+  for (var name in assetList) {
+    data[index++] = [name, assetList[name]];
+  }
+  var bufferMap = new WX.BufferMap();
+  // start recursion
+  WX._recurseXHR(data, bufferMap, 0, oncomplete);
+};
+
+
+WX._recurseXHR = function (data, buffermap, iteration, oncomplete) {
   // get first key(name)/value(url) from data
   var d = data.shift();
   var name = d[0], url = d[1];
@@ -324,14 +357,14 @@ WX._recurseXHR = function (data, storage, iteration, oncomplete) {
   xhr.onload = function () {
     try {
       var b = WX.context.createBuffer(xhr.response, false);
-      storage.list[iteration++] = b;
-      storage.map[name] = b;
+      buffermap.addBuffer(iteration++, name, b);
       WX._log.post("loaded: " + url);
       if (data.length === 0) {
-        oncomplete();
+        console.log("loading complete.");
+        oncomplete(buffermap);
         return;
       } else {
-        WX._recurseXHR(data, storage, iteration, oncomplete);
+        WX._recurseXHR(data, buffermap, iteration, oncomplete);
       }
     } catch (error) {
       WX._log.error("xhr failed (" + error.message + "): " + url);
@@ -339,6 +372,18 @@ WX._recurseXHR = function (data, storage, iteration, oncomplete) {
   };
   xhr.send();
 };
+
+
+
+
+
+
+
+
+
+
+
+
 
 WX._loadBufferX = function (wxobject, buffers, oncomplete) {
   // assembling an array from wxobject

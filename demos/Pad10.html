@@ -10,8 +10,7 @@
   <div class="container">
     <h1>Pad10</h1>
     <div id="s-preset"></div>
-    <div id="s-pad" class="c-pad">
-    </div>
+    <div id="s-pad" class="c-pad"></div>
     <div class="clearfix"></div>
     <div id="s-control"></div>
     <div id="s-master"></div>
@@ -38,6 +37,7 @@
   <script src="../src/processor/Pingpong.js"></script>
   <script src="../src/processor/Chorus.js"></script>
   <script src="../src/processor/Phasor.js"></script>
+  <script src="../src/processor/Dist.js"></script>
   <script src="../src/processor/Comp.js"></script>
   <script src="../src/processor/Converb.js"></script>
   <script src="../src/analyzer/Waveform.js"></script>
@@ -50,6 +50,7 @@
   <script src="../lib/UI/UIIndexedList.js"></script>
 
   <!-- Pad10 logic -->
+  <script src="presets/Pad10-assets.js"></script>
   <script src="static/Pad10.js"></script>
 
   <!-- test code -->
@@ -74,11 +75,11 @@
     //   exclude: true
     // }, s_preset);
 
-    // pad control
-    var s_padControl = UI.ControlCenter.createSection("Control", "s-control");
+    // section: cell control
+    var s_cellControl = UI.ControlCenter.createSection("Control", "s-control");
 
     // pad control : sample
-    var ss_sample = UI.ControlCenter.createSubSection("Sample", s_padControl);
+    var ss_sample = UI.ControlCenter.createSubSection("Sample", s_cellControl);
     var btn_mute = UI.ControlCenter.createControl({
       type: "button", name: "Mute", value: false, mode: "toggle"
      }, ss_sample);
@@ -91,12 +92,12 @@
       precision: 2, scale: "linear", unit: "dB"
      }, ss_sample);
     var list_samples = UI.ControlCenter.createControl({
-      type: "indexed-list", name: "Sample", value: Pads.getSelectedPad().getCurrentFilename(),
-      data: Pads.getSelectedPad().getFilenames(),
+      type: "indexed-list", name: "Sample", value: "",
+      data: ["loading..."]
     }, ss_sample);
 
     // pad control : envelope
-    var ss_envelope = UI.ControlCenter.createSubSection("Envelope", s_padControl);
+    var ss_envelope = UI.ControlCenter.createSubSection("Envelope", s_cellControl);
     var btn_env = UI.ControlCenter.createControl({
       type: "button", name: "Envelope", value: false, mode: "toggle"
      }, ss_envelope);
@@ -114,7 +115,7 @@
      }, ss_envelope);
 
     // pad control : 2 shelving filter
-    var ss_filter = UI.ControlCenter.createSubSection("Filter", s_padControl);
+    var ss_filter = UI.ControlCenter.createSubSection("Filter", s_cellControl);
     var btn_filt = UI.ControlCenter.createControl({
       type: "button", name: "Filters", value: false, mode: "toggle"
      }, ss_filter);
@@ -131,6 +132,7 @@
       precision: 2, scale: "linear", unit: "dB"
      }, ss_filter);
 
+    /*
     // master
     var s_master = UI.ControlCenter.createSection("Master Effects", "s-master");
 
@@ -169,6 +171,8 @@
       type: "slider", name: "Master Gain", value: 0.0, min: -60.0, max: 12.0,
       precision: 2, scale: "linear", unit: "dB"
      }, ss_final);
+    */
+
 
     /**
      * actions
@@ -189,6 +193,7 @@
     // UI.ControlCenter.loadPreset(value);
     // });
 
+/*
 
     btn_mute.addAction(function (value) {
       Pads.getSelectedPad().setMute(value);
@@ -284,8 +289,49 @@
     "Strong Space": "../data/ir/strong.wav",
     "Heavy Space": "../data/ir/heavy.wav"
   };
+*/
+    // onReady!!
+    Pad10.onReady(function () {
 
-  var bufmap = WX.BufferMap(spaces2);
+      console.log("Ready! Starting...");
+
+      list_samples.setListData(Pad10.cell.getSampleNames());
+      list_samples.setValue(Pad10.cell.getSampleName());
+
+      // add actions
+      btn_mute.addAction(function (value) {
+        Pad10.cell.setSampleMute(value);
+      });
+      sli_tune.addAction(function (value) {
+        Pad10.cell.setSampleTune(value);
+      });
+      sli_volume.addAction(function (value) {
+        Pad10.cell.setSampleVolume(value);
+      });
+      // FIXME: this fuck up buffer index somehow
+      // list_samples.addAction(function (value) {
+      //   Pad10.cell.setBufferByName(value);
+      // });
+
+    });
+
+    // onCellChanged
+    Pad10.onCellChanged(function () {
+      var c = Pad10.cell.getParams();
+      btn_mute.setValue(c.muted);
+      sli_tune.setValue(c.tune);
+      sli_volume.setValue(c.volume);
+      list_samples.setValue(c.sampleName);
+      list_samples.setListData(c.sampleNames);
+      btn_env.setValue(c.envState);
+      sli_att.setValue(c.attack);
+      sli_hld.setValue(c.hold);
+      sli_rel.setValue(c.release);
+      btn_filt.setValue(c.filterState);
+      sli_freq.setValue(c.filterFreq);
+      sli_loshelf.setValue(c.LSGain);
+      sli_hishelf.setValue(c.HSGain);
+    });
 
     /**
      * MIDI

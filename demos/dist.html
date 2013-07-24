@@ -7,8 +7,8 @@
     <h1>Dist!</h1>
 
     <canvas id="spectrum" width="900" height="600"></canvas>
-    <canvas id="curve" width="128" height="128"></canvas>
     <div id="container"></div>
+    <canvas id="curve" width="128" height="128"></canvas>
 
 
     <!-- lib r8 -->
@@ -31,6 +31,7 @@
     <script src="../src/processor/Pingpong.js"></script>
     <script src="../src/processor/Chorus.js"></script>
     <script src="../src/processor/Phasor.js"></script>
+    <script src="../src/processor/Dist.js"></script>
     <script src="../src/processor/Comp.js"></script>
     <script src="../src/processor/Converb.js"></script>
     <script src="../src/analyzer/Waveform.js"></script>
@@ -52,35 +53,11 @@
       ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";
       var v1 = WX.Spectrum({ context:ctx, smoothingFactor:0.85, grid:true });
 
-      var len = 128;
-      var curve1 = new Float32Array(len);
-      var curve2 = new Float32Array(len);
-      var curve3 = new Float32Array(len);
+      var smp = WX.Sampler({ source:"../data/samples/cleangtr.wav", loop:true });
+      var dst = WX.Dist();
 
-      // controllabe curve
-      function getCurve (iter) {
-        for (var i = 0; i < len; ++i) {
-          var x = i / len;
-          for (var j = 0; j < iter; ++j) {
-            x = x * x * (3 - 2 * x);
-          }
-          curve1[i] = x;
-        }
-      }
-      getCurve(0);
-
-      var smp = WX.Sampler({ source:"../data/samples/fables-aesop.ogg", loop:true });
-      //var osc = WX.Oscil();
-      var fx = WX.context.createWaveShaper();
-      fx.curve = curve1;
-      //fx.oversampleType = "2x";
-
-      smp.connect(fx);
-      fx.connect(WX.DAC._inlet);
-      fx.connect(v1._inlet);
-      WX.DAC.type("mono");
-
-
+      smp.to(dst).to(WX.DAC);
+      dst.to(v1);
 
       setTimeout(function () {
         smp.start(60);
@@ -97,31 +74,49 @@
        * UI
        */
       var section = UI.ControlCenter.createSection("Control", "container");
-      slider_factor = UI.ControlCenter.createControl({
-        type: "slider", name: "Slope", value: 1, min: 1, max: 16,
-        precision: 0, scale: "linear", unit: ""
+      var slider_factor = UI.ControlCenter.createControl({
+        type: "slider", name: "Distortion", value: 1.0, min: 0.1, max: 2.0,
+        precision: 4, scale: "linear", unit: ""
+      }, section);
+      var slider_drive = UI.ControlCenter.createControl({
+        type: "slider", name: "Drive", value: 6.0, min: 6.0, max: 36.0,
+        precision: 4, scale: "linear", unit: "dB"
+      }, section);
+      var list_type = UI.ControlCenter.createControl({
+        type: "indexed-list", name: "Curve", value: "hardclip",
+        data: ["hardclip", "softclip", "saturate"]
       }, section);
 
       slider_factor.addAction(function (value) {
-        getCurve(~~(value));
-        drawGraph();
+        dst.factor(value);
+        drawGraph(dst.getCurve());
       });
+      slider_drive.addAction(function (value) {
+        dst.drive(WX.db2lin(value));
+        drawGraph(dst.getCurve());
+      });
+      list_type.addAction(function (value) {
+        dst.curveType(value);
+        drawGraph(dst.getCurve());
+      })
 
       var cvs2 = document.getElementById('curve');
       var ctx2 = cvs2.getContext('2d');
-      ctx2.canvas.width = len;
-      ctx2.canvas.height = len;
+      ctx2.canvas.width = 128;
+      ctx2.canvas.height = 128;
       ctx2.lineWidth = 1.0;
       ctx2.strokeStyle = "#f00";
 
-      var xoffset = len / 128;
-      function drawGraph () {
-        ctx2.clearRect(0, 0, 128, 128);
-        ctx2.beginPath();
-        for (var i = 0; i < len; i++) {
-            ctx2.lineTo(i, 128 * (1.0 - curve1[i]));
+      function drawGraph (curve) {
+        if (curve) {
+          var xoffset = 65535 / 128;
+          ctx2.clearRect(0, 0, 128, 128);
+          ctx2.beginPath();
+          for (var i = 0; i < 128; i++) {
+              ctx2.lineTo(i, 128 * (curve[~~(i * xoffset)] * -0.5 + 0.5));
+          }
+          ctx2.stroke();
         }
-        ctx2.stroke();
       }
       drawGraph();
 
