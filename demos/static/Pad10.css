@@ -1,5 +1,5 @@
 @-webkit-keyframes flash {
-  from { opacity: 0.5; }
+  from { opacity: 0.75; }
   to { opacity: 0; }
 }
 .clearfix:before, .clearfix:after {
@@ -24,16 +24,17 @@
   float: left;
   background: #fff;
   margin: 5px;
-  border: 1px solid #999;
-  box-shadow: 0 0 6px #bbb;
-  border-radius: 5px;
+  border: 1px solid #313131;
+  box-shadow: 0 0 8px #474747;
+  border-radius: 10px;
 }
 .pad-highlight {
-  background: rgba(49, 150, 204, 0.2);
+  background: rgba(178, 227, 253, 0.89);
+  border: 1px solid #1A1A1A;
 }
 .pad-overlay {
   opacity: 0;
-  background-color:  #ff0;
+  background-color: #aa0;
   width: 110px;
   height: 90px;
 }

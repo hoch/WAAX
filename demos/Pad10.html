@@ -76,13 +76,17 @@
     // }, s_preset);
 
     // section: cell control
-    var s_cellControl = UI.ControlCenter.createSection("Control", "s-control");
+    var s_cellControl = UI.ControlCenter.createSection("Cell Setting", "s-control");
 
     // pad control : sample
     var ss_sample = UI.ControlCenter.createSubSection("Sample", s_cellControl);
     var btn_mute = UI.ControlCenter.createControl({
       type: "button", name: "Mute", value: false, mode: "toggle"
      }, ss_sample);
+    var list_samples = UI.ControlCenter.createControl({
+      type: "indexed-list", name: "Sample", value: "",
+      data: ["loading..."]
+    }, ss_sample);
     var sli_tune = UI.ControlCenter.createControl({
       type: "slider", name: "Tune", value: 0.0, min: -1200.0, max: 1200.0,
       precision: 0, scale: "linear", unit: "cents"
@@ -91,10 +95,8 @@
       type: "slider", name: "Volume", value: 0.0, min: -80.0, max: 12.0,
       precision: 2, scale: "linear", unit: "dB"
      }, ss_sample);
-    var list_samples = UI.ControlCenter.createControl({
-      type: "indexed-list", name: "Sample", value: "",
-      data: ["loading..."]
-    }, ss_sample);
+
+    
 
     // pad control : envelope
     var ss_envelope = UI.ControlCenter.createSubSection("Envelope", s_cellControl);
@@ -295,10 +297,11 @@
 
       console.log("Ready! Starting...");
 
+      // the order is very important... should be fixed
       list_samples.setListData(Pad10.cell.getSampleNames());
       list_samples.setValue(Pad10.cell.getSampleName());
 
-      // add actions
+      // sample: add actions
       btn_mute.addAction(function (value) {
         Pad10.cell.setSampleMute(value);
       });
@@ -308,11 +311,37 @@
       sli_volume.addAction(function (value) {
         Pad10.cell.setSampleVolume(value);
       });
-      // FIXME: this fuck up buffer index somehow
-      // list_samples.addAction(function (value) {
-      //   Pad10.cell.setBufferByName(value);
-      // });
+      list_samples.addAction(function (value) {
+        Pad10.cell.setBufferByName(value);
+      });
 
+      // envelope: add actions
+      btn_env.addAction(function (value) {
+        Pad10.cell.setEnvelopeState(value);
+      });
+      sli_att.addAction(function (value) {
+        Pad10.cell.setAttack(value);
+      });
+      sli_hld.addAction(function (value) {
+        Pad10.cell.setHold(value);
+      });
+      sli_rel.addAction(function (value) {
+        Pad10.cell.setRelease(value);
+      });
+
+      // filter: add actions
+      btn_filt.addAction(function (value) {
+        Pad10.cell.setFilterState(value);
+      });
+      sli_freq.addAction(function (value) {
+        Pad10.cell.setFilterFreq(value);
+      });
+      sli_loshelf.addAction(function (value) {
+        Pad10.cell.setLSGain(value);
+      });
+      sli_hishelf.addAction(function (value) {
+        Pad10.cell.setHSGain(value);
+      });
     });
 
     // onCellChanged
@@ -321,8 +350,8 @@
       btn_mute.setValue(c.muted);
       sli_tune.setValue(c.tune);
       sli_volume.setValue(c.volume);
-      list_samples.setValue(c.sampleName);
       list_samples.setListData(c.sampleNames);
+      list_samples.setValue(c.sampleName);
       btn_env.setValue(c.envState);
       sli_att.setValue(c.attack);
       sli_hld.setValue(c.hold);

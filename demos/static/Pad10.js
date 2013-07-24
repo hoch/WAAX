@@ -1,8 +1,12 @@
+// log shortcut
+window.ll = console.log.bind(console);
+
 /*
  * @class PadCell
  */
 var PadCell = function (targetDiv) {
   // vars
+  this._id = targetDiv.id;
   this._view = targetDiv;
   this._overlay = this._view.getElementsByClassName('pad-overlay')[0];
   this._bufferMap = null;
@@ -135,8 +139,8 @@ PadCell.prototype = {
       muted: this._muted,
       tune: this._tune,
       volume: this._volume,
-      sampleName: this._sampleName,
       sampleNames: this.getSampleNames(),
+      sampleName: this._sampleName,
       envState: this._envState,
       attack: this._attack,
       hold: this._hold,
@@ -158,8 +162,7 @@ PadCell.prototype = {
     source.connect(env);
     env.connect(this._nFilterSwitcher);
 
-    console.log(this._bufferIndex);
-    source.buffer = this._bufferMap.getBufferByIndex(this._bufferIndex);
+    source.buffer = this._buffer;
     moment = (moment || WX.now);
     var prate = Math.pow(2, this._tune / 1200);
     source.playbackRate.setValueAtTime(prate, moment);
@@ -234,7 +237,6 @@ var Pad10 = (function (assets, WX, Center, window) {
   selectedCell.highlight(true);
   s_pad.addEventListener("mousedown", function (event) {
     var index = event.target.id.slice(11);
-    console.log(index);
     if (index > -1 && index < 10) {
       if (index !== cellIndex) {
         cellIndex = index;
@@ -293,22 +295,20 @@ var Pad10 = (function (assets, WX, Center, window) {
     }
   }
 
-  return {
-    onCellChanged: _onCellChanged,
-    onReady: _onReady,
-    get cell () { return selectedCell; }
-    // getSampleName: function () {
-    //   // get current cell's sample list
-    //   return selectedCell.getSampleName();
-    // },
-    // getSampleNames: function () {
-    //   // get current cell's sample list
-    //   return selectedCell.getSampleNames();
-    // },
-    // setSampleByName: function (name) {
-    //   selectedCell.setBufferByName(name);
-    // }
-  };
+  // return object
+  return Object.create(null, {
+    onCellChanged: {
+      value: _onCellChanged
+    },
+    onReady: {
+      value: _onReady
+    },
+    cell: {
+      get: function () {
+        return selectedCell;
+      }
+    }
+  });
 
 })(ASSETS, WX, UI.ControlCenter, window);
 

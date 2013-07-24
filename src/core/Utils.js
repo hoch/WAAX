@@ -288,7 +288,16 @@ WX.BufferMap = function () {
   return {
     addBuffer: function (index, name, buffer) {
       _indexMap[index] = name;
-      _nameMap[name] = buffer;
+      // when buffer is mono, make it duplicated stereo
+      if (buffer.numberOfChannels === 1) {
+        var newBuffer = WX.context.createBuffer(2, buffer.length, WX.sampleRate);
+        var chan = buffer.getChannelData(0);
+        newBuffer.getChannelData(0).set(new Float32Array(chan));
+        newBuffer.getChannelData(1).set(new Float32Array(chan));
+        _nameMap[name] = newBuffer;
+      } else {
+        _nameMap[name] = buffer;
+      }
     },
     getBufferByName: function (name) {
       if (_nameMap.hasOwnProperty(name)) {
@@ -358,7 +367,7 @@ WX._recurseXHR = function (data, buffermap, iteration, oncomplete) {
     try {
       var b = WX.context.createBuffer(xhr.response, false);
       buffermap.addBuffer(iteration++, name, b);
-      WX._log.post("loaded: " + url);
+      WX._log.post("loaded: " + url + " " + b.numberOfChannels);
       if (data.length === 0) {
         console.log("loading complete.");
         oncomplete(buffermap);
@@ -372,17 +381,6 @@ WX._recurseXHR = function (data, buffermap, iteration, oncomplete) {
   };
   xhr.send();
 };
-
-
-
-
-
-
-
-
-
-
-
 
 
 WX._loadBufferX = function (wxobject, buffers, oncomplete) {

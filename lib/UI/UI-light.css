@@ -5,17 +5,21 @@
 /* ----- demo style base ----- */
 body {
   font-family: 'Roboto', sans-serif;
-  background: #EEE;
+  background: #808080;
   margin: 0;
   padding: 0;
   -webkit-user-select: none;
+}
+h1 {
+  color: #fff;
 }
 
 
 /* ---------- ui-section ---------- */
 .ui-section {
-  box-shadow: 0 0 3px #aaa;
-  border-radius: 10px;
+  background-color: #EEE;
+  box-shadow: 0 0 2px #242424;
+  border-radius: 4px;
   padding: 2px;
   margin: 20px auto;
 }
@@ -23,8 +27,8 @@ body {
   font-size: 15px;
   margin: 4px;
   padding: 5px;
-  background-color: #ddd;
-  border-radius: 5px;
+  background-color: #D6D6D6;
+  border-radius: 2px;
 }
 
 
@@ -41,7 +45,7 @@ body {
   display: inline-block;
   overflow: hidden;
   margin: 6px;
-  padding: 5px;
+  padding: 4px;
 }
 .ui-slider-touchable {
   cursor: move;
@@ -87,19 +91,19 @@ body {
 .ui-button-view {
   display: inline-block;
   overflow: hidden;
-  height: 10px;
+  height: 22px;
   border: 1px solid #999;
   margin: 6px;
   padding: 4px;
   border-radius: 3px;
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0.125)));
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0.2)));
 }
 .ui-button-touchable {
   position: relative;
   cursor: pointer;
 }
 .ui-button-led {
-  height: 10px;
+  height: 22px;
   background: #A7A7A7;
   box-shadow: 1px 1px 0 #eee;
 }
@@ -110,10 +114,10 @@ body {
 .ui-button-label {
   position: absolute;
   top: 0;
-  left: 15px;
+  left: 10px;
   font-size: 11px;
-  line-height: 10px;
-  height: 10px;
+  line-height: 22px;
+  height: 22px;
   color: #5F5F5f;
   display: inline-block;
 }
