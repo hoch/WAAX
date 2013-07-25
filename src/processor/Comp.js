@@ -69,6 +69,14 @@ WX._unit.comp.prototype = {
     } else {
       this.gain(WX.db2lin(value), moment, type);
     }
+  },
+  getParams: function () {
+    return {
+      active: this.active(),
+      threshold: this.threshold(),
+      ratio: this.ratio(),
+      makeup: this.makeup()
+    };
   }
 };
 

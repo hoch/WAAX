@@ -78,6 +78,12 @@
     },
     getCurve: function() {
       return this._curve;
+    },
+    getParams: function () {
+      return {
+        active: this.active(),
+        drive: this.drive()
+      };
     }
   };
 

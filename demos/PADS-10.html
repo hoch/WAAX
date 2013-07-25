@@ -318,7 +318,7 @@
 
       // master section
       btn_comp.addAction(function (value) {
-        Pad10.comp.bypass(!value);
+        Pad10.comp.active(value);
       });
       sli_thre.addAction(function (value) {
         Pad10.comp.threshold(value);
@@ -330,7 +330,7 @@
         Pad10.comp.makeup(value);
       });
       btn_crush.addAction(function (value) {
-        Pad10.dist.bypass(!value);
+        Pad10.dist.active(value);
       });
       sli_crush.addAction(function (value) {
         var amp = WX.db2lin(value);

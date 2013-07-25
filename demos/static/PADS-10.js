@@ -223,8 +223,8 @@ PadCell.prototype = {
 var Pad10 = (function (WX, Center, Ktrl, window) {
 
   // Master Class
-  var compUnit = WX.Comp({ threshold: -12, ratio: 8, makeup: 4.0, bypass: true });
-  var distUnit = WX.Dist({ type:"saturate", factor:1.5, bypass: true });
+  var compUnit = WX.Comp({ threshold: -12, ratio: 8, makeup: 4.0, active: false });
+  var distUnit = WX.Dist({ type:"saturate", factor:1.5, active: false });
   var verbUnit = WX.Multiverb();
   compUnit.to(distUnit).to(verbUnit).to(WX.DAC);
 
@@ -250,39 +250,71 @@ var Pad10 = (function (WX, Center, Ktrl, window) {
     PadCells[i].to(compUnit);
   }
 
+
+  /**
+   * preset
+   */
+  var _preset = {
+    name: "",
+    payload: {
+      drumkit: "",
+      cellIndex: 0,
+      cellParams: [],
+      masterParams: {
+        comp: {
+          active: compUnit.active(),
+          threshold: compUnit.threshold(),
+          ratio: compUnit.ratio(),
+          makeup: compUnit.makeup()
+        },
+        dist: {
+          active: distUnit.active(),
+          drive: distUnit.drive()
+        },
+        verb: {
+          mix: verbUnit.mix(),
+          preset: verbUnit.getPresetName()
+        }
+      }
+    }
+  };
+
+  // UI touched => update elements => update preset
+
+
+  // init: selected cell
+  var _selectedCell = PadCells[0];
+  _selectedCell.highlight(true);
   // add user interaction to PadCells
-  var cellIndex = 0;
-  var selectedCell = PadCells[cellIndex];
-  selectedCell.highlight(true);
   s_pad.addEventListener("mousedown", function (event) {
     var index = event.target.id.slice(11);
     if (index > -1 && index < 10) {
       if (index !== cellIndex) {
-        cellIndex = index;
-        selectedCell.highlight(false);
-        selectedCell = PadCells[cellIndex];
-        selectedCell.highlight(true);
+        _preset.payload.cellIndex = index;
+        _selectedCell.highlight(false);
+        _selectedCell = PadCells[index];
+        _selectedCell.highlight(true);
         _onCellChangedCallback();
       }
-      selectedCell.noteOn(0.75);
-      selectedCell.flash();
+      _selectedCell.noteOn(0.75);
+      _selectedCell.flash();
       event.stopPropagation();
     }
   }, false);
 
-  // keydown event
+  // handle keyboard
+  var _keyMap = KeyboardSetup.KeyCodeToPadMap;
   var _keyPressed = [];
-  var _keyPadMap = KeyboardSetup.KeyCodeToPadMap;
   window.addEventListener("keydown", function (event) {
-    // if key is pressed, ignore
     var kc = event.keyCode;
+    // if key is pressed, ignore
     if (_keyPressed[kc]) {
       return;
     } else {
-      if (typeof _keyPadMap[kc] !== 'undefined') {
+      if (typeof _keyMap[kc] !== 'undefined') {
         _keyPressed[kc] = true;
-        PadCells[_keyPadMap[kc]].noteOn(0.75);
-        PadCells[_keyPadMap[kc]].flash();
+        PadCells[_keyMap[kc]].noteOn(0.75);
+        PadCells[_keyMap[kc]].flash();
       }
     }
     event.stopPropagation();
@@ -291,79 +323,37 @@ var Pad10 = (function (WX, Center, Ktrl, window) {
     _keyPressed[event.keyCode] = false;
   });
 
-  // handleMIDINote
-  var _pitchMap = MIDISetup.PitchToPadMap;
+  // handle MIDINote
+  var _noteMap = MIDISetup.NoteToPadMap;
   function _handleMIDINote (data) {
-    if (typeof _pitchMap[data.pitch] === 'undefined') {
+    if (typeof _noteMap[data.pitch] === 'undefined') {
       return;
     }
-    var id = _pitchMap[data.pitch];
+    var id = _noteMap[data.pitch];
     PadCells[id].noteOn(Ktrl.CurveCubed(data.velocity), WX.now);
   }
 
   // load drum kit
-  var _currentDrumKitData = null;
   function _loadDrumKit(drumkitData, oncomplete) {
-    _currentDrumKitData = drumkitData;
     WX.buildBufferMap(drumkitData, function (buffermap) {
       for (var i = 0; i < PadCells.length; i++) {
         PadCells[i].loadBufferMap(buffermap);
         PadCells[i].setBufferByIndex(i);
       }
+      _preset.payload.drumkit = drumkitData.name;
       oncomplete();
     });
   }
 
-  // getMasterParams
-  function _getMasterParams () {
-    var params = {
-      comp: {},
-      crush: {},
-      reverb: {}
-    };
-    params.comp.active = !compUnit.bypass();
-    params.comp.threshold = compUnit.threshold();
-    params.comp.ratio = compUnit.ratio();
-    params.comp.makeup = compUnit.makeup();
-    params.crush.active = !distUnit.bypass();
-    params.crush.drive = distUnit.drive();
-    params.reverb.mix = verbUnit.mix();
-    //params.reverb.preset = verbUnit.mix();
-    return params;
-  }
-
-  // setMasterParams
-  function _setMasterParams (params) {
-    compUnit.bypass(!params.comp.active);
-    compUnit.threshold(params.comp.threshold);
-    compUnit.ratio(params.comp.ratio);
-    compUnit.makeup(params.comp.makeup);
-    distUnit.bypass(!params.crush.active);
-    distUnit.drive(params.crush.drive);
-    distUnit.gain(1/params.crush.drive);
-    verbUnit.mix(params.reverb.mix);
-    //params.reverb.preset
-    console.log(params.comp.threshold, compUnit.threshold());
-  }
-
   // save preset
   function _savePreset (name) {
-    // get drumkit name
-    var mp = _getMasterParams();
-    var preset = {
-      name: name,
-      payload: {
-        drumkit: _currentDrumKitData.name,
-        cellParams: [],
-        masterParams: mp
-      }
-    };
+    _preset.name = name;
     for (var i = 0; i < PadCells.length; i++) {
       var params = PadCells[i].getParams();
       delete params.sampleNames;
-      preset.payload.cellParams.push(params);
+      _preset.payload.cellParams.push(params);
     }
-    return JSON.stringify(preset);
+    return JSON.stringify(_preset);
   }
 
   // load preset
@@ -398,7 +388,7 @@ var Pad10 = (function (WX, Center, Ktrl, window) {
     _onPresetChangedCallback = callback;
   }
 
-  // check all cells to be ready, then fire updateAllView
+  // check all cells to be ready, then fire onready callback
   function _onReady (callback) {
     var flag = PadCells[0].isReady();
     for (var i = 1; i < 10; i++) {
@@ -414,8 +404,9 @@ var Pad10 = (function (WX, Center, Ktrl, window) {
     }
   }
 
-  // return object
+  // revealed methods
   return Object.create(null, {
+
     onCellChanged: {
       value: _onCellChanged
     },
@@ -425,9 +416,14 @@ var Pad10 = (function (WX, Center, Ktrl, window) {
     onReady: {
       value: _onReady
     },
+
+    setSampleMute: function (value) {
+
+    },
+
     cell: {
       get: function () {
-        return selectedCell;
+        return _selectedCell;
       }
     },
     loadDrumKit: {
@@ -438,9 +434,6 @@ var Pad10 = (function (WX, Center, Ktrl, window) {
     },
     loadPreset: {
       value: _loadPreset
-    },
-    getMasterParams: {
-      value: _getMasterParams
     },
     comp: {
       value: compUnit

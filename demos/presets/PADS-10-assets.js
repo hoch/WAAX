@@ -133,7 +133,7 @@ var ImpulseResponses = {
 
 
 var MIDISetup = {
-  PitchToPadMap : {
+  NoteToPadMap : {
     "48": 0,
     "52": 1,
     "54": 2,

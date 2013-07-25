@@ -245,13 +245,23 @@ WX._unit.extend(WX._unit.generator.prototype, WX._unit.abstract);
  * abstract: processor
  */
 WX._unit.processor = function () {
-  this._active = true;
+  
   this._inlet = WX.context.createGain();
   this._inputGain = WX.context.createGain();
   this._outputGain = WX.context.createGain();
+  this._processed = WX.context.createGain();
+  this._bypassed = WX.context.createGain();
   this._outlet = WX.context.createGain();
+  
   this._inlet.connect(this._inputGain);
-  this._outputGain.connect(this._outlet);
+  this._inlet.connect(this._bypassed);
+  this._outputGain.connect(this._processed);
+  this._processed.connect(this._outlet);
+  this._bypassed.connect(this._outlet);
+  
+  this._active = true;
+  this.active(true);
+
   WX._unit.bindAudioParam.call(this, "gain", this._outputGain.gain);
 };
 
@@ -259,25 +269,27 @@ WX._unit.processor.prototype = {
   label: "u.pro",
 
   /**
-   * bypass core audio graph (unit-processor-specific)
-   * @param  {boolean} bool bypass processing when true.
+   * activate processing stream
+   * @param  {boolean} bool activate processing when true.
    */
-  bypass: function (bool) {
+  active: function (bool) {
     if (typeof bool === 'undefined') {
       return this._active;
     }
     if (typeof bool !== "boolean") {
       return;
     }
-    this._active = !bool;
+    // NOTE: the initial bypassing was implemented by "disconnection" for
+    // the CPU efficiency sake, but it has some issues. (i.e. AudioParams are
+    // not properly controlled or updated without a connection.) So now it
+    // is implemented with the flipping gain trick.
+    this._active = bool;
     if (bool) {
-      this._inlet.disconnect();
-      this._outputGain.disconnect();
-      this._inlet.connect(this._outlet);
+      this._processed.gain.value = 1.0;
+      this._bypassed.gain.value = 0.0;
     } else {
-      this._inlet.disconnect();
-      this._inlet.connect(this._inputGain);
-      this._outputGain.connect(this._outlet);
+      this._processed.gain.value = 0.0;
+      this._bypassed.gain.value = 1.0;
     }
   }
 };

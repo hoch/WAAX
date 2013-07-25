@@ -8,6 +8,7 @@
 
     this._ready = false;
     this._bufferMap = null;
+    this._presetName = "";
 
     this._convolver = WX.context.createConvolver();
     this._dry = WX.context.createGain();
@@ -37,9 +38,11 @@
       this._bufferMap = buffermap;
     },
     setBufferByName: function (name) {
+      this._presetName = name;
       this._convolver.buffer = this._bufferMap.getBufferByName(name);
     },
     setBufferByIndex: function (index) {
+      this._presetName = this._bufferMap.getBufferNameByIndex(index);
       this._convolver.buffer = this._bufferMap.getBufferByIndex(index);
     },
     mix: function (mix, moment, type) {
@@ -49,6 +52,9 @@
       } else {
         return this.wet();
       }
+    },
+    getPresetName: function () {
+      return this._presetName;
     }
   };
 
