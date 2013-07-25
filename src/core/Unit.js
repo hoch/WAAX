@@ -263,6 +263,9 @@ WX._unit.processor.prototype = {
    * @param  {boolean} bool bypass processing when true.
    */
   bypass: function (bool) {
+    if (typeof bool === 'undefined') {
+      return this._active;
+    }
     if (typeof bool !== "boolean") {
       return;
     }

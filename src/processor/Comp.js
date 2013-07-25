@@ -36,7 +36,7 @@
 WX._unit.comp = function (options) {
   // pre-building
   WX._unit.processor.call(this);
-  // building  
+  // building
   this._comp = WX.context.createDynamicsCompressor();
   this._inputGain.connect(this._comp);
   this._comp.connect(this._outputGain);
@@ -64,8 +64,11 @@ WX._unit.comp.prototype = {
     gain: 1.0
   },
   makeup: function(value, moment, type) {
-    var a = WX.db2lin(value);
-    this.gain(a, moment, type);
+    if (typeof value === 'undefined') {
+      return WX.lin2db(this.gain());
+    } else {
+      this.gain(WX.db2lin(value), moment, type);
+    }
   }
 };
 

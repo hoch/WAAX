@@ -2,6 +2,13 @@
   from { opacity: 0.75; }
   to { opacity: 0; }
 }
+body {
+  background: -webkit-radial-gradient(center, ellipse cover, rgba(181,189,200,1) 0%,rgba(130,140,149,1) 26%,rgba(40,52,59,1) 100%);
+}
+h1 {
+  color: #fff;
+  text-shadow: 0 0 8px #101011;
+}
 .clearfix:before, .clearfix:after {
   content: " ";
   display: table;
@@ -37,6 +44,7 @@
   background-color: #aa0;
   width: 110px;
   height: 90px;
+  border-radius: 10px;
 }
 .flash {
   -webkit-animation: flash 0.15s;

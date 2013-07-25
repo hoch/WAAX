@@ -1,6 +1,3 @@
-// log shortcut
-window.ll = console.log.bind(console);
-
 /*
  * @class PadCell
  */
@@ -152,11 +149,28 @@ PadCell.prototype = {
     };
   },
 
+  // setter
+  setParams: function (params) {
+    this._muted = params.muted;
+    this._tune = params.tune;
+    this._volume = params.volume;
+    //this.getSampleNames() = params.sampleNames
+    //params.sampleName: this._sampleName,
+    this._envState = params.envState;
+    this._hold = params.hold;
+    this._release = params.release;
+    this._filterState = params.filterState;
+    this._filterFreq = params.filterFreq;
+    this._LSGain = params.LSGain;
+    this._HSGain = params.HSGain;
+  },
+
   // note-on
   noteOn: function (intensity, moment) {
     if (this._muted) {
       return;
     }
+    this.flash();
     var source = WX.context.createBufferSource();
     var env = WX.context.createGain();
     source.connect(env);
@@ -193,6 +207,7 @@ PadCell.prototype = {
     }
   },
   flash: function () {
+    // TODO: cancel scheduled event... when triggered
     this._overlay.className += " flash";
     var me = this;
     setTimeout(function () {
@@ -203,17 +218,21 @@ PadCell.prototype = {
 
 
 /**
- * @class Multiverb
- */
-
-
-
-/**
  * Pad10 core, Singletone
  */
-var Pad10 = (function (assets, WX, Center, window) {
+var Pad10 = (function (WX, Center, Ktrl, window) {
 
   // Master Class
+  var compUnit = WX.Comp({ threshold: -12, ratio: 8, makeup: 4.0, bypass: true });
+  var distUnit = WX.Dist({ type:"saturate", factor:1.5, bypass: true });
+  var verbUnit = WX.Multiverb();
+  compUnit.to(distUnit).to(verbUnit).to(WX.DAC);
+
+  // load impulse responses and assign to verbUnit
+  WX.buildBufferMap(ImpulseResponses.Default, function (buffermap) {
+    verbUnit.setBufferMap(buffermap);
+    verbUnit.setBufferByIndex(0);
+  });
 
   // create 10 PadCells
   var PadCells = [];
@@ -228,7 +247,7 @@ var Pad10 = (function (assets, WX, Center, window) {
     pad.appendChild(overlay);
     s_pad.appendChild(pad);
     PadCells[i] = new PadCell(pad);
-    PadCells[i].to(WX.DAC);
+    PadCells[i].to(compUnit);
   }
 
   // add user interaction to PadCells
@@ -245,38 +264,138 @@ var Pad10 = (function (assets, WX, Center, window) {
         selectedCell.highlight(true);
         _onCellChangedCallback();
       }
-      selectedCell.noteOn(1.0);
+      selectedCell.noteOn(0.75);
       selectedCell.flash();
       event.stopPropagation();
     }
   }, false);
 
-  // process assets
-  WX.buildBufferMap(assets.kd, function (buffermap) {
-    PadCells[0].loadBufferMap(buffermap);
-    PadCells[1].loadBufferMap(buffermap);
+  // keydown event
+  var _keyPressed = [];
+  var _keyPadMap = KeyboardSetup.KeyCodeToPadMap;
+  window.addEventListener("keydown", function (event) {
+    // if key is pressed, ignore
+    var kc = event.keyCode;
+    if (_keyPressed[kc]) {
+      return;
+    } else {
+      if (typeof _keyPadMap[kc] !== 'undefined') {
+        _keyPressed[kc] = true;
+        PadCells[_keyPadMap[kc]].noteOn(0.75);
+        PadCells[_keyPadMap[kc]].flash();
+      }
+    }
+    event.stopPropagation();
   });
-  WX.buildBufferMap(assets.sd, function (buffermap) {
-    PadCells[2].loadBufferMap(buffermap);
-    PadCells[3].loadBufferMap(buffermap);
+  window.addEventListener("keyup", function (event) {
+    _keyPressed[event.keyCode] = false;
   });
-  WX.buildBufferMap(assets.hh, function (buffermap) {
-    PadCells[4].loadBufferMap(buffermap);
-    PadCells[5].loadBufferMap(buffermap);
-  });
-  WX.buildBufferMap(assets.perc, function (buffermap) {
-    PadCells[6].loadBufferMap(buffermap);
-    PadCells[7].loadBufferMap(buffermap);
-  });
-  WX.buildBufferMap(assets.fx, function (buffermap) {
-    PadCells[8].loadBufferMap(buffermap);
-    PadCells[9].loadBufferMap(buffermap);
-  });
+
+  // handleMIDINote
+  var _pitchMap = MIDISetup.PitchToPadMap;
+  function _handleMIDINote (data) {
+    if (typeof _pitchMap[data.pitch] === 'undefined') {
+      return;
+    }
+    var id = _pitchMap[data.pitch];
+    PadCells[id].noteOn(Ktrl.CurveCubed(data.velocity), WX.now);
+  }
+
+  // load drum kit
+  var _currentDrumKitData = null;
+  function _loadDrumKit(drumkitData, oncomplete) {
+    _currentDrumKitData = drumkitData;
+    WX.buildBufferMap(drumkitData, function (buffermap) {
+      for (var i = 0; i < PadCells.length; i++) {
+        PadCells[i].loadBufferMap(buffermap);
+        PadCells[i].setBufferByIndex(i);
+      }
+      oncomplete();
+    });
+  }
+
+  // getMasterParams
+  function _getMasterParams () {
+    var params = {
+      comp: {},
+      crush: {},
+      reverb: {}
+    };
+    params.comp.active = !compUnit.bypass();
+    params.comp.threshold = compUnit.threshold();
+    params.comp.ratio = compUnit.ratio();
+    params.comp.makeup = compUnit.makeup();
+    params.crush.active = !distUnit.bypass();
+    params.crush.drive = distUnit.drive();
+    params.reverb.mix = verbUnit.mix();
+    //params.reverb.preset = verbUnit.mix();
+    return params;
+  }
+
+  // setMasterParams
+  function _setMasterParams (params) {
+    compUnit.bypass(!params.comp.active);
+    compUnit.threshold(params.comp.threshold);
+    compUnit.ratio(params.comp.ratio);
+    compUnit.makeup(params.comp.makeup);
+    distUnit.bypass(!params.crush.active);
+    distUnit.drive(params.crush.drive);
+    distUnit.gain(1/params.crush.drive);
+    verbUnit.mix(params.reverb.mix);
+    //params.reverb.preset
+    console.log(params.comp.threshold, compUnit.threshold());
+  }
+
+  // save preset
+  function _savePreset (name) {
+    // get drumkit name
+    var mp = _getMasterParams();
+    var preset = {
+      name: name,
+      payload: {
+        drumkit: _currentDrumKitData.name,
+        cellParams: [],
+        masterParams: mp
+      }
+    };
+    for (var i = 0; i < PadCells.length; i++) {
+      var params = PadCells[i].getParams();
+      delete params.sampleNames;
+      preset.payload.cellParams.push(params);
+    }
+    return JSON.stringify(preset);
+  }
+
+  // load preset
+  var _currentPresetName = null;
+  function _loadPreset (preset) {
+    // get preset name
+    _currentPresetName = preset.name;
+    var pl = preset.payload;
+    //  get cell params => iterate(cell.setParam())
+    for (var i = 0; i < PadCells.length; i++) {
+      PadCells[i].setParams(pl.cellParams[i]);
+    }
+    //  get master params => set parameters
+    _setMasterParams(pl.masterParams);
+    // find drumkitname in DrumKits & update view and all
+    for (var kit in DrumKits) {
+      if (DrumKits[kit].name === pl.drumkit) {
+        _loadDrumKit(DrumKits[kit], _onPresetChangedCallback);
+      }
+    }
+  }
 
   // onCellChangedCallback
   var _onCellChangedCallback = null;
   function _onCellChanged (callback) {
     _onCellChangedCallback = callback;
+  }
+
+  // onPresetChangedCallback
+  var _onPresetChangedCallback = null;
+  function _onPresetChanged (callback) {
+    _onPresetChangedCallback = callback;
   }
 
   // check all cells to be ready, then fire updateAllView
@@ -300,6 +419,9 @@ var Pad10 = (function (assets, WX, Center, window) {
     onCellChanged: {
       value: _onCellChanged
     },
+    onPresetChanged: {
+      value: _onPresetChanged
+    },
     onReady: {
       value: _onReady
     },
@@ -307,10 +429,34 @@ var Pad10 = (function (assets, WX, Center, window) {
       get: function () {
         return selectedCell;
       }
+    },
+    loadDrumKit: {
+      value: _loadDrumKit
+    },
+    savePreset: {
+      value: _savePreset
+    },
+    loadPreset: {
+      value: _loadPreset
+    },
+    getMasterParams: {
+      value: _getMasterParams
+    },
+    comp: {
+      value: compUnit
+    },
+    dist: {
+      value: distUnit
+    },
+    verb: {
+      value: verbUnit
+    },
+    handleMIDINote: {
+      value: _handleMIDINote
     }
   });
 
-})(ASSETS, WX, UI.ControlCenter, window);
+})(WX, UI.ControlCenter, Ktrl, window);
 
 
 

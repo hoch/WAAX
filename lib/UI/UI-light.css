@@ -10,9 +10,6 @@ body {
   padding: 0;
   -webkit-user-select: none;
 }
-h1 {
-  color: #fff;
-}
 
 
 /* ---------- ui-section ---------- */
@@ -36,7 +33,7 @@ h1 {
 .ui-view-selected {
   background-color: #fee;
   box-shadow: 0 0 10px #f66;
-  border-radius: 5px; 
+  border-radius: 5px;
 }
 
 
@@ -54,7 +51,7 @@ h1 {
   height: 20px;
   position: relative;
 }
-.ui-slider-value { 
+.ui-slider-value {
   color: #000;
   display: inline-block;
   font-size: 20px;
@@ -138,6 +135,8 @@ h1 {
   line-height: 24px;
 }
 .ui-list-value {
+  height: 24px;
+  word-break: break-all;
   padding-left: 5px;
   font-size: 14px;
   overflow: hidden;

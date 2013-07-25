@@ -344,11 +344,11 @@ WX.BufferMap = function () {
 };
 
 
-WX.buildBufferMap = function (assetList, oncomplete) {
+WX.buildBufferMap = function (assetEntry, oncomplete) {
 // serialize asset list for recursion
   var data = [], index = 0;
-  for (var name in assetList) {
-    data[index++] = [name, assetList[name]];
+  for (var name in assetEntry.payload) {
+    data[index++] = [name, assetEntry.payload[name]];
   }
   var bufferMap = new WX.BufferMap();
   // start recursion

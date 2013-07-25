@@ -53,8 +53,8 @@
       ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";
       var v1 = WX.Spectrum({ context:ctx, smoothingFactor:0.85, grid:true });
 
-      var smp = WX.Sampler({ source:"../data/samples/cleangtr.wav", loop:true });
-      var dst = WX.Dist();
+      var smp = WX.Sampler({ source:"../data/samples/fillin.wav", loop:true });
+      var dst = WX.Dist({ type:"saturate", factor:1.5 });
 
       smp.to(dst).to(WX.DAC);
       dst.to(v1);
@@ -74,6 +74,9 @@
        * UI
        */
       var section = UI.ControlCenter.createSection("Control", "container");
+      var btn_active = UI.ControlCenter.createControl({
+      type: "button", name: "Active", value: true, mode: "toggle"
+     }, section);
       var slider_factor = UI.ControlCenter.createControl({
         type: "slider", name: "Distortion", value: 1.0, min: 0.1, max: 2.0,
         precision: 4, scale: "linear", unit: ""
@@ -83,16 +86,20 @@
         precision: 4, scale: "linear", unit: "dB"
       }, section);
       var list_type = UI.ControlCenter.createControl({
-        type: "indexed-list", name: "Curve", value: "hardclip",
+        type: "indexed-list", name: "Curve", value: "saturate",
         data: ["hardclip", "softclip", "saturate"]
       }, section);
 
+      btn_active.addAction(function (value) {
+        dst.bypass(!value);
+      });
       slider_factor.addAction(function (value) {
         dst.factor(value);
         drawGraph(dst.getCurve());
       });
       slider_drive.addAction(function (value) {
         dst.drive(WX.db2lin(value));
+        dst.gain(WX.db2lin(-value * 0.4));
         drawGraph(dst.getCurve());
       });
       list_type.addAction(function (value) {
