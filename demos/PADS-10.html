@@ -9,7 +9,12 @@
   <!-- html -->
   <div class="container">
     <h1>PADS-10</h1>
-    <div id="s-preset"></div>
+    <div id="s-preset" class="c-preset">
+      <input type="file" class="b-import" id="i-import"/>
+      <a id="i-export-link" class="b-export">       
+        <button id="i-export" class="b-export-dummy"></button>
+      </a>
+    </div>
     <div id="s-pad" class="c-pad"></div>
     <div class="clearfix"></div>
     <div id="s-control"></div>
@@ -112,7 +117,7 @@
      }, ss_sample);
     var list_samples = UI.ControlCenter.createControl({
       type: "indexed-list", name: "Sample", value: "",
-      data: ["loading..."]
+      data: ["Loading..."]
     }, ss_sample);
     var sli_tune = UI.ControlCenter.createControl({
       type: "slider", name: "Tune", value: 0.0, min: -1200.0, max: 1200.0,
@@ -220,6 +225,7 @@
       }
       var sampleData = Pad10.getSampleData();
       list_samples.setListData(sampleData.list);
+      list_samples.setValue(sampleData.name);
     }
 
     // shorcut: update cell setting
@@ -282,7 +288,7 @@
       console.log("[PADS-10] Assets loaded. Building interface...");
 
       // preset menu
-      list_preset.addAction(function (value) {
+      list_preset.addAction(function (value) {        
         // find preset name in presets
         var preset = null;
         for(var i = 0; i < Presets.length; i++) {
@@ -305,11 +311,55 @@
       // TODO: block duplicate names
       btn_savePreset.addAction(function () {
         var name = window.prompt("Save preset as...");
+        // find duplicate name
+        for (var i = 0; i < Presets.length; i++) {
+          if (Presets[i].name === name) {
+            window.alert("Duplicate preset name found. Try again.");
+            return;
+          }
+        }
         var preset = Pad10.getNewPreset(name);
         Presets.push(preset);
-        console.log(JSON.stringify(Presets));
+        //console.log(JSON.stringify(Presets));
         list_preset.addListItem(name);
       });
+      // import
+      var b_importPreset = document.getElementById('i-import');
+      b_importPreset.addEventListener("change", function (event) {
+        var file = event.target.files[0];
+        var reader = new FileReader();  
+        reader.onload = function (e) {
+          //console.log(e.target.result);
+          Presets = JSON.parse(e.target.result);
+          gPresetList.length = 0;
+          for (var i = 0; i < Presets.length; i++) {
+            gPresetList.push(Presets[i].name);
+          }
+          // refresh preset list as well
+          list_preset.setListData(gPresetList);
+          // set initial preset
+          Pad10.setPreset(Presets[0]);
+          console.log("[PADS-10] Preset file loaded.");
+        };
+        reader.onerror = function (e) {
+          console.log("error", e);
+        };
+        reader.readAsText(file);
+      }, false);
+      // export
+      var b_export = document.getElementById('i-export');
+      var b_exportLink = document.getElementById('i-export-link');
+      b_export.addEventListener("click", function (event) {
+        var name = window.prompt("Export presets as...");
+        if (name) {
+          var exportFileName = name;
+          exportFileName += ".pdx";
+          var blob = new Blob([JSON.stringify(Presets)], {type: "text/html"});
+          var url = URL.createObjectURL(blob);
+          b_exportLink.href = url;
+          b_exportLink.download = exportFileName;
+        }
+      }, false);
 
       // sample: add actions
       btn_mute.addAction(function (value) { 

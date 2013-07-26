@@ -220,7 +220,7 @@ PadCell.prototype = {
 
 
 /**
- * Pad10 core, Singletone
+ * Pad10 core, Singleton
  */
 var Pad10 = (function (WX, Center, Ktrl, window) {
 
@@ -254,7 +254,6 @@ var Pad10 = (function (WX, Center, Ktrl, window) {
   var i_indicator = document.createElement('div');
   i_indicator.className = "c-indicator";
   s_pad.appendChild(i_indicator);
-
   function _setIndicator (value) {
     i_indicator.style.width = 103 * (1.0 - (value / 9)) + "px";
   }

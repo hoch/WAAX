@@ -2,7 +2,14 @@
   from { opacity: 0.75; }
   to { opacity: 0; }
 }
+html {
+  height: 100%;
+}
 body {
+  height: 100%;
+  margin: 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   background: -webkit-radial-gradient(center, ellipse cover, rgba(181,189,200,1) 0%,rgba(130,140,149,1) 26%,rgba(40,52,59,1) 100%);
 }
 h1 {
@@ -18,9 +25,13 @@ h1 {
   margin-bottom: 15px;
 }
 
+
 .container {
   width: 610px;
   margin: 100px auto;
+}
+.c-preset {
+  position: relative;
 }
 .c-pad {
   margin: 0 auto;
@@ -66,4 +77,34 @@ h1 {
   position: relative;
   top: -41px;
   left: 236px;
+}
+.b-import {
+  position: absolute;
+  top: 51px;
+  left: 439px;
+  width: 68px;
+  opacity: 0.0;
+  background-color: #fff;
+  z-index: 10;
+  line-height: 31px;
+  margin: 0;
+  padding: 0;
+}
+.b-export {
+  display: block;
+  position: absolute;
+  top: 51px;
+  left: 521px;
+  width: 68px;
+  opacity: 0;
+  background-color: #f00;
+  z-index: 10;
+  height: 30px;
+}
+.b-export-dummy {
+  padding: 0;
+  margin: 0;
+  width: 68px;
+  line-height: 30px;
+  height: 30px;
 }
