@@ -344,7 +344,7 @@ WX.BufferMap = function () {
 };
 
 
-WX.buildBufferMap = function (assetEntry, oncomplete) {
+WX.buildBufferMap = function (assetEntry, oncomplete, onprogress) {
 // serialize asset list for recursion
   var data = [], index = 0;
   for (var name in assetEntry.payload) {
@@ -352,11 +352,11 @@ WX.buildBufferMap = function (assetEntry, oncomplete) {
   }
   var bufferMap = new WX.BufferMap();
   // start recursion
-  WX._recurseXHR(data, bufferMap, 0, oncomplete);
+  WX._recurseXHR(data, bufferMap, 0, oncomplete, onprogress);
 };
 
 
-WX._recurseXHR = function (data, buffermap, iteration, oncomplete) {
+WX._recurseXHR = function (data, buffermap, iteration, oncomplete, onprogress) {
   // get first key(name)/value(url) from data
   var d = data.shift();
   var name = d[0], url = d[1];
@@ -367,13 +367,14 @@ WX._recurseXHR = function (data, buffermap, iteration, oncomplete) {
     try {
       var b = WX.context.createBuffer(xhr.response, false);
       buffermap.addBuffer(iteration++, name, b);
-      WX._log.post("loaded: " + url + " " + b.numberOfChannels);
+      //WX._log.post("loaded: " + url + " " + b.numberOfChannels);
       if (data.length === 0) {
         console.log("loading complete.");
         oncomplete(buffermap);
         return;
       } else {
-        WX._recurseXHR(data, buffermap, iteration, oncomplete);
+        onprogress(iteration);
+        WX._recurseXHR(data, buffermap, iteration, oncomplete, onprogress);
       }
     } catch (error) {
       WX._log.error("xhr failed (" + error.message + "): " + url);

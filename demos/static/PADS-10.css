@@ -49,3 +49,11 @@ h1 {
 .flash {
   -webkit-animation: flash 0.15s;
 }
+.c-indicator {
+  width: 103px;
+  background: rgba(224, 161, 47, 0.87);
+  height: 4px;
+  position: relative;
+  top: -41px;
+  left: 236px;
+}

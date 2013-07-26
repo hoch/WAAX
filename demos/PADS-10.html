@@ -81,7 +81,7 @@
     var s_preset = UI.ControlCenter.createSection("Presets", "s-preset");
     var list_preset = UI.ControlCenter.createControl({
       type: "indexed-list", name: "Preset", value: "",
-      data: ["Not yet..."],
+      data: gPresetList,
       exclude: true
     }, s_preset);
     var list_drumkit = UI.ControlCenter.createControl({
@@ -211,143 +211,47 @@
     // console.log(presets);
     // });
 
-
-    // shorcut: update cell setting
-    function updateCellSettingView() {
-      var c = Pad10.cell.getParams();
-      btn_mute.setValue(c.muted);
-      sli_tune.setValue(c.tune);
-      sli_volume.setValue(c.volume);
-      list_samples.setListData(c.sampleNames);
-      list_samples.setValue(c.sampleName);
-      btn_env.setValue(c.envState);
-      sli_att.setValue(c.attack);
-      sli_hld.setValue(c.hold);
-      sli_rel.setValue(c.release);
-      btn_filt.setValue(c.filterState);
-      sli_freq.setValue(c.filterFreq);
-      sli_loshelf.setValue(c.LSGain);
-      sli_hishelf.setValue(c.HSGain);
+    function updateDrumKitView () {
+      var dk = Pad10.getDrumKitName();
+      for (var drumkit in DrumKits) {
+        if (DrumKits[drumkit].name === dk) {
+          list_drumkit.setValue(drumkit, false);
+        }
+      }
+      var sampleData = Pad10.getSampleData();
+      list_samples.setListData(sampleData.list);
     }
 
     // shorcut: update cell setting
-    function updateMasterEffectView() {
-      var m = Pad10.getMasterParams();
-      //console.log(m);
-      btn_comp.setValue(m.comp.active);
-      sli_thre.setValue(m.comp.threshold);
-      sli_rat.setValue(m.comp.ratio);
-      sli_makeup.setValue(m.comp.makeup);
-      btn_crush.setValue(m.crush.active);
-      sli_crush.setValue(m.crush.drive);
-      sli_vrbmix.setValue(m.reverb.mix);
-      //list_irs.setValue(m.reverb.preset);
+    function updateCellSettingView () {
+      // get current selected cell params
+      var c = Pad10.getCellParams();
+      btn_mute.setValue(c.muted, false);
+      list_samples.setValue(c.sampleName, false);
+      sli_tune.setValue(c.tune, false);
+      sli_volume.setValue(c.volume, false);
+      btn_env.setValue(c.envState, false);
+      sli_att.setValue(c.attack, false);
+      sli_hld.setValue(c.hold, false);
+      sli_rel.setValue(c.release, false);
+      btn_filt.setValue(c.filterState, false);
+      sli_freq.setValue(c.filterFreq, false);
+      sli_loshelf.setValue(c.LSGain, false);
+      sli_hishelf.setValue(c.HSGain, false);
     }
 
-    // start loading initial drum kit
-    Pad10.loadDrumKit(DrumKits.MPC2000, updateCellSettingView);
-
-    // onReady!!
-    Pad10.onReady(function () {
-
-      console.log("Ready! Starting...");
-
-      // the order is very important... should be fixed
-      list_samples.setListData(Pad10.cell.getSampleNames());
-      list_samples.setValue(Pad10.cell.getSampleName());
-
-      // Control Panel
-      list_preset.addAction(function(value) {
-        // find preset name in presets
-        // for(var i = 0; i < Presets.length; i++) {
-        //   if (Presets[i].name === value) {
-        //     Pad10.loadPreset(Presets[i]);
-        //     break;
-        //   }
-        // }
-      });
-      list_drumkit.addAction(function (value) {
-        Pad10.loadDrumKit(DrumKits[value], updateCellSettingView);
-      });
-      btn_savePreset.addAction(function () {
-        var name = window.prompt("Save preset as...");
-        console.log(Pad10.savePreset(name));
-      });
-
-      // sample: add actions
-      btn_mute.addAction(function (value) {
-        Pad10.cell.setSampleMute(value);
-      });
-      sli_tune.addAction(function (value) {
-        Pad10.cell.setSampleTune(value);
-      });
-      sli_volume.addAction(function (value) {
-        Pad10.cell.setSampleVolume(value);
-      });
-      list_samples.addAction(function (value) {
-        Pad10.cell.setBufferByName(value);
-      });
-
-      // envelope: add actions
-      btn_env.addAction(function (value) {
-        Pad10.cell.setEnvelopeState(value);
-      });
-      sli_att.addAction(function (value) {
-        Pad10.cell.setAttack(value);
-      });
-      sli_hld.addAction(function (value) {
-        Pad10.cell.setHold(value);
-      });
-      sli_rel.addAction(function (value) {
-        Pad10.cell.setRelease(value);
-      });
-
-      // filter: add actions
-      btn_filt.addAction(function (value) {
-        Pad10.cell.setFilterState(value);
-      });
-      sli_freq.addAction(function (value) {
-        Pad10.cell.setFilterFreq(value);
-      });
-      sli_loshelf.addAction(function (value) {
-        Pad10.cell.setLSGain(value);
-      });
-      sli_hishelf.addAction(function (value) {
-        Pad10.cell.setHSGain(value);
-      });
-
-      // master section
-      btn_comp.addAction(function (value) {
-        Pad10.comp.active(value);
-      });
-      sli_thre.addAction(function (value) {
-        Pad10.comp.threshold(value);
-      });
-      sli_rat.addAction(function (value) {
-        Pad10.comp.ratio(value);
-      });
-      sli_makeup.addAction(function (value) {
-        Pad10.comp.makeup(value);
-      });
-      btn_crush.addAction(function (value) {
-        Pad10.dist.active(value);
-      });
-      sli_crush.addAction(function (value) {
-        var amp = WX.db2lin(value);
-        Pad10.dist.drive(amp);
-        Pad10.dist.gain(1/amp);
-      });
-      sli_vrbmix.addAction(function (value) {
-        Pad10.verb.mix(value);
-      });
-      list_irs.addAction(function (value) {
-        Pad10.verb.setBufferByName(value);
-      });
-      // sli_mastergain.addAction(function (value) {
-      //   WX.DAC.db(value);
-      // });
-
-    });
+    // shorcut: update cell setting
+    function updateMasterEffectView (params) {
+      var p = Pad10.getNewPreset();
+      btn_comp.setValue(p.compActive, false);
+      sli_thre.setValue(p.compThreshold, false);
+      sli_rat.setValue(p.compRatio, false);
+      sli_makeup.setValue(p.compMakeup, false);
+      btn_crush.setValue(p.distActive, false);
+      sli_crush.setValue(WX.lin2db(p.distDrive), false);
+      sli_vrbmix.setValue(p.verbMix, false);
+      list_irs.setValue(p.verbPresetName, false);
+    }
 
     // onCellChanged
     Pad10.onCellChanged(function () {
@@ -356,10 +260,134 @@
 
     // onPresetChanged
     Pad10.onPresetChanged(function () {
-      //updateDrumKitView();
-      //updateMasterEffectView();
-      //updateCellSettingView();
+      updateDrumKitView();
+      updateCellSettingView();
+      updateMasterEffectView();
     });
+
+    // initialize : start loading assets
+    console.log("[PADS-10] Start loading assets...");
+    Pad10.loadDrumKit(DrumKits.MPC2000, function () {
+      updateDrumKitView();
+      updateCellSettingView();
+    });
+    Pad10.loadImpulseResponses(ImpulseResponses.Default, function () {
+      updateMasterEffectView();
+    });
+
+    // onReady!!
+    Pad10.onReady(function () {
+
+      // start working
+      console.log("[PADS-10] Assets loaded. Building interface...");
+
+      // preset menu
+      list_preset.addAction(function (value) {
+        // find preset name in presets
+        var preset = null;
+        for(var i = 0; i < Presets.length; i++) {
+          if (Presets[i].name === value) {
+            preset = Presets[i];
+          }
+        }
+        if (preset) {
+          Pad10.setPreset(preset);
+        }
+      });
+      // drumkit menu
+      list_drumkit.addAction(function (value) {
+        Pad10.loadDrumKit(DrumKits[value], function () {
+          updateDrumKitView();
+          updateCellSettingView();
+        });
+      });
+      // save preset
+      // TODO: block duplicate names
+      btn_savePreset.addAction(function () {
+        var name = window.prompt("Save preset as...");
+        var preset = Pad10.getNewPreset(name);
+        Presets.push(preset);
+        console.log(JSON.stringify(Presets));
+        list_preset.addListItem(name);
+      });
+
+      // sample: add actions
+      btn_mute.addAction(function (value) { 
+        Pad10.setSample("mute", value);
+      });
+      list_samples.addAction(function (value) {
+        Pad10.setSample("buffername", value);
+      });
+      sli_tune.addAction(function (value) {
+        Pad10.setSample("tune", value);
+      });
+      sli_volume.addAction(function (value) {
+        Pad10.setSample("volume", value);
+      });
+
+      // this could be:
+      // UI.ControlCenter.callbackMap = {
+      //  "Mute": [Pad10.setSample, "mute"]
+      //  "Name": [callbackfn, argument]
+      //  ...
+      // }
+
+      // envelope: add actions
+      btn_env.addAction(function (value) {
+        Pad10.setEnvelope("state", value);
+      });
+      sli_att.addAction(function (value) {
+        Pad10.setEnvelope("attack", value);
+      });
+      sli_hld.addAction(function (value) {
+        Pad10.setEnvelope("hold", value);
+      });
+      sli_rel.addAction(function (value) {
+        Pad10.setEnvelope("release", value);
+      });
+
+      // filter: add actions
+      btn_filt.addAction(function (value) {
+        Pad10.setFilter("state", value);
+      });
+      sli_freq.addAction(function (value) {
+        Pad10.setFilter("frequency", value);
+      });
+      sli_loshelf.addAction(function (value) {
+        Pad10.setFilter("lsgain", value);
+      });
+      sli_hishelf.addAction(function (value) {
+        Pad10.setFilter("hsgain", value);
+      });
+
+      // master section
+      btn_comp.addAction(function (value) {
+        Pad10.setComp("state", value);
+      });
+      sli_thre.addAction(function (value) {
+        Pad10.setComp("threshold", value);
+      });
+      sli_rat.addAction(function (value) {
+        Pad10.setComp("ratio", value);
+      });
+      sli_makeup.addAction(function (value) {
+        Pad10.setComp("makeup", value);
+      });
+      btn_crush.addAction(function (value) {
+        Pad10.setDist("state", value);
+      });
+      sli_crush.addAction(function (value) {
+        Pad10.setDist("drive", value);
+      });
+      sli_vrbmix.addAction(function (value) {
+        Pad10.setReverb("mix", value);
+      });
+      list_irs.addAction(function (value) {
+        Pad10.setReverb("preset", value);
+      });
+
+    });
+
 
     // MIDI
     var gMIDITarget = Ktrl.createTarget("PADS-10");

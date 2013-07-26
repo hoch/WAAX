@@ -1,4 +1,4 @@
-/*
+/**
  * @class PadCell
  */
 var PadCell = function (targetDiv) {
@@ -91,7 +91,7 @@ PadCell.prototype = {
   getSampleName: function () {
     return this._sampleName;
   },
-  getSampleNames: function () {
+  getSampleList: function () {
     return this._bufferMap.getBufferNames();
   },
 
@@ -136,7 +136,7 @@ PadCell.prototype = {
       muted: this._muted,
       tune: this._tune,
       volume: this._volume,
-      sampleNames: this.getSampleNames(),
+      sampleNames: this.getSampleList(),
       sampleName: this._sampleName,
       envState: this._envState,
       attack: this._attack,
@@ -222,17 +222,11 @@ PadCell.prototype = {
  */
 var Pad10 = (function (WX, Center, Ktrl, window) {
 
-  // Master Class
-  var compUnit = WX.Comp({ threshold: -12, ratio: 8, makeup: 4.0, active: false });
-  var distUnit = WX.Dist({ type:"saturate", factor:1.5, active: false });
-  var verbUnit = WX.Multiverb();
-  compUnit.to(distUnit).to(verbUnit).to(WX.DAC);
-
-  // load impulse responses and assign to verbUnit
-  WX.buildBufferMap(ImpulseResponses.Default, function (buffermap) {
-    verbUnit.setBufferMap(buffermap);
-    verbUnit.setBufferByIndex(0);
-  });
+  // Master effect chain
+  var _compUnit = WX.Comp({ threshold: -12, ratio: 8, makeup: 4.0, active: false });
+  var _distUnit = WX.Dist({ type:"saturate", factor:1.5, active: false });
+  var _verbUnit = WX.Multiverb();
+  _compUnit.to(_distUnit).to(_verbUnit).to(WX.DAC);
 
   // create 10 PadCells
   var PadCells = [];
@@ -247,62 +241,157 @@ var Pad10 = (function (WX, Center, Ktrl, window) {
     pad.appendChild(overlay);
     s_pad.appendChild(pad);
     PadCells[i] = new PadCell(pad);
-    PadCells[i].to(compUnit);
+    PadCells[i].to(_compUnit);
+  }
+
+  // loading indicator
+  var i_indicator = document.createElement('div');
+  i_indicator.className = "c-indicator";
+  s_pad.appendChild(i_indicator);
+
+  function _setIndicator (value) {
+    i_indicator.style.width = 103 * (1.0 - (value / 9)) + "px";
+  }
+
+  // loading blocker
+  var _onhold = true;
+
+  // some system variables
+  var _presetName = "";
+  var _drumKitName = "";
+
+  // _getNewPreset
+  function _getNewPreset (name) {
+    var preset = {
+      name: name,
+      drumKitName: _drumKitName,
+      cellParams: [],
+      compActive: _compUnit.active(),
+      compThreshold: _compUnit.threshold(),
+      compRatio:_compUnit.ratio(),
+      compMakeup: _compUnit.makeup(),
+      distActive: _distUnit.active(),
+      distDrive: _distUnit.drive(),
+      verbMix: _verbUnit.mix(),
+      verbPresetName: _verbUnit.getPresetName()
+    };
+    // debugger;
+    for (var i = 0; i < PadCells.length; i++) {
+      var params = PadCells[i].getParams();
+      delete params.sampleNames;
+      preset.cellParams.push(params);
+    }
+    return preset;
+  }
+
+  // _setPreset
+  function _setPreset (preset) {
+    if (!_onhold) {
+      // store names
+      _presetName = preset.name;
+      // loading cell params
+      for (var i = 0; i < PadCells.length; i++) {
+        PadCells[i].setParams(preset.cellParams[i]);
+      }
+      // unpacking master params
+      _compUnit.active(preset.active);
+      _compUnit.threshold(preset.compThreshold);
+      _compUnit.ratio(preset.compRatio);
+      _compUnit.makeup(preset.compMakeup);
+      _distUnit.active(preset.distActive);
+      _distUnit.drive(preset.distDrive);
+      _verbUnit.mix(preset.verbMix);
+      _verbUnit.setBufferByName(preset.verbPresetName);
+      // find and load drum kit
+      var drumKitData = null;
+      for (var kit in DrumKits) {
+        if (DrumKits[kit].name === preset.drumKitName) {
+          drumKitData = DrumKits[kit];
+          break;
+        }
+      }
+      if (drumKitData !== null) {
+        _loadDrumKit(drumKitData, function () {
+          _drumKitName = preset.drumKitName;
+          _onPresetChangedCallback();
+        });
+      } else {
+        console.log("[PADS-10] drumkit not found...", preset.drumKitName);
+      }
+    } else {
+      console.log("[PADS-10] system busy(on hold)...");
+    }
   }
 
 
-  /**
-   * preset
-   */
-  var _preset = {
-    name: "",
-    payload: {
-      drumkit: "",
-      cellIndex: 0,
-      cellParams: [],
-      masterParams: {
-        comp: {
-          active: compUnit.active(),
-          threshold: compUnit.threshold(),
-          ratio: compUnit.ratio(),
-          makeup: compUnit.makeup()
-        },
-        dist: {
-          active: distUnit.active(),
-          drive: distUnit.drive()
-        },
-        verb: {
-          mix: verbUnit.mix(),
-          preset: verbUnit.getPresetName()
+
+  // load drum kit
+  function _loadDrumKit(drumKitData, oncomplete) {
+    _onhold = true;
+    var loadingIndicator = 0;
+    WX.buildBufferMap(
+      drumKitData,
+      function (buffermap) {
+        for (var i = 0; i < PadCells.length; i++) {
+          PadCells[i].loadBufferMap(buffermap);
+          PadCells[i].setBufferByIndex(i);
         }
+        // save drumkit name
+        _drumKitName = drumKitData.name;
+        if (oncomplete) {
+          oncomplete();
+          _onhold = false;
+        }
+      },
+      function (progress) {
+        _setIndicator(progress);
       }
-    }
-  };
+    );
+  }
 
-  // UI touched => update elements => update preset
+  // load impulse response
+  function _loadImpulseResponses(irdata, oncomplete) {
+    WX.buildBufferMap(
+      irdata,
+      function (buffermap) {
+        _verbUnit.setBufferMap(buffermap);
+        _verbUnit.setBufferByIndex(0);
+        if (oncomplete) {
+          oncomplete();
+        }
+      },
+      function (progress) {
+        //console.log(progress);
+      }
+    );
+  }
 
 
-  // init: selected cell
-  var _selectedCell = PadCells[0];
+
+  // handle mouse input (cell selection)
+  var _selectedCellIndex = 0;
+  var _selectedCell = PadCells[_selectedCellIndex];
   _selectedCell.highlight(true);
   // add user interaction to PadCells
   s_pad.addEventListener("mousedown", function (event) {
-    var index = event.target.id.slice(11);
-    if (index > -1 && index < 10) {
-      if (index !== cellIndex) {
-        _preset.payload.cellIndex = index;
-        _selectedCell.highlight(false);
-        _selectedCell = PadCells[index];
-        _selectedCell.highlight(true);
-        _onCellChangedCallback();
+    if (!_onhold) {
+      var index = event.target.id.slice(11);
+      if (index > -1 && index < 10) {
+        if (index !== _selectedCellIndex) {
+          _selectedCellIndex = index;
+          _selectedCell.highlight(false);
+          _selectedCell = PadCells[index];
+          _selectedCell.highlight(true);
+          _onCellChangedCallback();
+        }
+        _selectedCell.noteOn(0.75);
+        _selectedCell.flash();
+        event.stopPropagation();
       }
-      _selectedCell.noteOn(0.75);
-      _selectedCell.flash();
-      event.stopPropagation();
     }
   }, false);
 
-  // handle keyboard
+  // handle keyboard (keyboard drumming)
   var _keyMap = KeyboardSetup.KeyCodeToPadMap;
   var _keyPressed = [];
   window.addEventListener("keydown", function (event) {
@@ -333,49 +422,6 @@ var Pad10 = (function (WX, Center, Ktrl, window) {
     PadCells[id].noteOn(Ktrl.CurveCubed(data.velocity), WX.now);
   }
 
-  // load drum kit
-  function _loadDrumKit(drumkitData, oncomplete) {
-    WX.buildBufferMap(drumkitData, function (buffermap) {
-      for (var i = 0; i < PadCells.length; i++) {
-        PadCells[i].loadBufferMap(buffermap);
-        PadCells[i].setBufferByIndex(i);
-      }
-      _preset.payload.drumkit = drumkitData.name;
-      oncomplete();
-    });
-  }
-
-  // save preset
-  function _savePreset (name) {
-    _preset.name = name;
-    for (var i = 0; i < PadCells.length; i++) {
-      var params = PadCells[i].getParams();
-      delete params.sampleNames;
-      _preset.payload.cellParams.push(params);
-    }
-    return JSON.stringify(_preset);
-  }
-
-  // load preset
-  var _currentPresetName = null;
-  function _loadPreset (preset) {
-    // get preset name
-    _currentPresetName = preset.name;
-    var pl = preset.payload;
-    //  get cell params => iterate(cell.setParam())
-    for (var i = 0; i < PadCells.length; i++) {
-      PadCells[i].setParams(pl.cellParams[i]);
-    }
-    //  get master params => set parameters
-    _setMasterParams(pl.masterParams);
-    // find drumkitname in DrumKits & update view and all
-    for (var kit in DrumKits) {
-      if (DrumKits[kit].name === pl.drumkit) {
-        _loadDrumKit(DrumKits[kit], _onPresetChangedCallback);
-      }
-    }
-  }
-
   // onCellChangedCallback
   var _onCellChangedCallback = null;
   function _onCellChanged (callback) {
@@ -397,297 +443,132 @@ var Pad10 = (function (WX, Center, Ktrl, window) {
     if (flag) {
       callback();
     } else {
-      console.log("checking...");
+      console.log("[PADS-10] waiting for samples to be loaded...");
       setTimeout(function () {
         _onReady(callback);
       }, 1000);
     }
   }
 
-  // revealed methods
-  return Object.create(null, {
+  /**
+   * revealed methods
+   */
+  return {
 
-    onCellChanged: {
-      value: _onCellChanged
+    onCellChanged: _onCellChanged,
+    onPresetChanged: _onPresetChanged,
+    onReady: _onReady,
+
+    getNewPreset: _getNewPreset,
+    getDrumKitName: function () {
+      return _drumKitName;
     },
-    onPresetChanged: {
-      value: _onPresetChanged
+    getSampleData: function () {
+      return {
+        list: _selectedCell.getSampleList(),
+        name: _selectedCell.getSampleName()
+      };
     },
-    onReady: {
-      value: _onReady
+    getCellParams: function () {
+      return _selectedCell.getParams();
     },
 
-    setSampleMute: function (value) {
-
-    },
-
-    cell: {
-      get: function () {
-        return _selectedCell;
+    setPreset: _setPreset,
+    setSample: function (prop, value) {
+      switch (prop) {
+        case "mute":
+          _selectedCell.setSampleMute(value);
+          break;
+        case "buffername":
+          _selectedCell.setBufferByName(value);
+          break;
+        case "tune":
+          _selectedCell.setSampleTune(value);
+          break;
+        case "volume":
+          _selectedCell.setSampleVolume(value);
+          break;
       }
     },
-    loadDrumKit: {
-      value: _loadDrumKit
+
+    setEnvelope: function (prop, value) {
+      switch (prop) {
+        case "state":
+          _selectedCell.setEnvelopeState(value);
+          break;
+        case "attack":
+          _selectedCell.setAttack(value);
+          break;
+        case "hold":
+          _selectedCell.setHold(value);
+          break;
+        case "release":
+          _selectedCell.setRelease(value);
+          break;
+      }
     },
-    savePreset: {
-      value: _savePreset
+
+    setFilter: function (prop, value) {
+      switch (prop) {
+        case "state":
+          _selectedCell.setFilterState(value);
+          break;
+        case "frequency":
+          _selectedCell.setFilterFreq(value);
+          break;
+        case "lsgain":
+          _selectedCell.setLSGain(value);
+          break;
+        case "hsgain":
+          _selectedCell.setHSGain(value);
+          break;
+      }
     },
-    loadPreset: {
-      value: _loadPreset
+
+    setComp: function (prop, value) {
+      switch (prop) {
+        case "state":
+          _compUnit.active(value);
+          break;
+        case "threshold":
+          _compUnit.threshold(value);
+          break;
+        case "ratio":
+          _compUnit.ratio(value);
+          break;
+        case "makeup":
+          _compUnit.makeup(value);
+          break;
+      }
     },
-    comp: {
-      value: compUnit
+
+    setDist: function (prop, value) {
+      switch (prop) {
+        case "state":
+          _distUnit.active(value);
+          break;
+        case "drive":
+          var amp = WX.db2lin(value);
+          _distUnit.drive(amp);
+          _distUnit.gain(1.0/amp);
+          break;
+      }
     },
-    dist: {
-      value: distUnit
+
+    setReverb: function (prop, value) {
+      switch (prop) {
+        case "mix":
+          _verbUnit.mix(value);
+          break;
+        case "preset":
+          _verbUnit.setBufferByName(value);
+          break;
+      }
     },
-    verb: {
-      value: verbUnit
-    },
-    handleMIDINote: {
-      value: _handleMIDINote
-    }
-  });
+
+    loadDrumKit: _loadDrumKit,
+    loadImpulseResponses: _loadImpulseResponses,
+    handleMIDINote: _handleMIDINote
+  };
 
 })(WX, UI.ControlCenter, Ktrl, window);
-
-
-
-
-
-/*
-
-
-function MultiVerb (spaces) {
-  this._data = spaces;
-  this._buffers = {};
-  this._currentBufferName = null;
-
-  this._inlet = WX.context.createGain();
-  this._dry = WX.context.createGain();
-  this._conv = WX.context.createConvolver();
-  this._wet = WX.context.createGain();
-  this._output = WX.context.createGain();
-
-  this._wet.gain.value = 0.0;
-
-  this._inlet.connect(this._dry);
-  this._inlet.connect(this._conv);
-  this._conv.connect(this._wet);
-  this._dry.connect(this._output);
-  this._wet.connect(this._output);
-
-  this.loadAssets();
-}
-
-MultiVerb.prototype = {
-  label: "u.pro.multiverb",
-  to: function (unit) {
-    this._output.connect(unit._inlet);
-    return unit;
-  },
-  loadAssets: function () {
-    var me = this;
-    WX._loadBufferX(this._data, this._buffers, function () {
-      console.log("IR loading completed.");
-      for (var b in me._buffers) {
-        me._conv.buffer = me._buffers[b];
-        break;
-      }
-    });
-  },
-  setSpace: function (value) {
-    this._conv.buffer = this._buffers[value];
-  },
-  setAmount: function (value) {
-    this._wet.gain.value = value;
-  },
-  getAmount: function () {
-    return this._wet.gain.value;
-  },
-  getSpaceList: function () {
-    var list = [];
-    for (var name in this._data) {
-      list.push(name);
-    }
-    return list;
-  }
-};
-
-
-// boot-up
-var Pads = (function (controlCenter) {
-
-  //build bufferPool
-  var paths = [
-    "../data/pad10/kd/",
-    "../data/pad10/sd/",
-    "../data/pad10/hh/",
-    "../data/pad10/perc/",
-    "../data/pad10/fx/"
-  ];
-  var filenames = [
-    ["kd1.wav", "kd2.wav", "kd3.wav", "kd4.wav", "kd5.wav",
-   "kd6.wav", "kd7.wav", "kd8.wav", "kd9.wav", "kd10.wav"],
-   ["sd1.wav", "sd2.wav", "sd3.wav", "sd4.wav", "sd5.wav",
-   "sd6.wav", "sd7.wav", "sd8.wav", "sd9.wav", "sd10.wav"],
-   ["hh1.wav", "hh2.wav", "hh3.wav", "hh4.wav", "hh5.wav",
-   "hh6.wav", "hh7.wav", "hh8.wav", "hh9.wav", "hh10.wav"],
-   ["perc1.wav", "perc2.wav", "perc3.wav", "perc4.wav", "perc5.wav",
-   "perc6.wav", "perc7.wav", "perc8.wav", "perc9.wav", "perc10.wav"],
-   ["belltree.wav", "bone-rattle.wav", "wah.wav", "moog-slide.wav", "scratch1.wav",
-   "scratch2.wav", "scratch3.wav", "shaker-fx.wav", "drop.wav", "waterdrop.wav"]
-  ];
-
-  // WXDATA (name:url data list)
-  var spaces = {
-    "Bright Hall": "../data/ir/bright-hall.wav",
-    "Plain Hall": "../data/ir/hall.wav",
-    "Large Room": "../data/ir/large.wav",
-    "Medium Room": "../data/ir/medium.wav",
-    "Small Room": "../data/ir/small.wav",
-    "Strong Space": "../data/ir/strong.wav",
-    "Heavy Space": "../data/ir/heavy.wav"
-  };
-
-  // for wave shaper
-  var len = 256;
-  var curve1 = new Float32Array(len);
-  function getCurve (iter) {
-    for (var i = 0; i < len; ++i) {
-      var x = i / len;
-      for (var j = 0; j < iter; ++j) {
-        x = x * x * (3 - 2 * x);
-      }
-      curve1[i] = x;
-    }
-  }
-  getCurve(0);
-
-  // Chebyshev Polynomials.
-  function T0(x) { return 1; }
-  function T1(x) { return x; }
-  function T2(x) { return 2*x*x - 1; }
-  function T3(x) { return 4*x*x*x - 3*x; }
-  function T4(x) { return 8*x*x*x*x - 8*x*x + 1; }
-
-  function createCurve_cheby() {
-    var n = 65536;
-    var n2 = n / 2;
-    var curve = new Float32Array(n);
-    for (var i = 0; i < n; ++i) {
-      var x = (i - n2) / n2;
-      var y = 0.25 * (T1(x) + T2(x) + T3(x) + T4(x));
-      curve[i] = y;
-    }
-    return curve;
-  }
-
-  function createCurve_softclip () {
-    var n = 65536;
-    var n2 = n / 2;
-    var curve = new Float32Array(n);
-    for (var i = 0; i < n; i++) {
-      var x = (i - n2) / n2;
-      var y = x / (1 + Math.abs(x));
-      curve[i] = y;
-    }
-    return curve;
-  }
-
-  var fx = WX.context.createWaveShaper();
-  // fx.curve = curve1;
-  fx.curve = createCurve_cheby();
-  fx.oversampleType = "2x";
-
-  var cmp = WX.Comp({ threshold: -12, ratio: 8, makeup: 4.0 });
-  var vrb = new MultiVerb(spaces);
-
-  var switcherIn = WX.context.createGain();
-  var switcherOut1 = WX.context.createGain();
-  var switcherOut2 = WX.context.createGain();
-
-  switcherIn.connect(switcherOut1);
-  switcherIn.connect(switcherOut2);
-
-  cmp.connect(switcherIn);
-  switcherOut1.connect(fx);
-  switcherOut2.connect(vrb._inlet);
-
-  function crush (bool) {
-    if (bool) {
-      switcherOut1.gain.value = 1.0;
-      switcherOut2.gain.value = 0.0;
-    } else {
-      switcherOut1.gain.value = 0.0;
-      switcherOut2.gain.value = 1.0;
-    }
-  }
-  crush(false);
-
-  fx.connect(vrb._inlet);
-  vrb.to(WX.DAC);
-
-  // create pad divs
-  var _pads = [];
-  var selectedPad = null;
-  var padContainer = document.getElementById('s-pad');
-  for (var i = 0; i < 5; i++) {
-    var pad = document.createElement('div');
-    pad.className = "pad";
-    pad.id = "pad" + i;
-    padContainer.appendChild(pad);
-
-    var p = new Pad(pad, paths[i], filenames[i]);
-    p.to(cmp);
-    _pads.push(p);
-  }
-
-  selectedPad = _pads[0];
-  selectedPad._padView.className += " pad-highlight";
-
-  function selectPadFromEvent (eventTarget) {
-    if (selectedPad) {
-      selectedPad._padView.className = " pad";
-    }
-    selectedPad = _pads[eventTarget.id.slice(3)];
-    selectedPad._padView.className += " pad-highlight";
-    //selectedPadIndex = eventTarget.id.slice(3);
-    UI.ControlCenter.updateView(selectedPad);
-  }
-
-  // add event listerner to s-pad
-  padContainer.addEventListener("mousedown", function (event) {
-    selectPadFromEvent(event.target);
-    event.stopPropagation();
-  }, false);
-
-  var MIDIRouteMap = {
-    "48": _pads[0], "52": _pads[0],
-    "54": _pads[1], "58": _pads[1],
-    "51": _pads[2], "49": _pads[2],
-    "68": _pads[3], "56": _pads[3],
-    "60": _pads[4], "59": _pads[4], "57": _pads[4], "55": _pads[4]
-  };
-
-  function _handleMIDINote (data) {
-    //console.log(data);
-    if (MIDIRouteMap[data.pitch]) {
-      MIDIRouteMap[data.pitch].noteOn(Ktrl.CurveCubed(data.velocity), WX.now);
-    }
-  }
-
-  function _getCurrentPad () {
-    return selectedPad;
-  }
-
-  return {
-    handleMIDINote: _handleMIDINote,
-    getSelectedPad: _getCurrentPad,
-    comp: cmp,
-    crush: crush,
-    reverb: vrb
-  };
-
-})(UI.ControlCenter);
-*/

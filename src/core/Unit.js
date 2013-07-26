@@ -86,6 +86,7 @@ WX._unit = (function () {
         if (typeof type === 'undefined') {
           t.cancelScheduledValues(m);
           t.setValueAtTime(val, m);
+          t.value = val;
           return this;
         }
         // otherwise, branch upon types
