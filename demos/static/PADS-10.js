@@ -1,11 +1,13 @@
 /**
  * @class PadCell
  */
-var PadCell = function (targetDiv) {
+var PadCell = function (targetDiv, label) {
   // vars
   this._id = targetDiv.id;
   this._view = targetDiv;
   this._overlay = this._view.getElementsByClassName('pad-overlay')[0];
+  this._label = this._view.getElementsByClassName('pad-label')[0];
+  this._label.textContent = label;
   this._bufferMap = null;
   this._ready = false;
   // parameters: sample
@@ -230,17 +232,21 @@ var Pad10 = (function (WX, Center, Ktrl, window) {
 
   // create 10 PadCells
   var PadCells = [];
+  var _labels = ["Q", "W", "E", "R", "T", "A", "S", "D", "F", "G"];
   var s_pad = document.getElementById('s-pad');
   for (var i = 0; i < 10; i++) {
     var overlay = document.createElement('div');
+    var label = document.createElement('div');
     var pad = document.createElement('div');
     overlay.className = "pad-overlay";
     overlay.id = "pad-overlay" + i;
+    label.className = "pad-label";
     pad.className = "pad";
     pad.id = "pad" + i;
     pad.appendChild(overlay);
+    pad.appendChild(label);
     s_pad.appendChild(pad);
-    PadCells[i] = new PadCell(pad);
+    PadCells[i] = new PadCell(pad, _labels[i]);
     PadCells[i].to(_compUnit);
   }
 
