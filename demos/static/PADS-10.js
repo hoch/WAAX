@@ -1,9 +1,9 @@
 /**
  * @class PadCell
  */
-var PadCell = function (targetDiv, label) {
+var PadCell = function (id, targetDiv, label) {
   // vars
-  this._id = targetDiv.id;
+  this._id = id;
   this._view = targetDiv;
   this._overlay = this._view.getElementsByClassName('pad-overlay')[0];
   this._label = this._view.getElementsByClassName('pad-label')[0];
@@ -95,6 +95,9 @@ PadCell.prototype = {
   },
   getSampleList: function () {
     return this._bufferMap.getBufferNames();
+  },
+  getId: function () {
+    return this._id;
   },
 
   // envelope-related
@@ -190,7 +193,7 @@ PadCell.prototype = {
       env.gain.linearRampToValueAtTime(gvol * intensity, moment + this._attack);
       env.gain.setValueAtTime(gvol * intensity, moment + this._attack + this._hold);
       env.gain.exponentialRampToValueAtTime(
-        0.0,
+        0.0001,
         moment + this._attack + this._hold + this._release
       );
       source.stop(moment + this._attack + this._hold + this._release);
@@ -204,6 +207,13 @@ PadCell.prototype = {
   highlight: function (bool) {
     if (bool) {
       this._view.className += " pad-highlight";
+    } else {
+      this._view.className = "pad";
+    }
+  },
+  MIDIlisten: function (bool) {
+    if (bool) {
+      this._view.className += " pad-midilisten";
     } else {
       this._view.className = "pad";
     }
@@ -246,7 +256,7 @@ var Pad10 = (function (WX, Center, Ktrl, window) {
     pad.appendChild(overlay);
     pad.appendChild(label);
     s_pad.appendChild(pad);
-    PadCells[i] = new PadCell(pad, _labels[i]);
+    PadCells[i] = new PadCell(i, pad, _labels[i]);
     PadCells[i].to(_compUnit);
   }
 
@@ -376,22 +386,34 @@ var Pad10 = (function (WX, Center, Ktrl, window) {
   // handle mouse input (cell selection)
   var _selectedCellIndex = 0;
   var _selectedCell = PadCells[_selectedCellIndex];
+  var _selectedForMIDILearn = null;
   _selectedCell.highlight(true);
   // add user interaction to PadCells
   s_pad.addEventListener("mousedown", function (event) {
     if (!_onhold) {
       var index = event.target.id.slice(11);
-      if (index > -1 && index < 10) {
-        if (index !== _selectedCellIndex) {
-          _selectedCellIndex = index;
-          _selectedCell.highlight(false);
-          _selectedCell = PadCells[index];
-          _selectedCell.highlight(true);
-          _onCellChangedCallback();
+      if (event.altKey) {
+        if (index > -1 && index) {
+          if (_selectedForMIDILearn) {
+            _selectedForMIDILearn.MIDIlisten(false);
+          }
+          _selectedForMIDILearn = PadCells[index];
+          _selectedForMIDILearn.MIDIlisten(true);
+          _MIDIMode = "midilearn";
         }
-        _selectedCell.noteOn(0.75);
-        _selectedCell.flash();
-        event.stopPropagation();
+      } else {
+        if (index > -1 && index) {
+          if (index !== _selectedCellIndex) {
+            _selectedCellIndex = index;
+            _selectedCell.highlight(false);
+            _selectedCell = PadCells[index];
+            _selectedCell.highlight(true);
+            _onCellChangedCallback();
+          }
+          _selectedCell.noteOn(0.75);
+          _selectedCell.flash();
+          event.stopPropagation();
+        }
       }
     }
   }, false);
@@ -418,13 +440,21 @@ var Pad10 = (function (WX, Center, Ktrl, window) {
   });
 
   // handle MIDINote
+  var _MIDIMode = "performance"; // or "midilearn"
   var _noteMap = MIDISetup.NoteToPadMap;
   function _handleMIDINote (data) {
     if (typeof _noteMap[data.pitch] === 'undefined') {
       return;
     }
-    var id = _noteMap[data.pitch];
-    PadCells[id].noteOn(Ktrl.CurveCubed(data.velocity), WX.now);
+    if (_MIDIMode === "performance") {
+      var id = _noteMap[data.pitch];
+      PadCells[id].noteOn(Ktrl.CurveCubed(data.velocity), WX.now);
+    } else if (_MIDIMode === "midilearn") {
+      _noteMap[data.pitch] = _selectedForMIDILearn.getId();
+      _selectedForMIDILearn.MIDIlisten(false);
+      _selectedForMIDILearn = null;
+      _MIDIMode = "performance";
+    }
   }
 
   // onCellChangedCallback

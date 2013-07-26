@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link href="static/demos.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <h1>FM e-piano</h1>
+
+    <h1>FM Keys</h1>
+    <div class="c-body-wrapper" id="i-container">
+    </div>
+
     <!-- lib r8 -->   
-    <script src="../src/core/Monkey.js"></script>
     <script src="../src/core/WAAX.js"></script>
     <script src="../src/core/Utils.js"></script>
     <script src="../src/core/Builtin.js"></script>
@@ -32,50 +36,55 @@
     <script src="../src/analyzer/Spectrum.js"></script>
     <script src="../src/core/Boot.js"></script>
     <!-- Ktrl -->
-    <script src="../lib/Ktrl.js"></script>
+    <script src="../lib/Ktrl/Ktrl.js"></script>
+    
     <script>
-      // master verb and a bit of panning
-      var cho = WX.Chorus({ mix:0.1 });
-      var pp = WX.Pingpong({ mix:0.1, 
-        delayTimeLeft: 0.160, delayTimeRight: 0.480,
-        feedbackLeft: 0.5, feedbackRight: 0.25
-      });
-      var vrb = WX.Converb({ mix:0.4 });
-      cho.to(pp).to(vrb).to(WX.DAC);
-      WX.DAC.panner(0.25);
-
+      
+      // master out
+      var chor = WX.Chorus({ mix:0.1 });
+      var pong = WX.Pingpong({ 
+          mix:0.1, delayTimeLeft: 0.160, delayTimeRight: 0.480,
+          feedbackLeft: 0.5, feedbackRight: 0.25 });
+      var verb = WX.Converb({ mix: 0.4, source:"../data/ir/large.wav" });
+      chor.to(pong).to(verb).to(WX.DAC);
+      
+      // fm vars
       var HR = 2;
       var MI1 = 8;
       var BAL = 0.5;
       var SUS = 0.4;
       var REL = 1.0;
       
-      function onset(pitch, velo) {
+      function Voice (pitch, velo) {
         // dynamic node creation
         var fund = WX.pitch2freq(pitch);
-        var fm1 = WX.Fmop({ freq:fund, gain:1 - BAL , modIndex:0.1 });
-            fm2 = WX.Fmop({ freq:fund * 2, gain:BAL, modIndex:0.5 });
-            env = WX.ADSR();
-        env.adsr(0.001, 0.07, SUS, REL);
+        this._fm1 = WX.Fmop({ freq:fund, gain:1 - BAL, modIndex:0.1 });
+        this._fm2 = WX.Fmop({ freq:fund * 2, gain:BAL, modIndex:0.5 });
+        this._env = WX.ADSR();
+        this._env.adsr(0.001, 0.07, SUS, REL);
 
         // connection
-        fm1.to(env).to(cho);
-        fm2.to(env);
+        this._fm1.to(this._env).to(chor);
+        this._fm2.to(this._env);
 
-        // trigger note with parameter enveloping
-        fm1
-          .harmRatio(HR)
-          .modIndex(MI1).modIndex(0.1, WX.now+1.5, "x")
-          .stop(WX.now+2.0);
-        fm2
-          .harmRatio(HR)
-          .modIndex(MI1 * 0.5).modIndex(0.5, WX.now+1.5, "x")
-          .stop(WX.now+2.0);
-        env
-          .gain(velo).noteOn().noteOff(WX.now+1.0);
-        console.log(WX.context.activeSourceCount);
-      };
-        
+        this.noteon(velo);
+      }
+
+      Voice.prototype = {
+        noteon: function (velo) {
+          this._fm1.harmRatio(HR).modIndex(MI1).modIndex(0.1, WX.now+1.5, "x");
+          this._fm2.harmRatio(HR).modIndex(MI1 * 0.5).modIndex(0.5, WX.now+1.5, "x");
+          this._env.gain(velo).noteOn();
+        },
+        noteoff: function () {
+          this._fm1.stop(WX.now+REL+0.25);
+          this._fm2.stop(WX.now+REL+0.25);
+          this._env.noteOff();
+        }
+      }
+      
+      var _voices = [];
+
       // key input handler
       window.addEventListener("keydown", function(e) {
         var kc = e.keyCode;
@@ -97,8 +106,18 @@
         //console.log(t.label, data);
         switch (data.type) {
           case "noteon":
-            MI1 = Ktrl.scale(Ktrl.CurveSquared(data.velocity), 1, 10); 
-            onset(data.pitch, Ktrl.scale(Ktrl.CurveSquared(data.velocity), 0, 1.5));
+            if (_voices[data.pitch]) {
+              return;
+            } else {
+              MI1 = Ktrl.scale(Ktrl.CurveSquared(data.velocity), 1, 10); 
+              _voices[data.pitch] = new Voice(data.pitch, Ktrl.scale(Ktrl.CurveLinear(data.velocity), 0, 1.5));
+            }
+            break;
+          case "noteoff":
+            if (_voices[data.pitch]) {
+              _voices[data.pitch].noteoff();
+              _voices[data.pitch] = null;  
+            }
             break;
           case "controlchange":
             switch (data.control) {
@@ -115,18 +134,18 @@
                 break;
                 REL = Ktrl.scale(Ktrl.CurveLinear(data.value), 0.01, 2.0);
               case 73:
-                cho.mix(Ktrl.scale(Ktrl.CurveLinear(data.value), 0.3, 0.7), WX.now+0.05);
+                chor.mix(Ktrl.scale(Ktrl.CurveLinear(data.value), 0.3, 0.7), WX.now+0.05);
                 break;
               case 72:
-                pp.mix(Ktrl.scale(Ktrl.CurveLinear(data.value), 0, 0.5), WX.now+0.05);
+                pong.mix(Ktrl.scale(Ktrl.CurveLinear(data.value), 0, 0.5), WX.now+0.05);
                 break;
               case 91:
                 DEL = Ktrl.scale(Ktrl.CurveLinear(data.value), 0.160, 0.480);
-                pp.delayTimeRight(DEL, WX.now+0.1, "l");
-                pp.delayTimeLeft(DEL * 3, WX.now+0.1, "l");
+                pong.delayTimeRight(DEL, WX.now+0.1, "l");
+                pong.delayTimeLeft(DEL * 3, WX.now+0.1, "l");
                 break;
               case 92:
-                vrb.mix(Ktrl.scale(Ktrl.CurveLinear(data.value)), WX.now+0.05);
+                verb.mix(Ktrl.scale(Ktrl.CurveLinear(data.value)), WX.now+0.05);
                 //WX.DAC.gain(Ktrl.scale(Ktrl.CurveLinear(data.value), 0, 1), WX.now+0.1, "l");
                 break;
               

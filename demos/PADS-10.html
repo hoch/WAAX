@@ -124,7 +124,7 @@
       precision: 0, scale: "linear", unit: "cents"
      }, ss_sample);
     var sli_volume = UI.ControlCenter.createControl({
-      type: "slider", name: "Volume", value: 0.0, min: -80.0, max: 12.0,
+      type: "slider", name: "Volume", value: 0.0, min: -24.0, max: 24.0,
       precision: 2, scale: "linear", unit: "dB"
      }, ss_sample);
 
@@ -287,6 +287,9 @@
       // start working
       console.log("[PADS-10] Assets loaded. Building interface...");
 
+      // get initial preset
+      Pad10.setPreset(Presets[0]);
+
       // preset menu
       list_preset.addAction(function (value) {        
         // find preset name in presets
@@ -320,7 +323,7 @@
         }
         var preset = Pad10.getNewPreset(name);
         Presets.push(preset);
-        //console.log(JSON.stringify(Presets));
+        console.log(JSON.stringify(Presets));
         list_preset.addListItem(name);
       });
       // import

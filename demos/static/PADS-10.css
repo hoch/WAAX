@@ -51,6 +51,10 @@ h1 {
   background: rgba(178, 227, 253, 0.89);
   border: 1px solid #1A1A1A;
 }
+.pad-midilisten {
+  background: rgba(253, 178, 178, 0.89);
+  border: 1px solid #1A1A1A;
+}
 .pad-overlay {
   opacity: 0;
   background-color: #aa0;
@@ -66,6 +70,7 @@ h1 {
   color: #EEEEEE;
   text-shadow: -1px -1px 1px #808080;
   font-size: 17px;
+  pointer-events: none;
 }
 .flash {
   -webkit-animation: flash 0.15s;

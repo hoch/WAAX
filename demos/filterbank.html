@@ -8,7 +8,7 @@
     <canvas id="sp" width="800" height="600"></canvas>
 
     <!-- lib r8 -->   
-    <script src="../src/core/Monkey.js"></script>
+    <!-- lib r8 -->   
     <script src="../src/core/WAAX.js"></script>
     <script src="../src/core/Utils.js"></script>
     <script src="../src/core/Builtin.js"></script>
@@ -35,7 +35,7 @@
     <script src="../src/analyzer/Spectrum.js"></script>
     <script src="../src/core/Boot.js"></script>
     <!-- Ktrl -->
-    <script src="../lib/Ktrl.js"></script>
+    <script src="../lib/Ktrl/Ktrl.js"></script>
     <!-- test code -->
     <script>
       var cvs = document.getElementById('sp');
@@ -59,7 +59,7 @@
       var env = adsr.envelope_;
 
       setTimeout(function() {
-        source.start();
+//        source.start();
       }, 1000);
 
       // initiate draw

@@ -120,8 +120,8 @@ WX._unit.adsr.prototype = {
         g = this._inputGain.gain;
     // if the moment is before decay ends, release it after decay
     //t = (t > this._sustainOnset) ? t : this._sustainOnset;
-    g.cancelScheduledValues(t); // ?
-    g.setValueAtTime(g.value, t); // this only works when t = now;
+    g.cancelScheduledValues(0); // ?
+    //g.setValueAtTime(g.value, t); // this only works when t = now;
     g.setTargetValueAtTime(0.0000001, t, this._releaseTau);
     this._isRunning = false;
     return this;
