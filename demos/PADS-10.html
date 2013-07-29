@@ -273,13 +273,13 @@
 
     // initialize : start loading assets
     console.log("[PADS-10] Start loading assets...");
-    Pad10.loadDrumKit(DrumKits.MPC2000, function () {
-      updateDrumKitView();
-      updateCellSettingView();
-    });
     Pad10.loadImpulseResponses(ImpulseResponses.Default, function () {
-      updateMasterEffectView();
-    });
+      Pad10.loadDrumKit(DrumKits.MPC2000, function () {
+        updateDrumKitView();
+        updateMasterEffectView();
+        updateCellSettingView();
+      });
+    });    
 
     // onReady!!
     Pad10.onReady(function () {
