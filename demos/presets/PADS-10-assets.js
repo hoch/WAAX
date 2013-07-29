@@ -116,7 +116,7 @@ var ImpulseResponses = {
     name: 'PADS-10 Default IRs',
     reference: 'www.google.com',
     payload: {
-      '960 Big Empty Church': '../data/PADS-10/ir/960-BigEmpthChurch.wav',
+      '960 Big Empty Church': '../data/PADS-10/ir/960-BigEmptyChurch.wav',
       '960 Brite Stage': '../data/PADS-10/ir/960-BriteStage.wav',
       '960 Large Bright Room': '../data/PADS-10/ir/960-LargeBrightRoom.wav',
       '960 Large Plate': '../data/PADS-10/ir/960-LargePlate.wav',

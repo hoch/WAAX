@@ -20,9 +20,23 @@ h1 {
   color: #12597F;
 }
 
+h2 {
+  margin: 30px 0 15px 0;
+  color: #545758;
+  font-size: 18px;
+}
+
+.c-demohome {
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  font-size: 12px;
+}
+
 .c-body-wrapper {
   margin: 10px 20px;
   padding: 0 10px;
+  width: 700px;
 }
 
 ul.c-list-menu {
@@ -46,4 +60,45 @@ ul.c-list-menu a {
 ul.c-list-menu a:hover {
   text-decoration: underline;
   color: #CC8831;
+}
+
+ul.c-signalflow {
+  margin: 0 0 20px 0;
+  padding: 0;
+}
+
+ul.c-signalflow li {
+  display: inline-block;
+  background-color: #aaa;
+  color: #fff;
+  padding: 3px 4px;
+  border: 1px solid #777;
+  border-radius: 3px;
+  margin-right: 0;
+  font-size: 14px;
+}
+
+ul.c-controlmap {
+  margin: 0 0 20px 0;
+  padding: 0;
+}
+
+ul.c-controlmap li {
+  list-style: none;
+  font-size: 14px;
+}
+
+ul.c-controlmap li dt {
+  background-color: #FFF;
+  display: inline-block;
+  padding: 4px;
+  width: 200px;
+}
+
+ul.c-controlmap li dd {
+  background-color: #FFF;
+  display: inline-block;
+  padding: 4px;
+  margin: 2px 4px;
+  width: 400px;
 }

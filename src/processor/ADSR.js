@@ -50,6 +50,7 @@ WX._unit.adsr = function (options) {
   // handling initial parameter : post-build
   this.envelope(0.0);
   this._initializeParams(options, this._default);
+  this._mono = false;
 };
 
 WX._unit.adsr.prototype = {
@@ -111,7 +112,7 @@ WX._unit.adsr.prototype = {
     g.setValueAtTime(g.value, t); // this only works when t = now;
     //g.setValueAtTime(0.0, t); // this will produce pop with previous release env
     g.linearRampToValueAtTime(1.0, t + this._attack);
-    g.exponentialRampToValueAtTime(this._sustain, this._sustainOnset);
+    g.exponentialRampToValueAtTime(this._sustain, this._sustainOnset);      
     this._isRunning = true;
     return this;
   },
@@ -121,8 +122,8 @@ WX._unit.adsr.prototype = {
     // if the moment is before decay ends, release it after decay
     //t = (t > this._sustainOnset) ? t : this._sustainOnset;
     g.cancelScheduledValues(0); // ?
-    //g.setValueAtTime(g.value, t); // this only works when t = now;
-    g.setTargetValueAtTime(0.0000001, t, this._releaseTau);
+    g.setValueAtTime(g.value, t); // this only works when t = now;
+    g.setTargetValueAtTime(0.0000001, t, this._releaseTau);  
     this._isRunning = false;
     return this;
   }

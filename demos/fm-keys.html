@@ -5,8 +5,38 @@
   </head>
   <body>
 
+    <div class="c-demohome"><a href="index.html">Index</a></div>
     <h1>FM Keys</h1>
+
     <div class="c-body-wrapper" id="i-container">
+      <h2>Audio Signal Flow</h2>
+      <ul class="c-signalflow">
+        <li>Fmop (Dynamic)</li> <li class="separator"></li>
+        <li>ADSR (Dynamic)</li> <li class="separator"></li>
+        <li>Chorus</li> <li class="separator"></li>
+        <li>Pingpong</li> <li class="separator"></li>
+        <li>Converb</li> <li class="separator"></li>
+        <li>DAC</li>
+      </ul>
+      <h2>MIDI Signal Flow</h2>
+      <ul class="c-signalflow">
+        <li>MIDI</li> <li class="separator"></li>
+        <li>Fmop</li> <li class="separator"></li>
+        <li>ADSR</li>
+      </ul>
+      <h2>MIDI Control Map</h2>
+      <ul class="c-controlmap">
+        <li>
+          <dt>Modulation (CC7)</dt><dd>Brightness</dd>
+          <dt>Modulation (CC10)</dt><dd>Octave</dd>
+          <dt>Modulation (CC74)</dt><dd>Envelope Sustain</dd>
+          <dt>Modulation (CC71)</dt><dd>Envelope Release</dd>
+          <dt>Modulation (CC73)</dt><dd>Chorus Mix</dd>
+          <dt>Modulation (CC72)</dt><dd>Delay Mix</dd>
+          <dt>Modulation (CC91)</dt><dd>Delay Time</dd>
+          <dt>Modulation (CC92)</dt><dd>Reverb mix</dd>
+        </li>
+      </ul>
     </div>
 
     <!-- lib r8 -->   
@@ -45,7 +75,7 @@
       var pong = WX.Pingpong({ 
           mix:0.1, delayTimeLeft: 0.160, delayTimeRight: 0.480,
           feedbackLeft: 0.5, feedbackRight: 0.25 });
-      var verb = WX.Converb({ mix: 0.4, source:"../data/ir/large.wav" });
+      var verb = WX.Converb({ mix: 0.4, source:"../data/PADS-10/ir/960-LargePlate.wav" });
       chor.to(pong).to(verb).to(WX.DAC);
       
       // fm vars
@@ -131,8 +161,8 @@
                 SUS = Ktrl.scale(Ktrl.CurveLinear(data.value), 0.01, 0.5);
                 break;
               case 71:
-                break;
                 REL = Ktrl.scale(Ktrl.CurveLinear(data.value), 0.01, 2.0);
+                break;
               case 73:
                 chor.mix(Ktrl.scale(Ktrl.CurveLinear(data.value), 0.3, 0.7), WX.now+0.05);
                 break;

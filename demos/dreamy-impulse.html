@@ -6,8 +6,21 @@
   </head>
   <body>
     
+    <div class="c-demohome"><a href="index.html">Index</a></div>
     <h1>Dreamy Impulse</h1>
     <div class="c-body-wrapper" id="i-container">
+      <h2>Audio Signal Flow</h2>
+      <ul class="c-signalflow">
+        <li>Impulse Train</li> <li class="separator"></li>
+        <li>LPF</li> <li class="separator"></li>
+        <li>Pingpong</li> <li class="separator"></li>
+        <li>Converb</li> <li class="separator"></li>
+        <li>DAC</li>
+      </ul>
+      <ul class="c-signalflow">
+        <li>LFO + Step</li> <li class="separator"></li>
+        <li>LPF: Frequency</li>
+      </ul>
     </div>
 
     <!-- lib r8 -->   
@@ -45,72 +58,72 @@
     <!-- scripts -->
     <script>
       // units
-      var uLfo = WX.Oscil({ gain:4.0, freq:0.125 });
-      var uImp = WX.ITrain({ gain:1.0, freq:6 });
-      var uLpf = WX.Filter({ cutoff:2500, Q:12 });
-      var uVerb = WX.Converb({ mix: 0.8 });
+      var uLfo = WX.Oscil({ gain:1250.0, freq:0.125 });
+      var uStp = WX.Step({ gain:1250.0 });
+      var uImp = WX.ITrain({ gain:2.2, freq:6 });
+      var uLpf = WX.Filter({ cutoff:125, Q:24 });
       var uPong = WX.Pingpong({ 
         delayTimeLeft: 0.600, delayTimeRight: 0.450, 
         feedbackLeft: 0.3, feedbackRight: 0.5, crosstalk: 0.25 
       });
-
+      var uVerb = WX.Converb({ mix: 0.8 });
+    
       // connection
-      uImp.to(uLpf).to(uVerb).to(uPong).to(WX.DAC);
+      uImp.to(uLpf).to(uPong).to(uVerb).to(WX.DAC);
+      uStp.control(uLpf.cutoff_);
       uLfo.control(uLpf.cutoff_);
 
-      // dream on
+      // DEPRECATED: dream on
       // function dream() {
       //   var t1 = WX.now + 4, 
       //       t2 = WX.now + 8;
-      //   f
+      //   uLpf
       //     .cutoff(125).Q(12)
       //     .cutoff(2500 + Math.random() * 4000, t1, "x").Q(36, t1, "l")
       //     .cutoff(125, t2, "x").Q(12, t2, "l");
       //   setTimeout(dream, 8000);
       // }
-      //dream();
+      // dream();
 
       // ui
-      var s_preset = UI.ControlCenter.createSection("Preset Manager", "i-container");
-      var l_preset = UI.ControlCenter.createControl({
-        type: "indexed-list", name: "Preset", value: "", data: ["Not yet..."],
-        exclude: true
-      }, s_preset);
-
-      var s_lfoFreq = UI.ControlCenter.createControl({
+      var section_preset = UI.ControlCenter.createSection("Control", "i-container");
+      
+      var s_lfoRate = UI.ControlCenter.createControl({
         type: "slider", name: "LFO Rate", value: 0.125, min: 0.1, max: 20.0,
         precision: 2, scale: "log", unit: "Hz"
-      }, s_preset);
-      var s_lfoGain = UI.ControlCenter.createControl({
-        type: "slider", name: "LFO Depth", value: 125.0, min: 125.0, max: 4000.0,
+      }, section_preset);
+      var s_lfoDepth = UI.ControlCenter.createControl({
+        type: "slider", name: "LFO Depth", value: 2500.0, min: 0.0, max: 6500.0,
         precision: 2, scale: "linear", unit: ""
-      }, s_preset);
+      }, section_preset);
       var s_impFreq = UI.ControlCenter.createControl({
-        type: "slider", name: "Imp Frequency", value: 5.0, min: 0.1, max: 20.0,
+        type: "slider", name: "Imp Frequency", value: 6.0, min: 0.1, max: 20.0,
         precision: 2, scale: "log", unit: "Hz"
-      }, s_preset);
+      }, section_preset);
       var s_filtCutoff = UI.ControlCenter.createControl({
-        type: "slider", name: "Cutoff", value: 2500.0, min: 125.0, max: 7000.0,
+        type: "slider", name: "Cutoff", value: 125.0, min: 125.0, max: 7000.0,
         precision: 2, scale: "log", unit: "Hz"
-      }, s_preset);
+      }, section_preset);
       var s_filtQ = UI.ControlCenter.createControl({
-        type: "slider", name: "Q", value: 12.0, min: 12.0, max: 36.0,
+        type: "slider", name: "Q", value: 24.0, min: 12.0, max: 36.0,
         precision: 2, scale: "linear", unit: ""
-      }, s_preset);
-      var s_verbMix = UI.ControlCenter.createControl({
-        type: "slider", name: "Reverb Mix", value: 0.8, min: 0.0, max: 1.0,
-        precision: 2, scale: "linear", unit: ""
-      }, s_preset);
+      }, section_preset);
       var s_dlyTime = UI.ControlCenter.createControl({
         type: "slider", name: "Delay Time", value: 0.6, min: 0.001, max: 1.0,
         precision: 2, scale: "linear", unit: ""
-      }, s_preset);
-
-      s_lfoFreq.addAction(function (value) {
+      }, section_preset);
+      var s_verbMix = UI.ControlCenter.createControl({
+        type: "slider", name: "Reverb Mix", value: 0.8, min: 0.0, max: 1.0,
+        precision: 2, scale: "linear", unit: ""
+      }, section_preset);
+      
+      // assign actions
+      s_lfoRate.addAction(function (value) {
         uLfo.freq(value, WX.now + 0.02, "x");
       });
-      s_lfoGain.addAction(function (value) {
-        uLfo.gain(value, WX.now + 0.02, "x");
+      s_lfoDepth.addAction(function (value) {
+        uStp.gain(value * 0.5, WX.now + 0.02, "l");
+        uLfo.gain(value * 0.5, WX.now + 0.02, "l");
       });
       s_impFreq.addAction(function (value) {
         uImp.freq(value, WX.now + 0.02, "x");
@@ -119,14 +132,19 @@
         uLpf.cutoff(value, WX.now + 0.02, "x");
       });
       s_filtQ.addAction(function (value) {
-        uLpf.Q(value, WX.now + 0.02, "x");
+        uLpf.Q(value, WX.now + 0.02, "l");
       });
       s_verbMix.addAction(function (value) {
-        uVerb.mix(value, WX.now + 0.02, "x");
+        uVerb.mix(value, WX.now + 0.02, "l");
       });
       s_dlyTime.addAction(function (value) {
         uPong.delayTimeLeft(value, WX.now + 0.02, "l");
         uPong.delayTimeLeft(value * 0.75, WX.now + 0.02, "l");
+      });
+
+      // ktrl onready
+      Ktrl.ready(function () {
+        Ktrl.report();
       });
 
     </script>
