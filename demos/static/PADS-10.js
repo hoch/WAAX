@@ -443,10 +443,10 @@ var Pad10 = (function (WX, Center, Ktrl, window) {
   var _MIDIMode = "performance"; // or "midilearn"
   var _noteMap = MIDISetup.NoteToPadMap;
   function _handleMIDINote (data) {
-    if (typeof _noteMap[data.pitch] === 'undefined') {
-      return;
-    }
     if (_MIDIMode === "performance") {
+      if (typeof _noteMap[data.pitch] === 'undefined') {
+        return;
+      }
       var id = _noteMap[data.pitch];
       PadCells[id].noteOn(Ktrl.CurveCubed(data.velocity), WX.now);
     } else if (_MIDIMode === "midilearn") {
