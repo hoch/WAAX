@@ -102,6 +102,8 @@
 
       Voice.prototype = {
         noteon: function (velo) {
+          this._fm1.start(time);
+          this._fm2.start(time);
           this._fm1.harmRatio(HR).modIndex(MI1).modIndex(0.1, WX.now+1.5, "x");
           this._fm2.harmRatio(HR).modIndex(MI1 * 0.5).modIndex(0.5, WX.now+1.5, "x");
           this._env.gain(velo).noteOn();

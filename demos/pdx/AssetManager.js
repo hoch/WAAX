@@ -1,49 +1,86 @@
 /**
- * AssetManager 
+ * AssetManager
  */
-var AssetManager = (function (Asset, Bundle, Context) {
+var AssetManager = (function(Asset, Bundle, Context, Callbacks) {
+
+
 
   // vars
-  var bReady = false;
+  var bAssetReady = false;
+  var bDrumSampleLoaded = false;
+  var bIRLoaded = false;
   var bVerbos = !true;
-  var drumSamples = [];
-  var bufferMap = new BufferMap();
+  var drumBufferMap = new BufferMap();
+  var irBufferMap = new BufferMap();
 
 
 
-  // organize drum sample list
-  for (var drumSample in Asset.Drumkits) {
-    drumSamples = drumSamples.concat(_serialize(Asset.Drumkits[drumSample].payload));
-  }
-  // organize ir list
-  
-  // start loading with oncomplete, onprogress
-  _recurseXHR(drumSamples.slice(0), bufferMap, 0, 
-    function () {
-      bReady = true;
-    }, 
-    function (value) {
-      var pct = (value * 100 / (drumSamples.length-1)).toFixed(2);
-      console.log(pct);
-    }
-  );
-  
+  // load assets
+  Callbacks.onLoadingStart();
+  _loadImpuseResponse(function() {
+    bIRLoaded = true;
+    _reportAssetStatus();
+  });
+  _loadDrumSamples(function() {
+    bDrumSampleLoaded = true;
+    _reportAssetStatus();
+  });
+
 
 
   // helpers
-  function _getKeyList (obj) {
+
+  function _getKeyList(obj) {
     return Object.keys(obj);
   }
-  function _getKeyByIndex (obj, index) {
+
+  function _getKeyByIndex(obj, index) {
     return Object.keys(obj)[index];
   }
-  function _getValueByIndex (obj, index) {
+
+  function _getValueByIndex(obj, index) {
     return obj[Object.keys(obj)[index]];
   }
-  function _serialize (obj) {
-    return Object.keys(obj).map(function (key) {
+
+  function _serialize(obj) {
+    return Object.keys(obj).map(function(key) {
       return [key, obj[key]];
     });
+  }
+
+  function _loadDrumSamples(oncomplete) {
+    var drumSamples = [];
+    for (var drumSample in Asset.Drumkits) {
+      drumSamples = drumSamples.concat(_serialize(Asset.Drumkits[drumSample].payload));
+    }
+    _recurseXHR(drumSamples.slice(0), drumBufferMap, 0,
+      oncomplete,
+      function(value) {
+        var pct = (value * 100 / (drumSamples.length - 1)).toFixed(2);
+        Callbacks.onProgress(pct);
+      }
+    );
+  }
+
+  function _loadImpuseResponse(oncomplete) {
+    var impulseResponses = [];
+    for (var ir in Asset.ImpulseResponses) {
+      impulseResponses = impulseResponses.concat(_serialize(Asset.ImpulseResponses[ir].payload));
+    }
+    _recurseXHR(impulseResponses.slice(0), irBufferMap, 0,
+      oncomplete,
+      function(value) {
+        var pct = (value * 100 / (impulseResponses.length - 1)).toFixed(2);
+        Callbacks.onProgress(pct);
+      }
+    );
+  }
+
+  function _reportAssetStatus() {
+    if (bIRLoaded && bDrumSampleLoaded) {
+      bAssetReady = true;
+      Callbacks.onLoaded();
+    }
   }
 
 
@@ -56,14 +93,15 @@ var AssetManager = (function (Asset, Bundle, Context) {
    * @param {Function} oncomplete callback on completion
    * @param {Function} onprogress callback on completion of each request
    */
-  function _recurseXHR (data, buffermap, iteration, oncomplete, onprogress) {
+  function _recurseXHR(data, buffermap, iteration, oncomplete, onprogress) {
     // get first key(name)/value(url) from data
-    var d = data.shift(); 
-    var name = d[0], url = d[1];
+    var d = data.shift();
+    var name = d[0],
+      url = d[1];
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.responseType = "arraybuffer";
-    xhr.onload = function () {
+    xhr.onload = function() {
       try {
         var b = Context.createBuffer(xhr.response, false);
         buffermap.addAudioBuffer(name, b);
@@ -74,7 +112,6 @@ var AssetManager = (function (Asset, Bundle, Context) {
           onprogress(++iteration);
           _recurseXHR(data, buffermap, iteration, oncomplete, onprogress);
         } else {
-          console.log("asset loading complete.");
           oncomplete(buffermap);
         }
       } catch (error) {
@@ -86,20 +123,23 @@ var AssetManager = (function (Asset, Bundle, Context) {
   }
 
 
+
   /**
    * @class BufferMap
    * @param {array} data array of asset data ([name1, url1], [name2, url2], ...)
    */
-  function BufferMap () {
+
+  function BufferMap() {
 
     // kv pair = "buffer name": AudioBuffer
     var _data = {};
 
     return {
+
       /**
        * add new audio buffer to the data
        */
-      addAudioBuffer: function (name, audioBuffer) {
+      addAudioBuffer: function(name, audioBuffer) {
         // check duplicate name first
         if (_data.hasOwnProperty(name)) {
           console.log("duplicate audio buffer name.");
@@ -117,20 +157,19 @@ var AssetManager = (function (Asset, Bundle, Context) {
       },
 
       /**
-       * various getters       
+       * various getters
        */
-      getBufferByName: function (name) {
+      getBufferByName: function(name) {
         return _data[name];
       },
-      getBufferByIndex: function (index) {
+      getBufferByIndex: function(index) {
         return _getValueByIndex(_data, index);
       },
-      getBufferNames: function () {
+      getBufferNames: function() {
         return _getKeyList(_data);
       }
-
     };
-    
+
   }
 
 
@@ -139,7 +178,8 @@ var AssetManager = (function (Asset, Bundle, Context) {
    * revealing resources
    */
   return {
-    bufferMap: bufferMap
+    drumBufferMap: drumBufferMap,
+    irBufferMap: irBufferMap
   };
 
-})(Asset, Bundle, PDX.AudioContext);
+})(Asset, Bundle, PDX.AudioContext, PDX.AssetCallbacks);

@@ -109,8 +109,8 @@ WX._unit.adsr.prototype = {
         g = this._inputGain.gain;
     this._sustainOnset = t + this._attack + this._decay;
     g.cancelScheduledValues(t);
-    g.setValueAtTime(g.value, t); // this only works when t = now;
-    //g.setValueAtTime(0.0, t); // this will produce pop with previous release env
+    //g.setValueAtTime(g.value, t); // this only works when t = now;
+    g.setValueAtTime(0.0, t); // this will produce pop with previous release env
     g.linearRampToValueAtTime(1.0, t + this._attack);
     g.exponentialRampToValueAtTime(this._sustain, this._sustainOnset);      
     this._isRunning = true;
@@ -121,9 +121,9 @@ WX._unit.adsr.prototype = {
         g = this._inputGain.gain;
     // if the moment is before decay ends, release it after decay
     //t = (t > this._sustainOnset) ? t : this._sustainOnset;
-    g.cancelScheduledValues(0); // ?
-    g.setValueAtTime(g.value, t); // this only works when t = now;
-    g.setTargetValueAtTime(0.0000001, t, this._releaseTau);  
+    g.cancelScheduledValues(t); // ?
+    //g.setValueAtTime(g.value, t); // this only works when t = now;
+    g.setTargetValueAtTime(0.00001, t, this._releaseTau);  
     this._isRunning = false;
     return this;
   }

@@ -111,12 +111,12 @@ Asset.Drumkits = {
 
 
 /**
- * IRs
+ * ImpulseResponses
  * @type {Object}
  */
-Asset.IRs = {
+Asset.ImpulseResponses = {
 
-  'Default IRs': {
+  'Default': {
     reference: 'www.google.com',
     payload: {
       '960 Big Empty Church': 'data/ir/960-BigEmptyChurch.wav',

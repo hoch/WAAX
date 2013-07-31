@@ -47,8 +47,6 @@ WX._unit.fmop = function (options) {
   this._carFreq = 220;
   this._harmRatio = 1.0;
   this._modIndex = 1.0;
-  this._mod.start(0);
-  this._car.start(0);
   // bind AudioParam
   WX._unit.bindAudioParam.call(this, "modFreq", this._mod.frequency);
   WX._unit.bindAudioParam.call(this, "carFreq", this._car.frequency);
@@ -91,6 +89,10 @@ WX._unit.fmop.prototype = {
     } else {
       return this._modIndex;
     }
+  },
+  start: function (moment) {
+    this._mod.start(moment);
+    this._car.start(moment);
   },
   stop: function(moment) {
     this._mod.stop(moment);
