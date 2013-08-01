@@ -12,42 +12,50 @@ var AssetManager = (function(Asset, Bundle, Context, Callbacks) {
   var bVerbos = !true;
   var drumBufferMap = new BufferMap();
   var irBufferMap = new BufferMap();
+  var presetMap = new PresetMap();
 
 
 
-  // load assets
+  // loading assets
+  _log("start loading assets...");
+  // async: loading impulse responses
   Callbacks.onLoadingStart();
   _loadImpuseResponse(function() {
     bIRLoaded = true;
     _reportAssetStatus();
   });
+  // async: loading impulse responses
   _loadDrumSamples(function() {
     bDrumSampleLoaded = true;
     _reportAssetStatus();
   });
+  // loading presets from bundle
+  presetMap.loadPresetFromBundle(Bundle);
 
 
 
   // helpers
-
   function _getKeyList(obj) {
     return Object.keys(obj);
   }
-
   function _getKeyByIndex(obj, index) {
     return Object.keys(obj)[index];
   }
-
   function _getValueByIndex(obj, index) {
     return obj[Object.keys(obj)[index]];
   }
-
   function _serialize(obj) {
     return Object.keys(obj).map(function(key) {
       return [key, obj[key]];
     });
   }
-
+  function _cloneObject(obj) {
+    var target = {};
+    for (var prop in obj) {
+      target[prop] = obj[prop];
+    }
+    return target;
+  }
   function _loadDrumSamples(oncomplete) {
     var drumSamples = [];
     for (var drumSample in Asset.Drumkits) {
@@ -57,11 +65,11 @@ var AssetManager = (function(Asset, Bundle, Context, Callbacks) {
       oncomplete,
       function(value) {
         var pct = (value * 100 / (drumSamples.length - 1)).toFixed(2);
+        _log("loading... (" + pct + "%)");
         Callbacks.onProgress(pct);
       }
     );
   }
-
   function _loadImpuseResponse(oncomplete) {
     var impulseResponses = [];
     for (var ir in Asset.ImpulseResponses) {
@@ -71,16 +79,25 @@ var AssetManager = (function(Asset, Bundle, Context, Callbacks) {
       oncomplete,
       function(value) {
         var pct = (value * 100 / (impulseResponses.length - 1)).toFixed(2);
+        _log("loading... (" + pct + "%)");
         Callbacks.onProgress(pct);
       }
     );
   }
-
   function _reportAssetStatus() {
     if (bIRLoaded && bDrumSampleLoaded) {
       bAssetReady = true;
+      _log("assets ready.");
       Callbacks.onLoaded();
     }
+  }
+  function _log (msg) {
+    if (bVerbos) {
+      console.log("[AssetMan] " + msg);  
+    }
+  }
+  function _err (msg) {
+    console.log("[AssetMan:ERR] " + msg);
   }
 
 
@@ -105,9 +122,7 @@ var AssetManager = (function(Asset, Bundle, Context, Callbacks) {
       try {
         var b = Context.createBuffer(xhr.response, false);
         buffermap.addAudioBuffer(name, b);
-        if (bVerbos) {
-          console.log(name, "\t", url);
-        }
+        _log(name, "\t", url);
         if (data.length) {
           onprogress(++iteration);
           _recurseXHR(data, buffermap, iteration, oncomplete, onprogress);
@@ -115,8 +130,8 @@ var AssetManager = (function(Asset, Bundle, Context, Callbacks) {
           oncomplete(buffermap);
         }
       } catch (error) {
-        console.log("xhr failed (" + error.message + "): " + url);
-        console.log("loading stopped.");
+        _err("xhr failed (" + error.message + "): " + url);
+        _err("loading stopped.");
       }
     }
     xhr.send();
@@ -131,8 +146,8 @@ var AssetManager = (function(Asset, Bundle, Context, Callbacks) {
 
   function BufferMap() {
 
-    // kv pair = "buffer name": AudioBuffer
-    var _data = {};
+    // "buffer name": AudioBuffer
+    var _buffers = {};
 
     return {
 
@@ -141,8 +156,8 @@ var AssetManager = (function(Asset, Bundle, Context, Callbacks) {
        */
       addAudioBuffer: function(name, audioBuffer) {
         // check duplicate name first
-        if (_data.hasOwnProperty(name)) {
-          console.log("duplicate audio buffer name.");
+        if (_buffers.hasOwnProperty(name)) {
+          _err("duplicate audio buffer name.");
           return null;
         } else {
           // when buffer is mono, duplicate L to R channel
@@ -151,7 +166,7 @@ var AssetManager = (function(Asset, Bundle, Context, Callbacks) {
             var chan = audioBuffer.getChannelData(0);
             newBuffer.getChannelData(0).set(new Float32Array(chan));
             newBuffer.getChannelData(1).set(new Float32Array(chan));
-            _data[name] = newBuffer;
+            _buffers[name] = newBuffer;
           }
         }
       },
@@ -160,18 +175,113 @@ var AssetManager = (function(Asset, Bundle, Context, Callbacks) {
        * various getters
        */
       getBufferByName: function(name) {
-        return _data[name];
+        return _buffers[name];
       },
       getBufferByIndex: function(index) {
-        return _getValueByIndex(_data, index);
+        return _getValueByIndex(_buffers, index);
       },
       getBufferNames: function() {
-        return _getKeyList(_data);
+        return _getKeyList(_buffers);
       }
     };
 
   }
 
+
+  /**
+   * @class PresetMap
+   */
+  function PresetMap () {
+
+    var _info = {};    
+    var _presets = {};
+
+    function _getPresetList () {
+      return Object.keys(_presets);
+    }
+
+    function _findPreset (arg) {
+      var key = null;
+      switch (typeof arg) {
+        case "number":
+          var presetList = _getPresetList();
+          if (arg > -1 && arg < presetList.length) {
+            key = presetList[arg];
+          }
+          break;
+        case "string":
+          if (_presets.hasOwnProperty(arg)) {
+            key = arg;
+          }
+          break;
+      }
+      return key;
+    }
+
+    return {
+
+      loadPresetFromBundle: function(bundle) {
+        _info = _cloneObject(bundle.info);
+        _presets = _cloneObject(bundle.presets);
+      },
+
+      getInfo: function () {
+        return _cloneObject(_info);
+      },
+
+      getPresetList: _getPresetList,
+      
+      getPreset: function(arg) {
+        var key = _findPreset(arg)
+        if (key) {
+          return _cloneObject(_presets[key]);
+        } else {
+          _err("couldn't find preset. (" + arg + ")");
+          return undefined;
+        }
+      },
+
+      addPreset: function(name, params) {
+        if (_getPresetByName(name)) {
+          _err("duplicate preset name.");
+          return null;
+        } else {
+          _presets[name] = _cloneObject(params);
+          return true;
+        }
+      },
+
+      removePreset: function(arg) {
+        var key = _findPreset(arg);
+        if (key) {
+          delete _presets[key];
+          return true
+        } else {
+          _err("couldn't find preset. (" + arg + ")");
+          return undefined;
+        }
+      },
+
+      updatePreset: function(arg, params) {
+        var key = _findPreset(arg);
+        if (key) {
+          _presets[key] = _cloneObject(params);
+          return true
+        } else {
+          _err("couldn't find preset. (" + arg + ")");
+          return undefined;
+        }
+      },
+
+      importBundle: function (bundle) {
+
+      },
+
+      exportBundle: function (filename) {
+
+      }
+    }
+  }
 
 
   /**
@@ -179,7 +289,8 @@ var AssetManager = (function(Asset, Bundle, Context, Callbacks) {
    */
   return {
     drumBufferMap: drumBufferMap,
-    irBufferMap: irBufferMap
+    irBufferMap: irBufferMap,
+    presetMap: presetMap,
   };
 
 })(Asset, Bundle, PDX.AudioContext, PDX.AssetCallbacks);

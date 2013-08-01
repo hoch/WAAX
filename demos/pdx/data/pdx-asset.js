@@ -133,3 +133,49 @@ Asset.ImpulseResponses = {
 
 
 };
+
+
+/**
+ * InteractionProfile
+ * @type {Object}
+ */
+Asset.InteractionProfile = {
+  
+  MIDINoteToPad: {
+    "48": 0,
+    "52": 1,
+    "54": 2,
+    "58": 3,
+    "51": 4,
+    "49": 5,
+    "68": 6,
+    "56": 7,
+    "60": 8,
+    "59": 9
+  },
+
+  MIDICCToControl: {
+    "71": "cLSFreq",
+    "74": "cHSFreq",
+    "91": "cVerbAmt",
+    "93": "cDlyAmt"
+  },
+
+  KeyCodeToPad: {
+    "81": 0,
+    "87": 1,
+    "69": 2,
+    "82": 3,
+    "84": 4,
+    "65": 5,
+    "83": 6,
+    "68": 7,
+    "70": 8,
+    "71": 9
+  },
+
+  MouseToControl: {
+    
+  }
+
+};

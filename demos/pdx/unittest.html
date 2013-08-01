@@ -2,14 +2,30 @@
 <html>
   <head>
     <link href="static/base.css" rel="stylesheet" type="text/css">
+    <link href="lib/UI-light.css" rel="stylesheet" type="text/css">
   </head>
   <body>
 
     <!-- html -->
     <div class="container">
       <h1>Unit Test</h1>
-    </div>
     
+      <div id="i-ui-container">
+        <div data-ui-section="Sample" id="i-sec-sample">
+          <div data-ui-name="cMute"></div>
+          <div data-ui-name="cTune"></div>
+          <div data-ui-name="cVolume"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- lib -->
+    <script src="lib/UI.js"></script>
+    <script src="lib/UIButton.js"></script>
+    <script src="lib/UIIndexedList.js"></script>
+    <script src="lib/UISlider.js"></script>
+
     <!-- pdx asset -->
     <script src="data/pdx-asset.js"></script>
     <script src="data/pdx-bundle.js"></script>
@@ -17,6 +33,9 @@
     <!-- pdx engine -->
     <script src="Core.js"></script>
     <script src="AssetManager.js"></script>
+    <script src="SamplerEngine.js"></script>
+    <script src="UIManager.js"></script>
+    <script src="EventDispatcher.js"></script>
     
     <!-- test code -->
     <script>

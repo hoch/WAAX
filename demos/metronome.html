@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="static/demos.css" rel="stylesheet" type="text/css">
+    <link href="../lib/UI/UI-light.css" rel="stylesheet" type="text/css">
+    <style>
+      .c-clock {
+        background-color: #333;
+        width: 400px;
+        height: 100px;
+        border-radius: 10px;
+        color: #3f3;
+        font-size: 50px;
+        font-family: monospace;
+        line-height: 100px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <div class="c-demohome"><a href="index.html">Index</a></div>
+    <h1>Metronome</h1>
+    <div class="c-body-wrapper" id="i-container">
+      <div class="c-clock" id="i-clock">0:0:0:000</div>
+    </div>
+
+    <!-- lib r8 -->   
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Utils.js"></script>
+    <script src="../src/core/Builtin.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/generator/Oscil.js"></script>
+    <script src="../src/generator/Fmop.js"></script>
+    <script src="../src/generator/Noise.js"></script>
+    <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/Sampler.js"></script>
+    <script src="../src/generator/Step.js"></script>
+    <script src="../src/processor/Fader.js"></script>
+    <script src="../src/processor/Spatter.js"></script>
+    <script src="../src/processor/ADSR.js"></script>
+    <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Filterbank.js"></script>
+    <script src="../src/processor/Formant.js"></script>
+    <script src="../src/processor/FormantV.js"></script>
+    <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Chorus.js"></script>
+    <script src="../src/processor/Phasor.js"></script>
+    <script src="../src/processor/Comp.js"></script>
+    <script src="../src/processor/Converb.js"></script>
+    <script src="../src/analyzer/Waveform.js"></script>
+    <script src="../src/analyzer/Spectrum.js"></script>
+    <script src="../src/core/Boot.js"></script>
+    <!-- Ktrl -->
+    <script src="../lib/Ktrl/Ktrl.js"></script>
+    <script src="../lib/UI/UI.js"></script>
+    <script src="../lib/UI/UISlider.js"></script>
+    <script src="../lib/UI/UIButton.js"></script>
+    <script src="../lib/UI/UIIndexedList.js"></script>
+    <!-- scripts -->
+    <script>
+
+      var uMetroFader = WX.Fader();
+      uMetroFader.to(WX.DAC);
+
+      var ticker = new Ticker();
+      
+      
+      var gQuantum = 1.0 / 60; // 60fps, reqAnimFrm
+      var gLookAhead = gQuantum * 2; // 1 quantums
+
+      var gOrigin = 0.0;
+      var gNow = 0.0;
+      
+      var gBPM = 120.0;
+      var gGrid4 = 60 / gBPM;
+      var gGrid1 = gGrid4 * 4;
+      var gGrid16 = gGrid4 * 0.25;
+      var gGridTick = gGrid16 / 480;
+      
+      var gNowInSec = 0.0
+      var gCurSec = 0.0;
+      var gCurTick = 0;
+      var gCur16th = 0;
+      var gCurBeat = 0;
+      var gCurMeasure = 0;
+      
+      // timing stuff
+      var divClock = document.getElementById('i-clock');
+      var playback = false;
+
+      var prevTimeStamp = 0;
+      function gAdvanceQuantum (timestamp) {
+
+        delta = timestamp - prevTimeStamp;
+
+        gNow = WX.now - gOrigin;
+        gCurSec = (gNow).toFixed(4);
+        gCurTick = ('000' + ~~((gNow % gGrid16) / gGridTick)).substr(-3);
+        gCur16th = ~~((gNow % gGrid4) / gGrid16);
+        gCurBeat = ~~((gNow % gGrid1) / gGrid4);
+        gCurMeasure = ~~(gNow / gGrid1);
+
+        lookAheadAndSchedule();
+
+        divClock.textContent = gCurMeasure + ":" + gCurBeat + ":" + gCur16th + ":" + gCurTick;
+
+        prevTimeStamp = timestamp;
+
+        if (playback) {
+          requestAnimationFrame(gAdvanceQuantum);
+        }
+      }
+      
+      function lookAheadAndSchedule () {
+        if (ticker.nextBeat < WX.now + gLookAhead) {
+          // because we're scheduling next one...
+          ticker.tick(gCurBeat + 1);
+        }
+      }
+     
+      function start () {
+        // always start from the origin
+        gOrigin = WX.now;
+        gNow = 0.0;
+        gBeatCounter = 0;
+        ticker.nextBeat = WX.now;
+        playback = true;
+        gAdvanceQuantum();
+        prevTimsStamp = Date.now();
+      } 
+
+      function stop () {
+        playback = false;
+      }
+
+
+
+
+
+
+
+
+
+
+      // build buffermap
+      WX.buildBufferMap(
+        {
+          payload: {
+            "Sample 1": "../data/PADS-10/mpc2000/P_SN_RIM.wav", 
+            "Sample 2": "../data/PADS-10/tr909/909rim.wav",
+            "Sample 3": "../data/PADS-10/cr78/Rim Shot.wav",
+            "Sample 4": "../data/PADS-10/cr78/Bongo High.wav",
+            "Sample 5": "../data/PADS-10/cr78/Bongo Low.wav",
+            "Sample 6": "../data/PADS-10/asrx/ASR-X Hat 02.wav"
+          }
+        },
+        function (buffermap) {
+          _metroBufferMap = buffermap;
+          ticker.setBufferMap(buffermap);
+          console.log("done.");
+        },
+        function (progress) {
+          console.log("loading...");
+        }
+      );
+
+      // sampler
+      function Ticker (beat) {
+
+        this.nextBeat = 0.0;
+        this.accent = [1.0, 0.4, 0.4, 0.4];
+        
+        this.setBufferMap = function (buffermap) {
+          this._bufferMap = buffermap;
+          this._buffer = this._bufferMap.getBufferByIndex(0);
+        }
+
+        this.setBufferByName = function (name) {
+          this._buffer = this._bufferMap.getBufferByName(name);
+        }
+
+        this.tick = function (beat) {
+
+          beat %= 4;
+
+          var source = WX.context.createBufferSource();
+          var volume = WX.context.createGain();
+          source.connect(volume);
+          volume.connect(uMetroFader._inlet);
+
+          source.buffer = this._buffer;
+          volume.gain.setValueAtTime(this.accent[beat], this.nextBeat);
+          source.start(this.nextBeat);
+          source.stop(this.nextBeat + source.buffer.duration);
+
+          this.nextBeat += gGrid4;
+        }
+      }
+
+      // UI
+      var sec_control = UI.ControlCenter.createSection("Control", "i-container");
+      var btn_metro = UI.ControlCenter.createControl({
+        type: "button", name: "ON", value: false, mode: "toggle"
+      }, sec_control);
+      var sli_tempo = UI.ControlCenter.createControl({
+        type: "slider", name: "Tempo", value: gBPM, min: 30.0, max: 240.0,
+        precision: 2, scale: "linear", unit: "bpm"
+      }, sec_control);
+
+      btn_metro.addAction(function (value) {
+        if (value) {
+          start();
+        } else {
+          stop();
+        }
+      });
+      sli_tempo.addAction(function (value) {
+        var factor = gBPM / value;
+        gOrigin *= factor;
+        gBPM = value;
+        gGrid4 = 60 / gBPM;
+        gGrid1 = gGrid4 * 4;
+        gGrid16 = gGrid4 * 0.25;
+        gGridTick = gGrid16 / 480;
+      });
+
+
+      // MIDI routing
+      var gTestTarget = Ktrl.createTarget("test");
+      gTestTarget.onData(function (midimessage) {
+        var data = Ktrl.parse(midimessage);
+        switch (data.type) {
+        }
+      });
+
+      Ktrl.ready(function () {
+        Ktrl.routeAllToTarget(gTestTarget);
+        gTestTarget.activate();
+      });
+
+    </script>
+  </body>
+</html>
