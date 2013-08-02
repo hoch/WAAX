@@ -15,14 +15,14 @@
     </style>
   </head>
   <body>
-    
+
     <div class="c-demohome"><a href="index.html">Index</a></div>
     <h1>MIDI Recording</h1>
     <div class="c-body-wrapper" id="i-container">
       <div id="i-midiregion" class="c-midiregion"></div>
     </div>
 
-    <!-- lib r8 -->   
+    <!-- lib r8 -->
     <script src="../src/core/WAAX.js"></script>
     <script src="../src/core/Utils.js"></script>
     <script src="../src/core/Builtin.js"></script>
@@ -59,13 +59,13 @@
 
       // master out
       var chor = WX.Chorus({ mix:0.1 });
-      var pong = WX.Pingpong({ 
+      var pong = WX.Pingpong({
           mix:0.1, delayTimeLeft: 0.160, delayTimeRight: 0.480,
           feedbackLeft: 0.5, feedbackRight: 0.25 });
       var verb = WX.Converb({ mix: 0.4, source:"../data/PADS-10/ir/960-LargePlate.wav" });
       chor.to(pong).to(verb).to(WX.DAC);
       WX.DAC.db(-6);
-      
+
       // fm vars
       var HR = 2;
       var MI1 = 8;
@@ -116,10 +116,10 @@
       var btn_panic = UI.ControlCenter.createControl({
         type: "button", name: "PANIC !!", value: false, mode: "oneshot"
       }, sec_xport);
-      
-      
+
+
       function MIDIRegion () {
-        
+
         var bFirstNote = true;
         var _started = 0.0;
 
@@ -142,7 +142,7 @@
             // setting offset
             this._offset = data.timestamp;
             bFirstNote = false;
-          } 
+          }
           // offset from the first data
           data.timestamp -= this._offset;
           this._buffer.push(data);
@@ -259,12 +259,13 @@
         }
         switch (data.type) {
           case "noteon":
+            console.log(data.timestamp - performance.timing.navigationStart * 0.001);
             _voiceMap2[data.pitch] = new Voice(WX.now, data.pitch, Ktrl.scale(Ktrl.CurveLinear(data.velocity), 0, 1.5));
             break;
           case "noteoff":
             if (_voiceMap2[data.pitch]) {
               _voiceMap2[data.pitch].noteOff(WX.now);
-              _voiceMap2[data.pitch] = null;  
+              _voiceMap2[data.pitch] = null;
             }
             break;
           case "controlchange":
@@ -296,7 +297,7 @@
                 verb.mix(Ktrl.scale(Ktrl.CurveLinear(data.value)), WX.now+0.05);
                 //WX.DAC.gain(Ktrl.scale(Ktrl.CurveLinear(data.value), 0, 1), WX.now+0.1, "l");
                 break;
-              
+
             }
             break;
         }

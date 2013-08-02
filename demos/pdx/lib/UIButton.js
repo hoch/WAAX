@@ -1,9 +1,9 @@
 /**
- * @class UI.ButtonController
+ * @class UIButton
  * @param  {object} params { name, unit, value, min, max, precision, scale }
  * @param  {object} section target UI.Section object
  */
-UI.ButtonController = function(params, section) {
+UIButtonController = function(params, section) {
   // storage for action callbacks
   this._actions = [];
   // target selection state
@@ -11,12 +11,12 @@ UI.ButtonController = function(params, section) {
   // set params
   this.setParams(params);
   // create view and initialize value
-  this._view = new UI._ButtonView(this, section);
+  this._view = new UIButtonView(this, section);
   // update value and do actions: changed without action
   this.changed();
 };
 
-UI.ButtonController.prototype = {
+UIButtonController.prototype = {
   // changed in toggle mode
   _changedToggle: function (action, flag) {
     if (action === "mousedown") {
@@ -144,17 +144,17 @@ UI.ButtonController.prototype = {
  * @param {object} controller UI.ButtonController object
  * @param {object} section target UI.Section object
  */
-UI._ButtonView = function(controller, section) {
+UIButtonView = function(controller, section) {
   // bound controller
   this._controller = controller;
   // building divs
-  this._view = UI.buildDiv("ui-button-view", section);
-  this._touchable = UI.buildDiv("ui-button-touchable", this._view);
-  this._led = UI.buildDiv("ui-button-led", this._touchable);
-  this._label = UI.buildDiv("ui-button-label", this._touchable);
+  this._view = UIManager.createDiv("ui-button-view", section);
+  this._touchable = UIManager.createDiv("ui-button-touchable", this._view);
+  this._led = UIManager.createDiv("ui-button-led", this._touchable);
+  this._label = UIManager.createDiv("ui-button-label", this._touchable);
   // set up styles
-  this._view.style.width = UI.Style.buttonWidth + "px";
-  this._led.style.width = UI.Style.buttonLEDSize + "px";
+  this._view.style.width = UIManager.Style.buttonWidth + "px";
+  this._led.style.width = UIManager.Style.buttonLEDSize + "px";
   // function references
   this._ref = {
     clicked: this.clicked.bind(this),
@@ -164,11 +164,11 @@ UI._ButtonView = function(controller, section) {
   this._initialize();
 };
 
-UI._ButtonView.prototype = {
+UIButtonView.prototype = {
   // internal: initialize the view
   _initialize: function() {
     this._label.textContent = this._controller.getLabel();
-    // add default event listeners 
+    // add default event listeners
     this._touchable.addEventListener("mousedown", this._ref.clicked, false);
   },
 

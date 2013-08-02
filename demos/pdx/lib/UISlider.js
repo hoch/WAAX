@@ -1,22 +1,89 @@
 /**
- * @class UI.SliderController
- * @param  {object} params { name, unit, value, min, max, precision, scale }
- * @param  {object} section target UI.Section object
+ * @class UI.Slider
+ * @param {string} name unique name for control
+ * @param {float} value value
+ * @param {float} min minimum value range
+ * @param {float} min minimum value range
+ * @param {Object} options { value, min, max, label, scale, precision, unit, width, exclude }
+ * @param {Object} target target div id
+ * @param {Function} callback callback function to UImanager
  */
-UI.SliderController = function (params, section) {
-  // storage for action callbacks
-  this._actions = [];
-  // target selection state
-  this._selected = false;
-  // set params
-  this.setParams(params);
+
+UISlider = function (name, options, target, callback) {
+
+  // name of control (should be unique!)
+  this._name = name;
   // create view and initialize value
-  this._view = new UI._SliderView(this, section);
-  // update value and do actions
-  this.setValue(this._value);
+  this._view = new UISliderView(this, options, target);
+  // callback to manager
+  this._callback = callback;
+
+  // control selection (for MIDI learning)
+  this._selected = false;
+  // set options
+  this._exclude = (options.exclude || false); // excluding from preset saving
+
+  // set option: scale
+  if (options.scale === "log") {
+    this.calculateValue = this._calculateValueLog;
+    this.calculateNormValue = this._calculateNormValueLog;
+  } else {
+    this.calculateValue = this._calculateValueLinear;
+    this.calculateNormValue = this._calculateNormValueLinear;
+  }
+
+  // set value and range
+  this._value = options.value;
+  this._min = options.min;
+  this._max = options.max;
+  this.calculateNormValue(this._value);
+
+  // update view and ready to go!
+  this.updateView();
+
 };
 
-UI.SliderController.prototype = {
+
+UISlider.prototype = {
+
+  // onChange: view => control => manager & view
+  onChange: function (normValue) {
+    if (normValue === this._normValue) {
+      return;
+    }
+    this._normValue = normValue;
+    this.calculateValue(normValue);
+    this._callback(this._name, "onchange", this._value);
+    this.updateView();
+  },
+
+  // onSelectToggle: view => control => manager & view
+  onSelectToggle: function () {
+    this._selected = !this._selected;
+    if (this._selected) {
+      this._view.highlight(true);
+      this._callback(this._name, "onselect", true);
+    } else {
+      this._view.highlight(false);
+      this._callback(this._name, "onselect", false);
+    }
+  },
+
+  // setValue: manager => control => view
+  setValue: function (value) {
+    this._value = value;
+    this.calculateNormValue(value);
+    this.updateView();
+  },
+  // updateView: control => view
+  updateView: function () {
+    this._view.update(this._value, this._normValue);
+  },
+  // isExcluded: is this controller excluded from preset?
+  isExcluded: function () {
+    return this._exclude;
+  },
+
   // internal: get value from normvalue, linear
   _calculateValueLinear: function (normValue) {
     this._normValue = normValue;
@@ -38,120 +105,38 @@ UI.SliderController.prototype = {
     this._value = value;
     var v1 = Math.log(this._min), v2 = Math.log(this._max), v = Math.log(this._value);
     this._normValue = (v - v1) / (v2 - v1);
-  },
-
-  // set normValue, update displayValue, update view, execute callbacks 
-  setNormValue: function (normValue) {
-    this.calculateValue(normValue);
-    this._view.update(this._normValue, this._value.toFixed(this._precision));
-    this._runActions();
-  },
-  // set displayValue, update normValue, update view, execute callbacks
-  // TODO: need to have separate function for log and linear
-  setValue: function (value, flag) {
-    this.calculateNormValue(value);
-    this._view.update(this._normValue, this._value.toFixed(this._precision));
-    if (flag === false) {
-      return;
-    }
-    this._runActions();
-  },
-
-  // getters
-  getValue: function () {
-    var value = {
-      name: this._name,
-      value: this._value
-    };
-    return value;
-  },
-  getName: function () {
-    return this._name;
-  },
-  getUnit: function () {
-    return this._unit;
-  },
-
-  // add action callback to this controller object
-  addAction: function (fn) {
-    this._actions.push(fn);
-  },
-  // internal: run all action callbacks
-  _runActions: function () {
-    for (var i = 0; i < this._actions.length; i++) {
-      this._actions[i](this._value);
-    }
-  },
-
-  // controller selection
-  toggleSelect: function () {
-    this._selected = !this._selected;
-    if (this._selected) {
-      this._view.highlight(true);
-      UI.ControlCenter.addControllerToSelection(this);
-    } else {
-      this._view.highlight(false);
-      //UI.ControlCenter.removeControllerFromSelection(this);
-    }
-    return this._selected;
-  },
-
-  // isExcluded: is this controller excluded from preset?
-  isExcluded: function () {
-    return this._exclude;
-  },
-  // setParams, getParams: ControlCenter responders
-  setParams: function (params) {
-    this._name = params.name;
-    this._unit = params.unit;
-    this._value = params.value;
-    this._min = params.min;
-    this._max = params.max;
-    this._precision = params.precision;
-    this._scale = params._scale;
-    this._precision = params.precision || 0.1; // hack for integer display
-    // value normalized
-    this._normValue = (this._value - this._min) / (this._max - this._min);
-    // scale type = log || linear
-    this._scale = params.scale;
-    if (this._scale === "log") {
-      this.calculateValue = this._calculateValueLog;
-      this.calculateNormValue = this._calculateNormValueLog;
-    } else {
-      this.calculateValue = this._calculateValueLinear;
-      this.calculateNormValue = this._calculateNormValueLinear;
-    }
-    this._exclude = (params.exclude || false);
-    // if view is alive, update value as well
-    if (this._view) {
-      this.setValue(this._value);
-    }
   }
+
 };
 
 
 /**
  * internal: view and UI logic for SliderView
- * @param {object} controller UI.SliderController object
- * @param {object} section target UI.Section object
+ * @param {Object} control UI.Slider object
+ * @param {Object} options { value, min, max, label, scale, precision, unit, width, exclude }
+ * @param {Object} target target div
  */
-UI._SliderView = function (controller, section) {
+UISliderView = function (control, options, target) {
   // bound controller
-  this._controller = controller;
+  this._control = control;
+
   // building divs
-  this._view = UI.buildDiv("ui-slider-view", section);
-  this._touchable = UI.buildDiv("ui-slider-touchable", this._view);
-  this._display = UI.buildDiv("ui-slider-display", this._touchable);
-  this._bar = UI.buildDiv("ui-slider-bar", this._touchable);
-  this._label = UI.buildDiv("ui-slider-label", this._view);
-  this._value = UI.buildDiv("ui-slider-value", this._display);
-  this._unit = UI.buildDiv("ui-slider-unit", this._display);
-  this._handle = UI.buildDiv("ui-slider-handle", this._bar);
+  this._view = UIManager.createDiv("ui-slider-view", target);
+  this._touchable = UIManager.createDiv("ui-slider-touchable", this._view);
+  this._display = UIManager.createDiv("ui-slider-display", this._touchable);
+  this._bar = UIManager.createDiv("ui-slider-bar", this._touchable);
+  this._label = UIManager.createDiv("ui-slider-label", this._view);
+  this._value = UIManager.createDiv("ui-slider-value", this._display);
+  this._unit = UIManager.createDiv("ui-slider-unit", this._display);
+  this._handle = UIManager.createDiv("ui-slider-handle", this._bar);
   // set up styles
-  this._view.style.width = UI.Style.sliderWidth + "px";
-  this._handle.style.borderRightWidth = UI.Style.sliderHandleSize + "px";
+  this._view.style.width = (options.width || UIManager.Style.sliderWidth) + "px";
+  this._handle.style.borderRightWidth = UIManager.Style.sliderHandleSize + "px";
+  this._label.textContent = options.label;
+  this._unit.textContent = options.unit;
+  this._precision = options.precision || 0.1; // hack for discrete scale
   // various vars
-  this._maxWidth = UI.Style.sliderWidth - UI.Style.sliderHandleSize;
+  this._maxWidth = (options.width || UIManager.Style.sliderWidth) - UIManager.Style.sliderHandleSize;
   this._pos = 0;
   this._px = 0;
   this._py = 0;
@@ -164,36 +149,21 @@ UI._SliderView = function (controller, section) {
     released: this.released.bind(this)
   };
   // activate slider for user interaction
-  this._initialize();
+  this._view.addEventListener("mousedown", this._ref.clicked, false);
 };
 
-UI._SliderView.prototype = {
-  // internal: initialize the view
-  _initialize: function () {
-    this._label.textContent = this._controller.getName();
-    this._unit.textContent = this._controller.getUnit();
-    // add default event listeners 
-    this._touchable.addEventListener("mousedown", this._ref.clicked, false);
-  },
+UISliderView.prototype = {
 
   // update slider position and value string (controller => view)
-  update: function (normValue, displayValue) {
-    this._value.textContent = displayValue;
+  update: function (value, normValue) {
+    this._value.textContent = value.toFixed(this._precision);
     this._pos = normValue * (this._maxWidth);
     this._handle.style.width = this._pos + "px";
   },
-  // report value (view => controller)
-  // FIXME: do not expose controller reference here.. use callback in controller.
-  report: function () {
-    this._controller.setNormValue(this._pos / this._maxWidth);
-  },
-  // highlight this view when selected
-  highlight: function (bool) {
-    if (bool) {
-      this._view.className += " ui-view-selected";
-    } else {
-      this._view.className = "ui-slider-view";
-    }
+
+  // onChange: report normValue to control
+  onChange: function () {
+    this._control.onChange(this._pos / this._maxWidth);
   },
 
   // event responders
@@ -201,16 +171,19 @@ UI._SliderView.prototype = {
     event.stopPropagation();
     // select this controller when alt is pressed
     if (event.altKey) {
-      // FIXME: this is not cool...
-      this._controller.toggleSelect();
+      this._control.onSelectToggle();
       return;
     }
+    // add responders for move/up actions
+    window.addEventListener("mousemove", this._ref.dragged, false);
+    window.addEventListener("mouseup", this._ref.released, false);
     // set start point
     this._px = event.clientX - this._left;
     this._py = event.clientY - this._top;
-    window.addEventListener("mousemove", this._ref.dragged, false);
-    window.addEventListener("mouseup", this._ref.released, false);
+    this._pos = UIManager.clamp(this._px, 0, this._maxWidth);
+    this.onChange();
   },
+
   dragged: function (event) {
     event.stopPropagation();
     var x = event.clientX - this._left;
@@ -222,13 +195,24 @@ UI._SliderView.prototype = {
     // shift key for fine controller
     // FIXME: take dx or dy. the control speed is a bit jittery...
     this._pos += (dx - dy) * (event.shiftKey ? 0.2 : 1);
-    this._pos = UI.clamp(this._pos, 0, this._maxWidth);
+    this._pos = UIManager.clamp(this._pos, 0, this._maxWidth);
     // report the result to controller
-    this.report();
+    this.onChange();
   },
+
   released: function (event) {
     event.stopPropagation();
     window.removeEventListener("mousemove", this._ref.dragged, false);
     window.removeEventListener("mouseup", this._ref.released, false);
+  },
+
+  // highlight this view when selected
+  highlight: function (bool) {
+    if (bool) {
+      this._view.className += " ui-view-selected";
+    } else {
+      this._view.className = "ui-slider-view";
+    }
   }
+
 };

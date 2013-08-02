@@ -34,6 +34,10 @@ body {
   box-shadow: 0 0 10px #f66;
   border-radius: 5px;
 }
+.ui-view-disabled {
+  opacity: 0.25;
+  pointer-events:none;
+}
 
 
 /* ---------- ui-slider-view ---------- */
@@ -43,17 +47,21 @@ body {
   margin: 6px;
   padding: 4px;
 }
+.ui-slider-view:hover {
+  background-color: #fff;
+  border-radius: 5px;
+}
 .ui-slider-touchable {
   cursor: move;
 }
 .ui-slider-display {
-  height: 20px;
+  height: 21px;
   position: relative;
 }
 .ui-slider-value {
   color: #000;
   display: inline-block;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 20px;
   overflow: hidden;
 }
@@ -66,12 +74,12 @@ body {
   text-align: right;
 }
 .ui-slider-bar {
-  height: 4px;
+  height: 5px;
   background: #A7A7A7;
   overflow: hidden;
 }
 .ui-slider-handle {
-  height: 4px;
+  height: 5px;
   background: #3196CC;
   border-right: 0 solid #fff;
 }

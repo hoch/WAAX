@@ -3,18 +3,18 @@
  * @param {object} params { name(string), value(string), data(array) }
  * @param {object} section target UI.Section object
  */
-UI.IndexedListController = function (params, section) {
+UIIndexedListController = function (params, section) {
   // storage for action callbacks
   this._actions = [];
   // set params
   this.setParams(params);
   // create view and initialize value
-  this._view = new UI._IndexedListView(this, section);
+  this._view = new UIIndexedListView(this, section);
   // update value and do actions
   this.setValue(this._value);
 };
 
-UI.IndexedListController.prototype = {
+UIIndexedListController.prototype = {
   // internal: update index from value string
   // if value doesn't exist, set with the first element
   // if value hasn't been changed, return false (not changed)
@@ -154,7 +154,7 @@ UI.IndexedListController.prototype = {
  * @param {object} controller UI.IndexedListController object
  * @param {object} section target UI.Section object
  */
-UI._IndexedListView = function (controller, section) {
+UIIndexedListView = function (controller, section) {
   // bound controller
   this._controller = controller;
   // building DOMs
@@ -186,7 +186,7 @@ UI._IndexedListView = function (controller, section) {
   this._initialize();
 };
 
-UI._IndexedListView.prototype = {
+UIIndexedListView.prototype = {
   // internal: initialize the view
   _initialize: function () {
     // set label and list data
