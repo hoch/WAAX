@@ -20,7 +20,7 @@
   <body>
 
     <div class="c-demohome"><a href="index.html">Index</a></div>
-    <h1>Grid</h1>
+    <h1>Loop Sequencer</h1>
     <div class="c-body-wrapper" id="i-container">
       <canvas id="i-grid"></canvas>
       <div class="c-clock" id="i-clock"></div>
@@ -65,6 +65,11 @@
       this.lane = lane;
       this.time = time;
       this.next = null;
+      this.selected = false;
+
+      this.select = function (bool) {
+        this.selected = bool;
+      }
     }
 
     function OrderedList () {
@@ -72,8 +77,8 @@
       this.last = null;
       this.first = null;
       this.head = null;
-      this.read = null;
-      this.read2 = null;
+      this.read = null; // drawing
+      this.read2 = null; // playing
       this.onchange = function () {};
     }
 
@@ -84,38 +89,110 @@
         this.onchange();
       },
 
+      deleteNode: function (node) {
+        this.remove(node);
+        this.onchange();
+      },
+
       add: function (node) {
         if (this.nodes.length === 0) {
+          // if this is the first node
           this.first = node;
-          this.head = this.first;
-          this.read = this.first;
-          this.read2 = this.first;
+          // this.head = this.first;
+          // this.read = this.first;
+          // this.read2 = this.first;
+          this.nodes.push(node);
+        } else if (node.time <= this.first.time) {
+          // if node is earlier than the first
+          node.next = this.first;
+          this.first = node;
           this.nodes.push(node);
         } else {
-          this._insert(node);
+          // otherwise get the shit done
+          this._insert(node, this.first);
         }
       },
 
-      _insert: function (node) {
-
-        if (this.head.next) {
-          // if next exists
-          if (node.time < this.head.next.time) {
-            // if node time is earlier than next time: insert between head and next (DONE)
-            node.next = this.head.next;
-            this.head.next = node;
-            this.head = this.first;
+      _insert: function (node, head) {
+        if (head.next) {
+          // if head has next, do compare
+          if (node.time <= head.next.time) {
+            // if node is between head and next
+            node.next = head.next;
+            head.next = node;
             this.nodes.push(node);
           } else {
-            // if node is later than next, advance head and iterate
-            this.head = this.head.next;
-            this._insert(node);
+            this._insert(node, head.next);
           }
         } else {
-          // if no next, node will be the last (DONE)
-          this.head.next = node;
-          this.head = this.first;
+          // if head doesn't have next, this is the last
+          head.next = node;
           this.nodes.push(node);
+        }
+      },
+
+
+        // if (node.time < this.head.time) {
+        //   // if this is the earliest node
+        //   node.next = this.head;
+        //   this.first = node;
+        //   this.head = this.first;
+        //   this.nodes.push(node);
+        //   return;
+        // } else {
+        //   // if node is somewhere later
+        //   if (this.head.next) {
+        //     // if next exists
+        //     if (node.time < this.head.next.time) {
+        //       // if node time is earlier than next time: insert between head and next (DONE)
+        //       node.next = this.head.next;
+        //       this.head.next = node;
+        //       this.head = this.first;
+        //       this.nodes.push(node);
+        //     } else {
+        //       // if node is later than next, advance head and iterate
+        //       this.head = this.head.next;
+        //       this._insert(node);
+        //     }
+        //   } else {
+        //     // if no next, node will be the last (DONE)
+        //     this.head.next = node;
+        //     this.head = this.first;
+        //     this.nodes.push(node);
+        //   }
+        // }
+
+
+      remove: function (node) {
+        if (this.first === node) {
+          // if node is first
+          this.first = this.first.next;
+          this.head = this.first;
+          this.read = this.first;
+          this.read2 = this.first;
+          var idx = this.nodes.indexOf(node);
+          this.nodes.splice(idx, 1);
+        } else {
+          // if node is somewhere else
+          this._delete(node, this.first);
+        }
+      },
+
+      _delete: function (node, head) {
+        if (node === head.next) {
+          // node found and removed
+          head.next = head.next.next;
+          var idx = this.nodes.indexOf(node);
+          this.nodes.splice(idx, 1);
+          return true;
+        } else {
+          if (head.next) {
+            // go to next iteration
+            this._delete(node, head.next);
+          } else {
+            // couldn't find, reached the EOL
+            return false;
+          }
         }
       },
 
@@ -132,14 +209,36 @@
 
       // for drawing
       traverse: function (callback) {
-        if (this.read) {
-          callback(this.read);
-          this.read = this.read.next;
-          if (this.read) {
-            this.traverse(callback);
-          } else {
-            this.read = this.first;
+        if (this.first) {
+          this._rTraverse(callback, this.first);
+        }
+      },
+
+      _rTraverse: function (callback, head) {
+        callback(head);
+        if (head.next) {
+          this._rTraverse(callback, head.next);
+        }
+      },
+
+      getNodeAtPosition: function (time, lane) {
+        if (this.first) {
+          return this._rGetNodeAtPosition(time, lane, this.first);
+        } else {
+          return null;
+        }
+      },
+
+      _rGetNodeAtPosition: function (time, lane, head) {
+        if (head.time <= time && time <= head.time + gDur16) {
+          if (head.lane === lane) {
+            return head;
           }
+        }
+        if (head.next) {
+          return this._rGetNodeAtPosition(time, lane, head.next);
+        } else {
+          return null;
         }
       },
 
@@ -305,7 +404,11 @@
         // note[0] = lane, note[1] = time
         var pos = node.time / gLoopDuration * gWidth;
         var dur = gDur16 / gLoopDuration * gWidth;
-        ctx.strokeStyle = "#000";
+        if (node.selected) {
+          ctx.strokeStyle = "#FFF";
+        } else {
+          ctx.strokeStyle = "#000";
+        }
         ctx.fillStyle = "#C66";
         ctx.strokeRect(pos + 2, node.lane * gridH + 2, dur - 4, gridH - 4);
         ctx.fillRect(pos + 2, node.lane * gridH + 2, dur - 4, gridH - 4);
@@ -378,6 +481,7 @@
       drawPlayhead();
 
       gEventList.onChange(function () {
+        drawGrid();
         drawAllNote();
       });
 
@@ -428,6 +532,9 @@
       var btn_playback = UI.ControlCenter.createControl({
         type: "button", name: "Play", value: false, mode: "toggle"
       }, sec_control);
+      var btn_quantize = UI.ControlCenter.createControl({
+        type: "button", name: "Quantize", value: false, mode: "toggle"
+      }, sec_control);
       var sli_tempo = UI.ControlCenter.createControl({
         type: "slider", name: "Tempo", value: gBPM, min: 30.0, max: 240.0,
         precision: 2, scale: "linear", unit: "bpm"
@@ -439,6 +546,9 @@
         } else {
           stop();
         }
+      });
+      btn_quantize.addAction(function (value) {
+        bQuantize = value;
       });
 
       sli_tempo.addAction(function (value) {
@@ -467,16 +577,75 @@
         gTestTarget.activate();
       });
 
-      gLeft = cvs.getBoundingClientRect().left;
-      gTop = cvs.getBoundingClientRect().top;
+      // interaction
+      var gLeft = cvs.getBoundingClientRect().left;
+      var gTop = cvs.getBoundingClientRect().top;
+      var gSelectedNodes = [];
       cvs.addEventListener("mousedown", function (event) {
+
         var x = event.clientX - gLeft;
         var y = event.clientY - gTop;
-
         var time = x / gWidth * gLoopDuration;
+        var quanitzed = ~~(time / gDur16) * gDur16;
         var lane = ~~(y / gHeight * 16);
 
-        gEventList.createNode(lane, time);
+        if (event.shiftKey) {
+          // get node
+          var node = gEventList.getNodeAtPosition(time, lane);
+          // if node is selected
+          if (node) {
+            if (gSelectedNodes.indexOf(node) === -1) {
+              node.select(true);
+              gSelectedNodes.push(node);
+            }
+          }
+        } else {
+          // without shift key
+          // empty selection buffer
+          // reset all selected node to deselect them
+          gSelectedNodes.map(function (node) {
+            node.select(false);
+          });
+          gSelectedNodes.length = 0;
+          // get node
+          var node = gEventList.getNodeAtPosition(time, lane);
+          if (node) {
+            // if node selected
+            if (gSelectedNodes.indexOf(node) === -1) {
+              node.select(true);
+              gSelectedNodes.push(node);
+            }
+          } else {
+            // if no node is selected, create new node
+            gEventList.createNode(lane, quanitzed);
+          }
+        }
+
+        drawGrid();
+        drawAllNote();
+        drawPlayhead();
+
+      });
+
+      window.addEventListener("keydown", function (event) {
+        event.preventDefault();
+        //console.log(event.keyCode);
+        switch (event.keyCode) {
+          // delete key
+          case 8:
+            if (gSelectedNodes.length > 0) {
+              gSelectedNodes.map(function (node) {
+                gEventList.deleteNode(node);
+              });
+              gSelectedNodes.length = 0;
+            }
+            break;
+          // space bar
+          case 32:
+            bPlayback = !bPlayback;
+            btn_playback.setValue(bPlayback);
+            break;
+        }
       });
 
 
