@@ -20,7 +20,7 @@
   <body>
 
     <div class="c-demohome"><a href="index.html">Index</a></div>
-    <h1>Loop Sequencer</h1>
+    <h1>Timeline</h1>
     <div class="c-body-wrapper" id="i-container">
       <canvas id="i-grid"></canvas>
       <div class="c-clock" id="i-clock"></div>
@@ -58,6 +58,8 @@
     <script src="../lib/UI/UISlider.js"></script>
     <script src="../lib/UI/UIButton.js"></script>
     <script src="../lib/UI/UIIndexedList.js"></script>
+    <!-- Ktrl -->
+    <script src="static/Sequencer.js"></script>
     <!-- scripts -->
     <script>
 
@@ -130,38 +132,6 @@
           this.nodes.push(node);
         }
       },
-
-
-        // if (node.time < this.head.time) {
-        //   // if this is the earliest node
-        //   node.next = this.head;
-        //   this.first = node;
-        //   this.head = this.first;
-        //   this.nodes.push(node);
-        //   return;
-        // } else {
-        //   // if node is somewhere later
-        //   if (this.head.next) {
-        //     // if next exists
-        //     if (node.time < this.head.next.time) {
-        //       // if node time is earlier than next time: insert between head and next (DONE)
-        //       node.next = this.head.next;
-        //       this.head.next = node;
-        //       this.head = this.first;
-        //       this.nodes.push(node);
-        //     } else {
-        //       // if node is later than next, advance head and iterate
-        //       this.head = this.head.next;
-        //       this._insert(node);
-        //     }
-        //   } else {
-        //     // if no next, node will be the last (DONE)
-        //     this.head.next = node;
-        //     this.head = this.first;
-        //     this.nodes.push(node);
-        //   }
-        // }
-
 
       remove: function (node) {
         if (this.first === node) {

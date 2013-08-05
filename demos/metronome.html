@@ -81,8 +81,9 @@
 
 
       function Timeline (BPM) {
-        // linear time (absolute)
+        // absolute origin time for current time context
         this.lOrigin = 0.0;
+        // current playback position from origin time
         this.lNow = 0.0;
 
         this.prevTimeStamp = 0.0;
@@ -135,7 +136,8 @@
         },
 
         rewind: function () {
-          this.lOrigin = this.lNow = 0.0;
+          this.lNow = 0.0;
+          this.lOrigin = WX.now;
         },
 
         getNow: function () {
@@ -165,6 +167,7 @@
 
         this.tick = function () {
           var time = tl.getOrigin() + tl.getLinearTime(this.event);
+          console.log(tl.getOrigin(), tl.getLinearTime(this.event));
 
           var source = WX.context.createBufferSource();
           var volume = WX.context.createGain();

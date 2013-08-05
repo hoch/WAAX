@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="static/demos.css" rel="stylesheet" type="text/css">
+    <link href="../lib/UI/UI-light.css" rel="stylesheet" type="text/css">
+    <style>
+      .c-clock {
+        background-color: #333;
+        width: 400px;
+        height: 100px;
+        border-radius: 10px;
+        color: #3f3;
+        font-size: 50px;
+        font-family: monospace;
+        line-height: 100px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="c-demohome"><a href="index.html">Index</a></div>
+    <h1>Loop Sequencer</h1>
+    <div class="c-body-wrapper" id="i-container">
+      <canvas id="i-grid"></canvas>
+      <div class="c-clock" id="i-clock">000:000</div>
+    </div>
+
+    <!-- lib r8 -->
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Utils.js"></script>
+    <script src="../src/core/Builtin.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/generator/Oscil.js"></script>
+    <script src="../src/generator/Fmop.js"></script>
+    <script src="../src/generator/Noise.js"></script>
+    <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/Sampler.js"></script>
+    <script src="../src/generator/Step.js"></script>
+    <script src="../src/processor/Fader.js"></script>
+    <script src="../src/processor/Spatter.js"></script>
+    <script src="../src/processor/ADSR.js"></script>
+    <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Filterbank.js"></script>
+    <script src="../src/processor/Formant.js"></script>
+    <script src="../src/processor/FormantV.js"></script>
+    <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Chorus.js"></script>
+    <script src="../src/processor/Phasor.js"></script>
+    <script src="../src/processor/Comp.js"></script>
+    <script src="../src/processor/Converb.js"></script>
+    <script src="../src/analyzer/Waveform.js"></script>
+    <script src="../src/analyzer/Spectrum.js"></script>
+    <script src="../src/core/Boot.js"></script>
+    <!-- Ktrl -->
+    <script src="../lib/Ktrl/Ktrl.js"></script>
+    <script src="../lib/UI/UI.js"></script>
+    <script src="../lib/UI/UISlider.js"></script>
+    <script src="../lib/UI/UIButton.js"></script>
+    <script src="../lib/UI/UIIndexedList.js"></script>
+    <!-- sequencer -->
+    <script src="static/Sequencer.js"></script>
+    <!-- scripts -->
+    <script>
+
+    var PianoRoll = (function () {
+
+      var cvs = document.getElementById('i-grid');
+      var ctx = cvs.getContext('2d');
+      var gWidth = 768;
+      var gHeight = 320;
+      ctx.canvas.width = gWidth;
+      ctx.canvas.height = gHeight;
+
+      var numGridTime = 16 * 2; // 2 bar (8 beats, 32 sixteenth)
+      var numGridLane = 16; // 16 lane
+      var loopTick = 8 * 480; // 8 beats in ticks
+      var gridW = gWidth / numGridTime;
+      var gridH = gHeight / numGridLane;
+      var gPlayhead = 0.0;
+
+      var _drawRangeInTime = 1.0;
+
+      function drawBackground () {
+        // background
+        ctx.fillStyle = "#333";
+        ctx.fillRect(0, 0, gWidth, gHeight);
+        // grid hori-vert
+        ctx.beginPath();
+        ctx.strokeStyle = "#444";
+        for (var i = 0; i < numGridLane; i++) {
+          ctx.moveTo(0, gridH * i);
+          ctx.lineTo(gWidth, gridH * i);
+        }
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.strokeStyle = "#444";
+        for (var i = 0; i < numGridTime; i++) {
+          if (i % 4) {
+            ctx.moveTo(i * gridW, 0);
+            ctx.lineTo(i * gridW, gHeight);
+          }
+        }
+        ctx.stroke();
+        // grid accent
+        ctx.beginPath();
+        ctx.strokeStyle = "#888";
+        for (var i = 0; i < numGridTime; i++) {
+          if (i % 4 === 0) {
+            ctx.moveTo(i * gridW, 0);
+            ctx.lineTo(i * gridW, gHeight);
+          }
+        }
+        ctx.stroke();
+      }
+
+      function drawEvent (event) {
+        // all events is 16th
+        var pos = event.getTick() / loopTick * gWidth;
+        var dur = 120 / loopTick * gWidth;
+        if (event.bSelected) {
+          ctx.strokeStyle = "#FFF";
+        } else {
+          ctx.strokeStyle = "#000";
+        }
+        ctx.fillStyle = "#C66";
+        ctx.strokeRect(pos + 2, event.data.pitch * gridH + 2, dur - 4, gridH - 4);
+        ctx.fillRect(pos + 2, event.data.pitch * gridH + 2, dur - 4, gridH - 4);
+      }
+
+      function drawPlayhead (time) {
+        var pos = time / _drawRangeInTime * gWidth;
+        ctx.beginPath();
+        ctx.strokeStyle = "#FFF";
+        ctx.moveTo(pos, 0);
+        ctx.lineTo(pos, gHeight);
+        ctx.stroke();
+      }
+
+      return {
+        UI: cvs,
+        drawBackground: drawBackground,
+        drawEvent: drawEvent,
+        drawPlayhead: drawPlayhead,
+
+        setDrawRange: function (range) {
+          _drawRangeInTime = range;
+        }
+      };
+
+    })();
+
+    // sampler
+    function Sampler() {
+
+      this.setBufferMap = function (buffermap) {
+        this._bufferMap = buffermap;
+        this._buffer = this._bufferMap.getBufferByIndex(0);
+      }
+
+      this.setBufferByName = function (name) {
+        this._buffer = this._bufferMap.getBufferByName(name);
+      }
+
+      this.play = function (data, time) {
+        var source = WX.context.createBufferSource();
+        var volume = WX.context.createGain();
+        source.connect(volume);
+        volume.connect(WX.context.destination);
+
+        source.buffer = this._bufferMap.getBufferByIndex(data.pitch);
+        volume.gain.setValueAtTime(data.velocity/127, time);
+        source.start(time);
+        source.stop(time + source.buffer.duration);
+      }
+    }
+
+    // clock display
+    var divClock = document.getElementById('i-clock');
+
+
+
+    // --------------------------------------------------------------
+    // timeline
+    var TL = new WX.Timeline(120);
+    TL.enableLoop(true);
+    TL.setLoop(
+      { beat: 0, tick: 0 },
+      { beat: 8, tick: 0 }
+    );
+
+    // event list
+    var EL = new WX.EventList();
+    // for (var i = 0; i < 16; i++) {
+    //   EL.createEvent(
+    //     { pitch: ~~(Math.random() * 16), velocity: 100 },
+    //     ~~(Math.random() * 8),
+    //     ~~(Math.random() * 480)
+    //     );
+    // }
+
+    // attach event list to timeline
+    TL.addEventList(EL);
+
+
+    // sampler
+    var sampler = new Sampler();
+    // build buffermap
+    WX.buildBufferMap(
+      {
+        payload: {
+          'ASRX KD1': '../data/PADS-10/asrx/ASR-X Kick 03.wav',
+          'ASRX KD2': '../data/PADS-10/asrx/ASR-X Kick 11.wav',
+          'ASRX KD3': '../data/PADS-10/asrx/ASR-X Kick 12.wav',
+          'ASRX SD1': '../data/PADS-10/asrx/ASR-X Snare 03.wav',
+          'ASRX SD2': '../data/PADS-10/asrx/ASR-X Snare 15.wav',
+          'ASRX SD3': '../data/PADS-10/asrx/ASR-X Snare 23.wav',
+          'ASRX HH1': '../data/PADS-10/asrx/ASR-X Hat 02.wav',
+          'ASRX HH2': '../data/PADS-10/asrx/ASR-X Hat 03.wav',
+          'ASRX HH3': '../data/PADS-10/asrx/ASR-X Hat 06.wav',
+          'ASRX Cym': '../data/PADS-10/asrx/ASR-X Crash 1.wav',
+          'Hip KD': '../data/PADS-10/mpc2000/HIP_KICK.wav',
+          '808 Long KD': '../data/PADS-10/mpc2000/808_LNG_KICK.wav',
+          'Hip SD': '../data/PADS-10/mpc2000/HIP_S_SN.wav',
+          'Hip SD7': '../data/PADS-10/mpc2000/HIP_SN_7.wav',
+          'Clap': '../data/PADS-10/mpc2000/F_CLAP_1.wav',
+          'Rim': '../data/PADS-10/mpc2000/P_SN_RIM.wav'
+        }
+      },
+      function (buffermap) {
+        TL.setMetronomeBuffer(buffermap.getBufferByIndex(15));
+        sampler.setBufferMap(buffermap);
+        console.log("done.");
+      },
+      function (progress) {
+        console.log("loading...");
+      }
+    );
+
+
+
+    // ---------------------------------------------------------------------
+
+    // draw
+    function gDraw () {
+      PianoRoll.setDrawRange(TL.getLoopDuration());
+      PianoRoll.drawBackground();
+      EL.iterate(function (event) {
+        PianoRoll.drawEvent(event);
+      });
+      PianoRoll.drawPlayhead(TL.getLinearNow());
+      var now = TL.getMusicalNow();
+      divClock.textContent = now.beat + ':' + ('000' + now.tick).slice(-3);
+    };
+
+    gDraw();
+
+    EL.setOnChange(gDraw);
+
+    // schedule
+    function schedule () {
+      var event = EL.getCurrentEvent();
+      if (event) {
+        if (TL.lookAheadEvent(event)) {
+          var absTime = TL.getAbsoluteTime(event);
+          sampler.play(event.data, absTime);
+          if (EL.advance()) {
+            schedule();
+          }
+        }
+      }
+    }
+
+    // runner
+    function gPlay() {
+
+      TL.advance();
+      schedule();
+      gDraw();
+
+      if (TL.isRunning()) {
+        requestAnimationFrame(gPlay);
+      }
+    }
+
+    var bPlayback = false;
+    function playbackToggle () {
+      bPlayback = !bPlayback;
+      if (bPlayback) {
+        TL.start();
+        gPlay();
+      } else {
+        TL.stop();
+      }
+    }
+
+    var bQuantize = false;
+    var bQuantizeGrid = 120;
+
+
+
+      // -----------------------------------------------------------------------
+      // UI
+      var sec_control = UI.ControlCenter.createSection("Control", "i-container");
+      var btn_playback = UI.ControlCenter.createControl({
+        type: "button", name: "Play", value: false, mode: "toggle"
+      }, sec_control);
+      var btn_rewind = UI.ControlCenter.createControl({
+        type: "button", name: "Rewind", value: false, mode: "oneshot"
+      }, sec_control);
+      var btn_quantize = UI.ControlCenter.createControl({
+        type: "button", name: "Quantize", value: false, mode: "toggle"
+      }, sec_control);
+      var btn_metro = UI.ControlCenter.createControl({
+        type: "button", name: "Metro", value: false, mode: "toggle"
+      }, sec_control);
+      var sli_tempo = UI.ControlCenter.createControl({
+        type: "slider", name: "Tempo", value: TL.BPM, min: 30.0, max: 240.0,
+        precision: 2, scale: "linear", unit: "bpm"
+      }, sec_control);
+
+      btn_playback.addAction(function (value) {
+        playbackToggle();
+      });
+
+      btn_rewind.addAction(function (value) {
+        TL.rewind();
+        gDraw();
+      });
+
+      btn_quantize.addAction(function (value) {
+        bQuantize = value;
+      });
+
+      btn_metro.addAction(function (value) {
+        TL.enableMetronome(value);
+      })
+
+      sli_tempo.addAction(function (value) {
+        TL.setBPM(value);
+      });
+
+
+
+
+
+
+
+
+      // MIDI routing
+      // var gTestTarget = Ktrl.createTarget("test");
+      // gTestTarget.onData(function (midimessage) {
+      //   var data = Ktrl.parse(midimessage);
+      //   switch (data.type) {
+      //   }
+      // });
+
+      Ktrl.ready(function () {
+        // Ktrl.routeAllToTarget(gTestTarget);
+        // gTestTarget.activate();
+      });
+
+      // interaction
+      var gLeft = PianoRoll.UI.getBoundingClientRect().left;
+      var gTop = PianoRoll.UI.getBoundingClientRect().top;
+      var gSelectedEvents = [];
+
+      PianoRoll.UI.addEventListener("mousedown", function (event) {
+
+        var x = event.clientX - gLeft;
+        var y = event.clientY - gTop;
+
+        var newEvent = TL.getMusicalTime(x / PianoRoll.UI.width * TL.getLoopDuration());
+        newEvent.data.pitch = ~~(y / PianoRoll.UI.height * 16);
+        newEvent.data.velocity = 100;
+
+        if (event.shiftKey) {
+          var evt = EL.findEvent(newEvent);
+          // if node is selected
+          if (evt) {
+            if (gSelectedEvents.indexOf(evt) === -1) {
+              evt.select(true);
+              gSelectedEvents.push(evt);
+            }
+          }
+          gDraw();
+        } else if (event.altKey) {
+          // set current position
+          TL.setLinearNow(x / PianoRoll.UI.width * TL.getLoopDuration());
+          gDraw();
+        } else {
+          // if event is selected,
+          var evt = EL.findEvent(newEvent);
+          //console.log(evt);
+          if (evt) {
+            gSelectedEvents.map(function (evt) {
+              evt.select(false);
+            });
+            gSelectedEvents.length = 0;
+            evt.select(true);
+            gSelectedEvents.push(evt);
+            gDraw();
+          } else {
+            // create event
+            if (bQuantize) {
+              newEvent.tick = Math.round(newEvent.tick / bQuantizeGrid) * bQuantizeGrid;
+            }
+            EL.createEvent(newEvent.data, newEvent.beat, newEvent.tick);
+          }
+        }
+      });
+
+      window.addEventListener("keydown", function (event) {
+        event.preventDefault();
+        //console.log(event.keyCode);
+        switch (event.keyCode) {
+          // delete key
+          case 8:
+            if (gSelectedEvents.length > 0) {
+              gSelectedEvents.map(function (evt) {
+                EL.deleteEvent(evt);
+              });
+              gSelectedEvents.length = 0;
+            }
+            break;
+          //space bar
+          case 32:
+            playbackToggle();
+            btn_playback.setValue(bPlayback, false);
+            break;
+        }
+      });
+
+
+
+    </script>
+  </body>
+</html>
