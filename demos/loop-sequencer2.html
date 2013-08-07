@@ -63,6 +63,8 @@
     <!-- scripts -->
     <script>
 
+
+
     var PianoRoll = (function () {
 
       var cvs = document.getElementById('i-grid');
@@ -241,12 +243,15 @@
 
     // ---------------------------------------------------------------------
 
+var gEF = new WX.EventFilter();
+
     // draw
     function gDraw () {
       PianoRoll.setDrawRange(TL.getLoopDuration());
       PianoRoll.drawBackground();
       EL.iterate(function (event) {
-        PianoRoll.drawEvent(event);
+        var e = gEF.filterEvent(event);
+        PianoRoll.drawEvent(e);
       });
       PianoRoll.drawPlayhead(TL.getLinearNow());
       var now = TL.getMusicalNow();
@@ -262,7 +267,8 @@
       var event = EL.getCurrentEvent();
       if (event) {
         if (TL.lookAheadEvent(event)) {
-          var absTime = TL.getAbsoluteTime(event);
+          var e = gEF.filterEvent(event);
+          var absTime = TL.getAbsoluteTime(e);
           sampler.play(event.data, absTime);
           if (EL.advance()) {
             schedule();
@@ -318,6 +324,10 @@
         type: "slider", name: "Tempo", value: TL.BPM, min: 30.0, max: 240.0,
         precision: 2, scale: "linear", unit: "bpm"
       }, sec_control);
+      var sli_swing = UI.ControlCenter.createControl({
+        type: "slider", name: "Swing", value: 0, min: 0, max: 100,
+        precision: 0, scale: "linear", unit: "%"
+      }, sec_control);
 
       btn_playback.addAction(function (value) {
         playbackToggle();
@@ -338,6 +348,9 @@
 
       sli_tempo.addAction(function (value) {
         TL.setBPM(value);
+      });
+      sli_swing.addAction(function (value) {
+        gEF.setSwing(value / 100);
       });
 
 
@@ -361,12 +374,13 @@
       });
 
       // interaction
-      var gLeft = PianoRoll.UI.getBoundingClientRect().left;
-      var gTop = PianoRoll.UI.getBoundingClientRect().top;
+
       var gSelectedEvents = [];
 
       PianoRoll.UI.addEventListener("mousedown", function (event) {
 
+        var gLeft = PianoRoll.UI.getBoundingClientRect().left;
+        var gTop = PianoRoll.UI.getBoundingClientRect().top;
         var x = event.clientX - gLeft;
         var y = event.clientY - gTop;
 
@@ -393,6 +407,7 @@
           var evt = EL.findEvent(newEvent);
           //console.log(evt);
           if (evt) {
+            console.log(evt);
             gSelectedEvents.map(function (evt) {
               evt.select(false);
             });
@@ -403,7 +418,9 @@
           } else {
             // create event
             if (bQuantize) {
-              newEvent.tick = Math.round(newEvent.tick / bQuantizeGrid) * bQuantizeGrid;
+              newEvent.tick = Math.floor(newEvent.tick / bQuantizeGrid) * bQuantizeGrid;
+            } else {
+              //newEvent.tick -= 60;
             }
             EL.createEvent(newEvent.data, newEvent.beat, newEvent.tick);
           }
@@ -411,11 +428,11 @@
       });
 
       window.addEventListener("keydown", function (event) {
-        event.preventDefault();
         //console.log(event.keyCode);
         switch (event.keyCode) {
           // delete key
           case 8:
+            event.preventDefault();
             if (gSelectedEvents.length > 0) {
               gSelectedEvents.map(function (evt) {
                 EL.deleteEvent(evt);
@@ -425,6 +442,7 @@
             break;
           //space bar
           case 32:
+            event.preventDefault();
             playbackToggle();
             btn_playback.setValue(bPlayback, false);
             break;

@@ -44,6 +44,10 @@
     },
     select: function (bool) {
       this.bSelected = bool;
+    },
+    cloneContent: function (event) {
+      this.setData(event.data);
+      this.setTime(event.beat, event.tick);
     }
   };
 
@@ -240,6 +244,36 @@
     }
   };
 
+
+
+  /**
+   * @class EventFilter (for swing)
+   */
+  WX.EventFilter = function () {
+    this.swing = 0;
+    this.swingGrid = 240;
+    this.kSwingFactor = -0.42000000000000004; // swing curve factor
+  }
+
+  WX.EventFilter.prototype = {
+    setSwing: function (swing) {
+      this.swing = swing;
+    },
+    filterEvent: function (event) {
+      var e = new _Event({}, 0, 0);
+      e.cloneContent(event);
+      var t = e.tick;
+      // swing based on 16th
+      // if ((120 <= e.tick && e.tick < 240) || (360 <= e.tick && e.tick < 480)) {
+      //   e.tick += 120 * this.swing;
+      // }
+      if (this.swing > 0.0) {
+        var rem = t % this.swingGrid;
+        e.tick = (t - rem) + Math.pow((rem / this.swingGrid), 1 + this.kSwingFactor * this.swing) * this.swingGrid;
+      }
+      return e;
+    }
+  };
 
 
 
