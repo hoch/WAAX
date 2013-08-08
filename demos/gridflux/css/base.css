@@ -1,0 +1,72 @@
+/* ----- header ----- */
+@import url(http://fonts.googleapis.com/css?family=Roboto:400);
+
+
+/* ----- demo style base ----- */
+html {
+  height: 100%;
+}
+
+body {
+  height: 80%;
+  font-family: 'Roboto', sans-serif;
+  background: #eee;
+  margin: 0;
+  padding: 0;
+  -webkit-user-select: none;
+}
+
+.c-body-wrapper {
+  margin: 100px auto;
+  padding: 0 10px;
+  width: 908px;
+}
+
+.c-grid-container {
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #bbb;
+  box-shadow: inset 0 0 3px #777;
+}
+
+.c-grid {
+
+}
+
+.c-xport-container {
+  margin: 20px 0;
+  width: 100%;
+  border-radius: 3px;
+  height: 50px;
+  text-align: center;
+  background-color: #ccc;
+  line-height: 72px;
+}
+
+.c-xport-control {
+  display: inline-block;
+}
+
+.c-btn {
+  width: 70px;
+  height: 35px;
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: 0 0 3px #666;
+}
+
+.c-rewind {
+  background: url("glyphicons_170_step_backward.png") #FFF top 9px left 28px no-repeat;
+}
+
+.c-stop {
+  background: url("glyphicons_175_stop.png") #FFF top 11px left 28px no-repeat;
+}
+
+.c-play {
+  background: url("glyphicons_173_play.png") #FFF top 9px left 28px no-repeat;
+}
+
+.c-record {
+  background: url("glyphicons_169_record.png") #FCC top 8px left 25px no-repeat;
+}

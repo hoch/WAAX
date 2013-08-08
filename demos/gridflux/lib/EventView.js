@@ -8,6 +8,7 @@
 
   var kNumBeat = 8; // 8 beats
   var kBeatDivision = 4; // 1 beat = 4 16th
+  var kTotalTick = 8 * 480;
   var kNumLane = 16; // 16 lane
 
   var kLaneNameWidth = 120;
@@ -91,51 +92,6 @@
     }
   };
 
-  // virtual: callbacks from event mananger
-  function onLaneNameClicked () {}
-  function onWorkSpaceClicked () {}
-  function onWorkSpaceDragged () {}
-  function onControlLaneClicked () {}
-  function onControlLaneDragged () {}
-
-
-  function _laneNameClicked (position) {
-    onLaneNameClicked();
-  }
-
-  function _workSpaceClicked (position) {
-    onWorkSpaceClicked();
-  }
-
-  function _controlLaneClicked (position) {
-    onControlLaneClicked();
-  }
-
-
-  var AreaLaneName = new _Area(0, 0, kLaneNameWidth, kWorkSpaceHeight);
-  var AreaWorkSpace = new _Area(kLaneNameWidth, 0, kLaneNameWidth + kWorkSpaceWidth, kWorkSpaceHeight);
-  var AreaControlLane = new _Area(kLaneNameWidth, kWorkSpaceHeight, kLaneNameWidth + kWorkSpaceWidth, kControlLaneHeight);
-
-  cvs.addEventListener("contextmenu", function (event) {
-    event.preventDefault();
-  });
-
-  cvs.addEventListener("mousedown", function (event) {
-
-    var p = _getMousePosition(event);
-
-    if (AreaLaneName.containsPoint(p)) {
-      console.log("lanename", "clicked", AreaLaneName.getNormPosition(p));
-    }
-    if (AreaWorkSpace.containsPoint(p)) {
-      console.log("workspace", "clicked", AreaWorkSpace.getNormPosition(p));
-    }
-    if (AreaControlLane.containsPoint(p)) {
-      console.log("controllane", "clicked", AreaControlLane.getNormPosition(p));
-    }
-
-  });
-
 
 
   /**
@@ -181,20 +137,144 @@
       ctx.stroke();
     },
 
-    drawLaneName: function () {
+    drawLaneName: function (selectedLane) {
       for (var i = 0; i < kNumGridY; i++) {
-        ctx.fillStyle = "#555";
-        ctx.fillRect(0, kGridSizeY * i, kLaneNameWidth - 2, kGridSizeY - 1);
-        ctx.fillStyle = "#EEE";
-        ctx.fillText("drum sound 99", 4, kGridSizeY * i + 3);
+        if (selectedLane === i) {
+          ctx.fillStyle = "#FFF";
+          ctx.fillRect(0, kGridSizeY * i, kLaneNameWidth - 2, kGridSizeY - 1);
+          ctx.fillStyle = "#555";
+          ctx.fillText("drum sound 99", 4, kGridSizeY * i + 3);
+        } else {
+          ctx.fillStyle = "#555";
+          ctx.fillRect(0, kGridSizeY * i, kLaneNameWidth - 2, kGridSizeY - 1);
+          ctx.fillStyle = "#EEE";
+          ctx.fillText("drum sound 99", 4, kGridSizeY * i + 3);
+        }
+
       }
-    }
+    },
+
+    drawEvent: function (event) {
+      // all events is 16th
+      var pos = kLaneNameWidth + event.getTick() / kTotalTick * kWorkSpaceWidth;
+      var dur = 120 / kTotalTick * kWorkSpaceWidth;
+      if (event.bSelected) {
+        ctx.strokeStyle = "#FFF";
+        ctx.fillStyle = "#F99";
+      } else {
+        ctx.strokeStyle = "#000";
+        ctx.fillStyle = "#C66";
+      }
+      ctx.strokeRect(pos + 2, event.lane * kGridSizeY + 2, dur - 4, kGridSizeY - 4);
+
+      ctx.fillRect(pos + 2, event.lane * kGridSizeY + 2, dur - 4, kGridSizeY - 4);
+    },
+
+    drawControlLane: function (eventsAtLane) {
+      if (eventsAtLane) {
+        for (var i = 0; i < eventsAtLane.length; i++) {
+          var pos = kLaneNameWidth + eventsAtLane[i].getTick() / kTotalTick * kWorkSpaceWidth;
+          var barTop = kWorkSpaceHeight + (1.0 - eventsAtLane[i].params.intensity) * kControlLaneHeight;
+          var barHeight = eventsAtLane[i].params.intensity * kControlLaneHeight;
+          var dur = 120 / kTotalTick * kWorkSpaceWidth;
+          ctx.strokeStyle = "#000";
+          ctx.strokeRect(pos + 2, barTop, dur - 4, barHeight);
+          ctx.fillStyle = "#669";
+          ctx.fillRect(pos + 2, barTop, dur - 4, barHeight);
+        }
+      }
+    },
+
+    draw: function (options) {
+      this.drawBackground();
+      this.drawLaneName(options.selectedLane);
+    },
+
+    // report back to event manager
+    report: function () {},
 
   };
 
-  GF.EventView.drawBackground();
-  GF.EventView.drawLaneName();
+  // user interaction
+  var AreaLaneName = new _Area(0, 0, kLaneNameWidth, kWorkSpaceHeight);
+  var AreaWorkSpace = new _Area(kLaneNameWidth, 0, kWorkSpaceWidth, kWorkSpaceHeight);
+  var AreaControlLane = new _Area(kLaneNameWidth, kWorkSpaceHeight, kWorkSpaceWidth, kControlLaneHeight);
 
+  var prevTick = 0;
+  function draggedWorkSpace (event) {
+    var p = _getMousePosition(event);
+    if (AreaWorkSpace.containsPoint(p)) {
+      var lane = ~~(AreaWorkSpace.getNormY(p) * kNumLane);
+      var tick = ~~(AreaWorkSpace.getNormX(p) * 480 * 8);
+      GF.EventView.report("workspace", "dragged", { lane: lane, tick: tick, deltaTick: tick - prevTick });
+      prevTick = tick;
+    }
+  }
+
+  function releasedWorkSpace (event) {
+    window.removeEventListener("mousemove", draggedWorkSpace, false);
+    window.removeEventListener("mouseup", releasedWorkSpace, false);
+  }
+
+  function draggedControlLane (event) {
+    var p = _getMousePosition(event);
+    if (AreaControlLane.containsPoint(p)) {
+      var tick = ~~(AreaControlLane.getNormX(p) * 480 * 8);
+      var value = 1.0 - AreaControlLane.getNormY(p);
+      GF.EventView.report("controllane", "dragged", { tick: tick, value: value });
+    }
+  }
+
+  function releasedControlLane (event) {
+    window.removeEventListener("mousemove", draggedControlLane, false);
+    window.removeEventListener("mouseup", releasedControlLane, false);
+  }
+
+  cvs.addEventListener("contextmenu", function (event) {
+    event.preventDefault();
+  });
+
+  window.addEventListener("keydown", function (event) {
+    switch (event.keyCode) {
+      case 8:
+      case 46:
+        event.preventDefault();
+        GF.EventView.report("window", "keydown", { action: "delete" });
+        break;
+    }
+  });
+
+  cvs.addEventListener("mousedown", function (event) {
+
+    var p = _getMousePosition(event);
+
+    if (AreaLaneName.containsPoint(p)) {
+      var lane = ~~(AreaLaneName.getNormY(p) *kNumLane);
+      GF.EventView.report("lanename", "clicked", { lane: lane });
+    }
+    if (AreaWorkSpace.containsPoint(p)) {
+      var lane = ~~(AreaWorkSpace.getNormY(p) * kNumLane);
+      var tick = ~~(AreaWorkSpace.getNormX(p) * 480 * 8);
+      if (event.shiftKey) {
+        GF.EventView.report("workspace", "shiftclicked", { lane: lane, tick: tick });
+      } else {
+        GF.EventView.report("workspace", "clicked", { lane: lane, tick: tick });
+      }
+      prevTick = tick;
+      window.addEventListener("mousemove", draggedWorkSpace, false);
+      window.addEventListener("mouseup", releasedWorkSpace, false);
+    }
+    if (AreaControlLane.containsPoint(p)) {
+      var tick = ~~(AreaControlLane.getNormX(p) * 480 * 8);
+      var value = 1.0 - AreaControlLane.getNormY(p);
+      GF.EventView.report("controllane", "clicked", { tick: tick, value: value });
+      window.addEventListener("mousemove", draggedControlLane, false);
+      window.addEventListener("mouseup", releasedControlLane, false);
+    }
+
+  }, false);
+
+  // initialization
 
 
 

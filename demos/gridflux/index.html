@@ -1,10 +1,25 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link href="css/base.css" rel="stylesheet" type="text/css">
   </head>
   <body>
 
-    <canvas id="i-grid"></canvas>
+  <div class="c-body-wrapper">
+    <div class="c-grid-container">
+      <canvas id="i-grid" class="c-grid"></canvas>
+    </div>
+    <div class="c-xport-container">
+      <div class="c-xport-control c-quantize">Q</div>
+      <div class="c-xport-control c-shuffle">Shuffle</div>
+      <div class="c-xport-control c-btn c-rewind"></div>
+      <div class="c-xport-control c-btn c-stop"></div>
+      <div class="c-xport-control c-btn c-play"></div>
+      <div class="c-xport-control c-btn c-record"></div>
+      <div class="c-xport-control c-counter">Counter</div>
+      <div class="c-xport-control c-tempo">tempo</div>
+    </div>
+  </div>
 
     <!-- core -->
     <script src="lib/Core.js"></script>
