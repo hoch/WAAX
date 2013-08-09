@@ -137,7 +137,7 @@
   function _EventList () {
     this.head = null;
     this.read = null;
-    this.eventFilter = new _EventFilter();
+    //this.eventFilter = new _EventFilter();
     //this.eventFilter.setQuantize(1.0);
   }
 
