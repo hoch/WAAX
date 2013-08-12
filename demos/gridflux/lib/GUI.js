@@ -249,14 +249,16 @@ var GUI = (function () {
   Button = function(name, options, target, callback) {
     this._name = name;
     // create view and initialize value
-    this._view = new UIButtonView(this, options, target);
+    this._view = new ButtonView(this, options, target);
     // callback to manager
     this._callback = callback;
     // target selection state
     this._selected = false;
     // set options: mode
+    this._mode = options.mode;
     switch (options.mode) {
       case "oneshot":
+
         this.changed = this._changedOneShot;
         break;
       case "momentary":
@@ -340,13 +342,13 @@ var GUI = (function () {
     // bound controller
     this._control = control;
     // building divs
-    this._view = UIManager.createDiv("ui-button-view", target);
-    this._touchable = UIManager.createDiv("ui-button-touchable", this._view);
-    this._led = UIManager.createDiv("ui-button-led", this._touchable);
-    this._label = UIManager.createDiv("ui-button-label", this._touchable);
+    this._view = _createDiv("ui-button-view", target);
+    this._touchable = _createDiv("ui-button-touchable", this._view);
+    this._led = _createDiv("ui-button-led", this._touchable);
+    this._label = _createDiv("ui-button-label", this._touchable);
     // set up styles
-    this._view.style.width = (options.width || UIManager.Style.buttonWidth) + "px";
-    this._led.style.width = (options.LEDwidth || UIManager.Style.buttonLEDSize) + "px";
+    this._view.style.width = (options.width || _Style.buttonWidth) + "px";
+    this._led.style.width = (options.LEDwidth || _Style.buttonLEDSize) + "px";
     this._label.textContent = options.label;
     // function references
     this._ref = {
@@ -394,6 +396,7 @@ var GUI = (function () {
       }
     }
   };
+
 
 
   /**

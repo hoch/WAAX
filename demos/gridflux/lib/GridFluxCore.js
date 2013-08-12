@@ -1,5 +1,6 @@
 /**
  * @namespace GF GridFlux
+ * @contains Event, EventList, Timeline
  */
 var GF = (function () {
 
@@ -237,6 +238,34 @@ var GF = (function () {
   };
 
 
+
+  /**
+   * @class  Metronome
+   */
+  function Metronome() {
+    this.buffer = null;
+    this.volume = 0.75;
+  }
+
+  Metronome.prototype = {
+    setBuffer: function (buffer) {
+      this.buffer = buffer;
+    },
+    play: function (time) {
+      var source = WX.context.createBufferSource();
+      var volume = WX.context.createGain();
+      source.connect(volume);
+      volume.connect(WX.context.destination);
+      source.buffer = this.buffer;
+      volume.gain.setValueAtTime(this.volume, time);
+
+      source.start(time);
+      source.stop(time + source.buffer.duration);
+    }
+  };
+
+
+
   /**
    * @class Timeline
    */
@@ -250,7 +279,7 @@ var GF = (function () {
     this.BPM = (BPM || 120.0);
     this.BIS = 60.0 / this.BPM; // beat in seconds
     this.TIS = this.BIS / 480.0; // tick in seconds (1 beat = 480 tick)
-    this.lookAhead = this.TIS * 5; // look ahead is 2 tick
+    this.lookAhead = this.TIS * 5; // look ahead is 5 tick
 
     // states
     this.bRunning = false;
@@ -265,20 +294,22 @@ var GF = (function () {
     // managed eventlist
     this.eventLists = [];
 
-    // click
-    this.nextClick = new _Event(1, 0, 0);
-    this.metronome = new _Metronome();
+    // click: event
+    this.nextClick = new Event(0, _mtime(1, 0));
+    this.metronome = new Metronome();
   }
 
   Timeline.prototype = {
 
     getLinearTime: function (event) {
-      return event.beat * this.BIS + event.tick * this.TIS;
+      return event.mTime.beat * this.BIS + event.mTime.tick * this.TIS;
     },
 
-    getMusicalTime: function (time) {
-      var evt = new _Event({}, ~~(time / this.BIS), ~~((time % this.BIS) / this.TIS));
-      return evt;
+    getMusicalTime: function (lTime) {
+      return _mtime(
+        ~~(lTime / this.BIS),
+        ~~((lTime % this.BIS) / this.TIS)
+      );
     },
 
     getAbsoluteTime: function (event) {
@@ -299,12 +330,13 @@ var GF = (function () {
     setLinearNow: function (time) {
       this.lNow = time;
       this.aOrigin = WX.now - this.lNow;
-      var musTime = this.getMusicalTime(time);
-      this.nextClick.setTime(musTime.beat + 1, 0);
+      var mNow = this.getMusicalTime(time);
+      var nextClickTime = _mtime(mNow.beat + 1, 0);
+      this.nextClick.setTime(nextClickTime);
 
-      for(var i = 0; i < this.eventLists.length; i++) {
-        this.eventLists[i].setPositionAtTime(musTime);
-      }
+      // for(var i = 0; i < this.eventLists.length; i++) {
+      //   this.eventLists[i].setPositionAtTime(musTime);
+      // }
     },
 
     setMusicalNow: function (event) {
@@ -312,9 +344,9 @@ var GF = (function () {
       this.setLinearNow(time);
     },
 
-    setLoop: function (startEvent, endEvent) {
-      this.lLoopStart = this.getLinearTime(startEvent);
-      this.lLoopEnd = this.getLinearTime(endEvent);
+    setLoop: function (eventStart, eventEnd) {
+      this.lLoopStart = this.getLinearTime(eventStart);
+      this.lLoopEnd = this.getLinearTime(eventEnd);
     },
 
     getLoopDuration: function () {
@@ -335,7 +367,7 @@ var GF = (function () {
 
     advance: function () {
       if (this.bRunning) {
-        this.lNow += WX.now - this.prevTimeStamp;
+        this.lNow += (WX.now - this.prevTimeStamp);
         this.prevTimeStamp = WX.now;
 
         if (this.bUseClick) {
@@ -343,14 +375,15 @@ var GF = (function () {
           var linTime = this.getLinearTime(this.nextClick);
           if (linTime < this.lNow + this.lookAhead) {
             this.metronome.play(this.aOrigin + linTime);
-            this.nextClick.moveTime(1, 0);
+            this.nextClick.moveBeatTick(1, 0);
           }
         }
 
         // check loop boundary
         if (this.bLoop) {
-          if (this.lLoopEnd < this.lNow) {
-            this.setLinearNow(this.lLoopStart);
+          var diff = this.lLoopEnd - this.lNow;
+          if (diff < 0) {
+            this.setLinearNow(this.lLoopStart + diff);
           }
         }
       }
@@ -383,11 +416,11 @@ var GF = (function () {
       return this.bRunning;
     },
 
-    setMetronomeBuffer: function (buffer) {
+    setMetronomeSound: function (buffer) {
       this.metronome.setBuffer(buffer);
     },
 
-    enableMetronome: function (bool) {
+    useMetronome: function (bool) {
       this.bUseClick = bool;
     },
 
@@ -397,10 +430,11 @@ var GF = (function () {
   };
 
 
+
   // revealing
   return {
     mTime: function (beat, tick) {
-      return _mtick(beat, tick);
+      return _mtime(beat, tick);
     },
     createEvent: function (lane, mTime, params, selected) {
       return new Event(lane, mTime, params, selected);
@@ -414,4 +448,4 @@ var GF = (function () {
   };
 
 
-})();
+})(WX);
