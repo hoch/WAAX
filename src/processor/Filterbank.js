@@ -66,9 +66,9 @@ WX._unit.filterbank = function (options) {
   this._detune = 100;
   this._detuneFactor = 0.0;
   // gain slope of filters
-  this._slope = 0.5;
+  this._slope = 0.08;
   // filter width
-  this._width = 0.5;
+  this._width = 0.2;
   // current chord type: ionian
   this._currentChord = this._chord.ion;
 
