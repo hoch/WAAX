@@ -61,7 +61,10 @@ var GF = (function () {
       this.mTime.tick += mTime.tick;
       if (this.mTime.tick >= 480) {
         this.mTime.beat += 1;
-        this.mTime.tick %= 480;
+        this.mTime.tick -= 480;
+      } else if (this.mTime.tick < 0) {
+        this.mTime.beat -= 1;
+        this.mTime.tick += 480;
       }
     },
     moveBeatTick: function (beat, tick) {
@@ -95,7 +98,7 @@ var GF = (function () {
 
   EventList.prototype = {
     addEvent: function (event) {
-      var e = new _Event(event.lane, event.mTime, event.params);
+      var e = new Event(event.lane, event.mTime, event.params);
       if (this.head) {
         if (e.isEarlierThan(this.head)) {
           e.next = this.head;
@@ -126,8 +129,9 @@ var GF = (function () {
     removeEvent: function (event) {
       if (event === this.head) {
         this.head = this.head.next;
+        return true;
       } else {
-        this._rDelete(event, this.head);
+        return this._rDelete(event, this.head);
       }
     },
     _rDelete: function (event, now) {
@@ -136,7 +140,7 @@ var GF = (function () {
         return true;
       } else {
         if (now.next) {
-          this._rDelete(event, now.next);
+          return this._rDelete(event, now.next);
         } else {
           return false;
         }
@@ -223,11 +227,17 @@ var GF = (function () {
         return false;
       }
     },
+    empty: function () {
+      this.head = null;
+      this.read = null;
+    },
     reset: function () {
       this.read = this.head;
     },
     dump: function () {
-      this._rDump(this.head);
+      if (this.head) {
+        this._rDump(this.head);
+      }
     },
     _rDump: function (now) {
       console.log(now.lane, now.mTime, now.bSelected);
