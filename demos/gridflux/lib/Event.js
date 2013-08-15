@@ -158,7 +158,7 @@ GF.Event = (function (GF) {
       }
     };
 
-    this.drawEvent = function (event) {
+    this.drawEvent = function (event, selectedLane) {
       // all events is 16th
       var pos = kLaneNameWidth + event.getTick() / kTotalTick * kWorkSpaceWidth;
       var dur = 120 / kTotalTick * kWorkSpaceWidth;
@@ -166,9 +166,19 @@ GF.Event = (function (GF) {
       ctx.fillStyle = "#C66";
       ctx.strokeRect(pos + 2, event.lane * kGridSizeY + 2, dur - 4, kGridSizeY - 4);
       ctx.fillRect(pos + 2, event.lane * kGridSizeY + 2, dur - 4, kGridSizeY - 4);
+      if (event.lane === selectedLane) {
+        var pos = kLaneNameWidth + event.getTick() / kTotalTick * kWorkSpaceWidth;
+        var barTop = kWorkSpaceHeight + (1.0 - event.params.intensity) * kControlLaneHeight;
+        var barHeight = event.params.intensity * kControlLaneHeight;
+        var dur = 120 / kTotalTick * kWorkSpaceWidth;
+        ctx.strokeStyle = "#000";
+        ctx.strokeRect(pos + 2, barTop, dur - 4, barHeight);
+        ctx.fillStyle = "#669";
+        ctx.fillRect(pos + 2, barTop, dur - 4, barHeight);
+      }
     };
 
-    this.drawSelectedEvent = function (event) {
+    this.drawSelectedEvent = function (event, selectedLane) {
       // all events is 16th
       var pos = kLaneNameWidth + event.getTick() / kTotalTick * kWorkSpaceWidth;
       var dur = 120 / kTotalTick * kWorkSpaceWidth;
@@ -176,20 +186,15 @@ GF.Event = (function (GF) {
       ctx.fillStyle = "#F99";
       ctx.strokeRect(pos + 2, event.lane * kGridSizeY + 2, dur - 4, kGridSizeY - 4);
       ctx.fillRect(pos + 2, event.lane * kGridSizeY + 2, dur - 4, kGridSizeY - 4);
-    };
-
-    this.drawControlLane = function (eventsAtLane) {
-      if (eventsAtLane) {
-        for (var i = 0; i < eventsAtLane.length; i++) {
-          var pos = kLaneNameWidth + eventsAtLane[i].getTick() / kTotalTick * kWorkSpaceWidth;
-          var barTop = kWorkSpaceHeight + (1.0 - eventsAtLane[i].params.intensity) * kControlLaneHeight;
-          var barHeight = eventsAtLane[i].params.intensity * kControlLaneHeight;
-          var dur = 120 / kTotalTick * kWorkSpaceWidth;
-          ctx.strokeStyle = "#000";
-          ctx.strokeRect(pos + 2, barTop, dur - 4, barHeight);
-          ctx.fillStyle = "#669";
-          ctx.fillRect(pos + 2, barTop, dur - 4, barHeight);
-        }
+      if (event.lane === selectedLane) {
+        var pos = kLaneNameWidth + event.getTick() / kTotalTick * kWorkSpaceWidth;
+        var barTop = kWorkSpaceHeight + (1.0 - event.params.intensity) * kControlLaneHeight;
+        var barHeight = event.params.intensity * kControlLaneHeight;
+        var dur = 120 / kTotalTick * kWorkSpaceWidth;
+        ctx.strokeStyle = "#000";
+        ctx.strokeRect(pos + 2, barTop, dur - 4, barHeight);
+        ctx.fillStyle = "#669";
+        ctx.fillRect(pos + 2, barTop, dur - 4, barHeight);
       }
     };
 
@@ -208,6 +213,7 @@ GF.Event = (function (GF) {
      * Event-related
      */
     var _prevTick = 0;
+    var _prevLane = 0;
 
     /**
      * responders
@@ -215,14 +221,17 @@ GF.Event = (function (GF) {
     function _draggedWorkSpace (event) {
       var p = _getMousePosition(event);
       if (AreaWorkSpace.containsPoint(p)) {
+        var lane = ~~(AreaWorkSpace.getNormY(p) * kNumLane);
         var tick = ~~(AreaWorkSpace.getNormX(p) * 480 * 8);
         var data = {
-          lane: ~~(AreaWorkSpace.getNormY(p) * kNumLane),
+          lane: lane,
           tick: tick,
+          deltaLane: lane - _prevLane,
           deltaTick: tick - _prevTick
         };
         manager.report.call(manager, "workspace", "dragged", data);
         _prevTick = tick;
+        _prevLane = lane;
       }
     }
 
@@ -263,9 +272,10 @@ GF.Event = (function (GF) {
       }
       // when mouse on workspace
       else if (AreaWorkSpace.containsPoint(p)) {
+        var lane = ~~(AreaWorkSpace.getNormY(p) * kNumLane);
         var tick = ~~(AreaWorkSpace.getNormX(p) * 480 * 8);
         var data = {
-          lane: ~~(AreaWorkSpace.getNormY(p) * kNumLane),
+          lane: lane,
           tick: tick
         };
         var action = "clicked";
@@ -278,6 +288,7 @@ GF.Event = (function (GF) {
         window.addEventListener("mousemove", _draggedWorkSpace, false);
         window.addEventListener("mouseup", _releasedWorkSpace, false);
         _prevTick = tick;
+        _prevLane = lane;
       }
       // when mouse on control lane
       else if (AreaControlLane.containsPoint(p)) {
@@ -376,11 +387,14 @@ GF.Event = (function (GF) {
                 // if click on empty area
                 // : empty selection and create a new event
                 this._insertSelectionToList();
-                this.eventlist.addEvent(GF.createEvent(
+                // quantized note creation
+                var evt = this.eventFilter.filter(GF.createEvent(
                   data.lane,
-                  GF.mTime(0, data.tick),
+                  GF.mTime(0, data.tick - 60),
                   { intensity: 0.75 }
                 ));
+                console.log(evt.mTime);
+                this.eventlist.addEvent(evt);
               }
               this.updateView();
               break;
@@ -413,6 +427,10 @@ GF.Event = (function (GF) {
 
         // case altclicked
         case "altclicked":
+          // report up to Transport
+          var evt = GF.createEvent(data.lane, GF.mTime(0, data.tick), null);
+          this.notify('playheadPosition', evt);
+          this.updateView();
           break;
 
         // case dragged
@@ -421,6 +439,7 @@ GF.Event = (function (GF) {
             case "workspace":
               if (this.selectBuffer.head) {
                 this.selectBuffer.iterate(function (event) {
+                  event.lane += data.deltaLane;
                   event.moveTime(GF.mTime(0, data.deltaTick));
                 });
                 this.updateView();
@@ -430,11 +449,12 @@ GF.Event = (function (GF) {
                   // do nothing
                 } else {
                   this.drawOptions.selectedLane = data.lane;
-                  this.eventlist.addEvent(GF.createEvent(
+                  var evt = this.eventFilter.filter(GF.createEvent(
                     data.lane,
-                    GF.mTime(0, data.tick),
+                    GF.mTime(0, data.tick - 60),
                     { intensity: 0.75 }
                   ));
+                  this.eventlist.addEvent(evt);
                 }
                 this.updateView();
               }
@@ -478,13 +498,11 @@ GF.Event = (function (GF) {
       var lane = this.drawOptions.selectedLane;
       this.view.drawBackground();
       this.view.drawLaneName(lane);
-      this.view.drawControlLane(this.eventlist.findEventsAtLane(lane));
-      this.view.drawControlLane(this.selectBuffer.findEventsAtLane(lane));
       this.eventlist.iterate(function (event) {
-        this.view.drawEvent(this.eventFilter.filter(event));
+        this.view.drawEvent(this.eventFilter.filter(event), lane);
       }.bind(this));
       this.selectBuffer.iterate(function (event) {
-        this.view.drawSelectedEvent(this.eventFilter.filter(event));
+        this.view.drawSelectedEvent(this.eventFilter.filter(event), lane);
       }.bind(this));
       this.view.drawPlayhead(this.drawOptions.playheadPosition);
     },

@@ -89,6 +89,16 @@ GF.Transport = (function (GF, GUI, WX) {
     this.timeline.addEventList(GF.EventManager.selectBuffer);
     var _sampler = GF.SamplerManager;
 
+    // callback from EventManager
+    GF.EventManager.notify = function (action, value) {
+      //console.log(action, value);
+      switch (action) {
+        case 'playheadPosition':
+          this.timeline.setMusicalNow(value);
+          break;
+      }
+    }.bind(this);
+
 
     // scope caching
     var me = this;
