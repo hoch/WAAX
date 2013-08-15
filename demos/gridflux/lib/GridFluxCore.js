@@ -39,7 +39,7 @@ var GF = (function () {
   }
 
   Event.prototype = {
-    setEvent: function (event) {
+    cloneEvent: function (event) {
       this.lane = event.lane;
       this.mTime = _clone(event.mTime);
       this.params = _clone(event.params);
@@ -186,20 +186,20 @@ var GF = (function () {
         return null;
       }
     },
-    setTimeAtPosition: function (mTime) {
+    setPositionAtTime: function (mTime) {
       if (this.head) {
-        return this._rSetTimeAtPosition(_mtick(mTime), this.head);
+        return this._rSetPositionAtTime(_mtick(mTime), this.head);
       } else {
         return null;
       }
     },
-    _rSetTimeAtPosition: function (tick, now) {
+    _rSetPositionAtTime: function (tick, now) {
       if (tick <= now.getTick()) {
         this.read = now;
         return true;
       }
       if (now.next) {
-        return this._rSetTimeAtPosition(tick, now.next);
+        return this._rSetPositionAtTime(tick, now.next);
       } else {
         return false;
       }
@@ -247,6 +247,46 @@ var GF = (function () {
     },
   };
 
+
+  /**
+   * @class  EventFilter
+   */
+  function EventFilter() {
+    this.kSwingFactor = -0.42000000000000004; // swing curve factor
+    this.swing = 0.0;
+    this.quantize = 0.0;
+    this.swingGrid = 240;
+    this.quantizeGrid = 120;
+  }
+
+  EventFilter.prototype = {
+    setSwing: function (value) {
+      this.swing = value;
+    },
+    setQuantize: function (value) {
+      this.quantize = value;
+    },
+    filter: function (event) {
+      var e = new Event(event.lane, event.mTime, event.params);
+      var tick = e.mTime.tick;
+      // quantize first
+      if (this.quantize > 0.0) {
+        var offset = tick % this.quantizeGrid;
+        if (offset < 60) {
+          e.mTime.tick -= offset * this.quantize;
+        } else {
+          e.mTime.tick += (this.quantizeGrid - offset) * this.quantize;
+        }
+      }
+      tick = e.mTime.tick;
+      // then swing
+      if (this.swing > 0.0) {
+        var rem = tick % this.swingGrid;
+        e.mTime.tick = (tick - rem) + Math.pow((rem / this.swingGrid), 1 + this.kSwingFactor * this.swing) * this.swingGrid;
+      }
+      return e;
+    }
+  };
 
 
   /**
@@ -303,6 +343,7 @@ var GF = (function () {
 
     // managed eventlist
     this.eventLists = [];
+    this.bucket = [];
 
     // click: event
     this.nextClick = new Event(0, _mtime(1, 0));
@@ -344,9 +385,9 @@ var GF = (function () {
       var nextClickTime = _mtime(mNow.beat + 1, 0);
       this.nextClick.setTime(nextClickTime);
 
-      // for(var i = 0; i < this.eventLists.length; i++) {
-      //   this.eventLists[i].setPositionAtTime(musTime);
-      // }
+      for(var i = 0; i < this.eventLists.length; i++) {
+        this.eventLists[i].setPositionAtTime(mNow);
+      }
     },
 
     setMusicalNow: function (event) {
@@ -399,12 +440,23 @@ var GF = (function () {
       }
     },
 
-    lookAheadEvent: function (event) {
-      var linTime = this.getLinearTime(event);
-      if (linTime < this.lNow + this.lookAhead) {
-        return true;
-      } else {
-        return false;
+    lookAheadEvents: function () {
+      this.bucket.length = 0;
+      for(var i = 0; i < this.eventLists.length; i++) {
+        this._rLookAheadEvents(this.eventLists[i]);
+      }
+      return this.bucket.slice(0);
+    },
+
+    _rLookAheadEvents: function (eventlist) {
+      var evt = eventlist.getCurrentEvent();
+      if (evt) {
+        var linTime = this.getLinearTime(evt);
+        if (linTime < this.lNow + this.lookAhead) {
+          this.bucket.push(evt);
+          eventlist.advance();
+          this._rLookAheadEvents(eventlist);
+        }
       }
     },
 
@@ -443,6 +495,9 @@ var GF = (function () {
 
   // revealing
   return {
+    mTick: function (mTime) {
+      return _mtick(mTime);
+    },
     mTime: function (beat, tick) {
       return _mtime(beat, tick);
     },
@@ -450,7 +505,10 @@ var GF = (function () {
       return new Event(lane, mTime, params, selected);
     },
     createEventList: function () {
-      return new EventList()
+      return new EventList();
+    },
+    createEventFilter: function () {
+      return new EventFilter();
     },
     createTimeline: function (BPM) {
       return new Timeline(BPM);

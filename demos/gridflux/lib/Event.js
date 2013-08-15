@@ -5,7 +5,6 @@
 GF.Event = (function (GF) {
 
 
-
   /**
    * @class Area (for EventView)
    */
@@ -40,7 +39,6 @@ GF.Event = (function (GF) {
       };
     }
   };
-
 
 
   /**
@@ -195,8 +193,8 @@ GF.Event = (function (GF) {
       }
     };
 
-    this.drawPlayhead = function (normPosition) {
-      var pos = normPosition * kWorkSpaceWidth + kLaneNameWidth;
+    this.drawPlayhead = function (tick) {
+      var pos = tick / kTotalTick * kWorkSpaceWidth + kLaneNameWidth;
       ctx.beginPath();
       ctx.strokeStyle = "#FFF";
       ctx.moveTo(pos, 0);
@@ -320,9 +318,15 @@ GF.Event = (function (GF) {
 
     // view
     this.view = new EventView(this);
+
     // Eventlist
     this.eventlist = GF.createEventList();
     this.selectBuffer = GF.createEventList();
+
+    // Event filter
+    this.eventFilter = GF.createEventFilter();
+
+
     // TEMP: filling random data
     for (var i = 0; i < 1; i++) {
       var lane = ~~(Math.random() * 16);
@@ -334,7 +338,7 @@ GF.Event = (function (GF) {
     // initial options
     this.drawOptions = {
       selectedLane: 0,
-      playheadPosition: 0.2
+      playheadPosition: 0
     };
 
     // initial draw
@@ -346,7 +350,7 @@ GF.Event = (function (GF) {
   EventManager.prototype = {
     // report from view
     report: function (element, action, data) {
-      console.log(element, action, data);
+      //console.log(element, action, data);
       switch (action) {
 
         // case clicked
@@ -460,6 +464,15 @@ GF.Event = (function (GF) {
       this.view.order(target, value);
     },
 
+    // set param from transport
+    setParam: function (param, value) {
+      switch (param) {
+        case 'playheadPosition':
+          this.drawOptions.playheadPosition = value;
+          break;
+      }
+    },
+
     // update view
     updateView: function () {
       var lane = this.drawOptions.selectedLane;
@@ -468,10 +481,10 @@ GF.Event = (function (GF) {
       this.view.drawControlLane(this.eventlist.findEventsAtLane(lane));
       this.view.drawControlLane(this.selectBuffer.findEventsAtLane(lane));
       this.eventlist.iterate(function (event) {
-        this.view.drawEvent(event);
+        this.view.drawEvent(this.eventFilter.filter(event));
       }.bind(this));
       this.selectBuffer.iterate(function (event) {
-        this.view.drawSelectedEvent(event);
+        this.view.drawSelectedEvent(this.eventFilter.filter(event));
       }.bind(this));
       this.view.drawPlayhead(this.drawOptions.playheadPosition);
     },
@@ -479,8 +492,8 @@ GF.Event = (function (GF) {
     _selectEventsFromList: function (events) {
       // list -> selection
       for (var i = 0; i < events.length; i++) {
-        console.log(this.eventlist.removeEvent(events[i]));
         this.selectBuffer.addEvent(events[i]);
+        this.eventlist.removeEvent(events[i]);
       }
     },
 
@@ -496,9 +509,13 @@ GF.Event = (function (GF) {
       var evt1 = this.eventlist.findEventAtPosition(lane, mTime);
       var evt2 = this.selectBuffer.findEventAtPosition(lane, mTime);
       return (evt2 || evt1);
+    },
+
+    setTimeAtPosition: function (mTime) {
+      this.eventlist.setTimeAtPosition(mTime);
+      this.selectBuffer.setTimeAtPosition(mTime);
     }
   };
-
 
 
   /**

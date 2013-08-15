@@ -85,8 +85,15 @@ GF.Transport = (function (GF, GUI, WX) {
     this.timeline.setLoop(loopStart, loopEnd);
     this.timeline.enableLoop(true);
 
-    // load metronome sample
+    this.timeline.addEventList(GF.EventManager.eventlist);
+    this.timeline.addEventList(GF.EventManager.selectBuffer);
+    var _sampler = GF.SamplerManager;
+
+
+    // scope caching
     var me = this;
+
+    // load metronome sample
     var sample = WX.BufferMap({
       'metronome': 'data/metronome.wav'
     }, function () {
@@ -97,12 +104,25 @@ GF.Transport = (function (GF, GUI, WX) {
     // var div_display = document.getElementById('i-display');
 
     // loop runner
-    var me = this;
     function _loop() {
       me.timeline.advance();
       var now = me.timeline.getMusicalNow();
       // TEMP: display current time
       // div_display.textContent = now.beat + " : " + now.tick;
+
+      // 1) set position at eventlist, selectbuffer
+      var bucket = me.timeline.lookAheadEvents();
+      if (bucket.length > 0) {
+        // do something with events in bucket: play events with sampler
+        for (var i = 0; i < bucket.length; i++) {
+          var evt = GF.EventManager.eventFilter.filter(bucket[i]);
+          _sampler.playEvent(evt, me.timeline.getAbsoluteTime(evt));
+        }
+      }
+
+      // update graphics
+      GF.EventManager.setParam('playheadPosition', GF.mTick(now));
+      GF.EventManager.updateView();
       requestAnimationFrame(_loop);
     }
     _loop();
@@ -136,6 +156,12 @@ GF.Transport = (function (GF, GUI, WX) {
           break;
         case 'pTempo':
           this.timeline.setBPM(value);
+          break;
+        case 'pShuffle':
+          GF.EventManager.eventFilter.setSwing(value);
+          break;
+        case 'pQuantize':
+          GF.EventManager.eventFilter.setQuantize(value);
           break;
       }
     },
