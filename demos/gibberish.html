@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="static/demos.css" rel="stylesheet" type="text/css">
+    <link href="../lib/UI/UI-light.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    
+    <div class="c-demohome"><a href="index.html">Index</a></div>
+    <h1>Gibberish</h1>
+
+    <div class="c-body-wrapper" id="i-container">
+      <p>Audio Signal Flow</p>
+      <ul class="c-signalflow">
+        <li>LFO</li> <li class="separator"></li>
+        <li>Sawtooth</li> <li class="separator"></li>
+        <li>FormantV</li> <li class="separator"></li>
+        <li>ADSR</li> <li class="separator"></li>
+        <li>Converb</li> <li class="separator"></li>
+        <li>DAC</li>
+      </ul>
+      <p>MIDI Signal Flow</p>
+      <ul class="c-signalflow">
+        <li>MIDI</li> <li class="separator"></li>
+        <li>Monophonic Behavior</li> <li class="separator"></li>
+        <li>ADSR</li>
+      </ul>
+      <p>MIDI Control Map</p>
+      <ul class="c-controlmap">
+        <li>
+          <dt>Modulation (CC1)</dt><dd>Vowel Type (a, e, i, o, u)</dd>
+        </li>
+      </ul>
+    </div>
+
+    <!-- lib r8 -->   
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Utils.js"></script>
+    <script src="../src/core/Builtin.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/generator/Oscil.js"></script>
+    <script src="../src/generator/Fmop.js"></script>
+    <script src="../src/generator/Noise.js"></script>
+    <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/Sampler.js"></script>
+    <script src="../src/generator/Step.js"></script>
+    <script src="../src/processor/Fader.js"></script>
+    <script src="../src/processor/Spatter.js"></script>
+    <script src="../src/processor/ADSR.js"></script>
+    <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Filterbank.js"></script>
+    <script src="../src/processor/Formant.js"></script>
+    <script src="../src/processor/FormantV.js"></script>
+    <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Chorus.js"></script>
+    <script src="../src/processor/Phasor.js"></script>
+    <script src="../src/processor/Comp.js"></script>
+    <script src="../src/processor/Converb.js"></script>
+    <script src="../src/analyzer/Waveform.js"></script>
+    <script src="../src/analyzer/Spectrum.js"></script>
+    <script src="../src/core/Boot.js"></script>
+    <!-- Ktrl -->
+    <script src="../lib/Ktrl/Ktrl.js"></script>
+    <script src="../lib/UI/UI.js"></script>
+    <script src="../lib/UI/UISlider.js"></script>
+    <script src="../lib/UI/UIButton.js"></script>
+    <script src="../lib/UI/UIIndexedList.js"></script>
+  
+    <script id="code">
+      // units
+      var lfo = WX.Oscil({ freq:4, gain:5.0 }),
+          saw = WX.Oscil({ type:"saw", gain: 0.9 }),
+          fmt = WX.FormantV(),
+          env = WX.ADSR(),
+          vrb = WX.Converb({ mix: 0.2 });
+      
+      // connection
+      lfo.control(saw.freq_);
+      saw.to(fmt).to(env).to(vrb).to(WX.DAC);
+
+      // default params
+      env._mono = true;
+      env.adsr(0.0001, 0.005, 0.8, 0.1);
+      fmt.setPosition(0.0, 1.0, 0.02);
+
+      // // score
+      // var n = Ktrl.NoteName;
+      // var mel = [n.C2, n.D2, n.E2, n.F2, n.G2, n.A2, n.B2, n.C3].map(WX.pitch2freq);
+      
+      // // development
+      // saw
+      //   .freq(mel[0], WX.now);
+
+      // wander
+      // function wander() {
+      //   // set pitch and vibrato
+      //   saw
+      //     .freq(mel[WX.random2(0, 7)], WX.now + 0.5, "x")
+      //     .gain(WX.random2f(0.5, 0.9), WX.now + 0.5, "l");
+      //   lfo
+      //     .freq(WX.random2f(5, 10), WX.now + 0.5, "x")
+      //     .gain(WX.random2f(0.7, 1.4), WX.now + 0.5, "l");
+      //   // the last param is the "slew" time
+      //   var phi = Math.PI * 2 * Math.random();
+      //   fmt.setPosition(Math.cos(phi), Math.sin(phi), 0.5);
+      //   setTimeout(wander, 500);
+      // }
+      // wander();
+
+
+      // creates a MIDI target
+      var tFmtSynth = Ktrl.createTarget("fmtSynth");
+      // activate!
+      tFmtSynth.activate();
+
+      // define user-action for incoming MIDI message
+      var _keyState = [];
+      tFmtSynth.onData(function (midimessage) {
+        // parse MIDI data with the utility
+        var data = Ktrl.parse(midimessage);
+        //console.log(t.label, data);
+        switch (data.type) {
+          case "noteon":
+            saw.freq(WX.pitch2freq(data.pitch), WX.now+0.1, "x");
+            env.noteOn();
+            _keyState[data.pitch] = true;
+            break;
+          case "noteoff":
+            _keyState[data.pitch] = false;
+            if (_keyState.indexOf(true) > -1) {
+            } else {
+              env.noteOff();  
+            }
+            break;
+          case "controlchange":
+            switch (data.control) {
+              case 1:
+                var phi = Math.PI * 1.6 * Ktrl.CurveLinear(data.value) + Math.PI / 2;
+                fmt.setPosition(Math.cos(phi), Math.sin(phi), 0.02);
+                break;
+            }
+        }
+      });
+
+      // ktrl onready
+      Ktrl.ready(function () {
+        Ktrl.report();
+        Ktrl.routeAllToTarget(tFmtSynth);
+      });
+
+    </script>
+  </body>
+</html>

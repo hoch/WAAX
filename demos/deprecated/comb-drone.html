@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Comb Drone</h1>
+    <script src="../build/waax.min.js"></script>
+    <script>
+      // ugens
+      var o = WX.Oscil({ freq: 110, type: "tri", gain: 0.075 }),
+          pp = WX.Pingpong({ 
+            delayTimeLeft: 0.007, feedbackLeft: 0.93,
+            delayTimeRight: 0.007, feedbackRight: -0.93,
+            crosstalk: 0.0, mix: 0.5, gain: 0.0
+          }),
+          v = WX.Converb({ mix: 0.2 });
+
+      // connection
+      o.to(pp).to(v).to(WX.DAC);
+
+      // parameter development
+      pp
+        .delayTimeLeft(0.004, 8.0, "l")
+        .delayTimeRight(0.011, 8.0, "l")
+        .crosstalk(0.15, 8.0, "l")
+        .delayTimeLeft(0.007, 16.0, "l")
+        .delayTimeRight(0.007, 16.0, "l")
+        .crosstalk(0.0, 16.0, "l");
+      pp
+        .gain(0.9, 8.0, "l")
+        .gain(0.9, 16.0)
+        .gain(0.0, 20.0, "l");
+    </script>
+  </body>
+</html>

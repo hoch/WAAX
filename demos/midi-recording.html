@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="static/demos.css" rel="stylesheet" type="text/css">
+    <link href="../lib/UI/UI-light.css" rel="stylesheet" type="text/css">
+    <style>
+      .c-midiregion {
+        background-color: #ccc;
+      }
+      .c-midiblob {
+        fill: rgba(255, 64, 64, 0.8);
+        stroke: rgba(32, 32, 32, 0.8);
+        stroke-width: 0.75;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="c-demohome"><a href="index.html">Index</a></div>
+    <h1>MIDI Recording</h1>
+    <div class="c-body-wrapper" id="i-container">
+      <div id="i-midiregion" class="c-midiregion"></div>
+    </div>
+
+    <!-- lib r8 -->
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Utils.js"></script>
+    <script src="../src/core/Builtin.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/generator/Oscil.js"></script>
+    <script src="../src/generator/Fmop.js"></script>
+    <script src="../src/generator/Noise.js"></script>
+    <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/Sampler.js"></script>
+    <script src="../src/generator/Step.js"></script>
+    <script src="../src/processor/Fader.js"></script>
+    <script src="../src/processor/Spatter.js"></script>
+    <script src="../src/processor/ADSR.js"></script>
+    <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Filterbank.js"></script>
+    <script src="../src/processor/Formant.js"></script>
+    <script src="../src/processor/FormantV.js"></script>
+    <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Chorus.js"></script>
+    <script src="../src/processor/Phasor.js"></script>
+    <script src="../src/processor/Comp.js"></script>
+    <script src="../src/processor/Converb.js"></script>
+    <script src="../src/analyzer/Waveform.js"></script>
+    <script src="../src/analyzer/Spectrum.js"></script>
+    <script src="../src/core/Boot.js"></script>
+    <!-- Ktrl -->
+    <script src="../lib/Ktrl/Ktrl.js"></script>
+    <script src="../lib/UI/UI.js"></script>
+    <script src="../lib/UI/UISlider.js"></script>
+    <script src="../lib/UI/UIButton.js"></script>
+    <script src="../lib/UI/UIIndexedList.js"></script>
+    <!-- scripts -->
+    <script>
+
+      // master out
+      var chor = WX.Chorus({ mix:0.1 });
+      var pong = WX.Pingpong({
+          mix:0.1, delayTimeLeft: 0.160, delayTimeRight: 0.480,
+          feedbackLeft: 0.5, feedbackRight: 0.25 });
+      var verb = WX.Converb({ mix: 0.4, source:"../data/PADS-10/ir/960-LargePlate.wav" });
+      chor.to(pong).to(verb).to(WX.DAC);
+      WX.DAC.db(-6);
+
+      // fm vars
+      var HR = 2;
+      var MI1 = 8;
+      var BAL = 0.5;
+      var SUS = 0.4;
+      var REL = 1.0;
+
+      function Voice (time, pitch, intensity) {
+        // dynamic node creation
+        var fund = WX.pitch2freq(pitch);
+        this._fm1 = WX.Fmop({ freq:fund, gain:1 - BAL, modIndex:0.1 });
+        this._fm2 = WX.Fmop({ freq:fund * 2, gain:BAL, modIndex:0.5 });
+        this._env = WX.ADSR();
+        this._env.adsr(0.002, 0.07, SUS, REL);
+
+        // connection
+        this._fm1.to(this._env).to(chor);
+        this._fm2.to(this._env);
+
+        this.noteOn(time, intensity);
+      }
+
+      Voice.prototype = {
+        noteOn: function (time, intensity) {
+          this._fm1.start(time);
+          this._fm2.start(time);
+          this._fm1.harmRatio(HR, time).modIndex(MI1, time).modIndex(0.1, time + 1.5, "l");
+          this._fm2.harmRatio(HR, time).modIndex(MI1 * 0.5, time).modIndex(0.5, time + 1.5, "l");
+          this._env.gain(intensity).noteOn(time);
+        },
+        noteOff: function (time) {
+          this._env.noteOff(time);
+          this._fm1.stop(time + REL + 0.02);
+          this._fm2.stop(time + REL + 0.02);
+        }
+      }
+
+
+
+      // UI
+      var sec_xport = UI.ControlCenter.createSection("Transport", "i-container");
+      var btn_record = UI.ControlCenter.createControl({
+        type: "button", name: "Record", value: false, mode: "toggle"
+      }, sec_xport);
+      var btn_playback = UI.ControlCenter.createControl({
+        type: "button", name: "Playback", value: false, mode: "oneshot"
+      }, sec_xport);
+      var btn_panic = UI.ControlCenter.createControl({
+        type: "button", name: "PANIC !!", value: false, mode: "oneshot"
+      }, sec_xport);
+
+
+      function MIDIRegion () {
+
+        var bFirstNote = true;
+        var _started = 0.0;
+
+        this._buffer = [];
+        this._offset = 0.0;
+        this._start = 0.0;
+        this._duration = 0.0;
+
+        this.startRecording = function () {
+          bFirstNote = true;
+          _started = WX.now;
+          this._buffer.length = 0
+          this._offset = 0.0;
+        }
+        this.stopRecording = function () {
+          this._duration = WX.now - _started;
+        }
+        this.pushData = function (data) {
+          if (bFirstNote) {
+            // setting offset
+            this._offset = data.timestamp;
+            bFirstNote = false;
+          }
+          // offset from the first data
+          data.timestamp -= this._offset;
+          this._buffer.push(data);
+        }
+        this.setStartTime = function (time) {
+          this._start = time;
+        }
+        this.getRegion = function () {
+          return {
+            offset: this._offset,
+            payload: this._buffer,
+            start: this._start,
+            duration: this._duration
+          }
+        }
+      }
+
+      // draw MIDI Region on SVG
+      var createSVG = function(tag, parent) {
+        var el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        if (parent) {
+          parent.appendChild(el);
+        }
+        return el;
+      }
+      var setAttr = function(el, obj) {
+        for (var key in obj) {
+          el.setAttributeNS(null, key, obj[key]);
+        }
+      }
+
+      var dom_midi = document.getElementById('i-midiregion');
+      var svg = createSVG("svg", dom_midi);
+      var svgWidth = 600;
+      var svgHeight = 400;
+      setAttr(svg, {
+        "width": svgWidth + "px",
+        "height": svgHeight + "px"
+      });
+
+      function clearMIDIRegion () {
+        while (svg.firstChild) {
+            svg.removeChild(svg.firstChild);
+        }
+      }
+
+      function drawMIDIRegion (region) {
+        var dur = region.duration;
+        region.payload.map(function (data) {
+          switch (data.type) {
+            case "noteon":
+              var blob = createSVG("rect", svg);
+              setAttr(blob, {
+                "class": "c-midiblob",
+                "x": data.timestamp / dur * svgWidth,
+                "y": (1.0 - data.pitch / 127) * svgHeight,
+                "width": 10,
+                "height": svgHeight / 127
+              });
+              break;
+          }
+        });
+      }
+
+      // interaction
+      var myRegion = new MIDIRegion();
+      var bRecording = false;
+
+      btn_record.addAction(function (value) {
+        bRecording = value;
+        if (bRecording) {
+          clearMIDIRegion();
+          myRegion.startRecording();
+        } else {
+          myRegion.stopRecording();
+          drawMIDIRegion(myRegion.getRegion());
+        }
+      });
+
+      var _voiceMap = [];
+      btn_playback.addAction(function (value) {
+        if (value) {
+          var r = myRegion.getRegion();
+          var regionStart = WX.now;
+          r.payload.map(function (data) {
+            switch (data.type) {
+              case "noteon":
+                _voiceMap[data.pitch] = new Voice(regionStart + data.timestamp, data.pitch, Ktrl.scale(Ktrl.CurveLinear(data.velocity), 0, 1.5));
+                break;
+              case "noteoff":
+                if (_voiceMap[data.pitch]) {
+                  _voiceMap[data.pitch].noteOff(regionStart + data.timestamp);
+                  _voiceMap[data.pitch] = null;
+                }
+                break;
+            }
+          })
+        }
+      });
+
+      btn_panic.addAction(function (value) {
+        _voiceMap.map(function (note) {
+          note.noteOff(WX.now);
+        })
+      });
+
+      // MIDI routing
+      var _voiceMap2 = [];
+      var gTestTarget = Ktrl.createTarget("test");
+      gTestTarget.onData(function (midimessage) {
+        var data = Ktrl.parse(midimessage);
+        if (bRecording) {
+          myRegion.pushData(data);
+        }
+        switch (data.type) {
+          case "noteon":
+            console.log(data.timestamp - performance.timing.navigationStart * 0.001);
+            _voiceMap2[data.pitch] = new Voice(WX.now, data.pitch, Ktrl.scale(Ktrl.CurveLinear(data.velocity), 0, 1.5));
+            break;
+          case "noteoff":
+            if (_voiceMap2[data.pitch]) {
+              _voiceMap2[data.pitch].noteOff(WX.now);
+              _voiceMap2[data.pitch] = null;
+            }
+            break;
+          case "controlchange":
+            switch (data.control) {
+              case 7:
+                HR = ~~Ktrl.scale(Ktrl.CurveLinear(data.value), 1, 6);
+                break;
+              case 10:
+                BAL = Ktrl.scale(Ktrl.CurveLinear(data.value));
+                break;
+              case 74:
+                SUS = Ktrl.scale(Ktrl.CurveLinear(data.value), 0.01, 0.5);
+                break;
+              case 71:
+                REL = Ktrl.scale(Ktrl.CurveLinear(data.value), 0.01, 2.0);
+                break;
+              case 73:
+                chor.mix(Ktrl.scale(Ktrl.CurveLinear(data.value), 0.3, 0.7), WX.now+0.05);
+                break;
+              case 72:
+                pong.mix(Ktrl.scale(Ktrl.CurveLinear(data.value), 0, 0.5), WX.now+0.05);
+                break;
+              case 91:
+                DEL = Ktrl.scale(Ktrl.CurveLinear(data.value), 0.160, 0.480);
+                pong.delayTimeRight(DEL, WX.now+0.1, "l");
+                pong.delayTimeLeft(DEL * 3, WX.now+0.1, "l");
+                break;
+              case 92:
+                verb.mix(Ktrl.scale(Ktrl.CurveLinear(data.value)), WX.now+0.05);
+                //WX.DAC.gain(Ktrl.scale(Ktrl.CurveLinear(data.value), 0, 1), WX.now+0.1, "l");
+                break;
+
+            }
+            break;
+        }
+      });
+
+      Ktrl.ready(function () {
+        Ktrl.routeAllToTarget(gTestTarget);
+        gTestTarget.activate();
+      });
+
+    </script>
+  </body>
+</html>

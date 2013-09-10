@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Dev Mode r8</h1>    
+
+    <canvas id="sp" width="800" height="600"></canvas>
+    <div id="preset"></div>
+
+    <!-- lib r8 -->   
+    <script src="../src/core/Monkey.js"></script>
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Utils.js"></script>
+    <script src="../src/core/Builtin.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/generator/Oscil.js"></script>
+    <script src="../src/generator/Fmop.js"></script>
+    <script src="../src/generator/Noise.js"></script>
+    <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/Sampler.js"></script>
+    <script src="../src/generator/Step.js"></script>
+    <script src="../src/processor/Fader.js"></script>
+    <script src="../src/processor/Spatter.js"></script>
+    <script src="../src/processor/ADSR.js"></script>
+    <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Formant.js"></script>
+    <script src="../src/processor/FormantV.js"></script>
+    <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Chorus.js"></script>
+    <script src="../src/processor/Phasor.js"></script>
+    <script src="../src/processor/Comp.js"></script>
+    <script src="../src/processor/Converb.js"></script>
+    <script src="../src/analyzer/Waveform.js"></script>
+    <script src="../src/analyzer/Spectrum.js"></script>
+    <script src="../src/core/Boot.js"></script>
+    
+    <script src="../lib/Ktrl.min.js"></script>
+    <!-- test code -->
+    <script>
+
+    FilterBank = (function(WX) {
+
+      var numStreams = 8;
+      var nyquist = WX.context.sampleRate * 0.5;
+
+      var gainCurveCoef = 1.2;
+      var QCurveCoef = 1.2;
+      var f0 = WX.pitch2freq(36);
+      var ratioFactor = 4;
+      var harmonicRatio = f0 / ratioFactor;
+
+      var freqs = [];
+      var Qs = [];
+      var gains = [];
+      var radians = [];
+      var speed = 0.1;
+
+      for (var i = 0; i < numStreams; ++i) {
+        radians[i] = Math.PI * 2 * Math.random();
+      }
+
+      var inputGainNode, outputGainNode;
+      var filterNodes1 = [];
+      var filterNodes2 = [];
+      var gainNodes = [];
+      var pannerNodes = [];
+
+      inputGainNode = WX.context.createGain();
+      outputGainNode = WX.context.createGain();
+      for (var i = 0; i < numStreams; ++i) {
+        filterNodes1[i] = WX.context.createBiquadFilter();
+        filterNodes2[i] = WX.context.createBiquadFilter();
+        gainNodes[i] = WX.context.createGain();
+        pannerNodes[i] = WX.context.createPanner();
+        filterNodes1[i].type = "bandpass";
+        filterNodes2[i].type = "bandpass";
+        inputGainNode.connect(filterNodes1[i]);
+        filterNodes1[i].connect(filterNodes2[i]);
+        filterNodes2[i].connect(gainNodes[i]);
+        gainNodes[i].connect(pannerNodes[i]);
+        pannerNodes[i].connect(outputGainNode);
+
+        gainNodes[i].gain.value = 0.0;
+      }
+
+      function _calculateFrequency () {
+        freqs[0] = f0;
+        for (var i = 1; i < numStreams; ++i) {
+          var f = f0 + harmonicRatio * Math.pow(2, i);
+          if (f > WX.context.sampleRate * 0.5 ) {
+            f -= (f - nyquist) * 2;
+          }
+          freqs[i] = f;
+        }
+      }
+
+      function _calculateQ () {
+        for (var i = 0; i < numStreams; ++i) {
+          Qs[i] = 8 + 36 / Math.pow(QCurveCoef, i);
+        }
+      }
+
+      function _calculateGain () {
+        for (var i = 0; i < numStreams; ++i) {
+          gains[i] = 1 / Math.pow(gainCurveCoef, i);
+        }
+      }
+
+      function _wander () {
+        for (var i = 0; i < numStreams; ++i) {
+          radians[i] += speed; //(Math.random() - 0.5) * 0.5;
+          pannerNodes[i].setPosition(Math.cos(radians[i]), 0.0, Math.sin(radians[i]));
+        }
+      }
+
+      function _slewToParams (slewDur) {
+        slewDur = slewDur || 0.05;
+        for (var i = 0; i < numStreams; ++i) {
+          filterNodes1[i].frequency.exponentialRampToValueAtTime(freqs[i] * 0.999, WX.now + slewDur);
+          filterNodes2[i].frequency.exponentialRampToValueAtTime(freqs[i] * 1.001, WX.now + slewDur);
+          filterNodes1[i].Q.linearRampToValueAtTime(Qs[i], WX.now + slewDur);
+          filterNodes2[i].Q.linearRampToValueAtTime(Qs[i] * 0.5, WX.now + slewDur);
+          gainNodes[i].gain.linearRampToValueAtTime(gains[i], WX.now + slewDur);
+        }
+      }
+
+      function setPitch (pitch, slewDur) {
+        f0 = WX.pitch2freq(pitch);
+        _calculateFrequency();
+        _slewToParams(slewDur);
+      }
+
+      function setHarmonicFactor (factor, slewDur) {
+        ratioFactor = factor;
+        harmonicRatio = f0 / ratioFactor;
+        _calculateFrequency();
+        _slewToParams(slewDur);
+      }
+
+      function setQCoef (coef, slewDur) {
+        QCurveCoef = coef;
+        _calculateQ();
+        _slewToParams(slewDur);
+      }
+
+      function setGainCoef (coef, slewDur) {
+        gainCurveCoef = coef;
+        _calculateGain();
+        _slewToParams(slewDur);
+      }
+
+      function setSpeed (value) {
+        speed = value;
+      }
+
+      function wander () {
+        _wander();
+      }
+
+      function report () {
+        var preset = {
+          gainCurveCoef: gainCurveCoef,
+          QCurveCoef: QCurveCoef,
+          ratioFactor: ratioFactor
+        }
+        return preset.gainCurveCoef + " : " + preset.QCurveCoef + " : " + preset.ratioFactor;
+      }
+
+      function setPreset (preset) {
+        gainCurveCoef = preset.gainCurveCoef;
+        QCurveCoef = preset.QCurveCoef;
+        ratioFactor = preset.ratioFactor;
+        _calculateFrequency();
+        _calculateQ();
+        _calculateGain();
+        _slewToParams();
+      }
+
+      // initialization
+      _calculateFrequency();
+      _calculateQ();
+      _calculateGain();
+      _slewToParams();
+      _wander(1.0);
+
+      return {
+        input: inputGainNode,
+        output: outputGainNode,
+        setPitch: setPitch,
+        setHarmonicFactor: setHarmonicFactor,
+        setQCoef: setQCoef,
+        setGainCoef: setGainCoef,
+        setSpeed: setSpeed,
+        wander: wander,
+        setPreset: setPreset,
+        report: report
+      }
+    })(WX);
+
+    var cvs = document.getElementById('sp');
+    var ctx = cvs.getContext('2d');
+    var dmp = document.getElementById('preset');
+
+    //var n = WX.Noise({ gain: 0.5 });
+    //var n = WX.Oscil({ type:"sqr", gain: 0.25 });
+    var n = WX.Sampler({ source:"../data/samples/fables-aesop.ogg", loop:true, gain: 2.0 });
+    var sp = WX.Spectrum({ context:ctx, smoothingFactor:0.8, grid:true });
+    n.connect(FilterBank.input);
+    //n.to(WX.DAC);
+    FilterBank.output.connect(sp._inlet);
+    FilterBank.output.connect(WX.DAC._inlet);
+    FilterBank.input.gain.value = 1.0;
+    FilterBank.output.gain.setValueAtTime(0.000001, WX.now);
+    FilterBank.output.gain.exponentialRampToValueAtTime(4.0, WX.now + 1.0);
+
+    function wander () {
+      FilterBank.wander();
+      // FilterBank.setPitch(WX.random2(24, 48));
+      // FilterBank.setHarmonicFactor(WX.random2(1, 8));
+      // FilterBank.setQCoef(WX.random2f(0.8, 1.2));
+      // FilterBank.setGainCoef(WX.random2f(0.99, 1.2));
+      setTimeout(wander, 100);
+    }
+    wander();
+
+    setTimeout(function() {
+      n.start();
+    }, 1000);
+
+    // initiate draw
+    function draw() {
+      requestAnimationFrame(draw);
+      sp.draw();
+    }
+    draw();
+
+    function scale (value, target0, target1) {
+      return (value / 127) * (target1 - target0) + target0;
+    }
+
+    // creates a MIDI target
+    var t = Ktrl.createTarget("mySynth");
+    // activate!
+    t.activate();
+
+    // define user-action for incoming MIDI message
+    t.onData(function (midimessage) {
+      // parse MIDI data with the utility
+      var data = Ktrl.parse(midimessage);
+      //console.log(t.label, data);
+      switch (data.type) {
+        case "noteon":
+          FilterBank.setPitch(data.pitch);
+          break;
+        case "controlchange":
+          switch (data.control) {
+            case 73:
+              FilterBank.setHarmonicFactor(~~(scale(data.value, 8, 1)));
+              break;
+            case 72:
+              FilterBank.setQCoef(scale(data.value, 0.5, 1.5));
+              break;
+            case 91:
+              FilterBank.setGainCoef(scale(data.value, 1.8, 0.9));
+              break;
+            case 92:
+              FilterBank.setSpeed(scale(data.value, 0.05, 0.5));
+              break;
+          }
+          break;
+        case "programchange":
+          switch (data.program) {
+            case 0:
+              FilterBank.setPreset(Presets.Robot);
+              break;
+            case 1:
+              FilterBank.setPreset(Presets.Belly);
+              break;
+            case 2:
+              FilterBank.setPreset(Presets.Organic);
+              break;    
+          }
+      }
+      dmp.textContent = FilterBank.report();
+    });
+
+    // routes sources and targets when the system is ready
+    Ktrl.ready(function () {
+      Ktrl.report();
+      Ktrl.routeAllToTarget(t);
+    });
+
+    var Presets = {
+      Robot: {
+        gainCurveCoef: 0.9, 
+        QCurveCoef: 0.9125984251968503, 
+        ratioFactor: 2
+      },
+      Belly: {
+        gainCurveCoef: 0.8, 
+        QCurveCoef: 0.7, 
+        ratioFactor: 7
+      },
+      Organic: {
+        gainCurveCoef: 1.45748, 
+        QCurveCoef: 0.90944, 
+        ratioFactor: 4
+      }
+    }
+    </script>
+  </body>
+</html>

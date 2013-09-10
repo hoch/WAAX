@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="../lib/UI/UI-light.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <h1>Dist!</h1>
+
+    <canvas id="spectrum" width="900" height="600"></canvas>
+    <div id="container"></div>
+    <canvas id="curve" width="128" height="128"></canvas>
+
+
+    <!-- lib r8 -->
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Utils.js"></script>
+    <script src="../src/core/Builtin.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/generator/Oscil.js"></script>
+    <script src="../src/generator/Fmop.js"></script>
+    <script src="../src/generator/Noise.js"></script>
+    <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/Sampler.js"></script>
+    <script src="../src/generator/Step.js"></script>
+    <script src="../src/processor/Fader.js"></script>
+    <script src="../src/processor/Spatter.js"></script>
+    <script src="../src/processor/ADSR.js"></script>
+    <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Formant.js"></script>
+    <script src="../src/processor/FormantV.js"></script>
+    <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Chorus.js"></script>
+    <script src="../src/processor/Phasor.js"></script>
+    <script src="../src/processor/Dist.js"></script>
+    <script src="../src/processor/Comp.js"></script>
+    <script src="../src/processor/Converb.js"></script>
+    <script src="../src/analyzer/Waveform.js"></script>
+    <script src="../src/analyzer/Spectrum.js"></script>
+    <script src="../src/core/Boot.js"></script>
+    <!-- UI and MIDI -->
+    <script src="../lib/UI/UI.js"></script>
+    <script src="../lib/UI/UISlider.js"></script>
+    <script src="../lib/UI/UIButton.js"></script>
+    <script src="../lib/UI/UIIndexedList.js"></script>
+    <script src="../lib/Ktrl/Ktrl.js"></script>
+
+    <!-- test code -->
+    <script>
+
+      var cvs = document.getElementById('spectrum');
+      var ctx = cvs.getContext('2d');
+      ctx.lineWidth = 1.0;
+      ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";
+      var v1 = WX.Spectrum({ context:ctx, smoothingFactor:0.85, grid:true });
+
+      var smp = WX.Sampler({ source:"../data/samples/fillin.wav", loop:true });
+      var dst = WX.Dist({ type:"saturate", factor:1.5 });
+
+      smp.to(dst).to(WX.DAC);
+      dst.to(v1);
+
+      setTimeout(function () {
+        smp.start(60);
+      }, 1000);
+
+      // initiate draw
+      function draw() {
+        requestAnimationFrame(draw);
+        v1.draw();
+      }
+      draw();
+
+      /**
+       * UI
+       */
+      var section = UI.ControlCenter.createSection("Control", "container");
+      var btn_active = UI.ControlCenter.createControl({
+      type: "button", name: "Active", value: true, mode: "toggle"
+     }, section);
+      var slider_factor = UI.ControlCenter.createControl({
+        type: "slider", name: "Distortion", value: 1.0, min: 0.1, max: 2.0,
+        precision: 4, scale: "linear", unit: ""
+      }, section);
+      var slider_drive = UI.ControlCenter.createControl({
+        type: "slider", name: "Drive", value: 6.0, min: 6.0, max: 36.0,
+        precision: 4, scale: "linear", unit: "dB"
+      }, section);
+      var list_type = UI.ControlCenter.createControl({
+        type: "indexed-list", name: "Curve", value: "saturate",
+        data: ["hardclip", "softclip", "saturate"]
+      }, section);
+
+      btn_active.addAction(function (value) {
+        dst.bypass(!value);
+      });
+      slider_factor.addAction(function (value) {
+        dst.factor(value);
+        drawGraph(dst.getCurve());
+      });
+      slider_drive.addAction(function (value) {
+        dst.drive(WX.db2lin(value));
+        dst.gain(WX.db2lin(-value * 0.4));
+        drawGraph(dst.getCurve());
+      });
+      list_type.addAction(function (value) {
+        dst.curveType(value);
+        drawGraph(dst.getCurve());
+      })
+
+      var cvs2 = document.getElementById('curve');
+      var ctx2 = cvs2.getContext('2d');
+      ctx2.canvas.width = 128;
+      ctx2.canvas.height = 128;
+      ctx2.lineWidth = 1.0;
+      ctx2.strokeStyle = "#f00";
+
+      function drawGraph (curve) {
+        if (curve) {
+          var xoffset = 65535 / 128;
+          ctx2.clearRect(0, 0, 128, 128);
+          ctx2.beginPath();
+          for (var i = 0; i < 128; i++) {
+              ctx2.lineTo(i, 128 * (curve[~~(i * xoffset)] * -0.5 + 0.5));
+          }
+          ctx2.stroke();
+        }
+      }
+      drawGraph();
+
+
+
+    </script>
+  </body>
+</html>

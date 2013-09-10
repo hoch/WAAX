@@ -1,0 +1,290 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="../lib/Ktrl/UI.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <h1>DR Prototyping</h1>    
+
+    <select name="presets" id="dropdown">
+      <option value="1">Preset 1</option>
+      <option value="2">Preset 2</option>
+      <option value="3">Preset 3</option>
+    </select>
+
+    <div class="ktrl-container" id="container" style="width:750px">
+    </div>
+
+    <!-- lib r8 -->   
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Utils.js"></script>
+    <script src="../src/core/Builtin.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/generator/Oscil.js"></script>
+    <script src="../src/generator/Fmop.js"></script>
+    <script src="../src/generator/Noise.js"></script>
+    <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/Sampler.js"></script>
+    <script src="../src/generator/Step.js"></script>
+    <script src="../src/processor/Fader.js"></script>
+    <script src="../src/processor/Spatter.js"></script>
+    <script src="../src/processor/ADSR.js"></script>
+    <script src="../src/processor/AHR.js"></script>
+    <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Formant.js"></script>
+    <script src="../src/processor/FormantV.js"></script>
+    <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Chorus.js"></script>
+    <script src="../src/processor/Phasor.js"></script>
+    <script src="../src/processor/Comp.js"></script>
+    <script src="../src/processor/Converb.js"></script>
+    <script src="../src/analyzer/Waveform.js"></script>
+    <script src="../src/analyzer/Spectrum.js"></script>
+    <script src="../src/core/Boot.js"></script>
+    <script src="../lib/Ktrl/Ktrl.js"></script>
+    <script src="../lib/Ktrl/UI.js"></script>
+    
+    <!-- test code -->
+    <script>    
+
+    var DRVoice = (function (WX) {
+
+      var buffer = null;
+      var bufferReady = false;
+
+      var attack = 0.01;
+      var hold = 0.05;
+      var release = 0.1;
+      var pitch = 60;
+      var basePitch = 60;
+
+      var output = WX.context.createGain();
+
+      function setSource (url) {
+        WX._loadBuffer(url, function (obj) {
+          buffer = obj.buffer;
+          bufferReady = true;
+        });
+      }
+
+      function noteOn (intensity, moment) {
+        var source = WX.context.createBufferSource();
+        var env = WX.context.createGain();
+        source.connect(env);
+        env.connect(output);
+
+        source.buffer = buffer;
+        moment = (moment || WX.now);
+        var prate = Math.pow(2, (pitch - basePitch) / 12);
+        source.playbackRate.setValueAtTime(prate, moment);
+
+        source.start(moment);
+        // source.playbackRate.setValueAtTime(prate, moment);
+        // source.playbackRate.linearRampToValueAtTime(prate + intensity, moment + attack);
+        // source.playbackRate.setValueAtTime(prate + intensity, moment + attack + hold);
+        // source.playbackRate.exponentialRampToValueAtTime(prate, moment + attack + hold + release);
+        env.gain.setValueAtTime(0.0, moment);
+        env.gain.linearRampToValueAtTime(intensity, moment + attack);
+        env.gain.setValueAtTime(intensity, moment + attack + hold);
+        env.gain.exponentialRampToValueAtTime(0.0, moment + attack + hold + release);
+        source.stop(moment + attack + hold + release);
+      }
+
+      function to (unit) {
+        output.connect(unit._inlet);
+        return unit;
+      }
+
+      function setPitch (value) {
+        pitch = value;
+      }
+
+      function setAttack (value) {
+        attack = value;
+      }
+
+      function setHold (value) {
+        hold = value;
+      }
+
+      function setRelease (value) {
+        release = value;
+      }
+
+      return {
+        setSource: setSource,
+        noteOn: noteOn,
+        to: to,
+        setPitch: setPitch,
+        setAttack: setAttack,
+        setHold: setHold,
+        setRelease: setRelease
+      }
+
+    })(WX);
+
+    DRVoice.setSource("../data/samples/snare-1.wav");
+
+    // static elements (channel)
+    var cmp = WX.Comp();
+    var cho = WX.Chorus({ mix:0.0 });
+    var vrb = WX.Converb({ mix:0.0 });
+      
+    DRVoice.to(cmp).to(cho).to(vrb).to(WX.DAC);
+      
+    var pitchSlider = new SliderView("container", 1);
+    var pitchControl = new Control(pitchSlider, "Pitch", "-", 60, 48, 72);
+    var attSlider = new SliderView("container", 4);
+    var attControl = new Control(attSlider, "Attack", "s", 0.01, 0.001, 0.100);
+    var holdSlider = new SliderView("container", 4);
+    var holdControl = new Control(holdSlider, "Hold", "s", 0.05, 0.001, 0.100);
+    var relSlider = new SliderView("container", 4);
+    var relControl = new Control(relSlider, "Release", "s", 0.1, 0.001, 2.0, true);
+    var threSlider = new SliderView("container", 2);
+    var threControl = new Control(threSlider, "Threshold", "dB", -8, -36, 0.0);
+    var makeupSlider = new SliderView("container", 2);
+    var makeupControl = new Control(makeupSlider, "Makeup", "dB", 0.0, 0.0, 12.0);
+    var choSlider = new SliderView("container", 2);
+    var choControl = new Control(choSlider, "Chorus", "-", 0.0, 0.0, 1.0);
+    var verbSlider = new SliderView("container", 2);
+    var verbControl = new Control(verbSlider, "Reverb", "-", 0.0, 0.0, 1.0);
+    
+    pitchControl.onchange = function (value) {
+      DRVoice.setPitch(value);
+    }
+    attControl.onchange = function (value) {
+      DRVoice.setAttack(value);
+    }
+    holdControl.onchange = function (value) {
+      DRVoice.setHold(value);
+    }
+    relControl.onchange = function (value) {
+      DRVoice.setRelease(value);
+    }
+    threControl.onchange = function (value) {
+      cmp.threshold(value, WX.now+0.02, "l");
+    }
+    makeupControl.onchange = function (value) {
+      cmp.makeup(value, WX.now+0.02, "l");
+    }
+    choControl.onchange = function (value) {
+      cho.mix(value, WX.now+0.02, "l");
+    }
+    verbControl.onchange = function (value) {
+      vrb.mix(value, WX.now+0.02, "l");
+    }
+
+    pitchControl.setValue(61.0);
+    attControl.setValue(0.003);
+    holdControl.setValue(0.045);
+    relControl.setValue(0.06);
+    threControl.setValue(-4);
+    makeupControl.setValue(4.0);
+    choControl.setValue(0.0);
+    verbControl.setValue(0.0);
+
+    var routeMap = {
+      7: [pitchControl],
+      10: [attControl],
+      74: [holdControl],
+      71: [relControl]
+    };
+
+    // controlCallback => MIDILearn ready
+    // get control number => change routemap => stop MIDI learn
+    
+    var targetControl = null;
+    var MIDILearnMode = false;
+
+    function startMIDILearn (which) {
+      MIDILearnMode = true;
+      targetControl = which;
+    }
+    function endMIDILearn () {
+      MIDILearnMode = false; 
+      if (targetControl) {
+        targetControl.targetView.toggleMIDILearn();
+        targetControl = null;
+      }
+    }
+
+    var targetWPC60 = Ktrl.createTarget("WPC60");
+    targetWPC60.onData(function (midimessage) {
+      var data = Ktrl.parse(midimessage);
+      //console.log(targetWPC60.label, data);
+      switch (data.type) {
+        case "noteon":
+          DRVoice.noteOn(Ktrl.CurveCubed(data.velocity), WX.now);
+          break;
+        case "controlchange":
+          if (MIDILearnMode && targetControl) {
+            // find and delete targetControl from routeMap
+            for (var r in routeMap) {
+              var idx = routeMap[r].indexOf(targetControl);
+              if (idx !== -1) {
+                routeMap[r].splice(idx, 1);    
+              }
+            }
+            // and add to map on new cc number
+            if (typeof routeMap[data.control] === 'undefined') {
+              routeMap[data.control] = new Array();
+            } 
+            routeMap[data.control].push(targetControl);
+            endMIDILearn();
+          } else {
+            if (routeMap[data.control]) {
+              var targets = routeMap[data.control];
+              for (var i = 0; i < targets.length; ++i) {
+                targets[i].setNormValue(Ktrl.CurveLinear(data.value));
+              }
+            }  
+          }
+          break;
+      }
+    });
+
+    Ktrl.ready(function () {
+      Ktrl.routeAllToTarget(targetWPC60);
+      targetWPC60.activate();
+    });
+
+    var dd = document.getElementById('dropdown');
+    dd.onchange = function (e) {    
+      switch (e.target.value) {
+        case "1":
+          pitchControl.setValue(61.0);
+          attControl.setValue(0.003);
+          holdControl.setValue(0.045);
+          relControl.setValue(0.06);
+          threControl.setValue(-4);
+          makeupControl.setValue(4.0);
+          choControl.setValue(0.0);
+          verbControl.setValue(0.0);
+          break;
+        case "2":
+          pitchControl.setValue(60.0);
+          attControl.setValue(0.001);
+          holdControl.setValue(0.1);
+          relControl.setValue(0.001);
+          threControl.setValue(-12);
+          makeupControl.setValue(6.0);
+          choControl.setValue(0.5);
+          verbControl.setValue(0.9);
+          break;
+        case "3":
+          pitchControl.setValue(48.0);
+          attControl.setValue(0.1);
+          holdControl.setValue(0.3);
+          relControl.setValue(1.5);
+          threControl.setValue(-2);
+          makeupControl.setValue(2.0);
+          choControl.setValue(0.9);
+          verbControl.setValue(0.0);
+          break;
+      }
+    }
+
+    </script>
+  </body>
+</html>

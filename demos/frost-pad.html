@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="static/demos.css" rel="stylesheet" type="text/css">
+    <link href="../lib/UI/UI-light.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    
+    <div class="c-demohome"><a href="index.html">Index</a></div>
+    <h1>Frost Pad</h1>
+
+    <div class="c-body-wrapper" id="i-container">
+      <h2>Audio Signal Flow</h2>
+      <ul class="c-signalflow">
+        <li>White Noise (Gaussian)</li> <li class="separator"></li>
+        <li>Filterbank</li> <li class="separator"></li>
+        <li>ADSR</li> <li class="separator"></li>
+        <li>Chorus</li> <li class="separator"></li>
+        <li>Pingpong</li> <li class="separator"></li>
+        <li>Converb</li> <li class="separator"></li>
+        <li>DAC</li>
+      </ul>
+      <h2>MIDI Signal Flow</h2>
+      <ul class="c-signalflow">
+        <li>MIDI</li> <li class="separator"></li>
+        <li>Monophonic Behavior</li> <li class="separator"></li>
+        <li>ADSR</li>
+      </ul>
+      <h2>MIDI Control Map</h2>
+      <ul class="c-controlmap">
+        <li>
+          <dt>Modulation (CC1)</dt><dd>Next Scale (Ionian, Lydian, Aeolian, Mixolydian)</dd>
+          <dt>Modulation (CC7)</dt><dd>Filter Bandwidth</dd>
+          <dt>Modulation (CC10)</dt><dd>Filter Gain Balance</dd>
+          <dt>Modulation (CC74)</dt><dd>Filter Frequency Detune</dd>
+          <dt>Modulation (CC71)</dt><dd>Master Gain</dd>
+        </li>
+      </ul>
+      <br>
+      <canvas id="sp" width="800" height="400"></canvas>
+    </div>
+
+    <!-- lib r8 -->   
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Utils.js"></script>
+    <script src="../src/core/Builtin.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/generator/Oscil.js"></script>
+    <script src="../src/generator/Fmop.js"></script>
+    <script src="../src/generator/Noise.js"></script>
+    <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/Sampler.js"></script>
+    <script src="../src/generator/Step.js"></script>
+    <script src="../src/processor/Fader.js"></script>
+    <script src="../src/processor/Spatter.js"></script>
+    <script src="../src/processor/ADSR.js"></script>
+    <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Filterbank.js"></script>
+    <script src="../src/processor/Formant.js"></script>
+    <script src="../src/processor/FormantV.js"></script>
+    <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Chorus.js"></script>
+    <script src="../src/processor/Phasor.js"></script>
+    <script src="../src/processor/Comp.js"></script>
+    <script src="../src/processor/Converb.js"></script>
+    <script src="../src/analyzer/Waveform.js"></script>
+    <script src="../src/analyzer/Spectrum.js"></script>
+    <script src="../src/core/Boot.js"></script>
+    <!-- Ktrl -->
+    <script src="../lib/Ktrl/Ktrl.js"></script>
+    <script src="../lib/UI/UI.js"></script>
+    <script src="../lib/UI/UISlider.js"></script>
+    <script src="../lib/UI/UIButton.js"></script>
+    <script src="../lib/UI/UIIndexedList.js"></script>
+    <!-- test code -->
+    
+    <script>
+      var cvs = document.getElementById('sp');
+      var ctx = cvs.getContext('2d');
+      var dmp = document.getElementById('preset');
+
+      var source = WX.Noise();
+      var bank = WX.Filterbank({ gain: 2.0 });
+      var adsr = WX.ADSR();
+      var cho = WX.Chorus({ mix: 0.5 });
+      var pong = WX.Pingpong({ 
+        delayTimeLeft: 0.600, delayTimeRight: 0.450, 
+        feedbackLeft: 0.3, feedbackRight: 0.5, crosstalk: 0.25 
+      });
+      var vrb = WX.Converb({ source:"../data/PADS-10/ir/960-BigEmptyChurch.wav", mix: 0.5 });
+      var sp = WX.Spectrum({ context:ctx, smoothingFactor:0.8, grid:true });
+
+      source.to(bank).to(adsr).to(pong).to(cho).to(vrb).to(WX.DAC);
+      adsr.to(sp);
+
+      WX.DAC.db = 6;
+      adsr.adsr(0.5, 1.0, 0.5, 2.0);
+
+      // initiate draw
+      function draw() {
+        requestAnimationFrame(draw);
+        sp.draw();
+      }
+      draw();
+      
+      // define user-action for incoming MIDI message
+      var nextChord = 1;
+      var _keyState = [];
+      var t = Ktrl.createTarget("mySynth");
+      t.onData(function (midimessage) {
+        // parse MIDI data with the utility
+        var data = Ktrl.parse(midimessage);
+        //console.log(t.label, data);
+        switch (data.type) {
+          case "noteon":
+            bank.pitch(data.pitch);
+            bank.chord(nextChord);
+            adsr.noteOn();
+            _keyState[data.pitch] = true;
+            break;
+          case "noteoff":
+            _keyState[data.pitch] = false;
+            if (_keyState.indexOf(true) > -1) {
+            } else {
+              adsr.noteOff();
+            }
+            break;
+          case "controlchange":
+            switch (data.control) {
+              case 1:
+                nextChord = ~~Ktrl.scale(Ktrl.CurveLinear(data.value), 1, 4.99); 
+                break;
+              case 7:
+                bank.width(Ktrl.scale(Ktrl.CurveLinear(data.value)));
+                break;
+              case 10:
+                bank.slope(Ktrl.scale(Ktrl.CurveLinear(data.value)));
+                break;
+              case 74:
+                bank.detune(Ktrl.scale(Ktrl.CurveSquared(data.value)));
+                break;
+              case 71:
+                bank.gain(Ktrl.scale(Ktrl.CurveLinear(data.value)) * 2.0, WX.now + 0.04, "l");
+                break;
+            }
+            break;
+          case "programchange":
+            switch (data.program) {
+            }
+        }
+      });
+
+      // routes sources and targets when the system is ready
+      Ktrl.ready(function () {
+        Ktrl.report();
+        Ktrl.routeAllToTarget(t);
+        t.activate();
+      });
+    </script>
+  </body>
+</html>

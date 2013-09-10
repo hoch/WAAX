@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Pink!</h1>
+
+    <canvas id="wf" width="900" height="600"></canvas>
+
+    <input id="rolloff" type="range" min="-18" max="-3" step="0.5" value="-3" style="width: 400px;">
+    <div id="sliderlabel"></div>
+    
+    <!-- lib r8 -->   
+    <script src="../src/core/Monkey.js"></script>
+    <script src="../src/core/WAAX.js"></script>
+    <script src="../src/core/Utils.js"></script>
+    <script src="../src/core/Builtin.js"></script>
+    <script src="../src/core/Unit.js"></script>
+    <script src="../src/generator/Oscil.js"></script>
+    <script src="../src/generator/Fmop.js"></script>
+    <script src="../src/generator/Noise.js"></script>
+    <script src="../src/generator/ITrain.js"></script>
+    <script src="../src/generator/Sampler.js"></script>
+    <script src="../src/generator/Step.js"></script>
+    <script src="../src/processor/Fader.js"></script>
+    <script src="../src/processor/Spatter.js"></script>
+    <script src="../src/processor/ADSR.js"></script>
+    <script src="../src/processor/Filter.js"></script>
+    <script src="../src/processor/Formant.js"></script>
+    <script src="../src/processor/FormantV.js"></script>
+    <script src="../src/processor/Pingpong.js"></script>
+    <script src="../src/processor/Chorus.js"></script>
+    <script src="../src/processor/Phasor.js"></script>
+    <script src="../src/processor/Comp.js"></script>
+    <script src="../src/processor/Converb.js"></script>
+    <script src="../src/analyzer/Waveform.js"></script>
+    <script src="../src/analyzer/Spectrum.js"></script>
+    <script src="../src/core/Boot.js"></script>
+    
+    <!-- test code -->
+    <script>
+      var cvs = document.getElementById('wf');
+      var ctx = cvs.getContext('2d');
+      ctx.lineWidth = 1.0;
+      var strokeStyle1 = "rgba(255, 0, 0, 0.5)",
+          strokeStyle2 = "rgba(0, 255, 0, 0.5)";
+
+      var n = WX.Noise({ rate:1.0, gain:1.0 }),
+          p = WX.Sampler({ source:"../data/samples/pink.wav", loop:true }),
+          sin = WX.Oscil(),
+          v1 = WX.Spectrum({ context:ctx, autoClear:false, smoothingFactor:0.85, grid:true }),
+          v2 = WX.Spectrum({ context:ctx, autoClear:false, smoothingFactor:0.99 });
+
+      setTimeout(function() {
+        p.start(60);
+      }, 1000);
+
+      s = [];
+      // hand-tuned pinky filter 
+       //prm = [[10, 0], [200, -6], [800, -7.5], [4000, -6.5], [13000, -3.5], [22900, -50]];
+      prm = [[1000, 0], [2000, -6], [8000, -7.5], [4000, -6.5], [13000, -3.5], [22900, -50]];
+      //prm = [[1, 0], [50, -6], [500, -7.5], [5000, -6.5], [10000, -3.5], [20000, -50]];
+      var num = prm.length;
+      for (var i = 0; i < num; i++) {
+        s[i] = WX.context.createBiquadFilter();
+        s[i].type = "highshelf";
+        s[i].frequency.setValueAtTime(prm[i][0], WX.now);
+        s[i].gain.setValueAtTime(prm[i][1], WX.now);
+      }
+      for (i = 0; i < num - 1; i++) {
+        s[i].connect(s[i+1]);
+      }
+
+      // NOTE: this makes a pop
+      function setSlope (gain) {
+        for (var i = 0; i < num - 1; i++) {
+          //s[i].frequency.value = freq;
+          s[i].gain.linearRampToValueAtTime(gain, WX.now+0.1);
+        }
+      }
+      var slider = document.getElementById('rolloff');
+      var label = document.getElementById('sliderlabel');
+      slider.onchange = function () {
+        setSlope(slider.value);
+        label.textContent = slider.value + "dB";
+      };
+
+      var toggle = false;
+      function ab() {
+        toggle = !toggle;
+        n.gain(toggle ? 1.0 : 0.0);
+        p.gain(toggle ? 0.0 : 1.0);
+      }
+
+      function all() {
+        n.gain(1.0);
+        p.gain(1.0);
+      }
+      
+      // notch = WX.context.createBiquadFilter();
+      // notch.type = "notch";
+      // notch.frequency.value = 22000;
+      // notch.Q.value = 0.25;
+      
+      n.connect(s[0]);
+      // s[num-1].connect(notch);
+      // notch.connect(WX.DAC._inlet);
+      // notch.connect(v1._inlet);
+
+      s[num-1].connect(WX.DAC._inlet);
+      s[num-1].connect(v1._inlet);
+
+      p.to(v2);
+      p.to(WX.DAC);
+      WX.DAC.db(-12);
+      WX.DAC.type("mono");
+
+      // p
+      //   .gain(1.0)
+      //   .gain(0.0, 4.0)
+      //   .gain(1.0, 8.0);
+      // n
+      //   .gain(0.0)
+      //   .gain(1.0, 4.0)
+      //   .gain(0.0, 8.0)
+      //   .gain(1.0, 12.0);
+
+      // initiate draw
+      function draw() {
+        requestAnimationFrame(draw);
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.strokeStyle = strokeStyle1;
+        v1.draw();
+        ctx.strokeStyle = strokeStyle2;
+        v2.draw();
+      }
+      draw();
+
+      ab();
+
+    </script>
+
+  </body>
+</html>
