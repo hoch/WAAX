@@ -39,7 +39,7 @@
       </ul>
     </div>
 
-    <!-- lib r8 -->   
+    <!-- lib r8 -->
     <script src="../src/core/WAAX.js"></script>
     <script src="../src/core/Utils.js"></script>
     <script src="../src/core/Builtin.js"></script>
@@ -67,24 +67,24 @@
     <script src="../src/core/Boot.js"></script>
     <!-- Ktrl -->
     <script src="../lib/Ktrl/Ktrl.js"></script>
-    
+
     <script>
-      
+
       // master out
       var chor = WX.Chorus({ mix:0.1 });
-      var pong = WX.Pingpong({ 
+      var pong = WX.Pingpong({
           mix:0.1, delayTimeLeft: 0.160, delayTimeRight: 0.480,
           feedbackLeft: 0.5, feedbackRight: 0.25 });
       var verb = WX.Converb({ mix: 0.4, source:"../data/PADS-10/ir/960-LargePlate.wav" });
       chor.to(pong).to(verb).to(WX.DAC);
-      
+
       // fm vars
       var HR = 2;
       var MI1 = 8;
       var BAL = 0.5;
       var SUS = 0.4;
       var REL = 1.0;
-      
+
       function Voice (pitch, velo) {
         // dynamic node creation
         var fund = WX.pitch2freq(pitch);
@@ -102,8 +102,8 @@
 
       Voice.prototype = {
         noteon: function (velo) {
-          this._fm1.start(time);
-          this._fm2.start(time);
+          this._fm1.start(WX.now);
+          this._fm2.start(WX.now);
           this._fm1.harmRatio(HR).modIndex(MI1).modIndex(0.1, WX.now+1.5, "x");
           this._fm2.harmRatio(HR).modIndex(MI1 * 0.5).modIndex(0.5, WX.now+1.5, "x");
           this._env.gain(velo).noteOn();
@@ -114,7 +114,7 @@
           this._env.noteOff();
         }
       }
-      
+
       var _voices = [];
 
       // key input handler
@@ -141,14 +141,14 @@
             if (_voices[data.pitch]) {
               return;
             } else {
-              MI1 = Ktrl.scale(Ktrl.CurveSquared(data.velocity), 1, 10); 
+              MI1 = Ktrl.scale(Ktrl.CurveSquared(data.velocity), 1, 10);
               _voices[data.pitch] = new Voice(data.pitch, Ktrl.scale(Ktrl.CurveLinear(data.velocity), 0, 1.5));
             }
             break;
           case "noteoff":
             if (_voices[data.pitch]) {
               _voices[data.pitch].noteoff();
-              _voices[data.pitch] = null;  
+              _voices[data.pitch] = null;
             }
             break;
           case "controlchange":
@@ -180,7 +180,7 @@
                 verb.mix(Ktrl.scale(Ktrl.CurveLinear(data.value)), WX.now+0.05);
                 //WX.DAC.gain(Ktrl.scale(Ktrl.CurveLinear(data.value), 0, 1), WX.now+0.1, "l");
                 break;
-              
+
             }
             break;
         }
