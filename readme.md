@@ -4,13 +4,13 @@ WAAX (Web Audio API eXtension)
 
 ### Please Note! ###
 
-Currently I am working on the _documentation_ which you will not find in the current repository. Sorry for your inconvenience and I will update the project as soon as possible. 
+The newer version of library (r12) will be pushed around the early October and it will include various enhancements and extra elements: **Web MIDI API support, Polymer-powered musical UI widgets, and a couple of impressive examples**. Stay tuned!
 
-This project is still in the early stage, thus I do not recommend to use this for the serious production until it reaches revision 10. If you find anything awkward or problematic, please submit the issue [here][23].
+The information below is for the previous revision (r5) and will be deprecated with the release of the newer revision (r12) since it is a major update of library including several fundamental changes. Sorry for your inconvineince!
 
 ### Quick links ###
-* [WX-IDE][6] 
-* [NIME 2013 Paper][21] 
+* [WX-IDE][6]
+* [NIME 2013 Paper][21]
 * [CCRMA Colloquium 2013 Slides][22]
 
 ### Table of Contents ###
@@ -20,8 +20,8 @@ This project is still in the early stage, thus I do not recommend to use this fo
   * [Creating Units](#creating-units)
   * [Making Connections](#making-connections)
   * [Setting Parameters](#setting-parameters)
-  * [Visualization](#visualization) 
-  * [Sample-accurate Looping](#sample-accurate-looping) 
+  * [Visualization](#visualization)
+  * [Sample-accurate Looping](#sample-accurate-looping)
   * [GUI](#gui)
 
 
@@ -67,7 +67,7 @@ Demo
 Requirements: **Google Chrome 20+** on any platform (Win/OSX/Linux). You can check the availability of the API in different web browsers [here](http://caniuse.com/audio-api).
 
  * **[mini-IDE][6]** (which includes all the examples below)
-  * [Hello WAAX][15] 
+  * [Hello WAAX][15]
   * [WAAX does THX][10]
   * [Acidic Bassline][11]
   * [Simple Drum Sampler][12]
@@ -124,7 +124,7 @@ node.connect(comp._inlet);
 The connection from a WAAX unit to Web Audio API node can be done by `.connect()` method, which is the same method in Web Audio API, but the connection from a node to a unit should be done manually with `._inlet` node from a unit. This enables to use the library in conjunction with plain Web Audio API codes.
 
 
-### Setting Parameters 
+### Setting Parameters
 
 _note: this will be changed in the next revision._
 
@@ -177,8 +177,8 @@ Triggering events with super-accurate timing is a quite involved task on the web
 // div for UI panel
 var panel = document.getElementById("wx-uipanel");
 // a knob
-var ka = new WX.UIKnob({ 
-  targetDiv:panel, label:"Attack", 
+var ka = new WX.UIKnob({
+  targetDiv:panel, label:"Attack",
   x:250, y:485, offset: 0.001, scale: 0.5, value: 0.2
 });
 // targeting an attack parameter in an ADSR unit
@@ -199,7 +199,7 @@ As WAAX is in early stages of development, there are several components (which a
 `WX.ADSR` `WX.ModLPF` `WX.LPF` `WX.TwinDelay` `WX.ConVerb` `WX.Comp` `WX.C2`
 
 ### Analyzers
-`WX.Waveform` `WX.Spectrum` `WX.Visualizer` 
+`WX.Waveform` `WX.Spectrum` `WX.Visualizer`
 
 ### GUI
 `WX.UISliderH` `WX.UISliderV` `WX.UIKnob`
