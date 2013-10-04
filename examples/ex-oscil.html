@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Kitchen Sink r12</h1>
+
+    <!-- lib r12 -->
+    <script src="../src/WAAX.js"></script>
+    <script src="../src/Fader.js"></script>
+    <script src="../src/Oscil.js"></script>
+    <script src="../src/ADSR.js"></script>
+    <!--<script src="../src/Noise.js"></script>
+    <script src="../src/Sampler.js"></script>
+    <script src="../src/LPF.js"></script>
+    <script src="../src/FilterBank.js"></script>
+    <script src="../src/Pingpong.js"></script>
+    <script src="../src/Comp.js"></script>
+    <script src="../src/Saturator.js"></script>-->
+
+    <!-- test code -->
+    <script>
+
+    var uOSC = WX.Oscil({ pType: "sine", pFreq: 7, pGain: 0.5 });
+    var uOSC2 = WX.Oscil({ pType: "sine", pGain: 0.25 });
+    uOSC.control(uOSC2, 'pGain');
+    // WX.patch(uOSC2, WX.DAC);
+
+    // ADSR, Chorus needs to be tested.
+
+    </script>
+
+  </body>
+</html>

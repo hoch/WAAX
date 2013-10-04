@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>WAAX.DOC</title>
+
+    <link type="text/css" rel="stylesheet" href="assets/css/reset.css">
+    <link type="text/css" rel="stylesheet" href="http://yandex.st/highlightjs/6.1/styles/sunburst.min.css">
+    <link type="text/css" rel="stylesheet" href="assets/css/docs.css">
+    <link type="text/css" rel="stylesheet" href="assets/css/print.css" media="print">
+    <link type="text/css" rel="stylesheet" href="src/waax-doc-base.css">
+
+    <script type="text/javascript" src="assets/js/jquery-1.10.1.min.js"></script>
+    <script type="text/javascript" src="http://yandex.st/highlightjs/6.1/highlight.min.js"></script>
+    <script type="text/javascript" src="assets/js/lunr.min.js"></script>
+
+    
+
+    <script type="text/javascript">var BASE_URL = "";</script>
+    <script type="text/javascript" src="assets/js/viewer.js"></script>
+
+    
+</head>
+<body>
+    <div id="page">
+        <a name="top" />
+        <header id="header">
+            <h1><a href="">WAAX.DOC</a></h1>
+        </header>
+        
+
+<div id="sidebar">
+    <form action="search.html"><input id="search" type="text" placeholder="Search" name="q" /></form>
+    <nav id="toc">
+        
+    <ol>
+    
+        <li>
+            <a href="what-is-waax.html#what-is-waax">What is WAAX?</a>
+            
+        </li>
+    
+        <li>
+            <a href="getting-started.html#getting-started">Getting Started</a>
+            
+        </li>
+    
+        <li>
+            <a href="parameter-control.html#parameter-control">Parameter Control</a>
+            
+        </li>
+    
+        <li>
+            <a href="mui.html#mui-musical-user-interface">MUI (Musical User Interface)</a>
+            
+        </li>
+    
+        <li>
+            <a href="midi.html#using-midi">Using MIDI</a>
+            
+        </li>
+    
+        <li>
+            <a href="unit-reference.html#unit-reference">Unit Reference</a>
+            
+        </li>
+    
+        <li>
+            <a href="license-and-acknowledgement.html#license-acknowledgement">License &amp; Acknowledgement</a>
+            
+        </li>
+    
+</ol>
+
+    </nav>
+    
+    <nav id="links">
+        <ul>
+            
+        </ul>
+    </nav>
+    
+</div>
+
+        <div id="content">
+            <a name="what-is-waax"></a><h1>What is WAAX?</h1>
+<a name="introduction"></a><h2>Introduction</h2>
+<p>WAAX (Web Audio API eXtension) is a JavaScript library built on top of Web Audio/MIDI API to facilitate audio programming on Blink-based web browsers - <em>Chrome, Chrome Canary and Chromium</em>.</p>
+<p>Although Web Audio API provides web devlopers with the unprecedent ability to generate sound on the web browser without additional plug-ins, building a full-blown music application with it still requires vast experience in digital audio, sound synthesis and even acoustics.</p>
+<p>Secondly, an audio programmer who is not familiar with the recent web techonologies will be lost in the workflow of web development spending a fair amount time to establish the environment to work on.</p>
+<p>The ultimate goal of this project is to fill the gap between two opposite ends:  helping web developers to create music software without the expertise on sound synthesis and signal processing, and offering an instant boilerplate for rapid development of web-based applications to audio programmers.</p>
+<a name="features"></a><h2>Features</h2>
+<ul>
+<li>Unit: production-ready sound generators, processors and visualizers</li>
+<li>Terse and flexible API design</li>
+<li>MUI (Musical User Interface) elements powered by Polymer</li>
+<li>Tight integration with Web MIDI API</li>
+<li>Demos, examples and documentation</li>
+</ul>
+<a name="cross-browser-support-as-of-92013"></a><h2>Cross-Browser Support <small>(as of 9.2013)</small></h2>
+<p><strong>Web Audio API</strong>: currently WAAX only supports Blink-based browsers (Chrome, Chrome Canary, and Chromium). Except for IE, supporting all the major web browsers is a top prirority on the roadmap of this project. Polyfills for Safari and FireFox will be patched up in the near future.</p>
+<p><strong>Web MIDI API</strong>: Chromium and Chrome Canary (31+) on OSX are the only web browsers that support the native MIDI I/O. It will take a while until it lands on Chrome stable and the support from Safari and FireFox is not clear at the moment.</p>
+<a name="cross-platform-support-as-of-92013"></a><h2>Cross-Platform Support <small>(as of 9.2013)</small></h2>
+<p>The audio/MIDI subsystem on different platforms significantly varies. Thanks to CoreAudio and CoreMIDI, the current implementation of Blink-based browsers on OSX uses 128 samples of audio buffer size (with the expected latency around 3ms, fixed and non-user-configurable) and it also comes with the solid support on Web MIDI API on Chrome Canary.</p>
+<p>On the other hand, the land of Windows, Linux and Android will suffer from several issues: high latency, buffer underun over time, and no love on MIDI support. This is simply because these platforms do not provide a viable audio/MIDI subsystem for optimum performance. For cross-platform isseus, please leave your feedback on the WAAX wiki on GitHub.</p>
+
+
+
+
+        </div>
+        <footer id="footer">
+            Powered by <a href="http://github.com/maximebf/beautiful-docs">beautiful-docs</a> -
+            <a href="#top">Back to top</a> - <a href="all.html">Everything on a single page</a>
+            - <a href="?print=1">Print current page</a> - <a href="all.html?print=1">Print all pages</a>
+            
+        </footer>
+    </div>
+</body>
+</html>

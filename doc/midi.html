@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>WAAX.DOC</title>
+
+    <link type="text/css" rel="stylesheet" href="assets/css/reset.css">
+    <link type="text/css" rel="stylesheet" href="http://yandex.st/highlightjs/6.1/styles/sunburst.min.css">
+    <link type="text/css" rel="stylesheet" href="assets/css/docs.css">
+    <link type="text/css" rel="stylesheet" href="assets/css/print.css" media="print">
+    <link type="text/css" rel="stylesheet" href="src/waax-doc-base.css">
+
+    <script type="text/javascript" src="assets/js/jquery-1.10.1.min.js"></script>
+    <script type="text/javascript" src="http://yandex.st/highlightjs/6.1/highlight.min.js"></script>
+    <script type="text/javascript" src="assets/js/lunr.min.js"></script>
+
+    
+
+    <script type="text/javascript">var BASE_URL = "";</script>
+    <script type="text/javascript" src="assets/js/viewer.js"></script>
+
+    
+</head>
+<body>
+    <div id="page">
+        <a name="top" />
+        <header id="header">
+            <h1><a href="">WAAX.DOC</a></h1>
+        </header>
+        
+
+<div id="sidebar">
+    <form action="search.html"><input id="search" type="text" placeholder="Search" name="q" /></form>
+    <nav id="toc">
+        
+    <ol>
+    
+        <li>
+            <a href="what-is-waax.html#what-is-waax">What is WAAX?</a>
+            
+        </li>
+    
+        <li>
+            <a href="getting-started.html#getting-started">Getting Started</a>
+            
+        </li>
+    
+        <li>
+            <a href="parameter-control.html#parameter-control">Parameter Control</a>
+            
+        </li>
+    
+        <li>
+            <a href="mui.html#mui-musical-user-interface">MUI (Musical User Interface)</a>
+            
+        </li>
+    
+        <li>
+            <a href="midi.html#using-midi">Using MIDI</a>
+            
+        </li>
+    
+        <li>
+            <a href="unit-reference.html#unit-reference">Unit Reference</a>
+            
+        </li>
+    
+        <li>
+            <a href="license-and-acknowledgement.html#license-acknowledgement">License &amp; Acknowledgement</a>
+            
+        </li>
+    
+</ol>
+
+    </nav>
+    
+    <nav id="links">
+        <ul>
+            
+        </ul>
+    </nav>
+    
+</div>
+
+        <div id="content">
+            <a name="using-midi"></a><h1>Using MIDI</h1>
+<p><strong>NOTE!</strong> MIDI support in WAAX requires Web MIDI API, which is only available on Chrome Canary on OSX at the time of writing.</p>
+<p>This section describes how to program MIDI functionalities in conjuntion with WAAX library. Before launching the browser, MIDI-compatible device (MIDI controller or MIDI interface) needs to be connected to the computer and the proper device driver should be installed. Otherwise you will have to restart the browser to get MIDI devices recognized.</p>
+<a name="importing-midi-supprot"></a><h2>Importing MIDI Supprot</h2>
+<p>If you are using the minified version of WAAX, you do not need to do anything further because the MIDI library is already enclosed. However, if you are selectivly importing WAAX components, the MIDI manager, <code>Ktrl.js</code>, should be included in the HTML document. (replace <code>waax_path</code> with the local WAAX directory.)</p>
+<pre><code>&lt;script src=&quot;waax_path/Ktrl.js&quot;&gt;&lt;/script&gt;</code></pre>
+<a name="creating-midi-target-and-data-handler"></a><h2>Creating MIDI Target and Data Handler</h2>
+<p><code>Ktrl.js</code> offers highly flexible MIDI data routing by abstracting physical and virtual MIDI devices. In order to route MIDI data to a certain destination, a MIDI target must be created.</p>
+<pre><code>var midiTarget = Ktrl.createTarget(&quot;mySynth&quot;);
+midiTarget.activate();</code></pre>
+<p>The next step is to design MIDI data handler for the newly created <code>midiTarget</code> instance. Use <code>.onData()</code> method to define the data handler. Programming the data handler is much easier than dealing with raw MIDI data bytes since the <code>.parse()</code> method transforms the raw data into human-readable form.</p>
+<pre><code>midiTarget.onData(function (midimessage) {
+  var data = Ktrl.parse(midimessage);
+  switch (data.type) {
+    case &quot;noteon&quot;:
+      console.log(data.pitch, data.velocity);
+      break;
+    // more handling code...
+  }
+});</code></pre>
+<a name="routing-midi-data"></a><h2>Routing MIDI data</h2>
+<p>With the data handler, now we are ready to use the MIDI target for the incoming MIDI data. The final step of MIDI programming is routing MIDI inputs to the MIDI targets. Like the MIDI system in common digital audio workstation, <code>Ktrl.js</code> provides an aggregated input device; regardless of the number of devices connected to the system, it can be treated as a single virtual MIDI input device.</p>
+<pre><code>Ktrl.ready(function () {
+  Ktrl.routeAllToTarget(midiTarget);
+});</code></pre>
+<p>This is a safe bet for common usage since whatever MIDI device connected to the system, it will be used by the HTML document without specifying the reference of MIDI device. Alternatively, you can create individual routings as shown below.</p>
+<pre><code>Ktrl.ready(function () {
+  Ktrl.routeSourceToTarget(1, midiTarget);
+});</code></pre>
+<p>The code above demonstrates how to connect the second MIDI device to the web audio synth (MIDI target). However, if the computer does not have the second MIDI device, it will throw an error.</p>
+<p>For the API reference, please visit <a href="https://github.com/hoch/Ktrl">the project page</a>.</p>
+
+
+
+
+        </div>
+        <footer id="footer">
+            Powered by <a href="http://github.com/maximebf/beautiful-docs">beautiful-docs</a> -
+            <a href="#top">Back to top</a> - <a href="all.html">Everything on a single page</a>
+            - <a href="?print=1">Print current page</a> - <a href="all.html?print=1">Print all pages</a>
+            
+        </footer>
+    </div>
+</body>
+</html>

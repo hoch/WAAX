@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WAAX: FM Keys</title>
+    <!-- lib r12 -->
+    <script src="../src/WAAX.js"></script>
+    <script src="../src/Fader.js"></script>
+    <script src="../src/FMop.js"></script>
+    <script src="../src/ADSR.js"></script>
+    <script src="../src/Chorus.js"></script>
+    <script src="../src/Pingpong.js"></script>
+    <script src="../src/Converb.js"></script>
+    <script src="../src/Ktrl.js"></script>
+    <!-- mui -->
+    <script src="../mui/lib/polymer.min.js"></script>
+    <script src="../mui/mui-core.js"></script>
+    <link rel="import" href="../mui/elements/mui-knob.html">
+    <link rel="stylesheet" type="text/css" href="../mui/mui-core.css">
+    <!-- example base -->
+    <link rel="stylesheet" type="text/css" href="css/examples-base.css">
+  </head>
+  <body>
+
+    <div class="c-header">
+      <span class="c-nav"><a href="../index.html">index</a> / <a href="index.html">examples</a></span>
+      <h1>FM Keys</h1>
+    </div>
+
+    <div class="c-content">
+      <p>Audio Signal Flow</p>
+      <ul class="c-signalflow">
+        <li>FMop (Dynamic)</li> <li class="separator"></li>
+        <li>ADSR (Dynamic)</li> <li class="separator"></li>
+        <li>Chorus</li> <li class="separator"></li>
+        <li>Pingpong</li> <li class="separator"></li>
+        <li>Converb</li> <li class="separator"></li>
+        <li>DAC</li>
+      </ul>
+      <p>MIDI Signal Flow</p>
+      <ul class="c-signalflow">
+        <li>MIDI</li> <li class="separator"></li>
+        <li>Fmop</li> <li class="separator"></li>
+        <li>ADSR</li>
+      </ul>
+      <p>Control</p>
+      <div class="c-mui-panel">
+        <div class="c-mui-section">
+          <h2>FM</h2>
+          <!-- <mui-knob id="kHarmonicRatio" label="Harmonic" value="6.0" min="0.01" max="60.0"></mui-knob>
+          <mui-knob id="kModulationIndex" label="Mod Index" value="1.0" min="0.0" max="2.0"></mui-knob> -->
+          <mui-knob id="kBalance" label="Balance" value="0.0" min="0.0" max="1.0"></mui-knob>
+        </div>
+        <div class="c-mui-section">
+          <h2>Envelope</h2>
+          <mui-knob id="kSustain" label="Sustain" value="0.65" min="0.0" max="1.0"></mui-knob>
+          <mui-knob id="kRelease" label="Release" value="2.0" min="0.0" max="4.0"></mui-knob>
+        </div>
+        <div class="c-mui-section">
+          <h2>Delay</h2>
+          <mui-knob id="kDlyTimeL" label="Time L" value="0.250" min="0.001" max="2.0"></mui-knob>
+          <mui-knob id="kDlyFeedbackL" label="FB L" value="0.125" min="0.0" max="0.99"></mui-knob>
+          <mui-knob id="kDlyTimeR" label="Time R" value="0.125" min="0.001" max="2.0"></mui-knob>
+          <mui-knob id="kDlyFeedbackR" label="FB R" value="0.250" min="0.0" max="0.99"></mui-knob>
+          <mui-knob id="kDlyMix" label="Mix" value="0.2" min="0.0" max="1.0"></mui-knob>
+        </div>
+        <div class="c-mui-section">
+          <h2>Effects</h2>
+          <mui-knob id="kChoMix" label="Chorus" value="0.2" min="0.0" max="1.0"></mui-knob>
+          <mui-knob id="kRevMix" label="Reverb" value="0.2" min="0.0" max="1.0"></mui-knob>
+        </div>
+        <div class="c-mui-section">
+          <h2>Master</h2>
+          <mui-knob id="kMasterGain" label="Gain" value="0.0" min="-60.0" max="12.0"></mui-knob>
+        </div>
+      </div>
+      <p>MIDI Control Map</p>
+      <ul class="c-controlmap">
+        <li>
+          <dt>Modulation (CC7)</dt><dd>Brightness</dd>
+          <dt>Modulation (CC10)</dt><dd>Octave</dd>
+          <dt>Modulation (CC74)</dt><dd>Envelope Sustain</dd>
+          <dt>Modulation (CC71)</dt><dd>Envelope Release</dd>
+          <dt>Modulation (CC73)</dt><dd>Chorus Mix</dd>
+          <dt>Modulation (CC72)</dt><dd>Delay Mix</dd>
+          <dt>Modulation (CC91)</dt><dd>Delay Time</dd>
+          <dt>Modulation (CC92)</dt><dd>Reverb mix</dd>
+        </li>
+      </ul>
+    </div>
+
+    <script>
+      // static channel
+      // var uSum = WX.Fader();
+      var uCho = WX.Chorus({ pMix: 0.45 });
+      var uPong = WX.Pingpong({
+        pMix: 0.17, pDelayTimeLeft: 0.600, pDelayTimeRight: 0.450,
+        pFeedbackLeft: 0.3, pFeedbackRight: 0.5, pCrosstalk: 0.25
+      });
+      var uVerb = WX.Converb({ pMix: 0.4 });
+      WX.DAC.set('pdB', -4.0);
+
+      var buffermap = WX.BufferMap({
+        "plate": "../data/ir/960-LargePlate.wav"
+      }, function () {
+        uVerb.setImpulseResponse(buffermap.getBufferByName("plate"));
+      });
+
+      // WX.patch(uSum, WX.DAC);
+      WX.patch(uCho, uPong, uVerb, WX.DAC);
+
+      // fm params
+      var FMParams = {
+        HarmonicRatio: 4,
+        ModulationIndex: 1.9379,
+        Balance: 0.7165,
+        Sustain: 0.7,
+        Release: 0.76
+      }
+
+      // MUI ready
+      window.addEventListener('WebComponentsReady', function () {
+        MUI.$('kBalance').bind('value', FMParams, 'Balance');
+        MUI.$('kSustain').bind('value', FMParams, 'Sustain');
+        MUI.$('kRelease').bind('value', FMParams, 'Release');
+        MUI.$('kDlyTimeL').link(uPong, 'pDelayTimeLeft');
+        MUI.$('kDlyFeedbackL').link(uPong, 'pFeedbackLeft');
+        MUI.$('kDlyTimeR').link(uPong, 'pDelayTimeRight');
+        MUI.$('kDlyFeedbackR').link(uPong, 'pFeedbackRight');
+        MUI.$('kDlyMix').link(uPong, 'pMix');
+        MUI.$('kChoMix').link(uCho, 'pMix');
+        MUI.$('kRevMix').link(uVerb, 'pMix');
+        MUI.$('kMasterGain').link(WX.DAC, 'pdB');
+      });
+
+      /**
+       * @class FMVoice
+       */
+      function Voice (pitch, intensity) {
+        // setup: creation, connection
+        var fund = WX.pitch2freq(pitch);
+        this._nFMop1 = WX.FMop({ pFreq: fund, pModulationIndex: 0.1, pGain: 1 - FMParams.Balance });
+        this._nFMop2 = WX.FMop({ pFreq: fund * 2, pModulationIndex: 0.5, pGain: FMParams.Balance });
+        this._nEnv = WX.ADSR();
+        this._nEnv.setADSR(0.002, 0.07, FMParams.Sustain, FMParams.Release);
+        this._nFMop1.to(this._nEnv).to(uCho);
+        this._nFMop2.to(this._nEnv);
+
+        this.noteOn(pitch, intensity);
+      }
+
+      Voice.prototype = {
+        noteOn: function (pitch, intensity) {
+          // trigger
+          this._nFMop1.start();
+          this._nFMop2.start();
+          this._nFMop1.set('pHarmonicRatio', FMParams.HarmonicRatio);
+          this._nFMop1.set('pModulationIndex', FMParams.ModulationIndex);
+          this._nFMop1.set('pModulationIndex', 0.1, 2, WX.now + 1.5);
+          this._nFMop2.set('pHarmonicRatio', FMParams.HarmonicRatio);
+          this._nFMop2.set('pModulationIndex', FMParams.ModulationIndex * 0.5);
+          this._nFMop2.set('pModulationIndex', 0.5, 2, WX.now + 1.5);
+          this._nEnv.set('pGain', intensity, 1, WX.now + 0.02);
+          this._nEnv.noteOn();
+        },
+        noteOff: function () {
+          // stop for resource management
+          this._nFMop1.stop(WX.now + FMParams.Release + 0.25);
+          this._nFMop2.stop(WX.now + FMParams.Release + 0.25);
+          this._nEnv.noteOff();
+        }
+      }
+
+      // define user-action for incoming MIDI message
+      var voiceTracker = [];
+      var midiTarget = Ktrl.createTarget("mySynth");
+      midiTarget.onData(function (midimessage) {
+        // parse MIDI data with the utility
+        var data = Ktrl.parse(midimessage);
+        //console.log(t.label, data);
+        switch (data.type) {
+          case "noteon":
+            if (voiceTracker[data.pitch]) {
+              return;
+            } else {
+              FMParams.ModulationIndex = Ktrl.scale(Ktrl.CurveSquared(data.velocity), 1, 10);
+              voiceTracker[data.pitch] = new Voice(data.pitch, Ktrl.scale(Ktrl.CurveLinear(data.velocity), 0, 1.5));
+            }
+            break;
+          case "noteoff":
+            if (voiceTracker[data.pitch]) {
+              voiceTracker[data.pitch].noteOff();
+              voiceTracker[data.pitch] = null;
+            }
+            break;
+          case "controlchange":
+            switch (data.control) {
+              case 7:
+                FMParams.HarmonicRatio = ~~Ktrl.scale(Ktrl.CurveLinear(data.value), 1, 6);
+                break;
+              case 10:
+                FMParams.Balance = Ktrl.scale(Ktrl.CurveLinear(data.value));
+                break;
+              case 74:
+                FMParams.Sustain = Ktrl.scale(Ktrl.CurveLinear(data.value), 0.01, 0.5);
+                break;
+              case 71:
+                FMParams.Release = Ktrl.scale(Ktrl.CurveLinear(data.value), 0.01, 2.0);
+                break;
+              case 73:
+                uCho.set('pMix', Ktrl.scale(Ktrl.CurveLinear(data.value), 0.3, 0.7), 1, WX.now + 0.08);
+                break;
+              case 72:
+                uPong.set('pMix', Ktrl.scale(Ktrl.CurveLinear(data.value), 0, 0.5), 1, WX.now + 0.08);
+                break;
+              case 91:
+                var dt = Ktrl.scale(Ktrl.CurveLinear(data.value), 0.01, 2.0);
+                uPong.set('pDelayTimeRight', dt, 1, WX.now + 0.1);
+                uPong.set('pDelayTimeLeft', dt * 3, 1, WX.now + 0.1);
+                break;
+              case 92:
+                uVerb.set('pMix', Ktrl.scale(Ktrl.CurveLinear(data.value)), 1, WX.now + 0.08);
+                break;
+            }
+            break;
+        }
+      });
+
+      // routes sources and targets when the system is ready
+      Ktrl.ready(function () {
+        Ktrl.routeAllToTarget(midiTarget);
+        midiTarget.activate();
+      });
+    </script>
+  </body>
+</html>

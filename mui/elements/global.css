@@ -1,0 +1,46 @@
+/* deepsea diver color palette
+  @deep-blue:     #31353D;
+  @light-blue:    #445878;
+  @sky-blue:      #92CDCF;
+*/
+
+/* font import */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url('icons/Roboto-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Play';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Play'), url('icons/Play-400.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Play';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Play-Bold'), url('icons/Play-700.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'muicon';
+  font-style: normal;
+  font-weight: normal;
+  src: url('icons/muicon.woff') format('woff');
+}
+
+/*
+  muicon from http://icomoon.io/
+  "btn-csave"     icon="&#x55
+  "btn-cload"     icon="&#x44
+  "btn-edit"      icon="&#x45
+  "btn-rewind"    icon="&#x52
+  "btn-stop"      icon="&#x53
+  "btn-play"      icon="&#x50
+  "btn-record"    icon="&#x43
+  "btn-metro"     icon="&#x4d
+ */

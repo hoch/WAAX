@@ -1,1 +1,0 @@
-http://bedroomproducersblog.com/2010/09/16/free-sample-shootout-5-the-best-free-drum-machine-samples/

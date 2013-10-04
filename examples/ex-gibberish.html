@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WAAX: Gibberish</title>
+    <!-- lib r12 -->
+    <script src="../src/WAAX.js"></script>
+    <script src="../src/Fader.js"></script>
+    <script src="../src/Oscil.js"></script>
+    <script src="../src/ADSR.js"></script>
+    <script src="../src/FormantV.js"></script>
+    <script src="../src/Converb.js"></script>
+    <script src="../src/Ktrl.js"></script>
+    <!-- mui -->
+    <script src="../mui/lib/polymer.min.js"></script>
+    <script src="../mui/mui-core.js"></script>
+    <link rel="import" href="../mui/elements/mui-knob.html">
+    <link rel="stylesheet" type="text/css" href="../mui/mui-core.css">
+    <!-- example base -->
+    <link rel="stylesheet" type="text/css" href="css/examples-base.css">
+  </head>
+  <body>
+
+    <div class="c-header">
+      <span class="c-nav"><a href="../index.html">index</a> / <a href="index.html">examples</a></span>
+      <h1>Gibberish</h1>
+    </div>
+
+    <div class="c-content">
+      <p>Audio Signal Flow</p>
+      <ul class="c-signalflow">
+        <li>LFO</li> <li class="separator"></li>
+        <li>Sawtooth</li> <li class="separator"></li>
+        <li>FormantV</li> <li class="separator"></li>
+        <li>ADSR</li> <li class="separator"></li>
+        <li>Converb</li> <li class="separator"></li>
+        <li>DAC</li>
+      </ul>
+      <p>MIDI Signal Flow</p>
+      <ul class="c-signalflow">
+        <li>MIDI</li> <li class="separator"></li>
+        <li>Monophonic Behavior</li> <li class="separator"></li>
+        <li>ADSR</li>
+      </ul>
+      <p>MIDI Control Map</p>
+      <ul class="c-controlmap">
+        <li>
+          <dt>Modulation (CC1)</dt><dd>Vowel Type (a, e, i, o, u)</dd>
+        </li>
+      </ul>
+      <br>
+      <h2>Control</h2>
+      <div class="c-mui-panel">
+        <div class="c-mui-section">
+          <h2>LFO</h2>
+          <mui-knob id="kLFOFreq" label="Frequency" value="0.125" min="0.01" max="8.0"></mui-knob>
+          <mui-knob id="kLFOGain" label="Gain" value="5.0" min="0.0" max="10.0"></mui-knob>
+        </div>
+        <div class="c-mui-section">
+          <h2>ADSR Envelope</h2>
+          <mui-knob id="kAttack" label="Attack" value="0.5" min="0.0" max="1.5"></mui-knob>
+          <mui-knob id="kDecay" label="Decay" value="0.25" min="0.0" max="1.0"></mui-knob>
+          <mui-knob id="kSustain" label="Sustain" value="0.65" min="0.0" max="1.0"></mui-knob>
+          <mui-knob id="kRelease" label="Release" value="2.0" min="0.0" max="4.0"></mui-knob>
+        </div>
+        <div class="c-mui-section">
+          <h2>Reverb</h2>
+          <mui-knob id="kRevMix" label="Mix" value="0.5" min="0.0" max="1.0"></mui-knob>
+        </div>
+        <div class="c-mui-section">
+          <h2>Master</h2>
+          <mui-knob id="kMasterGain" label="Gain" value="0.0" min="-60.0" max="12.0"></mui-knob>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      var uLFO = WX.Oscil({ pFreq: 4.4, pGain: 7.8 });
+      var uOSC = WX.Oscil({ pType: 'sawtooth', pGain: 1.5 });
+      var uForm = WX.FormantV();
+      var uEnv = WX.ADSR({ pMode: 'monophonic' });
+      var uVerb = WX.Converb({ pMix: 0.71 });
+
+      var buffermap = WX.BufferMap({
+        "plate": "../data/ir/960-LargePlate.wav"
+      }, function () {
+        uVerb.setImpulseResponse(buffermap.getBufferByName("plate"));
+      });
+
+      // connection
+      uLFO.control(uOSC, 'pFreq');
+      WX.patch(uOSC, uForm, uEnv, WX.DAC);
+      WX.patch(uEnv, uVerb, WX.DAC);
+
+      // default params
+      uEnv.setADSR(0.11, 0.12, 0.48, 0.26);
+      uForm.setPosition(0.01, 0.99, 2, 0.1);
+
+      // MUI ready
+      window.addEventListener('WebComponentsReady', function () {
+        MUI.$('kLFOFreq').link(uLFO, 'pFreq');
+        MUI.$('kLFOGain').link(uLFO, 'pGain');
+        MUI.$('kAttack').link(uEnv, 'pAttack');
+        MUI.$('kDecay').link(uEnv, 'pDecay');
+        MUI.$('kSustain').link(uEnv, 'pSustain');
+        MUI.$('kRelease').link(uEnv, 'pRelease');
+        MUI.$('kRevMix').link(uVerb, 'pMix');
+        MUI.$('kMasterGain').link(WX.DAC, 'pdB');
+      });
+
+      // define user-action for incoming MIDI message
+      var keyTracker = [];
+      var midiTarget = Ktrl.createTarget("mySynth");
+      midiTarget.onData(function (midimessage) {
+        // parse MIDI data with the utility
+        var data = Ktrl.parse(midimessage);
+        //console.log(t.label, data);
+        switch (data.type) {
+          case "noteon":
+            keyTracker[data.pitch] = true;
+            uOSC.set('pFreq', WX.pitch2freq(data.pitch), 2, WX.now + 0.1);
+            uEnv.noteOn();
+            break;
+          case "noteoff":
+            keyTracker[data.pitch] = false;
+            if (keyTracker.indexOf(true) === -1) {
+              uEnv.noteOff();
+            }
+            break;
+          case "controlchange":
+            switch (data.control) {
+              case 1:
+                var phi = Math.PI * 1.6 * (data.value / 127) + Math.PI / 2;
+                uForm.setPosition(Math.cos(phi), Math.sin(phi), 2, 0.1);
+                break;
+            }
+            break;
+        }
+      });
+
+      // ktrl onready
+      Ktrl.ready(function () {
+        Ktrl.routeAllToTarget(midiTarget);
+        midiTarget.activate();
+      });
+
+    </script>
+  </body>
+</html>

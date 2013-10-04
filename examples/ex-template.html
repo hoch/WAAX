@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WAAX: Dreamy Impulse</title>
+    <!-- lib r12 -->
+    <script src="../src/WAAX.js"></script>
+    <script src="../src/Fader.js"></script>
+    <script src="../src/ImpulseTrain.js"></script>
+    <script src="../src/Oscil.js"></script>
+    <script src="../src/Step.js"></script>
+    <script src="../src/LPF.js"></script>
+    <script src="../src/Pingpong.js"></script>
+    <script src="../src/Converb.js"></script>
+
+    <!-- mui -->
+    <script src="../mui/lib/polymer.min.js"></script>
+    <script src="../mui/mui-core.js"></script>
+    <link rel="import" href="../mui/elements/mui-knob.html">
+    <link rel="stylesheet" type="text/css" href="../mui/mui-core.css">
+
+    <!-- example base -->
+    <link rel="stylesheet" type="text/css" href="css/examples-base.css">
+  </head>
+  <body>
+
+    <div class="c-header">
+      <span class="c-nav"><a href="../index.html">index</a> / <a href="index.html">examples</a></span>
+      <h1>Dreamy Impulse</h1>
+    </div>
+
+    <div class="c-content">
+      <p>Audio Signal Flow</p>
+      <ul class="c-signalflow">
+        <li>Impulse Train</li> <li class="separator"></li>
+        <li>LPF</li> <li class="separator"></li>
+        <li>Pingpong</li> <li class="separator"></li>
+        <li>Converb</li> <li class="separator"></li>
+        <li>DAC</li>
+      </ul>
+      <ul class="c-signalflow">
+        <li>LFO + Step</li> <li class="separator"></li>
+        <li>LPF: Frequency</li>
+      </ul>
+      <br>
+      <h2>Control</h2>
+      <div class="c-mui-panel">
+        <div class="c-mui-section">
+          <h2>Impulse Train</h2>
+          <mui-knob id="kFreq" label="Frequency" value="6.0" min="0.01" max="60.0"></mui-knob>
+          <mui-knob id="kGain" label="Gain" value="1.0" min="0.0" max="2.0"></mui-knob>
+        </div>
+        <div class="c-mui-section">
+          <h2>LFO</h2>
+          <mui-knob id="kLFOFreq" label="Frequency" value="0.125" min="0.01" max="20.0"></mui-knob>
+          <mui-knob id="kLFOGain" label="Gain" value="1250.0" min="625.0" max="2500.0"></mui-knob>
+        </div>
+        <div class="c-mui-section">
+          <h2>Delay</h2>
+          <mui-knob id="kDlyTimeL" label="Time L" value="0.250" min="0.001" max="2.0"></mui-knob>
+          <mui-knob id="kDlyFeedbackL" label="FB L" value="0.125" min="0.0" max="0.99"></mui-knob>
+          <mui-knob id="kDlyTimeR" label="Time R" value="0.125" min="0.001" max="2.0"></mui-knob>
+          <mui-knob id="kDlyFeedbackR" label="FB R" value="0.250" min="0.0" max="0.99"></mui-knob>
+        </div>
+        <div class="c-mui-section">
+          <h2>Reverb</h2>
+          <mui-knob id="kRevMix" label="Mix" value="0.2" min="0.0" max="1.0"></mui-knob>
+        </div>
+        <div class="c-mui-section">
+          <h2>Master</h2>
+          <mui-knob id="kMasterGain" label="Gain" value="0.0" min="-60.0" max="12.0"></mui-knob>
+        </div>
+      </div>
+    </div>
+
+    <!-- scripts -->
+    <script>
+      // patch
+      var uLfo = WX.Oscil({ pGain:1250.0, pFreq:0.125 });
+      var uStp = WX.Step({ pGain:1250.0 });
+      var uImp = WX.ImpulseTrain({ pGain:1.0, pFreq:6 });
+      var uLpf = WX.LPF({ pCutoff:500, pResonance:24, pGain: 2.0 });
+      var uPong = WX.Pingpong({
+        pDelayTimeLeft: 0.600, pDelayTimeRight: 0.450,
+        pFeedbackLeft: 0.3, pFeedbackRight: 0.5, pCrosstalk: 0.25
+      });
+      var uVerb = WX.Converb({ pMix: 0.8 });
+
+      var buffermap = WX.BufferMap({
+        "plate": "../data/960-LargePlate.wav"
+      }, function () {
+        uVerb.setImpulseResponse(buffermap.getBufferByName("plate"));
+      });
+
+      // connection
+      WX.patch(uImp, uLpf, uVerb, WX.DAC);
+      WX.patch(uVerb, uPong, WX.DAC);
+      uStp.control(uLpf, 'pCutoff');
+      uLfo.control(uLpf, 'pCutoff');
+
+      // mui linkage
+      window.addEventListener('WebComponentsReady', function () {
+        MUI.$('kFreq').link(uImp, 'pFreq');
+        MUI.$('kGain').link(uImp, 'pGain');
+        MUI.$('kLFOFreq').link(uLfo, 'pFreq');
+        MUI.$('kLFOGain').link(uLfo, 'pGain');
+        MUI.$('kDlyTimeL').link(uPong, 'pDelayTimeLeft');
+        MUI.$('kDlyFeedbackL').link(uPong, 'pFeedbackLeft');
+        MUI.$('kDlyTimeR').link(uPong, 'pDelayTimeRight');
+        MUI.$('kDlyFeedbackR').link(uPong, 'pFeedbackRight');
+        MUI.$('kRevMix').link(uVerb, 'pMix');
+        MUI.$('kMasterGain').link(WX.DAC, 'pdB');
+      });
+
+    </script>
+  </body>
+</html>

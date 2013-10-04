@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WAAX: Frost Pad</title>
+    <!-- lib r12 -->
+    <script src="../src/WAAX.js"></script>
+    <script src="../src/Fader.js"></script>
+    <script src="../src/Noise.js"></script>
+    <script src="../src/FilterBank.js"></script>
+    <script src="../src/ADSR.js"></script>
+    <script src="../src/Chorus.js"></script>
+    <script src="../src/Pingpong.js"></script>
+    <script src="../src/Converb.js"></script>
+    <script src="../src/Spectrum.js"></script>
+    <script src="../src/Ktrl.js"></script>
+    <!-- mui -->
+    <script src="../mui/lib/polymer.min.js"></script>
+    <script src="../mui/mui-core.js"></script>
+    <link rel="import" href="../mui/elements/mui-knob.html">
+    <link rel="stylesheet" type="text/css" href="../mui/mui-core.css">
+    <!-- example base -->
+    <link rel="stylesheet" type="text/css" href="css/examples-base.css">
+    <style>
+      .c-spectrum {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        z-index: -1;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="c-header">
+      <span class="c-nav"><a href="../index.html">index</a> / <a href="index.html">examples</a></span>
+      <h1>Frost Pad</h1>
+    </div>
+
+    <div class="c-content">
+      <p>Audio Signal Flow</p>
+      <ul class="c-signalflow">
+        <li>White Noise (Gaussian)</li> <li class="separator"></li>
+        <li>Filterbank</li> <li class="separator"></li>
+        <li>ADSR</li> <li class="separator"></li>
+        <li>Chorus</li> <li class="separator"></li>
+        <li>Pingpong</li> <li class="separator"></li>
+        <li>Converb</li> <li class="separator"></li>
+        <li>DAC</li>
+      </ul>
+      <p>MIDI Signal Flow</p>
+      <ul class="c-signalflow">
+        <li>MIDI</li> <li class="separator"></li>
+        <li>Monophonic Behavior</li> <li class="separator"></li>
+        <li>ADSR</li>
+      </ul>
+      <br>
+      <h2>Control</h2>
+      <div class="c-mui-panel">
+        <div class="c-mui-section">
+          <h2>Filterbank</h2>
+          <mui-knob id="kBandwidth" label="Bandwidth" value="0.2" min="0.0" max="1.0"></mui-knob>
+          <mui-knob id="kSlope" label="Slope" value="0.24" min="0.1" max="0.75"></mui-knob>
+        </div>
+        <div class="c-mui-section">
+          <h2>ADSR Envelope</h2>
+          <mui-knob id="kAttack" label="Attack" value="0.5" min="0.0" max="1.5"></mui-knob>
+          <mui-knob id="kDecay" label="Decay" value="0.25" min="0.0" max="1.0"></mui-knob>
+          <mui-knob id="kSustain" label="Sustain" value="0.65" min="0.0" max="1.0"></mui-knob>
+          <mui-knob id="kRelease" label="Release" value="2.0" min="0.0" max="4.0"></mui-knob>
+        </div>
+        <div class="c-mui-section">
+          <h2>Delay</h2>
+          <mui-knob id="kDlyTimeL" label="Time L" value="0.250" min="0.001" max="2.0"></mui-knob>
+          <mui-knob id="kDlyFeedbackL" label="FB L" value="0.125" min="0.0" max="0.99"></mui-knob>
+          <mui-knob id="kDlyTimeR" label="Time R" value="0.125" min="0.001" max="2.0"></mui-knob>
+          <mui-knob id="kDlyFeedbackR" label="FB R" value="0.250" min="0.0" max="0.99"></mui-knob>
+        </div>
+        <div class="c-mui-section">
+          <h2>Master</h2>
+          <mui-knob id="kMasterGain" label="Gain" value="0.0" min="-60.0" max="12.0"></mui-knob>
+        </div>
+      </div>
+      <canvas id="i-spectrum" class="c-spectrum" height="400"></canvas>
+      <!-- <li>
+        <dt>Modulation (CC1)</dt><dd>Next Scale (Ionian, Lydian, Aeolian, Mixolydian)</dd>
+        <dt>Modulation (CC7)</dt><dd>Filter Bandwidth</dd>
+        <dt>Modulation (CC10)</dt><dd>Filter Gain Balance</dd>
+        <dt>Modulation (CC74)</dt><dd>Filter Frequency Detune</dd>
+        <dt>Modulation (CC71)</dt><dd>Master Gain</dd>
+      </li> -->
+    </div>
+
+    <script>
+      var cvs = document.getElementById('i-spectrum');
+      var ctx = cvs.getContext('2d');
+      cvs.width = window.innerWidth;
+
+      var uNoise = WX.Noise();
+      var uBank = WX.FilterBank({ pGain: 2.0 });
+      var uEnv = WX.ADSR({ pMode: 'monophonic' });
+      var uCho = WX.Chorus();
+      var uPong = WX.Pingpong({
+        pDelayTimeLeft: 0.600, pDelayTimeRight: 0.450,
+        pFeedbackLeft: 0.3, pFeedbackRight: 0.5, pCrosstalk: 0.25
+      });
+      var uVerb = WX.Converb();
+      var uSpec = WX.Spectrum({ pSmoothingTimeConstant:0.8 });
+
+      var buffermap = WX.BufferMap({
+        "plate": "../data/ir/960-LargePlate.wav"
+      }, function () {
+        uVerb.setImpulseResponse(buffermap.getBufferByName("plate"));
+      });
+
+      WX.patch(uNoise, uBank, uEnv, uVerb, WX.DAC);
+      WX.patch(uEnv, uPong, uCho, uVerb, WX.DAC);
+      WX.patch(uEnv, uSpec);
+
+      WX.DAC.set('pdB', -8.0);
+      uEnv.setADSR(1.2, 1.0, 0.65, 3.0);
+      uSpec.setContext2D(ctx);
+
+      // MUI ready
+      window.addEventListener('WebComponentsReady', function () {
+        MUI.$('kBandwidth').link(uBank, 'pWidth');
+        MUI.$('kSlope').link(uBank, 'pSlope');
+        MUI.$('kAttack').link(uEnv, 'pAttack');
+        MUI.$('kDecay').link(uEnv, 'pDecay');
+        MUI.$('kSustain').link(uEnv, 'pSustain');
+        MUI.$('kRelease').link(uEnv, 'pRelease');
+        MUI.$('kDlyTimeL').link(uPong, 'pDelayTimeLeft');
+        MUI.$('kDlyFeedbackL').link(uPong, 'pFeedbackLeft');
+        MUI.$('kDlyTimeR').link(uPong, 'pDelayTimeRight');
+        MUI.$('kDlyFeedbackR').link(uPong, 'pFeedbackRight');
+        MUI.$('kMasterGain').link(WX.DAC, 'pdB');
+      });
+
+      // define user-action for incoming MIDI message
+      var chords = ['ionian', 'lydian', 'aeolian', 'mixolydian'];
+      var keyTracker = [];
+      var midiTarget = Ktrl.createTarget("mySynth");
+      midiTarget.onData(function (midimessage) {
+        var data = Ktrl.parse(midimessage);
+        switch (data.type) {
+          case "noteon":
+            keyTracker[data.pitch] = true;
+            uBank.set('pPitch', data.pitch);
+            uBank.set('pChord', chords[0]);
+            uEnv.noteOn();
+            break;
+          case "noteoff":
+            keyTracker[data.pitch] = false;
+            if (keyTracker.indexOf(true) === -1) {
+              uEnv.noteOff();
+            }
+            break;
+          case "controlchange":
+            switch (data.control) {
+              case 1:
+                break;
+              case 20:
+                uBank.set('pWidth', data.value / 127);
+                break;
+              case 21:
+                uBank.set('pSlope', data.value / 127);
+                break;
+              case 74:
+                break;
+              case 71:
+                break;
+            }
+            break;
+        }
+      });
+
+      // routes sources and targets when the system is ready
+      Ktrl.ready(function () {
+        Ktrl.routeAllToTarget(midiTarget);
+        midiTarget.activate();
+      });
+
+      // initiate draw
+      function loop() {
+        requestAnimationFrame(loop);
+        uSpec.draw();
+      }
+      loop();
+
+      //   // parse MIDI data with the utility
+      //   var data = Ktrl.parse(midimessage);
+      //   //console.log(t.label, data);
+      //   switch (data.type) {
+      //     case "noteon":
+      //       bank.pitch(data.pitch);
+      //       bank.chord(nextChord);
+      //       adsr.noteOn();
+      //       _keyState[data.pitch] = true;
+      //       break;
+      //     case "noteoff":
+      //       _keyState[data.pitch] = false;
+      //       if (_keyState.indexOf(true) > -1) {
+      //       } else {
+      //         adsr.noteOff();
+      //       }
+      //       break;
+      //     case "controlchange":
+      //       switch (data.control) {
+      //         case 1:
+      //           nextChord = ~~Ktrl.scale(Ktrl.CurveLinear(data.value), 1, 4.99);
+      //           break;
+      //         case 7:
+      //           bank.width(Ktrl.scale(Ktrl.CurveLinear(data.value)));
+      //           break;
+      //         case 10:
+      //           bank.slope(Ktrl.scale(Ktrl.CurveLinear(data.value)));
+      //           break;
+      //         case 74:
+      //           bank.detune(Ktrl.scale(Ktrl.CurveSquared(data.value)));
+      //           break;
+      //         case 71:
+      //           bank.gain(Ktrl.scale(Ktrl.CurveLinear(data.value)) * 2.0, WX.now + 0.04, "l");
+      //           break;
+      //       }
+      //       break;
+      //     case "programchange":
+      //       switch (data.program) {
+      //       }
+      //   }
+      // });
+
+
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- waax r12 -->
+  <script src="../src/WAAX.js"></script>
+  <script src="../src/Fader.js"></script>
+  <script src="../src/Oscil.js"></script>
+  <!-- polymer + mui core -->
+  <script src="lib/polymer.min.js"></script>
+  <script src="mui-core.js"></script>
+  <link rel="stylesheet" type="text/css" href="mui-core.css">
+  <!-- mui elements -->
+  <link rel="import" href="elements/mui-knob.html">
+  <link rel="import" href="elements/mui-knob2.html">
+  <link rel="import" href="elements/mui-hslider.html">
+  <link rel="import" href="elements/mui-toggle.html">
+  <link rel="import" href="elements/mui-button.html">
+  <link rel="import" href="elements/mui-select.html">
+  <!-- firebase -->
+  <script src='https://cdn.firebase.com/v0/firebase.js'></script>
+  <!-- doc & demo css -->
+  <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/doc-base.css">
+</head>
+
+<body>
+
+  <div class="c-header">
+    <span class="c-nav"><a href="example-1.html">examples</a></span>
+    <h1>MUI Elements</h1>
+  </div>
+
+
+  <div class="c-content">
+
+    <h3>UI Panel and Section</h3>
+    <div class="c-mui-panel">
+      <h1>Panel</h1>
+        <div class="c-mui-section">
+          <h2>SECTION</h2>
+          <div style="width: 200px; height: 50px; line-height: 50px;">
+            UI Elements Here.
+          </div>
+        </div>
+    </div>
+
+    <h3>Toggle, Buttons</h3>
+    <div class="c-mui-panel">
+      <div class="c-mui-section">
+        <h2>Toggles</h2>
+        <mui-toggle label="ON"></mui-toggle>
+        <mui-toggle label="OFF"></mui-toggle>
+      </div>
+      <div class="c-mui-section">
+        <h2>Buttons</h2>
+        <mui-button id="btn-csave" icon="&#x55;"></mui-button>
+        <mui-button id="btn-rewind" icon="&#x52;"></mui-button>
+        <mui-button id="btn-stop" icon="&#x53;"></mui-button>
+        <mui-button id="btn-play" icon="&#x50;"></mui-button>
+        <mui-button id="btn-record" icon="&#x43;"></mui-button>
+      </div>
+    </div>
+
+    <pre class="prettyprint">
+&lt;mui-toggle label=&quot;ON&quot;&gt;&lt;/mui-toggle&gt;
+&lt;mui-button id=&quot;button-id&quot; icon=&quot;&amp;#x55;&quot;&gt;&lt;/mui-button&gt;</pre>
+
+    <h3>Knobs</h3>
+    <div class="c-mui-panel">
+      <div class="c-mui-section">
+        <h2>Knobs (V)</h2>
+        <mui-knob label="Attack" value="0.25" min="0.0" max="1.0"></mui-knob>
+        <mui-knob label="Cutoff" value="0.75" min="0.0" max="1.0"></mui-knob>
+      </div>
+      <div class="c-mui-section">
+        <h2>Knobs (H)</h2>
+        <mui-knob2 label="Hold" value="0.25" min="0.0" max="1.0"></mui-knob2>
+        <mui-knob2 label="Mix" value="0.25" min="0.0" max="1.0"></mui-knob2>
+      </div>
+    </div>
+
+    <pre class="prettyprint">
+&lt;mui-knob label=&quot;Param1&quot; value=&quot;0.0&quot; min=&quot;0.0&quot; max=&quot;1.0&quot;&gt;&lt;/mui-knob&gt;
+&lt;mui-knob2 label=&quot;Param2&quot; value=&quot;0.0&quot; min=&quot;0.0&quot; max=&quot;1.0&quot;&gt;&lt;/mui-knob2&gt;</pre>
+
+
+    <h3>HSlider</h3>
+    <div class="c-mui-panel">
+      <div class="c-mui-section-noborder">
+      <mui-hslider label="Gain" value="0.25" min="0.0" max="1.0"></mui-hslider>
+      <mui-hslider label="Volume" value="0.75" min="0.0" max="1.0"></mui-hslider>
+      </div>
+    </div>
+
+    <pre class="prettyprint">
+&lt;mui-hslider label=&quot;Gain&quot; value=&quot;0.25&quot; min=&quot;0.0&quot; max=&quot;1.0&quot;&gt;&lt;/mui-hslider&gt;</pre>
+  </div>
+
+  <script type="text/javascript">
+
+  function init() {
+    var params = {
+    };
+  }
+
+  window.addEventListener('WebComponentsReady', init);
+
+  </script>
+
+</body>
+
+
+</html>

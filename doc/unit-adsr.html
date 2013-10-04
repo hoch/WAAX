@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WAAX: Doc</title>
+    <!-- lib r12 -->
+    <script src="../src/WAAX.js"></script>
+    <script src="../src/Fader.js"></script>
+    <script src="../src/Oscil.js"></script>
+    <script src="../src/ADSR.js"></script>
+
+    <!-- mui -->
+    <script src="../mui/lib/polymer.min.js"></script>
+    <script src="../mui/mui-core.js"></script>
+    <link rel="import" href="../mui/elements/mui-knob.html">
+    <link rel="stylesheet" type="text/css" href="../mui/mui-core.css">
+
+    <!-- example base -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/examples-base.css">
+  </head>
+  <body>
+
+    <div class="c-header">
+      <span class="c-nav"><a href="../index.html">index</a> / doc / <a href="index.html">examples</a></span>
+      <h1>WX.ADSR</h1>
+    </div>
+
+    <div class="c-content">
+      <h3>Description</h3>
+      <p>Triggable envelope with multiple phases.</p>
+      <h3>Parameters</h3>
+      <table class="c-parameters">
+        <tr><th class="name">Name</th><th class="type">Type</th><th class="desc">Description</th><th class="value">Default</th></tr>
+        <tr><td>pAttack</td><td>float</td><td>Attack time in seconds</td><td>0.005</td></tr>
+        <tr><td>pDecay</td><td>float</td><td>Decay time in seconds</td><td>0.015</td></tr>
+        <tr><td>pSustain</td><td>float</td><td>Gain in sustain phase</td><td>0.75</td></tr>
+        <tr><td>pRelease</td><td>float</td><td>Release time in seconds</td><td>0.05</td></tr>
+        <tr><td>pTimeConstant</td><td>float</td><td>Time constant for exponential release</td><td>0.01 (-60dB)</td></tr>
+        <tr><td>pMode</td><td>string</td><td>Voice handling</td><td>'polyphonic', 'monophonic'</td></tr>
+      </table>
+      <h3>Usage</h3>
+      <pre class="prettyprint">
+var osc1 = WX.Oscil();
+var env = WX.ADSR({ pAttack:2.0, pRelease: 2.0 });
+WX.patch(osc1, env, WX.DAC);
+
+env.noteOn(WX.now + 1.0);
+env.noteOff(WX.now + 2.0);</pre>
+    </div>
+    <script>
+      var osc1 = WX.Oscil();
+      var env = WX.ADSR({ pAttack:2.0, pRelease: 2.0 });
+      WX.patch(osc1, env, WX.DAC);
+
+      env.noteOn(WX.now + 1.0);
+      env.noteOff(WX.now + 2.0);
+    </script>
+  </body>
+</html>
