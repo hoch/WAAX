@@ -1,5 +1,6 @@
 (function (WX) {
 
+
   /**
    * WX.Oscil
    */
@@ -21,7 +22,7 @@
     this.setParams(this.params);
 
     // this unit supports dynamic lifetime
-    // if this is non-dynamic, start osc immediately
+    // if instance runs as non-dynamic mode, start osc immediately
     if (!this.params.pDynamic) {
       this.start();
     }

@@ -1,6 +1,6 @@
 /**
- * WAAX Core framework
- * @revision r13
+ * WAAX Core
+ * @revision r13 dev
  */
 
 
@@ -14,9 +14,11 @@ window.WX = {};
 
   'use strict';
 
+
   /**
    * @module log
    */
+
   WX.log = (function () {
     var _prefix = '[wx] ',
       _prefix_info = '[wx:info] ',
@@ -58,12 +60,12 @@ window.WX = {};
   })();
 
 
-
   /**
    * API support checking and monkey patching
    * @note WAAX only supports: Chrome and Safari
-   * TODO: this needs to be more comprehensive. do collaborate with Chris Wilson.
+   * TODO: this needs to be more comprehensive. collaborate with Chris Wilson.
    */
+
   var _kApiAvailable = false;
   var _kLegacySupport = false;
   if (!window.hasOwnProperty('webkitAudioContext') && !window.hasOwnProperty('AudioContext')) {
@@ -90,21 +92,21 @@ window.WX = {};
 
 
   /**
-   * internal variables
+   * internal
    */
 
   // audio context
   var _ctx = new AudioContext();
   // unit stack for patch building
-  var _unitStack = [];
-  // ignore function (avoid prototype propagation)
+  // var _unitStack = [];
+  // ignore function (to avoid prototype propagation)
   var _ignore = function () {
     return;
   };
 
 
   /**
-   * system-wide variables, utilities
+   * system variables and utilities
    */
 
   Object.defineProperties(WX, {
@@ -186,12 +188,11 @@ window.WX = {};
       value: function () {
         for (var i = 0; i < arguments.length - 1; i++) {
           arguments[i].outlet.connect(arguments[i+1].inlet);
-          // console.log(arguments[i].get('pLabel') + ' >> ' + arguments[i+1].get('pLabel'));
         }
       }
     },
 
-    // $ => $
+    // $: setAudioParam function (internal)
     $: {
       value: function (audioParam, value, transType, time1, time2) {
         // if no trans type, change param immediately
@@ -311,15 +312,14 @@ window.WX = {};
   WX.nOSC = function () { return _ctx.createOscillator(); };
   WX.nAnalyzer = function () { return _ctx.createAnalyser(); };
   WX.nPanner = function () { return _ctx.createPanner(); };
-
   WX.nSplitter = function (numChannel) { return _ctx.createChannelSplitter(numChannel); };
   WX.nMerger = function (numChannel) { return _ctx.createChannelMerger(numChannel); };
-
+  WX.nPeriodicWave = function () { return _ctx.createPeriodicWave(); };
 
   WX.nBuffer = function (nChannel, length, sampleRate) {
     return _ctx.createBuffer(nChannel, length, sampleRate);
   };
-  WX.nPeriodicWave = function () { return _ctx.createPeriodicWave(); };
+
 
   /**
    * ENUMs
@@ -585,6 +585,6 @@ window.WX = {};
   };
 
   // start loading other units... go!
-  WX.log.post('WAAX foundation loaded. (' + WX.System.REVISION + ')');
+  WX.log.post('WAAX core loaded. (' + WX.System.REVISION + ')');
 
 })(window.WX);

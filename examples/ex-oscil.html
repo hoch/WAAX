@@ -5,13 +5,15 @@
   <body>
     <h1>Kitchen Sink r12</h1>
 
+    <pre id="code-listing"></pre>
+
     <!-- lib r12 -->
     <script src="../src/WAAX.js"></script>
     <script src="../src/Fader.js"></script>
     <script src="../src/Oscil.js"></script>
     <script src="../src/ADSR.js"></script>
-    <!--<script src="../src/Noise.js"></script>
-    <script src="../src/Sampler.js"></script>
+    <script src="../src/Noise.js"></script>
+    <!--<script src="../src/Sampler.js"></script>
     <script src="../src/LPF.js"></script>
     <script src="../src/FilterBank.js"></script>
     <script src="../src/Pingpong.js"></script>
@@ -19,15 +21,22 @@
     <script src="../src/Saturator.js"></script>-->
 
     <!-- test code -->
+    <script id="code">
+      var uOSC = WX.Oscil({ pType: "sine", pFreq: 440, pGain: 0.5 });
+      var uNoise = WX.Noise();
+      // var uOSC2 = WX.Oscil({ pType: "sine", pGain: 0.25 });
+      // uOSC.control(uOSC2, 'pGain');
+      // WX.patch(uOSC2, WX.DAC);
+      // WX.patch(uOSC, WX.DAC);
+      // WX.patch(uNoise, WX.DAC);
+
+      // ADSR, Chorus needs to be tested.
+    </script>
+
     <script>
-
-    var uOSC = WX.Oscil({ pType: "sine", pFreq: 7, pGain: 0.5 });
-    var uOSC2 = WX.Oscil({ pType: "sine", pGain: 0.25 });
-    uOSC.control(uOSC2, 'pGain');
-    // WX.patch(uOSC2, WX.DAC);
-
-    // ADSR, Chorus needs to be tested.
-
+      var id_codelisting = document.getElementById('code-listing');
+      var id_code = document.getElementById('code');
+      id_codelisting.textContent = id_code.innerHTML;
     </script>
 
   </body>
