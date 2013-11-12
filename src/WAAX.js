@@ -511,8 +511,6 @@ window.WX = {};
     for (var i = 0; i < names.length; i++) {
       _data[i] = [names[i], bufferData[names[i]]];
     }
-    // start recursion
-    _recurseXHR(_data, 0);
 
     // recurse XHR loader
     function _recurseXHR (data, iteration) {
@@ -575,6 +573,13 @@ window.WX = {};
       },
       getBufferNames: function () {
         return Object.keys(_buffers);
+      },
+      /**
+       *  Begin loading the buffers.
+       **/
+      load: function () {
+        // start recursion
+        _recurseXHR(_data, 0);
       }
     };
 
