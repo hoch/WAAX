@@ -26,7 +26,7 @@
     },
 
     _Mute: function () {
-      this._nInput.gain.value = this.params.pMute ? 0.0 : 1.0;
+      WX.$(this._nInput.gain, this.params.pMute ? 0.0 : 1.0);
     },
 
     // overide default _Gain helper
