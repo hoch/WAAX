@@ -9,12 +9,15 @@
     phase[i] = 0.0;
   }
   var impulse;
-  // TODO: shim
-  if (typeof WX.context.createWaveTable === 'function') {
-    impulse = WX.context.createWaveTable(mag, phase);
-  } else {
-    impulse = WX.context.createPeriodicWave(mag, phase);
-  }
+
+  WX.add_init_callback(function () {
+    // TODO: shim
+    if (typeof WX.context.createWaveTable === 'function') {
+      impulse = WX.context.createWaveTable(mag, phase);
+    } else {
+      impulse = WX.context.createPeriodicWave(mag, phase);
+    }
+  });
 
 
   /**

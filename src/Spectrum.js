@@ -1,10 +1,21 @@
 (function (WX) {
 
   // static
-  var kOctaves = 10;
-  var kFrequencyGrid = [30, 65, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
-  var kNyquist = WX.sampleRate * 0.5;
-  var kLogBase = 2.0;
+  var kOctaves;
+  var kFrequencyGrid;
+  var kNyquist;
+  var kLogBase;
+  
+  /**
+   *  Initialize the Spectrum static class variables before using the class.
+   **/
+  WX.add_init_callback(function () {
+    kOctaves = 10;
+    kFrequencyGrid = [30, 65, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
+    kNyquist = WX.sampleRate * 0.5;
+    kLogBase = 2.0;
+  });
+
 
   /**
    * WX.Spectrum
@@ -32,6 +43,7 @@
 
     this.setParams(this.params);
   }
+
 
   Spectrum.prototype = {
 
@@ -125,5 +137,4 @@
   WX.Spectrum = function (params) {
     return new Spectrum(params);
   };
-
 })(WX);
