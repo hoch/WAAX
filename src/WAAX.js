@@ -615,10 +615,9 @@ window.WX = {};
     if (_kApiAvailable) {
       for (i = 0; i < _initCallbacks.length; i++) {
         (_initCallbacks[i])();
-        
-        // start loading other units... go!
-        WX.log.post('WAAX core loaded. (' + WX.System.REVISION + ')');
       }
+      // start loading other units... go!
+      WX.log.post('WAAX core loaded. (' + WX.System.REVISION + ')');
     } else {
       WX.log.error('WAAX is not currently supported in this browser!');
       
