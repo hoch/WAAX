@@ -2,15 +2,17 @@
 
   // generating impulse periodic wave
   var binSize = 4096;
-  var mag = new Float32Array(binSize);
-  var phase = new Float32Array(binSize);
-  for (i = 0; i < binSize; ++i) {
-    mag[i] = 1.0;
-    phase[i] = 0.0;
-  }
+  var mag;
+  var phase;
   var impulse;
 
   WX.add_init_callback(function () {
+    mag = new Float32Array(binSize);
+    phase = new Float32Array(binSize);
+    for (i = 0; i < binSize; ++i) {
+      mag[i] = 1.0;
+      phase[i] = 0.0;
+    }
     // TODO: shim
     if (typeof WX.context.createWaveTable === 'function') {
       impulse = WX.context.createWaveTable(mag, phase);
