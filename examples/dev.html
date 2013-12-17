@@ -20,7 +20,9 @@
 
     <!-- test code -->
     <script>
-
+      
+    WX.init();
+    
     var uOSC = WX.Oscil({ pType: "sine", pFreq: 7, pGain: 0.5 });
     var uOSC2 = WX.Oscil({ pType: "sine", pGain: 0.25 });
     uOSC.control(uOSC2, 'pGain');

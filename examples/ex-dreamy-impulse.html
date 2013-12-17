@@ -74,6 +74,9 @@
 
     <!-- scripts -->
     <script>
+
+      WX.init();
+      
       // patch
       var uLfo = WX.Oscil({ pGain:1250.0, pFreq:0.125 });
       var uStp = WX.Step({ pGain:1250.0 });

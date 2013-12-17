@@ -1,12 +1,17 @@
 (function (WX) {
 
   // DC offset of 1 second for step function
-  var dcOffset = WX.nBuffer(1, WX.context.sampleRate, WX.context.sampleRate);
-  var temp = new Float32Array(WX.context.sampleRate);
-  for(var i = 0; i < WX.context.sampleRate; ++i) {
-    temp[i] = 1.0;
-  }
-  dcOffset.getChannelData(0).set(temp, 0);
+  var dcOffset;
+  var temp;
+
+  WX.add_init_callback(function () {
+    dcOffset = WX.nBuffer(1, WX.context.sampleRate, WX.context.sampleRate);
+    temp = new Float32Array(WX.context.sampleRate);
+    for(var i = 0; i < WX.context.sampleRate; ++i) {
+      temp[i] = 1.0;
+    }
+    dcOffset.getChannelData(0).set(temp, 0);
+  });
 
 
   /**

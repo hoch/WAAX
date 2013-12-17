@@ -16,7 +16,11 @@
 
   // creating white noise (gaussian distribution) buffer (10s)
   var duration = 10.0;
-  var baseNoiseBuffer = getNoiseBuffer_Gaussian(duration, WX.sampleRate);
+  var baseNoiseBuffer;
+
+  WX.add_init_callback(function () {
+    baseNoiseBuffer = getNoiseBuffer_Gaussian(duration, WX.sampleRate);
+  });
 
   // var whiteNoise1 = new Float32Array(bufferLength);
   // var whiteNoise2 = new Float32Array(bufferLength);

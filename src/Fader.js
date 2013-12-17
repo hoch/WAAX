@@ -53,8 +53,10 @@
     return new Fader(params);
   };
 
-  // hardcoded master channel
-  WX.DAC = WX.Fader({ pLabel: "DAC" });
-  WX.DAC.connect(WX.context.destination);
+  WX.add_init_callback(function () {
+    // hardcoded master channel
+    WX.DAC = WX.Fader({ pLabel: "DAC" });
+    WX.DAC.connect(WX.context.destination);
+  });
 
 })(WX);

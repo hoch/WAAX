@@ -69,12 +69,12 @@ window.WX = {};
   var _kApiAvailable = false;
   var _kLegacySupport = false;
   if (!window.hasOwnProperty('webkitAudioContext') && !window.hasOwnProperty('AudioContext')) {
-    WX.log.error('AudioContext seems to be missing. Bye.');
-    return null;
+    //WX.log.error('AudioContext seems to be missing. Bye.');
+    //return null;
   } else {
     if (!window.hasOwnProperty('webkitAudioContext')) {
-      WX.log.error('WAAX currently does not support FireFox due to its incomplete implementation of Web Audio API. Use Chrome or Safari. bye.');
-      return null;
+      //WX.log.error('WAAX currently does not support FireFox due to its incomplete implementation of Web Audio API. Use Chrome or Safari. bye.');
+      //return null;
     } else {
       _kApiAvailable = true;
       WX.log.info('Web Audio API fully supported.');
@@ -89,14 +89,31 @@ window.WX = {};
       }
     }
   }
+  
+  /**
+   *  For WX.init, any ugen that has static variables that depend on the
+   *  audio context running can register with `WX.add_init_callback` to 
+   *  ensure they are initialized after the audio context is set up.
+   *
+   *  If the audio context is not set up, i.e. it isn't available, then
+   *  WX.init will throw an error.
+   **/
+  var _initCallbacks = [];
 
+  WX.add_init_callback = function (cb) {
+    _initCallbacks.push(cb);
+  };
 
   /**
    * internal
    */
 
   // audio context
-  var _ctx = new AudioContext();
+  var _ctx = null;
+  if (_kApiAvailable) {
+    _ctx = new AudioContext();
+  }
+ 
   // unit stack for patch building
   // var _unitStack = [];
   // ignore function (to avoid prototype propagation)
@@ -588,8 +605,25 @@ window.WX = {};
   WX.BufferMap = function (bufferMapData, oncomplete, onprogress) {
     return _BufferMap(bufferMapData, oncomplete, onprogress);
   };
+  
+  /**
+   *  `WX.init` should be called from user code to initialize WAAX if possible.
+   **/
+  WX.init = function () {
+    var i;
 
-  // start loading other units... go!
-  WX.log.post('WAAX core loaded. (' + WX.System.REVISION + ')');
+    if (_kApiAvailable) {
+      for (i = 0; i < _initCallbacks.length; i++) {
+        (_initCallbacks[i])();
+      }
+      // start loading other units... go!
+      WX.log.post('WAAX core loaded. (' + WX.System.REVISION + ')');
+    } else {
+      WX.log.error('WAAX is not currently supported in this browser!');
+      
+    }
+  };
+
+
 
 })(window.WX);

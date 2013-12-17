@@ -74,6 +74,9 @@
     </div>
 
     <script>
+
+      WX.init();
+
       var uLFO = WX.Oscil({ pFreq: 4.4, pGain: 7.8 });
       var uOSC = WX.Oscil({ pType: 'sawtooth', pGain: 1.5 });
       var uForm = WX.FormantV();
