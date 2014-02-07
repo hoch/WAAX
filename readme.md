@@ -4,9 +4,9 @@ WAAX (Web Audio API eXtension)
 
 ### Please Note! ###
 
-The newer version of library (r12) will be pushed around the early October and it will include various enhancements and extra elements: **Web MIDI API support, Polymer-powered musical UI widgets, and a couple of impressive examples**. Stay tuned!
+The newer version of library (r13) will be pushed soon and it will include various enhancements and extra elements: **Web MIDI API support, Polymer-powered musical UI widgets, and a couple of impressive examples**. If you are interested in the future release, you can checkout the 'dev' branch.
 
-The information below is for the previous revision (r5) and will be deprecated with the release of the newer revision (r12) since it is a major update of library including several fundamental changes. Sorry for your inconvineince!
+The information below is for the previous revision (r5) and will be deprecated with the release of the newer revision (r13) since it is a major update of library including several fundamental changes. Sorry for your inconvineince!
 
 ### Quick links ###
 * [WX-IDE][6]
