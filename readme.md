@@ -11,7 +11,6 @@ The information below is for the previous revision (r5) and will be deprecated w
 ### Quick links ###
 * [WX-IDE][6]
 * [NIME 2013 Paper][21]
-* [CCRMA Colloquium 2013 Slides][22]
 
 ### Table of Contents ###
 * [Introduction](#indroduction)
