@@ -19,3 +19,11 @@ $ grunt
 ```
 
 Both `waax.js` and `waax.min.js` will be generated in the `build/` directory.
+
+Documentation
+-------------
+To generate the documentation:
+
+```bash
+$ grunt bfdocs
+```
