@@ -48,10 +48,30 @@ module.exports = function(grunt) {
         dest: 'build/<%= pkg.name %>.js'
       }
     },
+    bfdocs: {
+      waaxDocs: {
+        options: {
+          title: "WAAX.DOC",
+          manifest: {
+            files: [
+              "./docs/src/what-is-waax.md",
+              "./docs/src/*.md"
+            ],
+            css: "./docs/src/waax-doc-base.css",
+            maxTocLevel: 1
+          },
+          dest: "./docs/out",
+          theme: "default"
+        }
+      }
+    }
   });
 
   // Load the plugin that provides the "uglify" task.
   grunt.loadNpmTasks('grunt-contrib-uglify');
+
+  // This loads beautiful docs to generate the waax documentation
+  grunt.loadNpmTasks('grunt-beautiful-docs');
 
   // Default task(s).
   grunt.registerTask('default', ['uglify']);

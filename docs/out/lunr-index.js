@@ -82,6 +82,105 @@ index.add({
 
 
 
+documentTitles["intro-preface-web-audio-api.html#waax-introduction"] = "WAAX - introduction";
+index.add({
+    url: "intro-preface-web-audio-api.html#waax-introduction",
+    title: "WAAX - introduction",
+    body: "### WAAX - introduction  "
+});
+
+documentTitles["intro-preface-web-audio-api.html#preface-web-audio-api"] = "Preface: Web Audio API";
+index.add({
+    url: "intro-preface-web-audio-api.html#preface-web-audio-api",
+    title: "Preface: Web Audio API",
+    body: "# Preface: Web Audio API  Hey. This is a doc.  ```javascript WX.Oscil = function () {  } ```  | Parameter | Type   	| Description 				| |:----------|:---------:|:--------------------------| | pFreq     | float		| oscillator frequency | | pGain     | float 	| oscillator gain |"
+});
+
+
+
+documentTitles["license-and-acknowledgement.html#license-acknowledgement"] = "License &amp; Acknowledgement";
+index.add({
+    url: "license-and-acknowledgement.html#license-acknowledgement",
+    title: "License &amp; Acknowledgement",
+    body: "# License &amp; Acknowledgement  "
+});
+
+documentTitles["license-and-acknowledgement.html#license"] = "License";
+index.add({
+    url: "license-and-acknowledgement.html#license",
+    title: "License",
+    body: "## License  The MIT License&lt;br&gt; Copyright (c) 2010-2013 Hongchan Choi  "
+});
+
+documentTitles["license-and-acknowledgement.html#acknowldegement"] = "Acknowldegement";
+index.add({
+    url: "license-and-acknowledgement.html#acknowldegement",
+    title: "Acknowldegement",
+    body: "## Acknowldegement  Special thanks to Chris Rogers, who invented the world of web audio, for invaluable guidance and feedback. I am also grateful to several Googlers who have been truly supportive on this project: Greg Simon and Dimitri Glazkov, Chris Wilson, and Boris Smus. Lastly, I sincerely thank to my CCRMAlites - Jonathan Berger, Chris Chafe, Ge Wang, John Granzow, Colin Sullivan and Juhan Nam - for their enthusiasm to help me bring new technologies into the computer music."
+});
+
+
+
+documentTitles["midi.html#using-midi"] = "Using MIDI";
+index.add({
+    url: "midi.html#using-midi",
+    title: "Using MIDI",
+    body: "# Using MIDI  **NOTE!** MIDI support in WAAX requires Web MIDI API, which is only available on Chrome Canary on OSX at the time of writing.  This section describes how to program MIDI functionalities in conjuntion with WAAX library. Before launching the browser, MIDI-compatible device (MIDI controller or MIDI interface) needs to be connected to the computer and the proper device driver should be installed. Otherwise you will have to restart the browser to get MIDI devices recognized.  "
+});
+
+documentTitles["midi.html#importing-midi-supprot"] = "Importing MIDI Supprot";
+index.add({
+    url: "midi.html#importing-midi-supprot",
+    title: "Importing MIDI Supprot",
+    body: "## Importing MIDI Supprot  If you are using the minified version of WAAX, you do not need to do anything further because the MIDI library is already enclosed. However, if you are selectivly importing WAAX components, the MIDI manager, `Ktrl.js`, should be included in the HTML document. (replace `waax_path` with the local WAAX directory.)  ``` &lt;script src=\&quot;waax_path/Ktrl.js\&quot;&gt;&lt;/script&gt; ```  "
+});
+
+documentTitles["midi.html#creating-midi-target-and-data-handler"] = "Creating MIDI Target and Data Handler";
+index.add({
+    url: "midi.html#creating-midi-target-and-data-handler",
+    title: "Creating MIDI Target and Data Handler",
+    body: "## Creating MIDI Target and Data Handler  `Ktrl.js` offers highly flexible MIDI data routing by abstracting physical and virtual MIDI devices. In order to route MIDI data to a certain destination, a MIDI target must be created.  ``` var midiTarget = Ktrl.createTarget(\&quot;mySynth\&quot;); midiTarget.activate(); ```  The next step is to design MIDI data handler for the newly created `midiTarget` instance. Use `.onData()` method to define the data handler. Programming the data handler is much easier than dealing with raw MIDI data bytes since the `.parse()` method transforms the raw data into human-readable form.  ``` midiTarget.onData(function (midimessage) {   var data = Ktrl.parse(midimessage);   switch (data.type) {     case \&quot;noteon\&quot;:       console.log(data.pitch, data.velocity);       break;     // more handling code...   } }); ```   "
+});
+
+documentTitles["midi.html#routing-midi-data"] = "Routing MIDI data";
+index.add({
+    url: "midi.html#routing-midi-data",
+    title: "Routing MIDI data",
+    body: "## Routing MIDI data  With the data handler, now we are ready to use the MIDI target for the incoming MIDI data. The final step of MIDI programming is routing MIDI inputs to the MIDI targets. Like the MIDI system in common digital audio workstation, `Ktrl.js` provides an aggregated input device; regardless of the number of devices connected to the system, it can be treated as a single virtual MIDI input device.  ``` Ktrl.ready(function () {   Ktrl.routeAllToTarget(midiTarget); }); ```  This is a safe bet for common usage since whatever MIDI device connected to the system, it will be used by the HTML document without specifying the reference of MIDI device. Alternatively, you can create individual routings as shown below.  ``` Ktrl.ready(function () {   Ktrl.routeSourceToTarget(1, midiTarget); }); ```  The code above demonstrates how to connect the second MIDI device to the web audio synth (MIDI target). However, if the computer does not have the second MIDI device, it will throw an error.  For the API reference, please visit [the project page](https://github.com/hoch/Ktrl)."
+});
+
+
+
+documentTitles["mui.html#mui-musical-user-interface"] = "MUI (Musical User Interface)";
+index.add({
+    url: "mui.html#mui-musical-user-interface",
+    title: "MUI (Musical User Interface)",
+    body: "# MUI (Musical User Interface)  MUI is a collection of custom HTML elements that are specifically disigned for musical applications.   "
+});
+
+documentTitles["mui.html#installation"] = "Installation";
+index.add({
+    url: "mui.html#installation",
+    title: "Installation",
+    body: "## Installation  Since MUI is a part of WAAX, so no additional installation is necessary if you have already installed the WAAX by cloning the repository or downloading the files. MUI elements are built on top of [Polymer](http://www.polymer-project.org/) and it is already included in the MUI directory.   "
+});
+
+documentTitles["mui.html#loading-mui-in-html-document"] = "Loading MUI in HTML document";
+index.add({
+    url: "mui.html#loading-mui-in-html-document",
+    title: "Loading MUI in HTML document",
+    body: "## Loading MUI in HTML document  Currently activating MUI needs a bit more work. (It will be fixed soon.) First off, Polymer library must be loaded first and then MUI core and its style sheet should come next.  ```html &lt;script src=\&quot;lib/polymer.min.js\&quot;&gt;&lt;/script&gt; &lt;script src=\&quot;mui-core.js\&quot;&gt;&lt;/script&gt; &lt;link rel=\&quot;stylesheet\&quot; type=\&quot;text/css\&quot; href=\&quot;mui-core.css\&quot;&gt; ```  Once the bootstrap is loaded, you can selectively start loading MUI elements (GUI widgets) you wish to use on the document. The following example shows how to import the knob and the toggle switch.  ```html &lt;link rel=\&quot;import\&quot; href=\&quot;elements/mui-knob.html\&quot;&gt; &lt;link rel=\&quot;import\&quot; href=\&quot;elements/mui-toggle.html\&quot;&gt; ```   "
+});
+
+documentTitles["mui.html#using-mui-elements"] = "Using MUI elements";
+index.add({
+    url: "mui.html#using-mui-elements",
+    title: "Using MUI elements",
+    body: "## Using MUI elements  Here is the fun part. You can create knobs and toggles switches by simply writing  HTML codes below. They are called \&quot;custom elements\&quot; which is made possible by Polymer; highly-componentized, portable, and reusable GUI widgets specifically designed for WAAX unit.  ```html &lt;mui-toggle id=\&quot;kActive\&quot; label=\&quot;ON\&quot;&gt;&lt;/mui-toggle&gt; &lt;mui-knob id=\&quot;kFreq\&quot; label=\&quot;Frequency\&quot; value=\&quot;0.01\&quot; min=\&quot;5000\&quot; max=\&quot;440.0\&quot;&gt;&lt;/mui-knob&gt; ```  Linking the toggle switch and the knob to the oscillator is surprinsingly simple. The good news is you do not have to worry about synchronizing variables in GUI widgets, corresponding parameters in WAAX unit and even values in the abstracted Web Audio API node.  ```javascript var osc = WX.Oscil(); MUI.$('kActive').link(osc, 'pActive'); MUI.$('kFreq').link(osc, 'pFreq'); ```  You can select a MUI element by using the special selector `MUI.$()`. Each MUI element has `.link()` method and the binding to a certain parameter can be done by passing the target unit reference (`osc`) and the parameter name (`pActive` or `pFreq`).  This auto-magical parameter binding is managed by Polymer ensuring all the values across different layers completely synchronized. That means the value in the oscillator will be changed when you touch the knob, and also the knob position will be changed when you modify the parameter value of the oscillator. This takes preset managment and MIDI support to another level. Truly empowering!"
+});
+
+
+
 documentTitles["parameter-control.html#parameter-control"] = "Parameter Control";
 index.add({
     url: "parameter-control.html#parameter-control",
@@ -119,62 +218,151 @@ index.add({
 
 
 
-documentTitles["mui.html#mui-musical-user-interface"] = "MUI (Musical User Interface)";
+documentTitles["toc.html#table-of-contents"] = "Table of contents";
 index.add({
-    url: "mui.html#mui-musical-user-interface",
-    title: "MUI (Musical User Interface)",
-    body: "# MUI (Musical User Interface)  MUI is a collection of custom HTML elements that are specifically disigned for musical applications.   "
+    url: "toc.html#table-of-contents",
+    title: "Table of contents",
+    body: "# Table of contents  "
 });
 
-documentTitles["mui.html#installation"] = "Installation";
+documentTitles["toc.html#what-is-waax"] = "What is WAAX?";
 index.add({
-    url: "mui.html#installation",
-    title: "Installation",
-    body: "## Installation  Since MUI is a part of WAAX, so no additional installation is necessary if you have already installed the WAAX by cloning the repository or downloading the files. MUI elements are built on top of [Polymer](http://www.polymer-project.org/) and it is already included in the MUI directory.   "
+    url: "toc.html#what-is-waax",
+    title: "What is WAAX?",
+    body: "# What is WAAX?   - Introduction   - Features   - Cross-platform Support   - Cross-browser Support  "
 });
 
-documentTitles["mui.html#loading-mui-in-html-document"] = "Loading MUI in HTML document";
+documentTitles["toc.html#getting-started"] = "Getting Started";
 index.add({
-    url: "mui.html#loading-mui-in-html-document",
-    title: "Loading MUI in HTML document",
-    body: "## Loading MUI in HTML document  Currently activating MUI needs a bit more work. (It will be fixed soon.) First off, Polymer library must be loaded first and then MUI core and its style sheet should come next.  ```html &lt;script src=\&quot;lib/polymer.min.js\&quot;&gt;&lt;/script&gt; &lt;script src=\&quot;mui-core.js\&quot;&gt;&lt;/script&gt; &lt;link rel=\&quot;stylesheet\&quot; type=\&quot;text/css\&quot; href=\&quot;mui-core.css\&quot;&gt; ```  Once the bootstrap is loaded, you can selectively start loading MUI elements (GUI widgets) you wish to use on the document. The following example shows how to import the knob and the toggle switch.  ```html &lt;link rel=\&quot;import\&quot; href=\&quot;elements/mui-knob.html\&quot;&gt; &lt;link rel=\&quot;import\&quot; href=\&quot;elements/mui-toggle.html\&quot;&gt; ```   "
+    url: "toc.html#getting-started",
+    title: "Getting Started",
+    body: "# Getting Started   - Installation   - Using WAAX in HTML document   - \&quot;Hello Sine\&quot;  "
 });
 
-documentTitles["mui.html#using-mui-elements"] = "Using MUI elements";
+documentTitles["toc.html#parameter-control"] = "Parameter Control";
 index.add({
-    url: "mui.html#using-mui-elements",
-    title: "Using MUI elements",
-    body: "## Using MUI elements  Here is the fun part. You can create knobs and toggles switches by simply writing  HTML codes below. They are called \&quot;custom elements\&quot; which is made possible by Polymer; highly-componentized, portable, and reusable GUI widgets specifically designed for WAAX unit.  ```html &lt;mui-toggle id=\&quot;kActive\&quot; label=\&quot;ON\&quot;&gt;&lt;/mui-toggle&gt; &lt;mui-knob id=\&quot;kFreq\&quot; label=\&quot;Frequency\&quot; value=\&quot;0.01\&quot; min=\&quot;5000\&quot; max=\&quot;440.0\&quot;&gt;&lt;/mui-knob&gt; ```  Linking the toggle switch and the knob to the oscillator is surprinsingly simple. The good news is you do not have to worry about synchronizing variables in GUI widgets, corresponding parameters in WAAX unit and even values in the abstracted Web Audio API node.  ```javascript var osc = WX.Oscil(); MUI.$('kActive').link(osc, 'pActive'); MUI.$('kFreq').link(osc, 'pFreq'); ```  You can select a MUI element by using the special selector `MUI.$()`. Each MUI element has `.link()` method and the binding to a certain parameter can be done by passing the target unit reference (`osc`) and the parameter name (`pActive` or `pFreq`).  This auto-magical parameter binding is managed by Polymer ensuring all the values across different layers completely synchronized. That means the value in the oscillator will be changed when you touch the knob, and also the knob position will be changed when you modify the parameter value of the oscillator. This takes preset managment and MIDI support to another level. Truly empowering!"
+    url: "toc.html#parameter-control",
+    title: "Parameter Control",
+    body: "# Parameter Control   - .set()   - Automation   - Modulation   - Saving/loading presets  "
 });
 
-
-
-documentTitles["midi.html#using-midi"] = "Using MIDI";
+documentTitles["toc.html#mui"] = "MUI";
 index.add({
-    url: "midi.html#using-midi",
-    title: "Using MIDI",
-    body: "# Using MIDI  **NOTE!** MIDI support in WAAX requires Web MIDI API, which is only available on Chrome Canary on OSX at the time of writing.  This section describes how to program MIDI functionalities in conjuntion with WAAX library. Before launching the browser, MIDI-compatible device (MIDI controller or MIDI interface) needs to be connected to the computer and the proper device driver should be installed. Otherwise you will have to restart the browser to get MIDI devices recognized.  "
+    url: "toc.html#mui",
+    title: "MUI",
+    body: "# MUI   - Installation   - Using MUI in HTML document   - Binding Parameters with MUI  "
 });
 
-documentTitles["midi.html#importing-midi-supprot"] = "Importing MIDI Supprot";
+documentTitles["toc.html#midi-support"] = "MIDI Support";
 index.add({
-    url: "midi.html#importing-midi-supprot",
-    title: "Importing MIDI Supprot",
-    body: "## Importing MIDI Supprot  If you are using the minified version of WAAX, you do not need to do anything further because the MIDI library is already enclosed. However, if you are selectivly importing WAAX components, the MIDI manager, `Ktrl.js`, should be included in the HTML document. (replace `waax_path` with the local WAAX directory.)  ``` &lt;script src=\&quot;waax_path/Ktrl.js\&quot;&gt;&lt;/script&gt; ```  "
+    url: "toc.html#midi-support",
+    title: "MIDI Support",
+    body: "# MIDI Support   - MIDI input and target   - Parsing incoming MIDI data  "
 });
 
-documentTitles["midi.html#creating-midi-target-and-data-handler"] = "Creating MIDI Target and Data Handler";
+documentTitles["toc.html#dynamic-lifecycle"] = "Dynamic Lifecycle";
 index.add({
-    url: "midi.html#creating-midi-target-and-data-handler",
-    title: "Creating MIDI Target and Data Handler",
-    body: "## Creating MIDI Target and Data Handler  `Ktrl.js` offers highly flexible MIDI data routing by abstracting physical and virtual MIDI devices. In order to route MIDI data to a certain destination, a MIDI target must be created.  ``` var midiTarget = Ktrl.createTarget(\&quot;mySynth\&quot;); midiTarget.activate(); ```  The next step is to design MIDI data handler for the newly created `midiTarget` instance. Use `.onData()` method to define the data handler. Programming the data handler is much easier than dealing with raw MIDI data bytes since the `.parse()` method transforms the raw data into human-readable form.  ``` midiTarget.onData(function (midimessage) {   var data = Ktrl.parse(midimessage);   switch (data.type) {     case \&quot;noteon\&quot;:       console.log(data.pitch, data.velocity);       break;     // more handling code...   } }); ```   "
+    url: "toc.html#dynamic-lifecycle",
+    title: "Dynamic Lifecycle",
+    body: "# Dynamic Lifecycle   - Why and when is it useful?   - Usage  "
 });
 
-documentTitles["midi.html#routing-midi-data"] = "Routing MIDI data";
+documentTitles["toc.html#using-visualizer"] = "Using Visualizer";
 index.add({
-    url: "midi.html#routing-midi-data",
-    title: "Routing MIDI data",
-    body: "## Routing MIDI data  With the data handler, now we are ready to use the MIDI target for the incoming MIDI data. The final step of MIDI programming is routing MIDI inputs to the MIDI targets. Like the MIDI system in common digital audio workstation, `Ktrl.js` provides an aggregated input device; regardless of the number of devices connected to the system, it can be treated as a single virtual MIDI input device.  ``` Ktrl.ready(function () {   Ktrl.routeAllToTarget(midiTarget); }); ```  This is a safe bet for common usage since whatever MIDI device connected to the system, it will be used by the HTML document without specifying the reference of MIDI device. Alternatively, you can create individual routings as shown below.  ``` Ktrl.ready(function () {   Ktrl.routeSourceToTarget(1, midiTarget); }); ```  The code above demonstrates how to connect the second MIDI device to the web audio synth (MIDI target). However, if the computer does not have the second MIDI device, it will throw an error.  For the API reference, please visit [the project page](https://github.com/hoch/Ktrl)."
+    url: "toc.html#using-visualizer",
+    title: "Using Visualizer",
+    body: "# Using Visualizer  "
+});
+
+documentTitles["toc.html#design-your-own-unit"] = "Design Your Own Unit";
+index.add({
+    url: "toc.html#design-your-own-unit",
+    title: "Design Your Own Unit",
+    body: "# Design Your Own Unit   - Anatomy of WAAX Unit  "
+});
+
+documentTitles["toc.html#unit-reference"] = "Unit Reference";
+index.add({
+    url: "toc.html#unit-reference",
+    title: "Unit Reference",
+    body: "# Unit Reference  "
+});
+
+documentTitles["toc.html#utilitiy-reference"] = "Utilitiy Reference";
+index.add({
+    url: "toc.html#utilitiy-reference",
+    title: "Utilitiy Reference",
+    body: "# Utilitiy Reference  "
+});
+
+documentTitles["toc.html#resources"] = "Resources";
+index.add({
+    url: "toc.html#resources",
+    title: "Resources",
+    body: "# Resources   - 2013 NIME paper   - Web Audio API W3C spec   - Web MIDI API W3C spec   - Web Audio/MIDI Playground (Chris Wilson)   - Web Audio Demo Collection  "
+});
+
+documentTitles["toc.html#license-and-acknowledgement"] = "License and Acknowledgement";
+index.add({
+    url: "toc.html#license-and-acknowledgement",
+    title: "License and Acknowledgement",
+    body: "# License and Acknowledgement       ----------------------------------------------------------------- "
+});
+
+documentTitles["toc.html#introduction"] = "Introduction";
+index.add({
+    url: "toc.html#introduction",
+    title: "Introduction",
+    body: "## Introduction   - Preface: Web Audio API   - What is WAAX?   - Why is it created?  "
+});
+
+documentTitles["toc.html#setting-up"] = "Setting up";
+index.add({
+    url: "toc.html#setting-up",
+    title: "Setting up",
+    body: "## Setting up   - System requirements   - Using WAAX in your web page  "
+});
+
+documentTitles["toc.html#concepts"] = "Concepts";
+index.add({
+    url: "toc.html#concepts",
+    title: "Concepts",
+    body: "## Concepts   - Units: generator, processor and analyzer   - Building your first synthesizer   - Parameter control using WAAX  "
+});
+
+documentTitles["toc.html#live-examples"] = "Live examples";
+index.add({
+    url: "toc.html#live-examples",
+    title: "Live examples",
+    body: "## Live examples   - Interactive Code Editor: WXide   - Using Web MIDI API with _Ktrl_ library  "
+});
+
+documentTitles["toc.html#references"] = "References";
+index.add({
+    url: "toc.html#references",
+    title: "References",
+    body: "## References   - WAAX Units   - WAAX Utilities   - 2013 NIME paper   - Web Audio API W3C spec   - Web MIDI API W3C spec  "
+});
+
+documentTitles["toc.html#tutorial"] = "Tutorial";
+index.add({
+    url: "toc.html#tutorial",
+    title: "Tutorial",
+    body: "## Tutorial  "
+});
+
+documentTitles["toc.html#waax-101-computer-generated-sound"] = "WAAX 101: Computer-generated Sound";
+index.add({
+    url: "toc.html#waax-101-computer-generated-sound",
+    title: "WAAX 101: Computer-generated Sound",
+    body: "### WAAX 101: Computer-generated Sound   - Making a new timbre   - Crafting your first synth   - Art of envelope: FM Drones   - Trigger-happy: a simple sampler  "
+});
+
+documentTitles["toc.html#advanced-topic"] = "Advanced topic";
+index.add({
+    url: "toc.html#advanced-topic",
+    title: "Advanced topic",
+    body: "###  Advanced topic   - Understanding WAAX unit container   - Creating a new unit with WAAX unit builder   - Using PeriodicWave for complex tone   - Tip: pre-baked array buffer   - Tip: homebrewing IR and warped convolution"
 });
 
 
@@ -769,25 +957,25 @@ index.add({
 
 
 
-documentTitles["license-and-acknowledgement.html#license-acknowledgement"] = "License &amp; Acknowledgement";
+documentTitles["wx-oscil.html#wxoscil"] = "WX.Oscil";
 index.add({
-    url: "license-and-acknowledgement.html#license-acknowledgement",
-    title: "License &amp; Acknowledgement",
-    body: "# License &amp; Acknowledgement  "
+    url: "wx-oscil.html#wxoscil",
+    title: "WX.Oscil",
+    body: "# WX.Oscil Multi-waveform oscillator with gain control.  "
 });
 
-documentTitles["license-and-acknowledgement.html#license"] = "License";
+documentTitles["wx-oscil.html#parameters"] = "Parameters";
 index.add({
-    url: "license-and-acknowledgement.html#license",
-    title: "License",
-    body: "## License  The MIT License&lt;br&gt; Copyright (c) 2010-2013 Hongchan Choi  "
+    url: "wx-oscil.html#parameters",
+    title: "Parameters",
+    body: "## Parameters | Parameter | Type    | Description     | Default  | Range | |:---------:|:-------:|:---------------:|:--------:|:-----:| | pType     | string  | waveform type   | 'sine'   | 'sine', 'square', 'sawtooth', 'triangle'| | pFreq     | float   | frequency  | 440.0   |            | | pGain     | float   | gain       | 0.25    |            ||   "
 });
 
-documentTitles["license-and-acknowledgement.html#acknowldegement"] = "Acknowldegement";
+documentTitles["wx-oscil.html#usage"] = "Usage";
 index.add({
-    url: "license-and-acknowledgement.html#acknowldegement",
-    title: "Acknowldegement",
-    body: "## Acknowldegement  Special thanks to Chris Rogers, who invented the world of web audio, for invaluable guidance and feedback. I am also grateful to several Googlers who have been truly supportive on this project: Greg Simon and Dimitri Glazkov, Chris Wilson, and Boris Smus. Lastly, I sincerely thank to my CCRMAlites - Jonathan Berger, Chris Chafe, Ge Wang, John Granzow, Colin Sullivan and Juhan Nam - for their enthusiasm to help me bring new technologies into the computer music."
+    url: "wx-oscil.html#usage",
+    title: "Usage",
+    body: "## Usage ```javascript var osc = WX.Oscil({ pFreq: 440 }); osc.set('pType', 'sawtooth'); // gain ramping (0.5 to 0.0 in 2 seconds) osc.set('pGain', 0.5).set('pGain', 0.0, 1, WX.now + 2); WX.patch(osc, WX.Master); ```"
 });
 
 
