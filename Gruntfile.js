@@ -55,7 +55,12 @@ module.exports = function(grunt) {
           manifest: {
             files: [
               "./docs/src/what-is-waax.md",
-              "./docs/src/*.md"
+              "./docs/src/getting-started.md",
+              "./docs/src/parameter-control.md",
+              "./docs/src/mui.md",
+              "./docs/src/midi.md",
+              "./docs/src/unit-reference.md",
+              "./docs/src/license-and-acknowledgement.md"
             ],
             css: "./docs/src/waax-doc-base.css",
             maxTocLevel: 1

@@ -46,17 +46,7 @@
         </li>
     
         <li>
-            <a href="intro-preface-web-audio-api.html#preface-web-audio-api">Preface: Web Audio API</a>
-            
-        </li>
-    
-        <li>
-            <a href="license-and-acknowledgement.html#license-acknowledgement">License &amp; Acknowledgement</a>
-            
-        </li>
-    
-        <li>
-            <a href="midi.html#using-midi">Using MIDI</a>
+            <a href="parameter-control.html#parameter-control">Parameter Control</a>
             
         </li>
     
@@ -66,72 +56,7 @@
         </li>
     
         <li>
-            <a href="parameter-control.html#parameter-control">Parameter Control</a>
-            
-        </li>
-    
-        <li>
-            <a href="toc.html#table-of-contents">Table of contents</a>
-            
-        </li>
-    
-        <li>
-            <a href="toc.html#what-is-waax">What is WAAX?</a>
-            
-        </li>
-    
-        <li>
-            <a href="toc.html#getting-started">Getting Started</a>
-            
-        </li>
-    
-        <li>
-            <a href="toc.html#parameter-control">Parameter Control</a>
-            
-        </li>
-    
-        <li>
-            <a href="toc.html#mui">MUI</a>
-            
-        </li>
-    
-        <li>
-            <a href="toc.html#midi-support">MIDI Support</a>
-            
-        </li>
-    
-        <li>
-            <a href="toc.html#dynamic-lifecycle">Dynamic Lifecycle</a>
-            
-        </li>
-    
-        <li>
-            <a href="toc.html#using-visualizer">Using Visualizer</a>
-            
-        </li>
-    
-        <li>
-            <a href="toc.html#design-your-own-unit">Design Your Own Unit</a>
-            
-        </li>
-    
-        <li>
-            <a href="toc.html#unit-reference">Unit Reference</a>
-            
-        </li>
-    
-        <li>
-            <a href="toc.html#utilitiy-reference">Utilitiy Reference</a>
-            
-        </li>
-    
-        <li>
-            <a href="toc.html#resources">Resources</a>
-            
-        </li>
-    
-        <li>
-            <a href="toc.html#license-and-acknowledgement">License and Acknowledgement</a>
+            <a href="midi.html#using-midi">Using MIDI</a>
             
         </li>
     
@@ -141,7 +66,7 @@
         </li>
     
         <li>
-            <a href="wx-oscil.html#wxoscil">WX.Oscil</a>
+            <a href="license-and-acknowledgement.html#license-acknowledgement">License &amp; Acknowledgement</a>
             
         </li>
     
@@ -207,41 +132,62 @@ noise.to(lpf).to(WX.Master);
 WX.patch(noise, lpf, WX.Master);
 </code></pre><p>There we just built our first <em>audiographs</em> with WAAX. Try this example here!</p>
 
-<h3 id="waax-introduction">WAAX - introduction</h3>
-<h1 id="preface-web-audio-api">Preface: Web Audio API</h1>
-<p>Hey. This is a doc.</p>
-<pre><code class="lang-javascript">WX.Oscil = function () {
-
-}
+<h1 id="parameter-control">Parameter Control</h1>
+<p>Having a complete control on parameters is crucial in sound synthesis. It gives you the ability to create more complex and interesting sound. With that in mind, WAAX is carefully designed to offer the ease of control with maximum flexibilty.</p>
+<h2 id="tweaking-parameters">Tweaking Parameters</h2>
+<p>Every WAAX unit has a <code>.params</code> object, that includes all the available parameters that user can tweak. It is fairly similar to <code>AudioParam</code> object from Web Audio API and it is an abstract layer for <code>AudioParam</code> with more simple syntax and other neat features such as saving/loading presets or easy binding to GUI widgets. The unit reference documentation contains detailed information on the unit-specific parameters.</p>
+<pre><code>var osc = WX.Oscil({ pFreq: 440.0 });
+osc.set(&#39;pGain&#39;, 0.25);
+osc.to(WX.Master);
+</code></pre><p>The <code>.set()</code> method in WAAX is designed for comprehensive parameter control. This method makes it possible to apply the unified parameter control across all the WAAX units. As shown above, the <code>.set()</code> method requires <strong>parameter name</strong> and <strong>value</strong> to do the job.</p>
+<p>Note that WAAX parameters start with the lowercase <em>p</em> such as <code>pGain</code> and <code>pFreq</code>. It indicates the variable is a parameter that you can <em>set, automate, link, and bind</em> with other elements in the WAAX system.</p>
+<h2 id="making-transitions">Making Transitions</h2>
+<p>The code example below will generate a sine wave with 2 seconds of fade-in and 2 seconds of fade-out. This procedure has so many names: automation, slewing, transition, ramping and so on; it is very important to avoid a sudden change on parameters unless it is required or intended. Without proper ramping up and down, the resulting sound will suffer from clicks and pops.</p>
+<pre><code class="lang-javascript">var osc = WX.Oscil({ pGain: 0.0 });
+osc.to(WX.Master);
+osc.set(&#39;pGain&#39;, 1.0, &#39;line&#39;, WX.now + 2.0);
+osc.set(&#39;pGain&#39;, 0,0, &#39;line&#39;, WX.now + 4.0);
 </code></pre>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">Parameter</th>
-<th style="text-align:center">Type</th>
-<th style="text-align:left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">pFreq</td>
-<td style="text-align:center">float</td>
-<td style="text-align:left">oscillator frequency</td>
-</tr>
-<tr>
-<td style="text-align:left">pGain</td>
-<td style="text-align:center">float</td>
-<td style="text-align:left">oscillator gain</td>
-</tr>
-</tbody>
-</table>
+<p>As shown above, you can add 3 more arguments to achieve time-related tasks. (In this case it uses 2 more arguments, transition type and end time) In addition, the <code>.set()</code> method is using <code>WX.now</code> variable because we need to specify the temporal structure of this transition. Note that <code>WX.now</code> always returns the elapsed time in seconds since the audio context of the page started.</p>
+<h2 id="modulation">Modulation</h2>
+<p>To make a long story <em>very</em> short, the modulation is modifying a signal with the other signal. In Web Audio API, you can change a parameter automatically and programmtically by connecting a signal to the parameter. Usually a synthesizer has a complex routing table for modulation and it is often called a modulation matrix.</p>
+<pre><code>var osc = WX.Oscil({ pGain: 0.0 }),
+    lfo = WX.Oscil({ pFreq: 1.0, Gain: 0.5 });
+lfo.modulate(osc, &#39;pGain&#39;);
+</code></pre><p>In the example above, we have the oscillator <code>lfo</code> modulate the gain of the <code>osc</code> unit to accomplish amplitude modulation (AM). Behind the scene, the <code>.modulate()</code> method looks for available modulation targets in the <code>osc</code> unit, and create the modulation route with the parameter named &#39;pGain.&#39;</p>
+<p>Not all parameters are modulatable. The information on modulation target on each unit can be found on the unit reference documentation. For more advanced modulation, please have a look at the tutorial on modulation.</p>
+<h2 id="saving-and-loading-presets">Saving and Loading Presets</h2>
+<p>Every unit in WAAX has two methods in common: <code>.getParams()</code> and <code>.setParams()</code>. By using these methods, you can retrieve or set the current parameters in unit. They are useful when you are saving whole paramemters for multiple units as a preset.</p>
+<pre><code>var params = osc.getParams();
+osc.setParams(params);
+</code></pre><p>Note that the method <code>.getParams()</code> returns a new (cloned) object, not the reference of parameter object in the unit.</p>
 
-<h1 id="license-acknowledgement">License &amp; Acknowledgement</h1>
-<h2 id="license">License</h2>
-<p>The MIT License<br>
-Copyright (c) 2010-2013 Hongchan Choi</p>
-<h2 id="acknowldegement">Acknowldegement</h2>
-<p>Special thanks to Chris Rogers, who invented the world of web audio, for invaluable guidance and feedback. I am also grateful to several Googlers who have been truly supportive on this project: Greg Simon and Dimitri Glazkov, Chris Wilson, and Boris Smus. Lastly, I sincerely thank to my CCRMAlites - Jonathan Berger, Chris Chafe, Ge Wang, John Granzow, Colin Sullivan and Juhan Nam - for their enthusiasm to help me bring new technologies into the computer music.</p>
+<h1 id="mui-musical-user-interface-">MUI (Musical User Interface)</h1>
+<p>MUI is a collection of custom HTML elements that are specifically disigned for musical applications.</p>
+<h2 id="installation">Installation</h2>
+<p>Since MUI is a part of WAAX, so no additional installation is necessary if you have already installed the WAAX by cloning the repository or downloading the files. MUI elements are built on top of <a href="http://www.polymer-project.org/">Polymer</a> and it is already included in the MUI directory.</p>
+<h2 id="loading-mui-in-html-document">Loading MUI in HTML document</h2>
+<p>Currently activating MUI needs a bit more work. (It will be fixed soon.) First off, Polymer library must be loaded first and then MUI core and its style sheet should come next.</p>
+<pre><code class="lang-html">&lt;script src=&quot;lib/polymer.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;mui-core.js&quot;&gt;&lt;/script&gt;
+&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;mui-core.css&quot;&gt;
+</code></pre>
+<p>Once the bootstrap is loaded, you can selectively start loading MUI elements (GUI widgets) you wish to use on the document. The following example shows how to import the knob and the toggle switch.</p>
+<pre><code class="lang-html">&lt;link rel=&quot;import&quot; href=&quot;elements/mui-knob.html&quot;&gt;
+&lt;link rel=&quot;import&quot; href=&quot;elements/mui-toggle.html&quot;&gt;
+</code></pre>
+<h2 id="using-mui-elements">Using MUI elements</h2>
+<p>Here is the fun part. You can create knobs and toggles switches by simply writing  HTML codes below. They are called &quot;custom elements&quot; which is made possible by Polymer; highly-componentized, portable, and reusable GUI widgets specifically designed for WAAX unit.</p>
+<pre><code class="lang-html">&lt;mui-toggle id=&quot;kActive&quot; label=&quot;ON&quot;&gt;&lt;/mui-toggle&gt;
+&lt;mui-knob id=&quot;kFreq&quot; label=&quot;Frequency&quot; value=&quot;0.01&quot; min=&quot;5000&quot; max=&quot;440.0&quot;&gt;&lt;/mui-knob&gt;
+</code></pre>
+<p>Linking the toggle switch and the knob to the oscillator is surprinsingly simple. The good news is you do not have to worry about synchronizing variables in GUI widgets, corresponding parameters in WAAX unit and even values in the abstracted Web Audio API node.</p>
+<pre><code class="lang-javascript">var osc = WX.Oscil();
+MUI.$(&#39;kActive&#39;).link(osc, &#39;pActive&#39;);
+MUI.$(&#39;kFreq&#39;).link(osc, &#39;pFreq&#39;);
+</code></pre>
+<p>You can select a MUI element by using the special selector <code>MUI.$()</code>. Each MUI element has <code>.link()</code> method and the binding to a certain parameter can be done by passing the target unit reference (<code>osc</code>) and the parameter name (<code>pActive</code> or <code>pFreq</code>).</p>
+<p>This auto-magical parameter binding is managed by Polymer ensuring all the values across different layers completely synchronized. That means the value in the oscillator will be changed when you touch the knob, and also the knob position will be changed when you modify the parameter value of the oscillator. This takes preset managment and MIDI support to another level. Truly empowering!</p>
 
 <h1 id="using-midi">Using MIDI</h1>
 <p><strong>NOTE!</strong> MIDI support in WAAX requires Web MIDI API, which is only available on Chrome Canary on OSX at the time of writing.</p>
@@ -274,164 +220,6 @@ midiTarget.activate();
 });
 </code></pre><p>The code above demonstrates how to connect the second MIDI device to the web audio synth (MIDI target). However, if the computer does not have the second MIDI device, it will throw an error.</p>
 <p>For the API reference, please visit <a href="https://github.com/hoch/Ktrl">the project page</a>.</p>
-
-<h1 id="mui-musical-user-interface-">MUI (Musical User Interface)</h1>
-<p>MUI is a collection of custom HTML elements that are specifically disigned for musical applications.</p>
-<h2 id="installation">Installation</h2>
-<p>Since MUI is a part of WAAX, so no additional installation is necessary if you have already installed the WAAX by cloning the repository or downloading the files. MUI elements are built on top of <a href="http://www.polymer-project.org/">Polymer</a> and it is already included in the MUI directory.</p>
-<h2 id="loading-mui-in-html-document">Loading MUI in HTML document</h2>
-<p>Currently activating MUI needs a bit more work. (It will be fixed soon.) First off, Polymer library must be loaded first and then MUI core and its style sheet should come next.</p>
-<pre><code class="lang-html">&lt;script src=&quot;lib/polymer.min.js&quot;&gt;&lt;/script&gt;
-&lt;script src=&quot;mui-core.js&quot;&gt;&lt;/script&gt;
-&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;mui-core.css&quot;&gt;
-</code></pre>
-<p>Once the bootstrap is loaded, you can selectively start loading MUI elements (GUI widgets) you wish to use on the document. The following example shows how to import the knob and the toggle switch.</p>
-<pre><code class="lang-html">&lt;link rel=&quot;import&quot; href=&quot;elements/mui-knob.html&quot;&gt;
-&lt;link rel=&quot;import&quot; href=&quot;elements/mui-toggle.html&quot;&gt;
-</code></pre>
-<h2 id="using-mui-elements">Using MUI elements</h2>
-<p>Here is the fun part. You can create knobs and toggles switches by simply writing  HTML codes below. They are called &quot;custom elements&quot; which is made possible by Polymer; highly-componentized, portable, and reusable GUI widgets specifically designed for WAAX unit.</p>
-<pre><code class="lang-html">&lt;mui-toggle id=&quot;kActive&quot; label=&quot;ON&quot;&gt;&lt;/mui-toggle&gt;
-&lt;mui-knob id=&quot;kFreq&quot; label=&quot;Frequency&quot; value=&quot;0.01&quot; min=&quot;5000&quot; max=&quot;440.0&quot;&gt;&lt;/mui-knob&gt;
-</code></pre>
-<p>Linking the toggle switch and the knob to the oscillator is surprinsingly simple. The good news is you do not have to worry about synchronizing variables in GUI widgets, corresponding parameters in WAAX unit and even values in the abstracted Web Audio API node.</p>
-<pre><code class="lang-javascript">var osc = WX.Oscil();
-MUI.$(&#39;kActive&#39;).link(osc, &#39;pActive&#39;);
-MUI.$(&#39;kFreq&#39;).link(osc, &#39;pFreq&#39;);
-</code></pre>
-<p>You can select a MUI element by using the special selector <code>MUI.$()</code>. Each MUI element has <code>.link()</code> method and the binding to a certain parameter can be done by passing the target unit reference (<code>osc</code>) and the parameter name (<code>pActive</code> or <code>pFreq</code>).</p>
-<p>This auto-magical parameter binding is managed by Polymer ensuring all the values across different layers completely synchronized. That means the value in the oscillator will be changed when you touch the knob, and also the knob position will be changed when you modify the parameter value of the oscillator. This takes preset managment and MIDI support to another level. Truly empowering!</p>
-
-<h1 id="parameter-control">Parameter Control</h1>
-<p>Having a complete control on parameters is crucial in sound synthesis. It gives you the ability to create more complex and interesting sound. With that in mind, WAAX is carefully designed to offer the ease of control with maximum flexibilty.</p>
-<h2 id="tweaking-parameters">Tweaking Parameters</h2>
-<p>Every WAAX unit has a <code>.params</code> object, that includes all the available parameters that user can tweak. It is fairly similar to <code>AudioParam</code> object from Web Audio API and it is an abstract layer for <code>AudioParam</code> with more simple syntax and other neat features such as saving/loading presets or easy binding to GUI widgets. The unit reference documentation contains detailed information on the unit-specific parameters.</p>
-<pre><code>var osc = WX.Oscil({ pFreq: 440.0 });
-osc.set(&#39;pGain&#39;, 0.25);
-osc.to(WX.Master);
-</code></pre><p>The <code>.set()</code> method in WAAX is designed for comprehensive parameter control. This method makes it possible to apply the unified parameter control across all the WAAX units. As shown above, the <code>.set()</code> method requires <strong>parameter name</strong> and <strong>value</strong> to do the job.</p>
-<p>Note that WAAX parameters start with the lowercase <em>p</em> such as <code>pGain</code> and <code>pFreq</code>. It indicates the variable is a parameter that you can <em>set, automate, link, and bind</em> with other elements in the WAAX system.</p>
-<h2 id="making-transitions">Making Transitions</h2>
-<p>The code example below will generate a sine wave with 2 seconds of fade-in and 2 seconds of fade-out. This procedure has so many names: automation, slewing, transition, ramping and so on; it is very important to avoid a sudden change on parameters unless it is required or intended. Without proper ramping up and down, the resulting sound will suffer from clicks and pops.</p>
-<pre><code class="lang-javascript">var osc = WX.Oscil({ pGain: 0.0 });
-osc.to(WX.Master);
-osc.set(&#39;pGain&#39;, 1.0, &#39;line&#39;, WX.now + 2.0);
-osc.set(&#39;pGain&#39;, 0,0, &#39;line&#39;, WX.now + 4.0);
-</code></pre>
-<p>As shown above, you can add 3 more arguments to achieve time-related tasks. (In this case it uses 2 more arguments, transition type and end time) In addition, the <code>.set()</code> method is using <code>WX.now</code> variable because we need to specify the temporal structure of this transition. Note that <code>WX.now</code> always returns the elapsed time in seconds since the audio context of the page started.</p>
-<h2 id="modulation">Modulation</h2>
-<p>To make a long story <em>very</em> short, the modulation is modifying a signal with the other signal. In Web Audio API, you can change a parameter automatically and programmtically by connecting a signal to the parameter. Usually a synthesizer has a complex routing table for modulation and it is often called a modulation matrix.</p>
-<pre><code>var osc = WX.Oscil({ pGain: 0.0 }),
-    lfo = WX.Oscil({ pFreq: 1.0, Gain: 0.5 });
-lfo.modulate(osc, &#39;pGain&#39;);
-</code></pre><p>In the example above, we have the oscillator <code>lfo</code> modulate the gain of the <code>osc</code> unit to accomplish amplitude modulation (AM). Behind the scene, the <code>.modulate()</code> method looks for available modulation targets in the <code>osc</code> unit, and create the modulation route with the parameter named &#39;pGain.&#39;</p>
-<p>Not all parameters are modulatable. The information on modulation target on each unit can be found on the unit reference documentation. For more advanced modulation, please have a look at the tutorial on modulation.</p>
-<h2 id="saving-and-loading-presets">Saving and Loading Presets</h2>
-<p>Every unit in WAAX has two methods in common: <code>.getParams()</code> and <code>.setParams()</code>. By using these methods, you can retrieve or set the current parameters in unit. They are useful when you are saving whole paramemters for multiple units as a preset.</p>
-<pre><code>var params = osc.getParams();
-osc.setParams(params);
-</code></pre><p>Note that the method <code>.getParams()</code> returns a new (cloned) object, not the reference of parameter object in the unit.</p>
-
-<h1 id="table-of-contents">Table of contents</h1>
-<h1 id="what-is-waax-">What is WAAX?</h1>
-<ul>
-<li>Introduction</li>
-<li>Features</li>
-<li>Cross-platform Support</li>
-<li>Cross-browser Support</li>
-</ul>
-<h1 id="getting-started">Getting Started</h1>
-<ul>
-<li>Installation</li>
-<li>Using WAAX in HTML document</li>
-<li>&quot;Hello Sine&quot;</li>
-</ul>
-<h1 id="parameter-control">Parameter Control</h1>
-<ul>
-<li>.set()</li>
-<li>Automation</li>
-<li>Modulation</li>
-<li>Saving/loading presets</li>
-</ul>
-<h1 id="mui">MUI</h1>
-<ul>
-<li>Installation</li>
-<li>Using MUI in HTML document</li>
-<li>Binding Parameters with MUI</li>
-</ul>
-<h1 id="midi-support">MIDI Support</h1>
-<ul>
-<li>MIDI input and target</li>
-<li>Parsing incoming MIDI data</li>
-</ul>
-<h1 id="dynamic-lifecycle">Dynamic Lifecycle</h1>
-<ul>
-<li>Why and when is it useful?</li>
-<li>Usage</li>
-</ul>
-<h1 id="using-visualizer">Using Visualizer</h1>
-<h1 id="design-your-own-unit">Design Your Own Unit</h1>
-<ul>
-<li>Anatomy of WAAX Unit</li>
-</ul>
-<h1 id="unit-reference">Unit Reference</h1>
-<h1 id="utilitiy-reference">Utilitiy Reference</h1>
-<h1 id="resources">Resources</h1>
-<ul>
-<li>2013 NIME paper</li>
-<li>Web Audio API W3C spec</li>
-<li>Web MIDI API W3C spec</li>
-<li>Web Audio/MIDI Playground (Chris Wilson)</li>
-<li>Web Audio Demo Collection</li>
-</ul>
-<h1 id="license-and-acknowledgement">License and Acknowledgement</h1>
-<hr>
-<h2 id="introduction">Introduction</h2>
-<ul>
-<li>Preface: Web Audio API</li>
-<li>What is WAAX?</li>
-<li>Why is it created?</li>
-</ul>
-<h2 id="setting-up">Setting up</h2>
-<ul>
-<li>System requirements</li>
-<li>Using WAAX in your web page</li>
-</ul>
-<h2 id="concepts">Concepts</h2>
-<ul>
-<li>Units: generator, processor and analyzer</li>
-<li>Building your first synthesizer</li>
-<li>Parameter control using WAAX</li>
-</ul>
-<h2 id="live-examples">Live examples</h2>
-<ul>
-<li>Interactive Code Editor: WXide</li>
-<li>Using Web MIDI API with <em>Ktrl</em> library</li>
-</ul>
-<h2 id="references">References</h2>
-<ul>
-<li>WAAX Units</li>
-<li>WAAX Utilities</li>
-<li>2013 NIME paper</li>
-<li>Web Audio API W3C spec</li>
-<li>Web MIDI API W3C spec</li>
-</ul>
-<h2 id="tutorial">Tutorial</h2>
-<h3 id="waax-101-computer-generated-sound">WAAX 101: Computer-generated Sound</h3>
-<ul>
-<li>Making a new timbre</li>
-<li>Crafting your first synth</li>
-<li>Art of envelope: FM Drones</li>
-<li>Trigger-happy: a simple sampler</li>
-</ul>
-<h3 id="advanced-topic">Advanced topic</h3>
-<ul>
-<li>Understanding WAAX unit container</li>
-<li>Creating a new unit with WAAX unit builder</li>
-<li>Using PeriodicWave for complex tone</li>
-<li>Tip: pre-baked array buffer</li>
-<li>Tip: homebrewing IR and warped convolution</li>
-</ul>
 
 <h1 id="unit-reference">Unit Reference</h1>
 <h3 id="unit-common-parameters-unit-base-class-">Unit Common Parameters (Unit Base Class)</h3>
@@ -1287,50 +1075,12 @@ osc.setParams(params);
 <li><code>buffer2</code> <em>(Float32Array | Uint8Array)</em> buffer data for right channel</li>
 </ul>
 
-<h1 id="wx-oscil">WX.Oscil</h1>
-<p>Multi-waveform oscillator with gain control.</p>
-<h2 id="parameters">Parameters</h2>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">Parameter</th>
-<th style="text-align:center">Type</th>
-<th style="text-align:center">Description</th>
-<th style="text-align:center">Default</th>
-<th style="text-align:center">Range</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">pType</td>
-<td style="text-align:center">string</td>
-<td style="text-align:center">waveform type</td>
-<td style="text-align:center">&#39;sine&#39;</td>
-<td style="text-align:center">&#39;sine&#39;, &#39;square&#39;, &#39;sawtooth&#39;, &#39;triangle&#39;</td>
-</tr>
-<tr>
-<td style="text-align:center">pFreq</td>
-<td style="text-align:center">float</td>
-<td style="text-align:center">frequency</td>
-<td style="text-align:center">440.0</td>
-<td style="text-align:center"></td>
-</tr>
-<tr>
-<td style="text-align:center">pGain</td>
-<td style="text-align:center">float</td>
-<td style="text-align:center">gain</td>
-<td style="text-align:center">0.25</td>
-<td style="text-align:center"></td>
-</tr>
-</tbody>
-</table>
-<h2 id="usage">Usage</h2>
-<pre><code class="lang-javascript">var osc = WX.Oscil({ pFreq: 440 });
-osc.set(&#39;pType&#39;, &#39;sawtooth&#39;);
-// gain ramping (0.5 to 0.0 in 2 seconds)
-osc.set(&#39;pGain&#39;, 0.5).set(&#39;pGain&#39;, 0.0, 1, WX.now + 2);
-WX.patch(osc, WX.Master);
-</code></pre>
+<h1 id="license-acknowledgement">License &amp; Acknowledgement</h1>
+<h2 id="license">License</h2>
+<p>The MIT License<br>
+Copyright (c) 2010-2013 Hongchan Choi</p>
+<h2 id="acknowldegement">Acknowldegement</h2>
+<p>Special thanks to Chris Rogers, who invented the world of web audio, for invaluable guidance and feedback. I am also grateful to several Googlers who have been truly supportive on this project: Greg Simon and Dimitri Glazkov, Chris Wilson, and Boris Smus. Lastly, I sincerely thank to my CCRMAlites - Jonathan Berger, Chris Chafe, Ge Wang, John Granzow, Colin Sullivan and Juhan Nam - for their enthusiasm to help me bring new technologies into the computer music.</p>
 
 
 
