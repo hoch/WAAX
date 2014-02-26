@@ -8,7 +8,7 @@
     <link type="text/css" rel="stylesheet" href="http://yandex.st/highlightjs/6.1/styles/sunburst.min.css">
     <link type="text/css" rel="stylesheet" href="assets/css/docs.css">
     <link type="text/css" rel="stylesheet" href="assets/css/print.css" media="print">
-    <link type="text/css" rel="stylesheet" href="src/waax-doc-base.css">
+    <link type="text/css" rel="stylesheet" href="./docs/src/waax-doc-base.css">
 
     <script type="text/javascript" src="assets/js/jquery-1.10.1.min.js"></script>
     <script type="text/javascript" src="http://yandex.st/highlightjs/6.1/highlight.min.js"></script>
@@ -83,15 +83,32 @@
 </div>
 
         <div id="content">
-            <a name="license-acknowledgement"></a><h1>License &amp; Acknowledgement</h1>
-<a name="license"></a><h2>License</h2>
-<p>The MIT License<br>
-Copyright (c) 2010-2013 Hongchan Choi</p>
-<a name="acknowldegement"></a><h2>Acknowldegement</h2>
-<p>Special thanks to Chris Rogers, who invented the world of web audio, for invaluable guidance and feedback. I am also grateful to several Googlers who have been truly supportive on this project: Greg Simon and Dimitri Glazkov, Chris Wilson, and Boris Smus. Lastly, I sincerely thank to my CCRMAlites - Jonathan Berger, Chris Chafe, Ge Wang, John Granzow, Colin Sullivan and Juhan Nam - for their enthusiasm to help me bring new technologies into the computer music.</p>
+            <h2>Search results for "<span id="search-q"></span>"</h2>
+<ul id="search-results"></ul>
+<script type="text/javascript" src="lunr-index.js"></script>
+<script type="text/javascript">
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
 
+    $(function() {
+        var q = getParameterByName('q'), 
+            ul = $('#search-results').empty(),
+            results = index.search(q);
 
-
+        $('#search-q').text(q);
+        if (results.length > 0) {
+            for (var i = 0; i < results.length; i++) {
+                ul.append($('<li><a href="' + results[i].ref + '">' + documentTitles[results[i].ref] + '</a></li>'));
+            }
+        } else {
+            ul.append($('<li class="no-results">No results found</li>'));
+        }
+    })
+</script>
 
         </div>
         <footer id="footer">

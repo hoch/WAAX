@@ -8,7 +8,7 @@
     <link type="text/css" rel="stylesheet" href="http://yandex.st/highlightjs/6.1/styles/sunburst.min.css">
     <link type="text/css" rel="stylesheet" href="assets/css/docs.css">
     <link type="text/css" rel="stylesheet" href="assets/css/print.css" media="print">
-    <link type="text/css" rel="stylesheet" href="src/waax-doc-base.css">
+    <link type="text/css" rel="stylesheet" href="./docs/src/waax-doc-base.css">
 
     <script type="text/javascript" src="assets/js/jquery-1.10.1.min.js"></script>
     <script type="text/javascript" src="http://yandex.st/highlightjs/6.1/highlight.min.js"></script>
@@ -83,32 +83,33 @@
 </div>
 
         <div id="content">
-            <a name="getting-started"></a><h1>Getting Started</h1>
-<a name="installation"></a><h2>Installation</h2>
+            <h1 id="getting-started">Getting Started</h1>
+<h2 id="installation">Installation</h2>
 <p>For the local developement, you can download the zipped file or clone the GitHub repository.</p>
-<pre><code>$ git clone https://github.com/hoch/WAAX.git</code></pre>
-<a name="using-waax-in-html-document"></a><h2>Using WAAX in HTML Document</h2>
+<pre><code>$ git clone https://github.com/hoch/WAAX.git
+</code></pre><h2 id="using-waax-in-html-document">Using WAAX in HTML Document</h2>
 <p>If you are simply using the minified library (core + reference units), include library files from the URL below.</p>
-<pre><code>&lt;script src=&quot;http://waax-static.appspot.com/build/WAAX.min.js&quot;&gt;&lt;/script&gt;</code></pre>
-<p>Alternatively, you can choose files you want to use. Note that the core library  and Fader plug-in must be loaded first before you can use any WAAX units. The example below loads the definition of oscillator unit after the WAAX core and Fader.</p>
+<pre><code>&lt;script src=&quot;http://waax-static.appspot.com/build/WAAX.min.js&quot;&gt;&lt;/script&gt;
+</code></pre><p>Alternatively, you can choose files you want to use. Note that the core library  and Fader plug-in must be loaded first before you can use any WAAX units. The example below loads the definition of oscillator unit after the WAAX core and Fader.</p>
 <pre><code>&lt;script src=&quot;your_path/WAAX.js&quot;&gt;&lt;/script&gt;
 &lt;script src=&quot;your_path/Fader.js&quot;&gt;&lt;/script&gt;
 &lt;script src=&quot;your_path/Oscil.js&quot;&gt;&lt;/script&gt;
 &lt;script&gt;
   // your WAAX code here...
-&lt;/script&gt;</code></pre>
-<p>The reference list of units can be found in this doucmentation. Once you&#39;ve done with the developelment, you can compile the core and unit JavaScript files into a single file with your favorite tool chains.</p>
-<a name="hello-sine"></a><h2>&quot;Hello Sine!&quot;</h2>
+&lt;/script&gt;
+</code></pre><p>The reference list of units can be found in this doucmentation. Once you&#39;ve done with the developelment, you can compile the core and unit JavaScript files into a single file with your favorite tool chains.</p>
+<h2 id="-hello-sine-">&quot;Hello Sine!&quot;</h2>
 <pre><code class="lang-javascript">var sine = WX.Oscil({ pGain: 0.25 });
-sine.to(WX.Master);</code></pre>
+sine.to(WX.Master);
+</code></pre>
 <p>In the code example above, a sine oscillator is being created and connected to the master output of WAAX system. The oscillator (<code>sine</code>) or the master output (<code>WX.Master</code>) is called <strong>&#39;WAAX Unit&#39;</strong> or <strong>&#39;unit&#39;</strong> for short. Note that there is no <em>new</em> keyword for unit construction. <code>WX.Oscil()</code> is a factory method that produces an instance of oscillator with the initial setting, the gain of 0.25 in this case. The <code>.to()</code> method connects the oscillator and the master output.</p>
-<a name="making-connections"></a><h2>Making Connections</h2>
+<h2 id="making-connections">Making Connections</h2>
 <p>The <code>.to()</code> method can be chained to connect more than 3 units. Also it might be useful to know <code>WX.patch()</code> method when connecting several units at once. As shown previously, you can intialize WAAX unit by passing an object of parameters to its factory method.</p>
 <pre><code>var noise = WX.Noise({ pGain: 0.5 }),
     lpf = WX.LPF({ pCutoff: 250, pQ: 12 });
 noise.to(lpf).to(WX.Master);
-WX.patch(noise, lpf, WX.Master);</code></pre>
-<p>There we just built our first <em>audiographs</em> with WAAX. Try this example here!</p>
+WX.patch(noise, lpf, WX.Master);
+</code></pre><p>There we just built our first <em>audiographs</em> with WAAX. Try this example here!</p>
 
 
 

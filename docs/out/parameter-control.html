@@ -8,7 +8,7 @@
     <link type="text/css" rel="stylesheet" href="http://yandex.st/highlightjs/6.1/styles/sunburst.min.css">
     <link type="text/css" rel="stylesheet" href="assets/css/docs.css">
     <link type="text/css" rel="stylesheet" href="assets/css/print.css" media="print">
-    <link type="text/css" rel="stylesheet" href="src/waax-doc-base.css">
+    <link type="text/css" rel="stylesheet" href="./docs/src/waax-doc-base.css">
 
     <script type="text/javascript" src="assets/js/jquery-1.10.1.min.js"></script>
     <script type="text/javascript" src="http://yandex.st/highlightjs/6.1/highlight.min.js"></script>
@@ -83,34 +83,35 @@
 </div>
 
         <div id="content">
-            <a name="parameter-control"></a><h1>Parameter Control</h1>
+            <h1 id="parameter-control">Parameter Control</h1>
 <p>Having a complete control on parameters is crucial in sound synthesis. It gives you the ability to create more complex and interesting sound. With that in mind, WAAX is carefully designed to offer the ease of control with maximum flexibilty.</p>
-<a name="tweaking-parameters"></a><h2>Tweaking Parameters</h2>
+<h2 id="tweaking-parameters">Tweaking Parameters</h2>
 <p>Every WAAX unit has a <code>.params</code> object, that includes all the available parameters that user can tweak. It is fairly similar to <code>AudioParam</code> object from Web Audio API and it is an abstract layer for <code>AudioParam</code> with more simple syntax and other neat features such as saving/loading presets or easy binding to GUI widgets. The unit reference documentation contains detailed information on the unit-specific parameters.</p>
 <pre><code>var osc = WX.Oscil({ pFreq: 440.0 });
 osc.set(&#39;pGain&#39;, 0.25);
-osc.to(WX.Master);</code></pre>
-<p>The <code>.set()</code> method in WAAX is designed for comprehensive parameter control. This method makes it possible to apply the unified parameter control across all the WAAX units. As shown above, the <code>.set()</code> method requires <strong>parameter name</strong> and <strong>value</strong> to do the job.</p>
+osc.to(WX.Master);
+</code></pre><p>The <code>.set()</code> method in WAAX is designed for comprehensive parameter control. This method makes it possible to apply the unified parameter control across all the WAAX units. As shown above, the <code>.set()</code> method requires <strong>parameter name</strong> and <strong>value</strong> to do the job.</p>
 <p>Note that WAAX parameters start with the lowercase <em>p</em> such as <code>pGain</code> and <code>pFreq</code>. It indicates the variable is a parameter that you can <em>set, automate, link, and bind</em> with other elements in the WAAX system.</p>
-<a name="making-transitions"></a><h2>Making Transitions</h2>
+<h2 id="making-transitions">Making Transitions</h2>
 <p>The code example below will generate a sine wave with 2 seconds of fade-in and 2 seconds of fade-out. This procedure has so many names: automation, slewing, transition, ramping and so on; it is very important to avoid a sudden change on parameters unless it is required or intended. Without proper ramping up and down, the resulting sound will suffer from clicks and pops.</p>
 <pre><code class="lang-javascript">var osc = WX.Oscil({ pGain: 0.0 });
 osc.to(WX.Master);
 osc.set(&#39;pGain&#39;, 1.0, &#39;line&#39;, WX.now + 2.0);
-osc.set(&#39;pGain&#39;, 0,0, &#39;line&#39;, WX.now + 4.0);</code></pre>
+osc.set(&#39;pGain&#39;, 0,0, &#39;line&#39;, WX.now + 4.0);
+</code></pre>
 <p>As shown above, you can add 3 more arguments to achieve time-related tasks. (In this case it uses 2 more arguments, transition type and end time) In addition, the <code>.set()</code> method is using <code>WX.now</code> variable because we need to specify the temporal structure of this transition. Note that <code>WX.now</code> always returns the elapsed time in seconds since the audio context of the page started.</p>
-<a name="modulation"></a><h2>Modulation</h2>
+<h2 id="modulation">Modulation</h2>
 <p>To make a long story <em>very</em> short, the modulation is modifying a signal with the other signal. In Web Audio API, you can change a parameter automatically and programmtically by connecting a signal to the parameter. Usually a synthesizer has a complex routing table for modulation and it is often called a modulation matrix.</p>
 <pre><code>var osc = WX.Oscil({ pGain: 0.0 }),
     lfo = WX.Oscil({ pFreq: 1.0, Gain: 0.5 });
-lfo.modulate(osc, &#39;pGain&#39;);</code></pre>
-<p>In the example above, we have the oscillator <code>lfo</code> modulate the gain of the <code>osc</code> unit to accomplish amplitude modulation (AM). Behind the scene, the <code>.modulate()</code> method looks for available modulation targets in the <code>osc</code> unit, and create the modulation route with the parameter named &#39;pGain.&#39;</p>
+lfo.modulate(osc, &#39;pGain&#39;);
+</code></pre><p>In the example above, we have the oscillator <code>lfo</code> modulate the gain of the <code>osc</code> unit to accomplish amplitude modulation (AM). Behind the scene, the <code>.modulate()</code> method looks for available modulation targets in the <code>osc</code> unit, and create the modulation route with the parameter named &#39;pGain.&#39;</p>
 <p>Not all parameters are modulatable. The information on modulation target on each unit can be found on the unit reference documentation. For more advanced modulation, please have a look at the tutorial on modulation.</p>
-<a name="saving-and-loading-presets"></a><h2>Saving and Loading Presets</h2>
+<h2 id="saving-and-loading-presets">Saving and Loading Presets</h2>
 <p>Every unit in WAAX has two methods in common: <code>.getParams()</code> and <code>.setParams()</code>. By using these methods, you can retrieve or set the current parameters in unit. They are useful when you are saving whole paramemters for multiple units as a preset.</p>
 <pre><code>var params = osc.getParams();
-osc.setParams(params);</code></pre>
-<p>Note that the method <code>.getParams()</code> returns a new (cloned) object, not the reference of parameter object in the unit.</p>
+osc.setParams(params);
+</code></pre><p>Note that the method <code>.getParams()</code> returns a new (cloned) object, not the reference of parameter object in the unit.</p>
 
 
 

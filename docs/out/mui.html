@@ -8,7 +8,7 @@
     <link type="text/css" rel="stylesheet" href="http://yandex.st/highlightjs/6.1/styles/sunburst.min.css">
     <link type="text/css" rel="stylesheet" href="assets/css/docs.css">
     <link type="text/css" rel="stylesheet" href="assets/css/print.css" media="print">
-    <link type="text/css" rel="stylesheet" href="src/waax-doc-base.css">
+    <link type="text/css" rel="stylesheet" href="./docs/src/waax-doc-base.css">
 
     <script type="text/javascript" src="assets/js/jquery-1.10.1.min.js"></script>
     <script type="text/javascript" src="http://yandex.st/highlightjs/6.1/highlight.min.js"></script>
@@ -83,26 +83,30 @@
 </div>
 
         <div id="content">
-            <a name="mui-musical-user-interface"></a><h1>MUI (Musical User Interface)</h1>
+            <h1 id="mui-musical-user-interface-">MUI (Musical User Interface)</h1>
 <p>MUI is a collection of custom HTML elements that are specifically disigned for musical applications.</p>
-<a name="installation"></a><h2>Installation</h2>
+<h2 id="installation">Installation</h2>
 <p>Since MUI is a part of WAAX, so no additional installation is necessary if you have already installed the WAAX by cloning the repository or downloading the files. MUI elements are built on top of <a href="http://www.polymer-project.org/">Polymer</a> and it is already included in the MUI directory.</p>
-<a name="loading-mui-in-html-document"></a><h2>Loading MUI in HTML document</h2>
+<h2 id="loading-mui-in-html-document">Loading MUI in HTML document</h2>
 <p>Currently activating MUI needs a bit more work. (It will be fixed soon.) First off, Polymer library must be loaded first and then MUI core and its style sheet should come next.</p>
 <pre><code class="lang-html">&lt;script src=&quot;lib/polymer.min.js&quot;&gt;&lt;/script&gt;
 &lt;script src=&quot;mui-core.js&quot;&gt;&lt;/script&gt;
-&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;mui-core.css&quot;&gt;</code></pre>
+&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;mui-core.css&quot;&gt;
+</code></pre>
 <p>Once the bootstrap is loaded, you can selectively start loading MUI elements (GUI widgets) you wish to use on the document. The following example shows how to import the knob and the toggle switch.</p>
 <pre><code class="lang-html">&lt;link rel=&quot;import&quot; href=&quot;elements/mui-knob.html&quot;&gt;
-&lt;link rel=&quot;import&quot; href=&quot;elements/mui-toggle.html&quot;&gt;</code></pre>
-<a name="using-mui-elements"></a><h2>Using MUI elements</h2>
+&lt;link rel=&quot;import&quot; href=&quot;elements/mui-toggle.html&quot;&gt;
+</code></pre>
+<h2 id="using-mui-elements">Using MUI elements</h2>
 <p>Here is the fun part. You can create knobs and toggles switches by simply writing  HTML codes below. They are called &quot;custom elements&quot; which is made possible by Polymer; highly-componentized, portable, and reusable GUI widgets specifically designed for WAAX unit.</p>
 <pre><code class="lang-html">&lt;mui-toggle id=&quot;kActive&quot; label=&quot;ON&quot;&gt;&lt;/mui-toggle&gt;
-&lt;mui-knob id=&quot;kFreq&quot; label=&quot;Frequency&quot; value=&quot;0.01&quot; min=&quot;5000&quot; max=&quot;440.0&quot;&gt;&lt;/mui-knob&gt;</code></pre>
+&lt;mui-knob id=&quot;kFreq&quot; label=&quot;Frequency&quot; value=&quot;0.01&quot; min=&quot;5000&quot; max=&quot;440.0&quot;&gt;&lt;/mui-knob&gt;
+</code></pre>
 <p>Linking the toggle switch and the knob to the oscillator is surprinsingly simple. The good news is you do not have to worry about synchronizing variables in GUI widgets, corresponding parameters in WAAX unit and even values in the abstracted Web Audio API node.</p>
 <pre><code class="lang-javascript">var osc = WX.Oscil();
 MUI.$(&#39;kActive&#39;).link(osc, &#39;pActive&#39;);
-MUI.$(&#39;kFreq&#39;).link(osc, &#39;pFreq&#39;);</code></pre>
+MUI.$(&#39;kFreq&#39;).link(osc, &#39;pFreq&#39;);
+</code></pre>
 <p>You can select a MUI element by using the special selector <code>MUI.$()</code>. Each MUI element has <code>.link()</code> method and the binding to a certain parameter can be done by passing the target unit reference (<code>osc</code>) and the parameter name (<code>pActive</code> or <code>pFreq</code>).</p>
 <p>This auto-magical parameter binding is managed by Polymer ensuring all the values across different layers completely synchronized. That means the value in the oscillator will be changed when you touch the knob, and also the knob position will be changed when you modify the parameter value of the oscillator. This takes preset managment and MIDI support to another level. Truly empowering!</p>
 
