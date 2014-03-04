@@ -1,0 +1,20 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<polymer-element name="mui-button" attributes="icon" noscript>
+  <template>
+    <!-- style -->
+    <link rel="stylesheet" href="mui-button.css" />
+    <!-- markup -->
+    <div id="eTouchable" class="c-button-view">
+      <span class="c-button-icon">{{icon}}</span>
+    </div>
+  </template>
+  <!-- logic -->
+  <script>
+    Polymer('mui-button', {
+
+      // published
+      icon: null
+
+    });
+  </script>
+</polymer-element>

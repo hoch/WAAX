@@ -1,0 +1,63 @@
+:host {
+  display: inline-block;
+  margin: 2px;
+  width: 48px;
+  height: 80px;
+  -webkit-user-select: none;
+}
+input:focus {
+  outline: none;
+}
+.c-knob-label {
+  display: block;
+  font-family:'Play', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+}
+.c-knob-flat {
+  display: block;
+  cursor: move;
+}
+.c-knob-value {
+  display: block;
+  font-family:'Roboto', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  height: 16px;
+  width: 48px;
+  line-height: 16px;
+  text-align: center;
+  background-color: #e0e0e0;
+  border-radius: 3px;
+  margin-top: 3px;
+  padding: 0;
+  border: none;
+}
+.c-knob-value-select {
+  color: #fff;
+  background-color: #666;
+  box-shadow: inset 0 0 5px #000;
+}
+.c-knob-flat-outer {
+  /*fill: #353D42;*/
+  /*fill: #7E8AA2;*/
+  /*fill: #374140;*/
+  fill: #31353D;
+}
+.c-knob-flat-inner {
+  /*fill: #505455;*/
+  /*fill: #EEE;*/
+  /*fill: #D9CB9E;*/
+  fill: #445878;
+}
+.c-knob-flat-gauge {
+  /*stroke: #0CB4F5;*/
+  /*stroke: #FF9800;*/
+  /*stroke: #DC3522;*/
+  stroke: #92CDCF;
+  stroke-width: 5px;
+  fill: none;
+}

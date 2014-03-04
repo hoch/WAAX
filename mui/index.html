@@ -7,33 +7,41 @@
   <script src="../src/Fader.js"></script>
   <script src="../src/Oscil.js"></script>
   <!-- polymer + mui core -->
-  <script src="lib/polymer.min.js"></script>
+  <script src="bower_components/platform/platform.js"></script>
   <script src="mui-core.js"></script>
   <link rel="stylesheet" type="text/css" href="mui-core.css">
   <!-- mui elements -->
-  <link rel="import" href="elements/mui-knob.html">
-  <link rel="import" href="elements/mui-knob2.html">
-  <link rel="import" href="elements/mui-hslider.html">
-  <link rel="import" href="elements/mui-toggle.html">
-  <link rel="import" href="elements/mui-button.html">
-  <link rel="import" href="elements/mui-select.html">
-  <!-- firebase -->
-  <script src='https://cdn.firebase.com/v0/firebase.js'></script>
-  <!-- doc & demo css -->
-  <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
-  <link rel="stylesheet" type="text/css" href="css/doc-base.css">
+  <link rel="import" href="mui-knob/mui-knob.html">
+  <link rel="import" href="mui-button/mui-button.html">
+  <link rel="import" href="mui-toggle/mui-toggle.html">
+  <link rel="import" href="mui-select/mui-select.html">
 </head>
 
 <body>
-
-  <div class="c-header">
-    <span class="c-nav"><a href="example-1.html">examples</a></span>
-    <h1>MUI Elements</h1>
-  </div>
-
-
   <div class="c-content">
 
+    <div class="c-mui-section">
+      <mui-knob label="Attack" value="0.25" min="0.0" max="1.0"></mui-knob>
+      <mui-knob label="Cutoff" value="0.75" min="0.0" max="1.0"></mui-knob>
+    </div>
+
+    <div class="c-mui-section">
+      <mui-button id="btn-csave" icon="&#x55;"></mui-button>
+      <mui-button id="btn-rewind" icon="&#x52;"></mui-button>
+      <mui-button id="btn-stop" icon="&#x53;"></mui-button>
+      <mui-button id="btn-play" icon="&#x50;"></mui-button>
+      <mui-button id="btn-record" icon="&#x43;"></mui-button>
+    </div>
+
+    <div class="c-mui-section">
+      <mui-toggle label="ON"></mui-toggle>
+      <mui-toggle label="OFF"></mui-toggle>
+    </div>
+
+    <div class="c-mui-section">
+      <mui-select id="select-preset" label="Preset"></mui-select>
+    </div>
+    <!--
     <h3>UI Panel and Section</h3>
     <div class="c-mui-panel">
       <h1>Panel</h1>
@@ -96,19 +104,30 @@
     <pre class="prettyprint">
 &lt;mui-hslider label=&quot;Gain&quot; value=&quot;0.25&quot; min=&quot;0.0&quot; max=&quot;1.0&quot;&gt;&lt;/mui-hslider&gt;</pre>
   </div>
+  -->
 
   <script type="text/javascript">
+    function init() {
+      var osc = WX.Oscil({ pType: 'triangle', pActive: true, pGain: 0.01 });
+      osc.to(WX.DAC);
 
-  function init() {
-    var params = {
-    };
-  }
+      var presets = [
+        { key: 'Sine', value: 'sine' },
+        { key: 'Square', value: 'square' },
+        { key: 'Sawtooth', value: 'sawtooth' },
+        { key: 'Triangle', value: 'triangle' }
+      ];
 
-  window.addEventListener('WebComponentsReady', init);
+      MUI.$('btn-rewind').onclick = function () {
+        console.log('rewind!');
+      };
 
+      // MUI.$('select-preset').setModel(presets);
+      // MUI.$('select-preset').link(osc, 'pType');
+    }
+
+    window.addEventListener('polymer-ready', init);
   </script>
-
 </body>
-
 
 </html>

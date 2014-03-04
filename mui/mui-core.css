@@ -1,9 +1,37 @@
-body {
-  /*background-color: #57646E;*/
-  padding: 0;
-  margin: 0;
+/**
+/* MUI specific styles
+ */
+
+/* font import: assets */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url('assets/Roboto-Regular.woff') format('woff');
 }
 
+@font-face {
+  font-family: 'Play';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Play'), url('assets/Play-400.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Play';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Play-Bold'), url('assets/Play-700.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'muicon';
+  font-style: normal;
+  font-weight: normal;
+  src: url('assets/muicon.woff') format('woff');
+}
+
+/* aux elements */
 .c-mui-panel {
   display: inline-block;
   padding: 4px;
