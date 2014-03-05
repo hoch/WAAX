@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>WAAX by hoch</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>WAAX</h1>
+          <h2>Web Audio API eXtension</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/hoch/WAAX/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/hoch/WAAX/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/hoch/WAAX" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h2>
+<a name="waax-web-audio-api-extension" class="anchor" href="#waax-web-audio-api-extension"><span class="octicon octicon-link"></span></a>WAAX (Web Audio API eXtension)</h2>
+
+<p>**JavaScript library for music and audio programming on Chrome **</p>
+
+<h3>
+<a name="please-note" class="anchor" href="#please-note"><span class="octicon octicon-link"></span></a>Please Note!</h3>
+
+<p>The newer version of library (r13) will be pushed soon and it will include various enhancements and extra elements: <strong>Web MIDI API support, Polymer-powered musical UI widgets, and a couple of impressive examples</strong>. If you are interested in the future release, you can checkout the 'dev' branch.</p>
+
+<p>The information below is for the previous revision (r5) and will be deprecated with the release of the newer revision (r13) since it is a major update of library including several fundamental changes. Sorry for your inconvineince!</p>
+
+<h3>
+<a name="quick-links" class="anchor" href="#quick-links"><span class="octicon octicon-link"></span></a>Quick links</h3>
+
+<ul>
+<li><a href="http://hoch.github.com/WAAX/examples/editor.html">WX-IDE</a></li>
+<li><a href="https://github.com/hoch/WAAX/raw/master/etc/nime2013-choi-waax-r3.pdf">NIME 2013 Paper</a></li>
+</ul><h3>
+<a name="table-of-contents" class="anchor" href="#table-of-contents"><span class="octicon octicon-link"></span></a>Table of Contents</h3>
+
+<ul>
+<li><a href="#indroduction">Introduction</a></li>
+<li><a href="#demo">Demo</a></li>
+<li>
+<a href="#usages">Usages</a>
+
+<ul>
+<li><a href="#creating-units">Creating Units</a></li>
+<li><a href="#making-connections">Making Connections</a></li>
+<li><a href="#setting-parameters">Setting Parameters</a></li>
+<li><a href="#visualization">Visualization</a></li>
+<li><a href="#sample-accurate-looping">Sample-accurate Looping</a></li>
+<li><a href="#gui">GUI</a></li>
+</ul>
+</li>
+</ul><h2>
+<a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h2>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">// creating units</span>
+<span class="kd">var</span> <span class="nx">saw</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WX</span><span class="p">.</span><span class="nx">Oscil</span><span class="p">({</span> <span class="nx">type</span><span class="o">:</span><span class="s2">"sawtooth"</span> <span class="p">}),</span>
+    <span class="nx">sqr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WX</span><span class="p">.</span><span class="nx">Oscil</span><span class="p">({</span> <span class="nx">type</span><span class="o">:</span><span class="s2">"square"</span> <span class="p">}),</span>
+    <span class="nx">lpf</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WX</span><span class="p">.</span><span class="nx">ModLPF</span><span class="p">({</span> <span class="nx">cutoff</span><span class="o">:</span><span class="mi">2500</span><span class="p">,</span> <span class="nx">Q</span><span class="o">:</span><span class="mi">12</span> <span class="p">}),</span>
+    <span class="nx">env</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WX</span><span class="p">.</span><span class="nx">ADSR</span><span class="p">({</span> <span class="nx">a</span><span class="o">:</span><span class="mf">0.001</span><span class="p">,</span> <span class="nx">d</span><span class="o">:</span><span class="mf">0.002</span><span class="p">,</span> <span class="nx">s</span><span class="o">:</span><span class="mf">0.3</span><span class="p">,</span> <span class="nx">r</span><span class="o">:</span><span class="mf">0.1</span> <span class="p">}),</span>
+    <span class="nx">vrb</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WX</span><span class="p">.</span><span class="nx">ConVerb</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span><span class="s2">"ir/hall.wav"</span><span class="p">,</span> <span class="nx">mix</span><span class="o">:</span><span class="mf">0.3</span> <span class="p">});</span>
+<span class="c1">// building an audiograph</span>
+<span class="nx">WX</span><span class="p">.</span><span class="nx">link</span><span class="p">(</span><span class="nx">saw</span><span class="p">,</span> <span class="nx">lpf</span><span class="p">,</span> <span class="nx">env</span><span class="p">,</span> <span class="nx">vrb</span><span class="p">,</span> <span class="nx">WX</span><span class="p">.</span><span class="nx">DAC</span><span class="p">);</span>
+<span class="c1">// connecting units</span>
+<span class="nx">sqr</span><span class="p">.</span><span class="nx">to</span><span class="p">(</span><span class="nx">lpf</span><span class="p">);</span>
+</pre></div>
+
+<p>WAAX is an experimental JavaScript library built on top of <a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html" title="Web Audio API: W3C Editor's Draft">Web Audio API</a> in Chrome. With <strong>music creation and production</strong> in mind, it is designed to offer the higher level of functionality than basic building blocks of Web Audio API.</p>
+
+<p>The goal of this project is 1) to facilitate experiments and iterations of web-based audio programming and 2) to hide audio-specific chores from web developers who are not familiar with audio programming. This library is designed to be used with other JavaScript APIs available on modern web browsers.</p>
+
+<p>The facade of API is strongly inspired by <a href="https://github.com/mrdoob/three.js/" title="THREE.js: Github Repo">THREE.js</a> and <a href="http://chuck.cs.princeton.edu/">ChucK</a>: Three.js is one of WebGL JavaScript libraries widely being used for web-based 3D graphics. ChucK is an experimental audio programming language being actively developed and used by computer music communities such as <a href="http://plork.cs.princeton.edu/">PLOrk</a>(Princeton Laptop Orchestra) and <a href="http://slork.stanford.edu/">SLOrk</a>(Stanford Laptop Orchestra).</p>
+
+<p>As this library is in early stages of development, it currently demonstrates minimum set of features, however, it will embrace more elements as it grows: ready-made instruments, comprehensive timebase system (in conjunction with Web MIDI API), and musical interconnection between multiple Chrome clients.</p>
+
+<p><a href="https://hacks.mozilla.org/2013/02/webrtc-enabled-h-264mp3-support-in-win-7-on-by-default-metro-ui-for-windows-8-more-firefox-development-highlights/">FireFox has recently started implementing Web Audio API</a> and it's partially available in the Nightly Build. Safari also has the implementation of Web Audio API but it is slightly outdated compared to the one in Chrome.)</p>
+
+<h2>
+<a name="demo" class="anchor" href="#demo"><span class="octicon octicon-link"></span></a>Demo</h2>
+
+<p>Requirements: <strong>Google Chrome 20+</strong> on any platform (Win/OSX/Linux). You can check the availability of the API in different web browsers <a href="http://caniuse.com/audio-api">here</a>.</p>
+
+<ul>
+<li>
+<strong><a href="http://hoch.github.com/WAAX/examples/editor.html">mini-IDE</a></strong> (which includes all the examples below)
+
+<ul>
+<li><a href="http://hoch.github.com/WAAX/examples/hello-waax.html">Hello WAAX</a></li>
+<li><a href="http://hoch.github.com/WAAX/examples/waax-does-thx.html">WAAX does THX</a></li>
+<li><a href="http://hoch.github.com/WAAX/examples/acidic-bassline.html">Acidic Bassline</a></li>
+<li><a href="http://hoch.github.com/WAAX/examples/simple-drum-sampler.html">Simple Drum Sampler</a></li>
+<li><a href="http://hoch.github.com/WAAX/examples/take-i-train.html">Take the I train</a></li>
+<li><a href="http://hoch.github.com/WAAX/examples/visualizer.html">Custom Visualizer</a></li>
+<li><a href="http://hoch.github.com/WAAX/examples/ui-manager.html">WAAX GUI (pilot)</a></li>
+</ul>
+</li>
+</ul><p><em>Adjust your volume setting before clicking. It might be loud!</em></p>
+
+<h2>
+<a name="usages" class="anchor" href="#usages"><span class="octicon octicon-link"></span></a>Usages</h2>
+
+<h3>
+<a name="creating-units" class="anchor" href="#creating-units"><span class="octicon octicon-link"></span></a>Creating Units</h3>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">// creating a sampler and a compressor units</span>
+<span class="kd">var</span> <span class="nx">kick</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WX</span><span class="p">.</span><span class="nx">Sampler</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="s2">"kd.wav"</span><span class="p">,</span> <span class="nx">basePitch</span><span class="o">:</span> <span class="mi">60</span> <span class="p">}),</span>
+    <span class="nx">comp</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WX</span><span class="p">.</span><span class="nx">Comp</span><span class="p">();</span>
+</pre></div>
+
+<p>Like the <em>node</em> in Web Audio API, WAAX has its own atomic object called <strong>unit</strong>. It is conceptually identical to the 'unit generator' of other audio programming environments. A unit can be created with initial parameters, or it can be set with default parameters when created with no argument.</p>
+
+<h3>
+<a name="making-connections" class="anchor" href="#making-connections"><span class="octicon octicon-link"></span></a>Making Connections</h3>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">// connecting units with .to() method</span>
+<span class="nx">kick</span><span class="p">.</span><span class="nx">to</span><span class="p">(</span><span class="nx">comp</span><span class="p">).</span><span class="nx">to</span><span class="p">(</span><span class="nx">WX</span><span class="p">.</span><span class="nx">DAC</span><span class="p">);</span>
+<span class="c1">// equivalent to the above</span>
+<span class="nx">WX</span><span class="p">.</span><span class="nx">link</span><span class="p">(</span><span class="nx">kick</span><span class="p">,</span> <span class="nx">comp</span><span class="p">,</span> <span class="nx">WX</span><span class="p">.</span><span class="nx">DAC</span><span class="p">);</span>
+</pre></div>
+
+<p>As shown above, the connection between several WAAX units can be achieved by chaining <code>.to()</code> methods. Alternatively, the <code>WX.link()</code> method can be used to build an audiograph out of multiple units. <code>WX.DAC</code> is the master output of WAAX system.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">// native Web Audio API node</span>
+<span class="kd">var</span> <span class="nx">node</span> <span class="o">=</span> <span class="nx">myAudioContext</span><span class="p">.</span><span class="nx">createGain</span><span class="p">();</span>
+<span class="c1">// unit =&gt; node</span>
+<span class="nx">kick</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">node</span><span class="p">);</span>
+<span class="c1">// node =&gt; unit</span>
+<span class="nx">node</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">comp</span><span class="p">.</span><span class="nx">_inlet</span><span class="p">);</span>
+</pre></div>
+
+<p>The connection from a WAAX unit to Web Audio API node can be done by <code>.connect()</code> method, which is the same method in Web Audio API, but the connection from a node to a unit should be done manually with <code>._inlet</code> node from a unit. This enables to use the library in conjunction with plain Web Audio API codes.</p>
+
+<h3>
+<a name="setting-parameters" class="anchor" href="#setting-parameters"><span class="octicon octicon-link"></span></a>Setting Parameters</h3>
+
+<p><em>note: this will be changed in the next revision.</em></p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">comp</span><span class="p">.</span><span class="nx">threshold</span> <span class="o">=</span> <span class="o">-</span><span class="mi">12</span><span class="p">;</span>
+<span class="nx">comp</span><span class="p">.</span><span class="nx">ratio</span> <span class="o">=</span> <span class="mf">8.0</span><span class="p">;</span>
+<span class="nx">kick</span><span class="p">.</span><span class="nx">params</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">source</span><span class="o">:</span><span class="s2">"kd2.wav"</span><span class="p">,</span> <span class="nx">basePitch</span><span class="o">:</span><span class="mi">48</span> <span class="p">};</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">kick</span><span class="p">.</span><span class="nx">source</span><span class="p">);</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="s2">"kd2.wav"</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">kick</span><span class="p">.</span><span class="nx">params</span><span class="p">);</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">{</span> <span class="nx">source</span><span class="o">:</span><span class="s2">"kd2.wav"</span><span class="p">,</span> <span class="nx">basePitch</span><span class="o">:</span><span class="mi">48</span> <span class="p">}</span>
+</pre></div>
+
+<p>All the parameters of a unit is accessible by simply setting or getting values. Alternatively, passing a javascript object literal with parameters into <code>.params</code> is also possible. Getting available parameters from a unit can be done by printing out <code>.params</code> as well.</p>
+
+<h3>
+<a name="visualization--example" class="anchor" href="#visualization--example"><span class="octicon octicon-link"></span></a>Visualization : <a href="http://hoch.github.com/WAAX/examples/simple-drum-sampler.html">Example</a>
+</h3>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">// creating waveform display with target canvas ID</span>
+<span class="kd">var</span> <span class="nx">wf</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WX</span><span class="p">.</span><span class="nx">Waveform</span><span class="p">({</span> <span class="nx">canvas</span><span class="o">:</span><span class="s2">"CANVAS-ID"</span> <span class="p">});</span>
+<span class="c1">// connecting compressor unit to waveform visualizer</span>
+<span class="nx">comp</span><span class="p">.</span><span class="nx">to</span><span class="p">(</span><span class="nx">wf</span><span class="p">);</span>
+<span class="c1">// draw waveform</span>
+<span class="nx">wf</span><span class="p">.</span><span class="nx">draw</span><span class="p">();</span>
+</pre></div>
+
+<p>Using a set of units called <em>Analyzers</em>, visualizing waveforms and spectrum can be achieved instantly. The visual content will be automatically resized according to the size of the target canvas DOM element.</p>
+
+<h3>
+<a name="sample-accurate-looping" class="anchor" href="#sample-accurate-looping"><span class="octicon octicon-link"></span></a>Sample-accurate Looping</h3>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">// playNote function</span>
+<span class="kd">function</span> <span class="nx">playNote</span><span class="p">(</span><span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">adsr</span><span class="p">.</span><span class="nx">noteOn</span><span class="p">(</span><span class="nx">next</span><span class="p">);</span>
+  <span class="nx">adsr</span><span class="p">.</span><span class="nx">noteOff</span><span class="p">(</span><span class="nx">next</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="c1">// looping playNote() infinitely every 3 seconds</span>
+<span class="kd">var</span> <span class="nx">myLoop</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WX</span><span class="p">.</span><span class="nx">Loop</span><span class="p">(</span><span class="nx">playNote</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">);</span>
+<span class="nx">myLoop</span><span class="p">.</span><span class="nx">start</span><span class="p">();</span>
+</pre></div>
+
+<p>Triggering events with super-accurate timing is a quite involved task on the web browsers due to the nature of <code>setTimeout()</code> or <code>setInterval()</code> function. However, the <code>WX.Loop()</code> object provides the sample-accurate looping mechanism. The API for sample-accurate event management is the key objective of this library and it will be expanded to accommodate more complex musical forms. (The detailed description of the scheduling mechanism can be found <a href="http://www.html5rocks.com/en/tutorials/audio/scheduling/">here</a>.)</p>
+
+<h3>
+<a name="gui--example" class="anchor" href="#gui--example"><span class="octicon octicon-link"></span></a>GUI : <a href="http://hoch.github.com/WAAX/examples/ui-manager.html">Example</a>
+</h3>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">// div for UI panel</span>
+<span class="kd">var</span> <span class="nx">panel</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">"wx-uipanel"</span><span class="p">);</span>
+<span class="c1">// a knob</span>
+<span class="kd">var</span> <span class="nx">ka</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WX</span><span class="p">.</span><span class="nx">UIKnob</span><span class="p">({</span>
+  <span class="nx">targetDiv</span><span class="o">:</span><span class="nx">panel</span><span class="p">,</span> <span class="nx">label</span><span class="o">:</span><span class="s2">"Attack"</span><span class="p">,</span>
+  <span class="nx">x</span><span class="o">:</span><span class="mi">250</span><span class="p">,</span> <span class="nx">y</span><span class="o">:</span><span class="mi">485</span><span class="p">,</span> <span class="nx">offset</span><span class="o">:</span> <span class="mf">0.001</span><span class="p">,</span> <span class="nx">scale</span><span class="o">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mf">0.2</span>
+<span class="p">});</span>
+<span class="c1">// targeting an attack parameter in an ADSR unit</span>
+<span class="nx">ka</span><span class="p">.</span><span class="nx">setTargetValue</span><span class="p">(</span><span class="nx">adsr</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">);</span>
+</pre></div>
+
+<p>The basic GUI interaction is implemented in the current revision (r5): vertical/horizontal slider, and a knob. WAAX units have "modulation targets" that can be controlled by various modulation sources such as GUI components or even other units simply by putting a single line of code.</p>
+
+<h2>
+<a name="units-generators-processors-and-analyzers" class="anchor" href="#units-generators-processors-and-analyzers"><span class="octicon octicon-link"></span></a>Units: Generators, Processors and Analyzers</h2>
+
+<p>As WAAX is in early stages of development, there are several components (which are yet to be released publicly) to be incorporated into this library in the near future. I am currently expanding its sonic vocabulary by adding more units to the library. The followings are a basic set of units as the first milestone. A detailed documentation for various units will be available soon.</p>
+
+<h3>
+<a name="generators" class="anchor" href="#generators"><span class="octicon octicon-link"></span></a>Generators</h3>
+
+<p><code>WX.Oscil</code> <code>WX.Noise</code> <code>WX.Sampler</code> <code>WX.LFO</code> <code>WX.ImpTrain</code></p>
+
+<h3>
+<a name="processors" class="anchor" href="#processors"><span class="octicon octicon-link"></span></a>Processors</h3>
+
+<p><code>WX.ADSR</code> <code>WX.ModLPF</code> <code>WX.LPF</code> <code>WX.TwinDelay</code> <code>WX.ConVerb</code> <code>WX.Comp</code> <code>WX.C2</code></p>
+
+<h3>
+<a name="analyzers" class="anchor" href="#analyzers"><span class="octicon octicon-link"></span></a>Analyzers</h3>
+
+<p><code>WX.Waveform</code> <code>WX.Spectrum</code> <code>WX.Visualizer</code></p>
+
+<h3>
+<a name="gui" class="anchor" href="#gui"><span class="octicon octicon-link"></span></a>GUI</h3>
+
+<p><code>WX.UISliderH</code> <code>WX.UISliderV</code> <code>WX.UIKnob</code></p>
+
+<h3>
+<a name="utilities" class="anchor" href="#utilities"><span class="octicon octicon-link"></span></a>Utilities</h3>
+
+<p><code>WX.random2</code> <code>WX.random2f</code> <code>WX.db2lin</code> <code>WX.lin2db</code> <code>WX.pitch2freq</code> <code>WX.freq2pitch</code></p>
+
+<h2>
+<a name="contact-and-license" class="anchor" href="#contact-and-license"><span class="octicon octicon-link"></span></a>Contact and License</h2>
+
+<p>This project is initiated and managed by hoch(<a href="https://ccrma.stanford.edu/%7Ehongchan/">Hongchan Choi</a>) at <a href="https://ccrma.stanford.edu/">CCRMA/Stanford University</a>. Please refer LICENSE file (MIT License) for more info.</p>
+        </section>
+
+        <footer>
+          WAAX is maintained by <a href="https://github.com/hoch">hoch</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
