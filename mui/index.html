@@ -12,54 +12,26 @@
   <link rel="stylesheet" type="text/css" href="mui-core.css">
   <!-- mui elements -->
   <link rel="import" href="mui-knob/mui-knob.html">
+  <link rel="import" href="mui-knobh/mui-knobh.html">
   <link rel="import" href="mui-button/mui-button.html">
   <link rel="import" href="mui-toggle/mui-toggle.html">
   <link rel="import" href="mui-select/mui-select.html">
+  <!-- index style, srcipt -->
+  <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
 <body>
   <div class="c-content">
-
-    <div class="c-mui-section">
-      <mui-knob label="Attack" value="0.25" min="0.0" max="1.0"></mui-knob>
-      <mui-knob label="Cutoff" value="0.75" min="0.0" max="1.0"></mui-knob>
-    </div>
-
-    <div class="c-mui-section">
-      <mui-button id="btn-csave" icon="&#x55;"></mui-button>
-      <mui-button id="btn-rewind" icon="&#x52;"></mui-button>
-      <mui-button id="btn-stop" icon="&#x53;"></mui-button>
-      <mui-button id="btn-play" icon="&#x50;"></mui-button>
-      <mui-button id="btn-record" icon="&#x43;"></mui-button>
-    </div>
-
-    <div class="c-mui-section">
-      <mui-toggle label="ON"></mui-toggle>
-      <mui-toggle label="OFF"></mui-toggle>
-    </div>
-
-    <div class="c-mui-section">
-      <mui-select id="select-preset" label="Preset"></mui-select>
-    </div>
-    <!--
-    <h3>UI Panel and Section</h3>
-    <div class="c-mui-panel">
-      <h1>Panel</h1>
-        <div class="c-mui-section">
-          <h2>SECTION</h2>
-          <div style="width: 200px; height: 50px; line-height: 50px;">
-            UI Elements Here.
-          </div>
-        </div>
-    </div>
-
-    <h3>Toggle, Buttons</h3>
+    <h2>MUI</h2>
+    <h3>Musical User Interface: Polymer-WAAX UI elements</h3>
     <div class="c-mui-panel">
       <div class="c-mui-section">
-        <h2>Toggles</h2>
-        <mui-toggle label="ON"></mui-toggle>
-        <mui-toggle label="OFF"></mui-toggle>
+        <h2>Knobs</h2>
+        <mui-knob id="knob-freq" label="Freq" min="40" max="2500"></mui-knob>
+        <mui-knobh id="knob-gain" label="Gain" min="0.0" max="1.0"></mui-knobh>
       </div>
+
       <div class="c-mui-section">
         <h2>Buttons</h2>
         <mui-button id="btn-csave" icon="&#x55;"></mui-button>
@@ -68,47 +40,40 @@
         <mui-button id="btn-play" icon="&#x50;"></mui-button>
         <mui-button id="btn-record" icon="&#x43;"></mui-button>
       </div>
-    </div>
 
-    <pre class="prettyprint">
-&lt;mui-toggle label=&quot;ON&quot;&gt;&lt;/mui-toggle&gt;
-&lt;mui-button id=&quot;button-id&quot; icon=&quot;&amp;#x55;&quot;&gt;&lt;/mui-button&gt;</pre>
-
-    <h3>Knobs</h3>
-    <div class="c-mui-panel">
       <div class="c-mui-section">
-        <h2>Knobs (V)</h2>
-        <mui-knob label="Attack" value="0.25" min="0.0" max="1.0"></mui-knob>
-        <mui-knob label="Cutoff" value="0.75" min="0.0" max="1.0"></mui-knob>
+        <h2>Toggle</h2>
+        <mui-toggle id="tgl-osc" label="M"></mui-toggle>
       </div>
+
       <div class="c-mui-section">
-        <h2>Knobs (H)</h2>
-        <mui-knob2 label="Hold" value="0.25" min="0.0" max="1.0"></mui-knob2>
-        <mui-knob2 label="Mix" value="0.25" min="0.0" max="1.0"></mui-knob2>
+        <h2>Selector</h2>
+        <mui-select id="select-preset" label="Preset"></mui-select>
       </div>
     </div>
 
+    <h3>Markup</h3>
     <pre class="prettyprint">
-&lt;mui-knob label=&quot;Param1&quot; value=&quot;0.0&quot; min=&quot;0.0&quot; max=&quot;1.0&quot;&gt;&lt;/mui-knob&gt;
-&lt;mui-knob2 label=&quot;Param2&quot; value=&quot;0.0&quot; min=&quot;0.0&quot; max=&quot;1.0&quot;&gt;&lt;/mui-knob2&gt;</pre>
+&lt;mui-knob id=&quot;knob-freq&quot; label=&quot;Freq&quot; min=&quot;40&quot; max=&quot;2500&quot;&gt;&lt;/mui-knob&gt;
+&lt;mui-knobh id=&quot;knob-gain&quot; label=&quot;Gain&quot; min=&quot;0.0&quot; max=&quot;1.0&quot;&gt;&lt;/mui-knobh&gt;
+&lt;mui-button id=&quot;btn-csave&quot; icon=&quot;&amp;#x55;&quot;&gt;&lt;/mui-button&gt;
+&lt;mui-toggle id=&quot;tgl-osc&quot; label=&quot;M&quot;&gt;&lt;/mui-toggle&gt;
+&lt;mui-select id=&quot;select-preset&quot; label=&quot;Preset&quot;&gt;&lt;/mui-select&gt;</pre>
 
+    <h3>Script</h3>
+<pre class="prettyprint">
+var osc = WX.Oscil();
+MUI.$(&#039;knob-freq&#039;).link(osc, &#039;pFreq&#039;);
+MUI.$(&#039;knob-gain&#039;).link(osc, &#039;pGain&#039;);
+MUI.$(&#039;tgl-osc&#039;).link(WX.DAC, &#039;pMute&#039;);
+MUI.$(&#039;select-preset&#039;).link(osc, &#039;pType&#039;);</pre>
 
-    <h3>HSlider</h3>
-    <div class="c-mui-panel">
-      <div class="c-mui-section-noborder">
-      <mui-hslider label="Gain" value="0.25" min="0.0" max="1.0"></mui-hslider>
-      <mui-hslider label="Volume" value="0.75" min="0.0" max="1.0"></mui-hslider>
-      </div>
-    </div>
-
-    <pre class="prettyprint">
-&lt;mui-hslider label=&quot;Gain&quot; value=&quot;0.25&quot; min=&quot;0.0&quot; max=&quot;1.0&quot;&gt;&lt;/mui-hslider&gt;</pre>
   </div>
-  -->
-
+  <!-- script -->
   <script type="text/javascript">
     function init() {
-      var osc = WX.Oscil({ pType: 'triangle', pActive: true, pGain: 0.01 });
+
+      var osc = WX.Oscil({ pType: 'triangle', pActive: true, pGain: 0.1 });
       osc.to(WX.DAC);
 
       var presets = [
@@ -118,12 +83,18 @@
         { key: 'Triangle', value: 'triangle' }
       ];
 
+      MUI.$('knob-freq').link(osc, 'pFreq');
+      MUI.$('knob-gain').link(osc, 'pGain');
+
       MUI.$('btn-rewind').onclick = function () {
         console.log('rewind!');
       };
 
+      MUI.$('tgl-osc').link(WX.DAC, 'pMute');
+
       MUI.$('select-preset').setModel(presets);
       MUI.$('select-preset').link(osc, 'pType');
+
     }
 
     window.addEventListener('polymer-ready', init);

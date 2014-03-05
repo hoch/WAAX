@@ -101,8 +101,7 @@ pre .atv, code .atv { color: #859900; } /* html/xml attribute value - green */
 pre .dec, code .dec { color: #3387CC; } /* decimal - blue */
 
 pre.prettyprint, code.prettyprint {
-  font-family: 'Droid Sans Mono Slashed';
-  font-size: 0.8em;
+  font-size: 1.1em;
   line-height: 1.4em;
   background-color: #073642;
   border-radius: 5px;
@@ -110,8 +109,8 @@ pre.prettyprint, code.prettyprint {
 }
 
 pre.prettyprint {
-  margin: 10px;
-  padding: 15px;
+  margin: 8px;
+  padding: 10px;
   white-space: pre-wrap;
 }
 

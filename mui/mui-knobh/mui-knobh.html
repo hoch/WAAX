@@ -1,20 +1,23 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<polymer-element name="mui-knob" attributes="value min max label" noscript>
+<polymer-element name="mui-knobh" attributes="value min max label">
+  <!-- global style -->
+
   <template>
-    <!-- style -->
-    <link rel="stylesheet" href="mui-knob.css" />
+    <link rel="stylesheet" href="mui-knobh.css">
     <!-- markup -->
-    <div class="c-knob-label">{{label}}</div>
+    <div class="c-right">
+      <div class="c-knob-label">{{label}}</div>
+      <input id="eValueDisplay" type="text" class="c-knob-value">
+    </div>
     <svg id="eTouchable" class="c-knob-flat" width="48" height="48" version="1.1" xmlns="http://www.w3.org/2000/svg">
       <circle cx="23.5" cy="23.5" r="23" class="c-knob-flat-outer" />
       <path id="eKnob" class="c-knob-flat-gauge" />
       <circle cx="23.5" cy="23.5" r="15" class="c-knob-flat-inner" />
     </svg>
-    <input id="eValueDisplay" type="text" class="c-knob-value">
   </template>
   <!-- logic -->
   <script>
-    Polymer('mui-knob', {
+    Polymer('mui-knobh', {
 
       // published
       label: 'unlabeled',
@@ -56,7 +59,7 @@
       // post: knob => model
       post: function () {
         if (this.linked) {
-          this.targetUnit.set(this.targetParam, this.value, 1, WX.now + 0.20);
+          this.targetUnit.set(this.targetParam, this.value, 1, WX.now+0.20);
         }
         this.render();
       },
@@ -158,10 +161,12 @@
 
         // handling parameter change in unit (unitparam => ui)
         // will invoke attributeChange when unitparam changed
+        // this.bind('value', unit.params, paramName);
         // fix for Polymer 0.2.0
         this.bind('value', new PathObserver(unit.params, paramName));
       }
 
     });
   </script>
+
 </polymer-element>

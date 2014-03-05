@@ -35,7 +35,7 @@
       // post: knob => model
       post: function () {
         if (this.linked) {
-          this.targetUnit.setParam(this.targetParam, this.state);
+          this.targetUnit.set(this.targetParam, this.state);
         }
         this.render();
       },
@@ -65,7 +65,8 @@
 
         // handling parameter change in unit (unitparam => ui)
         // will invoke attributeChange when unitparam changed
-        this.bind('state', unit.params, paramName);
+        // fix for Polymer 0.2.0
+        this.bind('state', new PathObserver(unit.params, paramName));
       },
 
 

@@ -1,4 +1,12 @@
 /**
+ * color scheme
+  1. deepsea diver color palette
+    @deep-blue:     #31353D;
+    @light-blue:    #445878;
+    @sky-blue:      #92CDCF;
+*/
+
+/**
 /* MUI specific styles
  */
 
@@ -53,7 +61,7 @@
   color: #31353D;
 }
 
-.c-mui-panel h2 {
+.c-mui-section h2 {
   padding: 0 5px;
   margin-top: -14px;
   font-size: 10px;

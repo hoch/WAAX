@@ -1,3 +1,15 @@
+/*
+  muicon from http://icomoon.io/
+  "btn-csave"     icon="&#x55
+  "btn-cload"     icon="&#x44
+  "btn-edit"      icon="&#x45
+  "btn-rewind"    icon="&#x52
+  "btn-stop"      icon="&#x53
+  "btn-play"      icon="&#x50
+  "btn-record"    icon="&#x43
+  "btn-metro"     icon="&#x4d
+ */
+
 :host {
   display: inline-block;
   margin: 20px 4px;

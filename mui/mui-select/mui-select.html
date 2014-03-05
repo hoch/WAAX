@@ -49,7 +49,6 @@
       // post: knob => model
       post: function () {
         this.value = MUI.findValueByKey(this.$.eItems.model, this.key);
-        console.log(this.value);
         if (this.linked) {
           this.targetUnit.set(this.targetParam, this.value);
         }

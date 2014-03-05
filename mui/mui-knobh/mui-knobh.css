@@ -2,8 +2,8 @@
   display: inline-block;
   vertical-align: middle;
   margin: 2px;
-  width: 48px;
-  height: 80px;
+  width: 100px;
+  height: 48px;
   -webkit-user-select: none;
 }
 input:focus {
@@ -19,8 +19,10 @@ input:focus {
   text-align: center;
 }
 .c-knob-flat {
+  /*display: inline-block;*/
   display: block;
   cursor: move;
+  /*vertical-align: top;*/
 }
 .c-knob-value {
   display: block;
@@ -41,6 +43,11 @@ input:focus {
   color: #fff;
   background-color: #666;
   box-shadow: inset 0 0 5px #000;
+}
+.c-right {
+  display: block;
+  float: right;
+  margin-top: 4px;
 }
 .c-knob-flat-outer {
   /*fill: #353D42;*/
