@@ -6,12 +6,12 @@
     <!-- markup -->
     <div class="c-select-label">{{ label }}</div>
     <div id="eTouchable" class="c-select-view">
-      <div class="c-select-button" on-click="menuClicked">&blacktriangledown;</div>
-      <div class="c-select-value" on-click="menuClicked">{{ key }}</div>
+      <div class="c-select-button" on-click="{{menuClicked}}">&blacktriangledown;</div>
+      <div class="c-select-value" on-click="{{menuClicked}}">{{ key }}</div>
       <div id="eDropdown" class="c-select-dropdown">
         <ul>
           <template id="eItems" class="c-select-dropdown" repeat>
-            <li class="c-select-dropdown-item" on-click="itemClicked" id="{{ value }}">{{ key }}</li>
+            <li class="c-select-dropdown-item" on-click="{{itemClicked}}" id="{{ value }}">{{ key }}</li>
           </template>
         </ul>
       </div>
@@ -49,15 +49,15 @@
       // post: knob => model
       post: function () {
         this.value = MUI.findValueByKey(this.$.eItems.model, this.key);
+        console.log(this.value);
         if (this.linked) {
-          this.targetUnit.setParam(this.targetParam, this.value);
+          this.targetUnit.set(this.targetParam, this.value);
         }
         this.render();
       },
 
       menuClicked: function (event, detail, sender) {
         event.stopPropagation();
-        console.log(1);
         this.menuShown = !this.menuShown;
         this.render();
       },
@@ -90,7 +90,9 @@
 
         // handling parameter change in unit (unitparam => ui)
         // will invoke attributeChange when unitparam changed
-        this.bind('value', unit.params, paramName);
+        // this.bind('value', unit.params, paramName);
+        // fix for Polymer 0.2.0
+        this.bind('value', new PathObserver(unit.params, paramName));
       }
     });
   </script>

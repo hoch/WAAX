@@ -117,6 +117,8 @@ var MUI = (function (WX) {
           return collection[i].value;
         }
       }
+      // if key not found, just return the first item
+      return collection[0].value;
     },
 
     findKeyByValue: function (collection, value) {
