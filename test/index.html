@@ -1,0 +1,21 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mocha Tests</title>
+  <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+</head>
+<body>
+  <div id="mocha"></div>
+  <script src="../node_modules/mocha/mocha.js"></script>
+  <script src="../node_modules/should/should.js"></script>
+  <script src="../src/WAAX.js"></script>
+  <script src="../src/Fader.js"></script>
+  <script src="../src/Sampler.js"></script>
+  <script>mocha.setup('bdd')</script>
+  <script src="/test/test.sampler.js"></script>
+  <script>
+    mocha.checkLeaks();
+    mocha.run();
+  </script>
+</body>
+</html>

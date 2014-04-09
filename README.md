@@ -27,3 +27,20 @@ To generate the documentation:
 ```bash
 $ grunt bfdocs
 ```
+
+Tests
+-----
+To run the unit tests, first install the development dependencies:
+
+```bash
+$ npm install
+```
+
+Then we need to serve the test index.html page.  I like using this [http-server](https://github.com/nodeapps/http-server) utility:
+
+```bash
+$ npm install -g http-server
+$ http-server
+```
+
+Then, visit [http://localhost:8080/test/](http://localhost:8080/test/) in your recently updated Google Chrome.
