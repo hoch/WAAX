@@ -20,6 +20,8 @@
   "devDependencies": {
     "grunt": "~0.4.2",
     "grunt-contrib-uglify": "~0.2.7",
-    "grunt-beautiful-docs": "~0.1.0"
+    "grunt-beautiful-docs": "~0.1.0",
+    "mocha": "~1.18.2",
+    "test_wavs": "~1.0.0"
   }
 }
