@@ -72,21 +72,20 @@ window.WX = {};
     WX.log.error('AudioContext seems to be missing. Bye.');
     return null;
   } else {
-    if (!window.hasOwnProperty('webkitAudioContext')) {
-      WX.log.error('WAAX currently does not support FireFox due to its incomplete implementation of Web Audio API. Use Chrome or Safari. bye.');
-      return null;
-    } else {
-      _kApiAvailable = true;
-      WX.log.info('Web Audio API fully supported.');
+    _kApiAvailable = true;
+    WX.log.info('Web Audio API supported.');
+
+    if (window.hasOwnProperty('webkitAudioContext')) {
       window.AudioContext = window.webkitAudioContext;
-      // and implements legacy support for safari
-      if (!AudioContext.prototype.hasOwnProperty('createGain')) {
-        _kLegacySupport = true;
-        WX.log.info('adding legacy support on audio context...');
-        // --------------------------------------
-        // TODO: do some monkey patching here....
-        // --------------------------------------
-      }
+    }
+
+    // and implements legacy support for safari
+    if (!AudioContext.prototype.hasOwnProperty('createGain')) {
+      _kLegacySupport = true;
+      WX.log.info('adding legacy support on audio context...');
+      // --------------------------------------
+      // TODO: do some monkey patching here....
+      // --------------------------------------
     }
   }
 
