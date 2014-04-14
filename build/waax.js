@@ -57,18 +57,15 @@ window.WX = {};
         WX.log.error("AudioContext seems to be missing. Bye.");
         return null;
     } else {
-        if (!window.hasOwnProperty("webkitAudioContext")) {
-            WX.log.error("WAAX currently does not support FireFox due to its incomplete implementation of Web Audio API. Use Chrome or Safari. bye.");
-            return null;
-        } else {
-            _kApiAvailable = true;
-            WX.log.info("Web Audio API fully supported.");
+        _kApiAvailable = true;
+        WX.log.info("Web Audio API supported.");
+        if (window.hasOwnProperty("webkitAudioContext")) {
             window.AudioContext = window.webkitAudioContext;
-            // and implements legacy support for safari
-            if (!AudioContext.prototype.hasOwnProperty("createGain")) {
-                _kLegacySupport = true;
-                WX.log.info("adding legacy support on audio context...");
-            }
+        }
+        // and implements legacy support for safari
+        if (!AudioContext.prototype.hasOwnProperty("createGain")) {
+            _kLegacySupport = true;
+            WX.log.info("adding legacy support on audio context...");
         }
     }
     /**
@@ -2133,7 +2130,16 @@ Ktrl = function() {
         WX.extend(this.params, this.defaultParams);
         WX.extend(this.params, params);
         this._buffer = null;
-        this._nBufferSource = null;
+        // a list of active source nodes, removed from this list when the
+        // `onended` event is fired.
+        //
+        // NOTE: This implementation is not meant to be a polyphonic sampler,
+        // although it could evolve into one.  This list of active nodes is just
+        // maintained so the nodes have time to finish and call `onended` before
+        // they are removed from the heap.  It also allows `stop` to be called
+        // multiple times, because we wait until the sound actually finishes
+        // to remove the reference to the node.
+        this._nBufferSources = [];
         this.setParams(params);
     }
     Sampler.prototype = {
@@ -2144,6 +2150,10 @@ Ktrl = function() {
             pGain: 1
         },
         onload: function() {},
+        /**
+     *  User overrideable `onended` callback for when a node is finished.
+     **/
+        onended: function() {},
         setBuffer: function(buffer) {
             // TODO: is this working on other browsers?
             if (buffer.constructor.name === "AudioBuffer") {
@@ -2154,38 +2164,85 @@ Ktrl = function() {
         getDuration: function() {
             return this._buffer ? this._buffer.duration : 0;
         },
+        /**
+     *  Actual source node `onended` callback for the passed-in node.
+     *
+     *  @param  {BufferSourceNode}  nBufferSource - The node that will use
+     *  this as its `onended` callback.
+     **/
+        _createOnendedCallback: function(nBufferSource) {
+            var me = this;
+            return function() {
+                // remove node from our list
+                me._removeSourceNode(nBufferSource);
+                // call our user-overrideable onended callback
+                me.onended();
+            };
+        },
+        /**
+     *  Create a new BufferSourceNode to play at a certain time.
+     *
+     *  @param  {Number}  time - Absolute time this node will play.
+     *  @param  {Boolean}  loop - The value to set the loop property of the
+     *  node
+     **/
+        _createSourceNode: function(time, loop) {
+            var nBufferSource = WX.nSource(), r = Math.pow(2, (this.params.pPitch - this.params.pBasePitch) / 12);
+            time = time || WX.now;
+            nBufferSource.buffer = this._buffer;
+            nBufferSource.connect(this._nOutput);
+            nBufferSource.playbackRate.setValueAtTime(r, time);
+            nBufferSource.loop = loop;
+            nBufferSource.start(time);
+            // add node to our list
+            this._nBufferSources.push(nBufferSource);
+            // handle node life end
+            nBufferSource.onended = this._createOnendedCallback(nBufferSource);
+            return nBufferSource;
+        },
+        /**
+     *  Remove buffer source node from our list of active nodes.
+     *  Called when a buffer node ends.
+     *
+     *  @param  {BufferSourceNode}  node - The node we are removing from the
+     *  list.
+     **/
+        _removeSourceNode: function(node) {
+            var i;
+            for (i = 0; i < this._nBufferSources.length; i++) {
+                if (this._nBufferSources[i] == node) {
+                    this._nBufferSources.splice(i, 1);
+                    return;
+                }
+            }
+        },
         // play sample for certain period of time and stop
         oneshot: function(time, dur) {
+            var nBufferSource;
             if (this._buffer) {
-                time = time || WX.now;
                 dur = dur || this._buffer.duration;
-                var nBufferSource = WX.nSource();
-                nBufferSource.buffer = this._buffer;
-                nBufferSource.connect(this._nOutput);
-                var r = Math.pow(2, (this.params.pPitch - this.params.pBasePitch) / 12);
-                nBufferSource.playbackRate.setValueAtTime(r, time);
-                nBufferSource.start(time);
+                nBufferSource = this._createSourceNode(time, false);
                 nBufferSource.stop(time + dur);
             }
         },
         // start (and loop)
         start: function(time) {
-            if (this._buffer && this._nBufferSource === null) {
-                time = time || WX.now;
-                this._nBufferSource = WX.nSource();
-                this._nBufferSource.buffer = this._buffer;
-                this._nBufferSource.loop = this.params.pLoop;
-                this._nBufferSource.connect(this._nOutput);
-                var r = Math.pow(2, (this.params.pPitch - this.params.pBasePitch) / 12);
-                this._nBufferSource.playbackRate.setValueAtTime(r, time);
-                this._nBufferSource.start(time);
+            var nBufferSource;
+            if (this._buffer) {
+                nBufferSource = this._createSourceNode(time, this.params.pLoop);
             }
         },
+        /**
+     *  Stops all nodes.  When the nodes actually stop rendering, their
+     *  `onended` callback will be fired and they will be removed from
+     *  the list.
+     **/
         stop: function(time) {
-            if (this._nBufferSource) {
-                time = time || WX.now;
-                this._nBufferSource.stop(time);
-                this._nBufferSource = null;
+            var i;
+            if (this._nBufferSources.length) {
+                for (i = 0; i < this._nBufferSources.length; i++) {
+                    this._nBufferSources[i].stop(time);
+                }
             }
         }
     };
