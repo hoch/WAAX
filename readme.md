@@ -21,11 +21,11 @@ osc.set('gain', [0.0, 0.0], [1.0, 0.01, 1], [0.0, 0.5, 2]);
 __WAAX__ is a JavaScript library that offers a comprehensive framework for web-based music application. Its goal is to facilitate music and audio programming on the modern web browser. The WAAX core library features:
 
 ### Plug-in interface
-WAAX proposes a draft of __audio plug-in format__ for web-based music application, such as [VST, RTAS and AudioUnit](http://en.wikipedia.org/wiki/Audio_plug-in). With this framework, developers can solely focus on designing instruments, sound effect and visualizer units.
+WAAX proposes a draft of __audio plug-in format__ for web-based music application, such as [VST, RTAS and AudioUnit](http://en.wikipedia.org/wiki/Audio_plug-in). With this framework, developers can solely focus on designing instruments, sound effect and visualizer units. More info on creating a WAAX plug-in, see [here](#).
 
 ```javascript
 var osc = WX.Osc3(),
-    afx = WX.AwesomeEffect();
+    afx = WX.AwesomeEffect();   // your own effect plug-in
 
 // connects osc -> afx -> Master    
 osc.to(afx).to(WX.Master);              
@@ -67,7 +67,7 @@ To use WAAX in a web page, simply load the `waax.js` at the end of `<body>`. Thi
 <script src="build/waax.min-0.0.1.js"></script>
 <script src="bower_component/platform.js"></script>
 <!-- load WAAX plug-ins and MUI elements -->
-<script src="plugins/awesome-synth.js"></script>
+<script src="build/plugins/awesome-synth.js"></script>
 <import src="mui/mui-knob.html"></script>
 ```
 
@@ -83,10 +83,11 @@ __Requirements__: [npm](http://nodejs.org/download/), [bower](http://bower.io/)
 
 To install everything including the developement setup:
 
-        $> git clone git://github.com/hoch/WAAX.git waax
-        $> cd waax
-        $> npm install && bower install
-
+```bash
+$> git clone git://github.com/hoch/WAAX.git waax
+$> cd waax
+$> npm install && bower install
+```
 
 ### Directory Structure
 
@@ -126,10 +127,14 @@ To install everything including the developement setup:
 
 ### Grunt Tasks
 
-To run the development server:
+```bash
+$> grunt dev            # Run the development server.
+$> grunt build          # Generate minimized JS files (core library, all plug-ins)
+```
 
-        $> grunt dev
 
-To generate minimized JS files (WAAX core, all plug-ins)
+# LICENSE
 
-        $> grunt build
+MIT
+
+
