@@ -1,214 +1,117 @@
-WAAX (Web Audio API eXtension)
-------------------------------
-**JavaScript library for music and audio programming on Chrome (r5)**
+# WAAX: Web Audio API eXtension
 
-### Please Note! ###
+> NOTE: Currently the repo is under the active developement. Please advise and use it at your own risk.
 
-The newer version of library (r13) will be pushed soon and it will include various enhancements and extra elements: **Web MIDI API support, Polymer-powered musical UI widgets, and a couple of impressive examples**. If you are interested in the future release, you can checkout the 'dev' branch.
+<!-- travis build image -->
 
-The information below is for the previous revision (r5) and will be deprecated with the release of the newer revision (r13) since it is a major update of library including several fundamental changes. Sorry for your inconvineince!
+[In-browser Test](#)
 
-### Quick links ###
-* [WX-IDE][6]
-* [NIME 2013 Paper][21]
-
-### Table of Contents ###
-* [Introduction](#indroduction)
-* [Demo](#demo)
-* [Usages](#usages)
-  * [Creating Units](#creating-units)
-  * [Making Connections](#making-connections)
-  * [Setting Parameters](#setting-parameters)
-  * [Visualization](#visualization)
-  * [Sample-accurate Looping](#sample-accurate-looping)
-  * [GUI](#gui)
-
-
-Introduction
-------------
+### Examples
 
 ```javascript
-// creating units
-var saw = new WX.Oscil({ type:"sawtooth" }),
-    sqr = new WX.Oscil({ type:"square" }),
-    lpf = new WX.ModLPF({ cutoff:2500, Q:12 }),
-    env = new WX.ADSR({ a:0.001, d:0.002, s:0.3, r:0.1 }),
-    vrb = new WX.ConVerb({ source:"ir/hall.wav", mix:0.3 });
-// building an audiograph
-WX.link(saw, lpf, env, vrb, WX.DAC);
-// connecting units
-sqr.to(lpf);
+var osc = WX.Osc3({ osc1type: 'square', osc2detune: 700 }),
+    afx = WX.AwesomeEffect();
+osc.to(afx).to(WX.Master);   
+osc.set('freq', WX.mtof(60));
+osc.set('gain', [0.0, 0.0], [1.0, 0.01, 1], [0.0, 0.5, 2]);
 ```
 
-WAAX is an experimental JavaScript library built on top of [Web Audio API][1] in Chrome. With **music creation and production** in mind, it is designed to offer the higher level of functionality than basic building blocks of Web Audio API.
 
-The goal of this project is 1) to facilitate experiments and iterations of web-based audio programming and 2) to hide audio-specific chores from web developers who are not familiar with audio programming. This library is designed to be used with other JavaScript APIs available on modern web browsers.
+# Introduction
+WAAX is a JavaScript library that offers a comprehensive framework for web-based music application. Its goal is to facilitate music and audio programming on the modern web browser. The WAAX core library features:
 
-The facade of API is strongly inspired by [THREE.js][2] and [ChucK][3]: Three.js is one of WebGL JavaScript libraries widely being used for web-based 3D graphics. ChucK is an experimental audio programming language being actively developed and used by computer music communities such as [PLOrk][4](Princeton Laptop Orchestra) and [SLOrk][5](Stanford Laptop Orchestra).
-
-As this library is in early stages of development, it currently demonstrates minimum set of features, however, it will embrace more elements as it grows: ready-made instruments, comprehensive timebase system (in conjunction with Web MIDI API), and musical interconnection between multiple Chrome clients.
-
-[FireFox has recently started implementing Web Audio API][20] and it's partially available in the Nightly Build. Safari also has the implementation of Web Audio API but it is slightly outdated compared to the one in Chrome.)
-
-[1]: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html "Web Audio API: W3C Editor's Draft"
-[2]: https://github.com/mrdoob/three.js/ "THREE.js: Github Repo"
-[3]: http://chuck.cs.princeton.edu/
-[4]: http://plork.cs.princeton.edu/
-[5]: http://slork.stanford.edu/
-[20]: https://hacks.mozilla.org/2013/02/webrtc-enabled-h-264mp3-support-in-win-7-on-by-default-metro-ui-for-windows-8-more-firefox-development-highlights/
-[21]: https://github.com/hoch/WAAX/raw/master/etc/nime2013-choi-waax-r3.pdf
-[22]: https://ccrma.stanford.edu/~hongchan/WAAX/
-[23]: https://github.com/hoch/WAAX/issues
-
-
-Demo
-----
-Requirements: **Google Chrome 20+** on any platform (Win/OSX/Linux). You can check the availability of the API in different web browsers [here](http://caniuse.com/audio-api).
-
- * **[mini-IDE][6]** (which includes all the examples below)
-  * [Hello WAAX][15]
-  * [WAAX does THX][10]
-  * [Acidic Bassline][11]
-  * [Simple Drum Sampler][12]
-  * [Take the I train][16]
-  * [Custom Visualizer][13]
-  * [WAAX GUI (pilot)][14]
-
-_Adjust your volume setting before clicking. It might be loud!_
-
-[6]: http://hoch.github.com/WAAX/examples/editor.html
-[10]: http://hoch.github.com/WAAX/examples/waax-does-thx.html
-[11]: http://hoch.github.com/WAAX/examples/acidic-bassline.html
-[12]: http://hoch.github.com/WAAX/examples/simple-drum-sampler.html
-[13]: http://hoch.github.com/WAAX/examples/visualizer.html
-[14]: http://hoch.github.com/WAAX/examples/ui-manager.html
-[15]: http://hoch.github.com/WAAX/examples/hello-waax.html
-[16]: http://hoch.github.com/WAAX/examples/take-i-train.html
-
-
-Usages
-------
-
-### Creating Units
+### Plug-in interface
+WAAX proposes a draft of plug-in format for web-based music application, such as VST, RTAS and AudioUnit. With the framework and boilerplate, developers can solely focus on designing instruments, sound effect and visualizer units.
 
 ```javascript
-// creating a sampler and a compressor units
-var kick = new WX.Sampler({ source: "kd.wav", basePitch: 60 }),
-    comp = new WX.Comp();
+var osc = WX.Osc3(),
+    afx = WX.AwesomeEffect();
+
+// connects osc -> afx -> Master    
+osc.to(afx).to(WX.Master);              
 ```
 
-Like the _node_ in Web Audio API, WAAX has its own atomic object called **unit**. It is conceptually identical to the 'unit generator' of other audio programming environments. A unit can be created with initial parameters, or it can be set with default parameters when created with no argument.
-
-
-### Making Connections
+### Better Parameter Control and Efficient Preset Management
+Web Audio API's AudioParam is a hassle for developers without computer music background. A systemic wrapper for parameter control is provided users or plug-in designers with succint syntax and without loosing flexiblity. Plus, saving and loading presets for plug-in setting are simple and easy as well.
 
 ```javascript
-// connecting units with .to() method
-kick.to(comp).to(WX.DAC);
-// equivalent to the above
-WX.link(kick, comp, WX.DAC);
+// freq changes to MIDI pitch 60 immediately
+osc.set('freq', WX.mtof(60));
+
+// gain ramps up linear and ramps down expoentially with an envelope
+osc.set('gain', [0.0, 0.0], [1.0, 0.01, 1], [0.0, 0.5, 2]);
 ```
 
-As shown above, the connection between several WAAX units can be achieved by chaining `.to()` methods. Alternatively, the `WX.link()` method can be used to build an audiograph out of multiple units. `WX.DAC` is the master output of WAAX system.
+### Polymer-ready: Modular GUI elements
+WAAX is designed with Polymer (or Web Component) in mind. With the help of MUI(Musical User Interface), A developer can easily design a polymer GUI element and bind it to WAAX plug-in parameters. Two-way binding between parameters and a GUI element will not only save you from 'callback hell' but also helps you write human-readable code.
 
 ```javascript
-// native Web Audio API node
-var node = myAudioContext.createGain();
-// unit => node
-kick.connect(node);
-// node => unit
-node.connect(comp._inlet);
+MUI.$('knobFreq').bind(osc, 'freq');    // #knobFreq connects to freq
 ```
 
-The connection from a WAAX unit to Web Audio API node can be done by `.connect()` method, which is the same method in Web Audio API, but the connection from a node to a unit should be done manually with `._inlet` node from a unit. This enables to use the library in conjunction with plain Web Audio API codes.
+### Planned: Web MIDI API integration
+Since it is only supported in Chrome Canary behind the flag, the integration of Ktrl.js library into WAAX is not completed yet. In the meantime, Ktrl.js should be loaded and used separately.
 
 
-### Setting Parameters
+# Usage
 
-_note: this will be changed in the next revision._
+To use WAAX in a web page, simply load the `waax.js` at the end of `<body>`. This will load `MUI` features as well. Note that you can skip the Platform/Polymer part if you do not need MUI elements in your project. Then Plug-ins and GUI elements can be loaded separately as needed.
 
-```javascript
-comp.threshold = -12;
-comp.ratio = 8.0;
-kick.params = { source:"kd2.wav", basePitch:48 };
-
-console.log(kick.source);
->>> "kd2.wav"
-console.log(kick.params);
->>> { source:"kd2.wav", basePitch:48 }
+```html
+<!-- load WAAX and Platform/Polymer -->
+<script src="build/waax.min-0.0.1.js"></script>
+<script src="bower_component/platform.js"></script>
+<!-- load WAAX plug-ins and MUI elements -->
+<script src="plugins/myWXSynth.js"></script>
+<import src="mui/mui-knob.html"></script>
 ```
 
-All the parameters of a unit is accessible by simply setting or getting values. Alternatively, passing a javascript object literal with parameters into `.params` is also possible. Getting available parameters from a unit can be done by printing out `.params` as well.
 
+# Development
 
-### Visualization : [Example][12]
+### Installation
 
-```javascript
-// creating waveform display with target canvas ID
-var wf = new WX.Waveform({ canvas:"CANVAS-ID" });
-// connecting compressor unit to waveform visualizer
-comp.to(wf);
-// draw waveform
-wf.draw();
-```
+__Requirements__: npm, bower
 
-Using a set of units called _Analyzers_, visualizing waveforms and spectrum can be achieved instantly. The visual content will be automatically resized according to the size of the target canvas DOM element.
+To install everything including the developement setup:
 
-### Sample-accurate Looping
+        $> git clone git://github.com/hoch/WAAX.git waax
+        $> cd waax
+        $> ./setup
 
-```javascript
-// playNote function
-function playNote(next) {
-  adsr.noteOn(next);
-  adsr.noteOff(next + 1.0);
-}
-// looping playNote() infinitely every 3 seconds
-var myLoop = new WX.Loop(playNote, 0, 3.0);
-myLoop.start();
-```
+Note that `./setup` command will install all the dependencies via npm and bower. Make sure to have them installed first.
 
-Triggering events with super-accurate timing is a quite involved task on the web browsers due to the nature of `setTimeout()` or `setInterval()` function. However, the `WX.Loop()` object provides the sample-accurate looping mechanism. The API for sample-accurate event management is the key objective of this library and it will be expanded to accommodate more complex musical forms. (The detailed description of the scheduling mechanism can be found [here](http://www.html5rocks.com/en/tutorials/audio/scheduling/).)
+### Directory Structure
 
+        .
+        |
+        +- build/               // flattened, minified dist files
+        |   +- waax.min.js
+        +- dev/                 // development files
+        |   +- waax.js
+        +- examples/            // example pages
+        +- mui/                 // MUI elements repository
+        |   +- mui-knob.html
+        |   +- mui-knobh.html
+        |   +- mui-toggle.html
+        |   +- mui-select.html
+        +- plugins/             // plug-in repository
+        |   +- Boilerplate.js   // plug-in boilerplate file 
+        +- test/                // client-side testing (mocha + chai)
+        |   +- index.html
+        |   +- test-core.js     // WAAX core test
+        +- bower.json           // bower package info
+        +- index.html           // dev landing page
+        +- Gruntfiles.js        // grunt tasks
+        +- package.json         // npm package info
+        +- README.md
 
-### GUI : [Example][14]
+### Grunt Tasks
 
-```javascript
-// div for UI panel
-var panel = document.getElementById("wx-uipanel");
-// a knob
-var ka = new WX.UIKnob({
-  targetDiv:panel, label:"Attack",
-  x:250, y:485, offset: 0.001, scale: 0.5, value: 0.2
-});
-// targeting an attack parameter in an ADSR unit
-ka.setTargetValue(adsr, "a");
-```
+To run the development server:
 
-The basic GUI interaction is implemented in the current revision (r5): vertical/horizontal slider, and a knob. WAAX units have "modulation targets" that can be controlled by various modulation sources such as GUI components or even other units simply by putting a single line of code.
+        $> grunt dev
 
+To build a minimized JS file:
 
-Units: Generators, Processors and Analyzers
--------------------------------------------
-As WAAX is in early stages of development, there are several components (which are yet to be released publicly) to be incorporated into this library in the near future. I am currently expanding its sonic vocabulary by adding more units to the library. The followings are a basic set of units as the first milestone. A detailed documentation for various units will be available soon.
-
-### Generators
-`WX.Oscil` `WX.Noise` `WX.Sampler` `WX.LFO` `WX.ImpTrain`
-
-### Processors
-`WX.ADSR` `WX.ModLPF` `WX.LPF` `WX.TwinDelay` `WX.ConVerb` `WX.Comp` `WX.C2`
-
-### Analyzers
-`WX.Waveform` `WX.Spectrum` `WX.Visualizer`
-
-### GUI
-`WX.UISliderH` `WX.UISliderV` `WX.UIKnob`
-
-### Utilities
-`WX.random2` `WX.random2f` `WX.db2lin` `WX.lin2db` `WX.pitch2freq` `WX.freq2pitch`
-
-
-Contact and License
--------------------
-This project is initiated and managed by hoch([Hongchan Choi][9]) at [CCRMA/Stanford University](https://ccrma.stanford.edu/). Please refer LICENSE file (MIT License) for more info.
-
-[9]: https://ccrma.stanford.edu/~hongchan/
+        $> grunt build

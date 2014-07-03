@@ -1,8 +1,3 @@
 .DS_Store
-gitup
-notes.md
-ideas.md
-update-waax
-ignore/
-out/
-gendoc-waax
+node_modules/
+bower_component/
