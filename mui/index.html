@@ -2,23 +2,21 @@
 <html>
 
 <head>
-  <!-- waax r12 -->
-  <script src="../src/WAAX.js"></script>
-  <script src="../src/Fader.js"></script>
-  <script src="../src/Oscil.js"></script>
+  <!-- waax 0.0.1-alpha -->
+  <script src="../src/waax.js"></script>
   <!-- polymer + mui core -->
-  <script src="bower_components/platform/platform.js"></script>
-  <script src="mui-core.js"></script>
-  <link rel="stylesheet" type="text/css" href="mui-core.css">
+  <script src="../bower_components/platform/platform.js"></script>
+  <script src="js/mui-core.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/mui-core.css">
   <!-- mui elements -->
-  <link rel="import" href="mui-knob/mui-knob.html">
-  <link rel="import" href="mui-knobh/mui-knobh.html">
-  <link rel="import" href="mui-button/mui-button.html">
-  <link rel="import" href="mui-toggle/mui-toggle.html">
-  <link rel="import" href="mui-select/mui-select.html">
+  <link rel="import" href="mui-knob.html">
+  <link rel="import" href="mui-knobh.html">
+  <link rel="import" href="mui-button.html">
+  <link rel="import" href="mui-toggle.html">
+  <link rel="import" href="mui-select.html">
   <!-- index style, srcipt -->
   <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
-  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 
 <body>
@@ -71,6 +69,7 @@ MUI.$(&#039;select-preset&#039;).link(osc, &#039;pType&#039;);</pre>
   </div>
   <!-- script -->
   <script type="text/javascript">
+
     function init() {
 
       var osc = WX.Oscil({ pType: 'triangle', pActive: true, pGain: 0.1 });
@@ -97,7 +96,8 @@ MUI.$(&#039;select-preset&#039;).link(osc, &#039;pType&#039;);</pre>
 
     }
 
-    window.addEventListener('polymer-ready', init);
+    // window.addEventListener('polymer-ready', init);
+
   </script>
 </body>
 

@@ -243,26 +243,30 @@ window.WX = (function () {
   /**
    * @function Envelope generator
    * @description Create an envelope generator function for WA audioParam
+   *   - Envelope data point: [val, offsetTimes, transition_type]
+   *   - transition types: { 0: jump, 1: linear, 2: expo, 3: target }
    * @example
-   *   // Envelope point: [val, offsetTime, transition_type]
-   *   // transition_type: { 0: jump, 1: linear, 2: expo }
-   *   var envGen = Envelope([0.0, 0.0], [0.8, 0.01, 1], [0.0, 0.3, 2]);
-   *   var myGen = envGen(2.0); // this will create an envelope starts 2.0 sec.
+   *   // build an envelope generator with relative data points
+   *   var AttRelEnv = WX.Envelope([0.0, 0.0], [0.8, 0.01, 1], [0.0, 0.3, 2]);
+   *   // creates an envelope starts at 2.0 sec.
+   *   var env = AttRelEnv(2.0);
    */
 
   function Envelope() {
     var args = arguments;
     return function (startTime) {
       var env = [];
+      startTime = (startTime || 0);
       for (var i = 0; i < args.length; i++) {
         var val = args[i][0], time;
+        // for setTargetAtTime - [t1, t2]
         if (Util.isArray(args[i][1])) {
-          // for: setTargetAtTime - [t1, t2]
-          time = [(startTime || 0) + args[i][1][0], (startTime || 0) + args[i][1][1]];
+          time = [startTime + args[i][1][0], startTime + args[i][1][1]];
           env.push([val, time, 3]);
-        } else {
-          // for: set, linear, expo atTime
-          time = (startTime || 0) + args[i][1];
+        }
+        // for jump, linear, expo
+        else {
+          time = startTime + args[i][1];
           env.push([val, time, (args[i][2] || 0)]);
         }
       }
@@ -717,6 +721,7 @@ window.WX = (function () {
 /**
  * Fader: Built-in Plugin
  */
+
 (function (WX) {
 
   function Fader(preset) {

@@ -1,1 +1,64 @@
-index.html
+<!DOCTYPE html>
+<!--[if IE 9]><html class="lt-ie10" lang="en" ><![endif]-->
+<html class="no-js">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WAAX: Web Audio API eXtension</title>
+  <link rel="stylesheet" href="bower_components/foundation/css/normalize.css">
+  <link rel="stylesheet" href="bower_components/foundation/css/foundation.css">
+  <script src="bower_components/foundation/js/vendor/modernizr.js"></script>
+  <style>
+    header {
+      padding-top: 3rem;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- body content here -->
+  <header>
+    <div class="row">
+      <div class="small-8 large-centered columns">
+        <h1>WAAX <small>Web Audio API eXtension <span class="label secondary radius" id="waax-ver"></span></small></h1>
+
+        <div class="contain-to-grid">
+          <nav class="top-bar" data-topbar>
+            <ul class="title-area">
+              <li class="name"></li>
+            </ul>
+            <section class="top-bar-section">
+              <ul class="left">
+                <li><a href="docs/">Documentaion</a></li>
+                <li><a href="examples/">Examples</a></li>
+                <li><a href="mui/">MUI</a></li>
+                <li><a href="test/">Test Suite</a></li>
+              </ul>
+            </section>
+          </nav>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <article>
+    <div class="row">
+      <div class="small-8 large-centered columns">
+      </div>
+    </div>
+  </article>
+
+  <!-- scripts -->
+  <script src="bower_components/foundation/js/vendor/jquery.js"></script>
+  <script src="bower_components/foundation/js/foundation.min.js"></script>
+  <script src="src/waax.js"></script>
+  <script>
+    $(document).foundation();
+    var domWAAXVersion = document.querySelector('#waax-ver');
+    domWAAXVersion.textContent = WX.Info.getVersion();
+  </script>
+
+</body>
+</html>

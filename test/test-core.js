@@ -300,9 +300,10 @@ describe('Envelope, Param and Clip loading', function () {
       expect(waveform.get()).to.equal('triangle');
     });
   });
+  // TODO: this test should be fixed to async testing
   describe('loadClip', function () {
     it('should return a audio buffer after xhr loading success.', function (done) {
-      var clip = { name: 'ziggy', url: 'data/testsound.wav' };
+      var clip = { name: 'ziggy', url: '../sound/hochkit/fx-001.wav' };
       var progress = false, complete = false;
       WX.loadClip(clip,
         function () { progress = true; },

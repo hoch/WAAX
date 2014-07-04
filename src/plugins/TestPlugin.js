@@ -5,6 +5,10 @@
  * @requires      WX namespace (waax.js)
  */
 
+// 1 osc, sawtooth
+// 1 biquad + envelope
+// noteOn method (dynamic lifetime)
+
 (function (WX) {
 
   'use strict';
@@ -54,6 +58,6 @@
   WX.Plugin.addPrototype(TestPlugin, ['input', 'output']);
 
   // REQUIRED: registering plug-in into WX ecosystem
-  WX.Plugin.register(WX, TestPlugin);
+  WX.Plugin.register(TestPlugin);
 
 })(WX);

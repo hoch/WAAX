@@ -12,8 +12,10 @@
 var osc = WX.Osc3({ osc1type: 'square', osc2detune: 700 }),
     afx = WX.AwesomeEffect();
 osc.to(afx).to(WX.Master);   
-osc.set('freq', WX.mtof(60));
-osc.set('gain', [0.0, 0.0], [1.0, 0.01, 1], [0.0, 0.5, 2]);
+
+var env = WX.Envelope([0.0, 0.0], [1.0, 0.01, 1], [0.0, 0.5, 2]);
+osc.set('osc2type', 'triangle');
+osc.set('freq', WX.mtof(60)).set('gain', env(WX.now + 0.5));
 ```
 
 
@@ -31,8 +33,8 @@ var osc = WX.Osc3(),
 osc.to(afx).to(WX.Master);              
 ```
 
-### Better Parameter Control and Efficient Preset Management
-Web Audio API's AudioParam is a hassle for developers without computer music background. A systemic wrapper for parameter control is provided users or plug-in designers with succint syntax and flexiblity. Plus, saving and loading plug-in setting as a preset only gets easier as it should.
+### Parameter & Preset Management
+Web Audio API's `AudioParam` is a hassle for developers without computer music background. A systemic wrapper for parameter control is provided users or plug-in designers with succint syntax and flexiblity. Plus, saving and loading plug-in setting as a preset only gets easier as it should.
 
 ```javascript
 // freq changes to MIDI pitch 60 immediately
