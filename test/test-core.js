@@ -306,11 +306,16 @@ describe('Envelope, Param and Clip loading', function () {
       var clip = { name: 'ziggy', url: '../sound/hochkit/fx-001.wav' };
       var progress = false, complete = false;
       WX.loadClip(clip,
-        function () { progress = true; },
-        function () {
+        function (event) {
+          progress = true;
+          expect(event.loaded).to.be.within(0, event.totalSize);
+        },
+        function (buffer) {
           complete = true;
           expect(progress).to.equal(true);
           expect(complete).to.equal(true);
+          expect(buffer.constructor.name).to.equal('AudioBuffer');
+          expect(clip.buffer.constructor.name).to.equal('AudioBuffer');
           done();
       });
     });

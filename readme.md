@@ -99,7 +99,7 @@ $> npm install && bower install
         +- build/                       // flattened, minified dist files
         |   +- waax.min.js
         |   +- plugins/
-        |       +- Boilerplate.js
+        |       +- TestPlugin.js
         +- doc/                         // documentation
         |   +- index.html
         |   +- ...       
@@ -115,7 +115,7 @@ $> npm install && bower install
         +- src/                         // development files
         |   +- waax.js
         |   +- plugins/
-        |       +- Boilerplate.js       // plug-in boilerplate file 
+        |       +- TestPlugin.js        // plug-in boilerplate file 
         +- test/                        // client-side testing (mocha + chai)
         |   +- index.html
         |   +- test-waax.js
