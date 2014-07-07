@@ -1,0 +1,20 @@
+{
+  "name": "WAAX",
+  "version": "0.0.1-alpha",
+  "homepage": "https://github.com/hoch/WAAX",
+  "description": "frontend utilities for WAAX library",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "foundation": "~5.3.0",
+    "polymer": "~0.3.3",
+    "chai": "~1.9.1",
+    "mocha": "~1.20.1"
+  }
+}

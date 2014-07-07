@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- waax 0.0.1-alpha -->
+  <script src="../src/waax.js"></script>
+  <!-- polymer core -->
+  <script src="../bower_components/platform/platform.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/mui-core.css">
+  <!-- mui elements -->
+  <link rel="import" href="mui-knob.html">
+  <link rel="import" href="mui-knobh.html">
+  <link rel="import" href="mui-button.html">
+  <link rel="import" href="mui-toggle.html">
+  <link rel="import" href="mui-select.html">
+  <!-- index style, srcipt -->
+  <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+
+<body>
+  <div class="c-content">
+    <h2>MUI</h2>
+    <h3>Musical User Interface: Polymer-WAAX UI elements</h3>
+    <div class="c-mui-panel">
+      <div class="c-mui-section">
+        <h2>Knobs</h2>
+        <mui-knob id="knob-freq" label="Freq" min="40" max="2500"></mui-knob>
+        <mui-knobh id="knob-gain" label="Gain" min="0.0" max="1.0"></mui-knobh>
+      </div>
+
+      <div class="c-mui-section">
+        <h2>Buttons</h2>
+        <mui-button id="btn-csave" icon="&#x55;"></mui-button>
+        <mui-button id="btn-rewind" icon="&#x52;"></mui-button>
+        <mui-button id="btn-stop" icon="&#x53;"></mui-button>
+        <mui-button id="btn-play" icon="&#x50;"></mui-button>
+        <mui-button id="btn-record" icon="&#x43;"></mui-button>
+      </div>
+
+      <div class="c-mui-section">
+        <h2>Toggle</h2>
+        <mui-toggle id="tgl-osc" label="M"></mui-toggle>
+      </div>
+
+      <div class="c-mui-section">
+        <h2>Selector</h2>
+        <mui-select id="select-preset" label="Preset"></mui-select>
+      </div>
+    </div>
+
+    <h3>Markup</h3>
+    <pre class="prettyprint">
+&lt;mui-knob id=&quot;knob-freq&quot; label=&quot;Freq&quot; min=&quot;40&quot; max=&quot;2500&quot;&gt;&lt;/mui-knob&gt;
+&lt;mui-knobh id=&quot;knob-gain&quot; label=&quot;Gain&quot; min=&quot;0.0&quot; max=&quot;1.0&quot;&gt;&lt;/mui-knobh&gt;
+&lt;mui-button id=&quot;btn-csave&quot; icon=&quot;&amp;#x55;&quot;&gt;&lt;/mui-button&gt;
+&lt;mui-toggle id=&quot;tgl-osc&quot; label=&quot;M&quot;&gt;&lt;/mui-toggle&gt;
+&lt;mui-select id=&quot;select-preset&quot; label=&quot;Preset&quot;&gt;&lt;/mui-select&gt;</pre>
+
+    <h3>Script</h3>
+<pre class="prettyprint">
+var osc = WX.Oscil();
+MUI.$(&#039;knob-freq&#039;).link(osc, &#039;pFreq&#039;);
+MUI.$(&#039;knob-gain&#039;).link(osc, &#039;pGain&#039;);
+MUI.$(&#039;tgl-osc&#039;).link(WX.DAC, &#039;pMute&#039;);
+MUI.$(&#039;select-preset&#039;).link(osc, &#039;pType&#039;);</pre>
+
+  </div>
+  <!-- script -->
+  <script type="text/javascript">
+
+    function init() {
+
+      var osc = WX.Oscil({ pType: 'triangle', pActive: true, pGain: 0.1 });
+      osc.to(WX.DAC);
+
+      var presets = [
+        { key: 'Sine', value: 'sine' },
+        { key: 'Square', value: 'square' },
+        { key: 'Sawtooth', value: 'sawtooth' },
+        { key: 'Triangle', value: 'triangle' }
+      ];
+
+      MUI.$('knob-freq').link(osc, 'pFreq');
+      MUI.$('knob-gain').link(osc, 'pGain');
+
+      MUI.$('btn-rewind').onclick = function () {
+        console.log('rewind!');
+      };
+
+      MUI.$('tgl-osc').link(WX.DAC, 'pMute');
+
+      MUI.$('select-preset').setModel(presets);
+      MUI.$('select-preset').link(osc, 'pType');
+
+    }
+
+    // window.addEventListener('polymer-ready', init);
+
+  </script>
+</body>
+
+</html>
