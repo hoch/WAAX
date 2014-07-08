@@ -181,6 +181,7 @@ describe('System: Core', function() {
       expect(WX.context.constructor.name).to.equal('AudioContext');
     });
   });
+  // TODO: there might be inconsistent between now and currentTime. be advise.
   describe('now (getter)', function () {
     it('should return current time in audio context.', function () {
       expect(WX.now).to.be.above(0.0);
