@@ -1,9 +1,9 @@
 /**
  * test-core.js
  *
- * @description   mocha + chai test suite for WAAX Core (0.0.1)
+ * @description   mocha + chai test suite for WAAX Core 1.0.0-alpha
  * @author        hoch (hongchan.choi@gmail.com)
- * @version       0.0.1
+ * @version       1.0.0
  */
 
 
@@ -20,7 +20,7 @@ describe('System: Info and Log', function() {
 
   describe('Info.getVersion()', function () {
     it('should return API version number.', function () {
-      expect(WX.Info.getVersion()).to.equal('0.0.1-alpha');
+      expect(WX.Info.getVersion()).to.equal('1.0.0-alpha');
     });
   });
   describe('Log.info(arg)', function () {
@@ -79,11 +79,18 @@ describe('System: Utilities', function() {
       expect(WX.isNumber({})).to.equal(false);
     });
   });
-  describe('hasParam(unit, param)', function () {
+  describe('isBoolean(arg)', function () {
+    it('should return true when input is Boolean.', function () {
+      expect(WX.isBoolean(true)).to.equal(true);
+      expect(WX.isBoolean(false)).to.equal(true);
+      expect(WX.isBoolean(1)).to.equal(false);
+    });
+  });
+  describe('hasParam(plugin, param)', function () {
     it('should return true when plugin has the parameter.', function () {
-      var unit = { preset: { 'parameter': 0.0 } };
-      expect(WX.hasParam(unit, 'parameter')).to.equal(true);
-      expect(WX.hasParam(unit, 'notParameter')).to.equal(false);
+      var plugin = { params: { 'parameter': 0.0 } };
+      expect(WX.hasParam(plugin, 'parameter')).to.equal(true);
+      expect(WX.hasParam(plugin, 'notParameter')).to.equal(false);
     });
   });
   describe('extend(target, source)', function () {
@@ -102,7 +109,7 @@ describe('System: Utilities', function() {
     });
   });
 
-  // Musicmath utilities
+  // Music Math utilities
   describe('clamp(value, min, max)', function () {
     it('should clamp value into between min and max.', function () {
       expect(WX.clamp(1.5, 0.0, 1.0)).to.equal(1.0);
@@ -161,11 +168,20 @@ describe('System: Utilities', function() {
       expect(WX.dbtorms(100.0)).to.equal(1.0);
     });
   });
-  describe('patch(args)', function () {
-    it('TBD: should patch plugin units in arguments.', function () {
-      // TBD
+  describe('veltoamp(vel)', function () {
+    it('should return linear amp from velocity.', function () {
+      expect(WX.veltoamp(0)).to.equal(0);
+      expect(WX.veltoamp(63)).to.equal(0.49606299212598426);
+      expect(WX.veltoamp(64)).to.equal(0.5039370078740157);
+      expect(WX.veltoamp(127)).to.equal(1.0);
     });
   });
+
+  // describe('patch(args)', function () {
+  //   it('TBD: should patch plugin units in arguments.', function () {
+  //     // TBD
+  //   });
+  // });
 
 });
 
@@ -264,44 +280,36 @@ describe('System: Core', function() {
       expect(WX.Buffer(1, 2.0, 48000).constructor.name).to.equal('AudioBuffer');
     });
   });
-
-});
-
-
-/**
- * Web Audio API utils and wrappers
- */
-describe('Envelope, Param and Clip loading', function () {
-  describe('Envelope', function () {
+  describe('Envelope(arg)', function () {
     it('should return an envelope generator.', function () {
       var env = WX.Envelope([0.0, 0.0], [0.8, 0.01, 1], [0.0, 0.3, 2]);
       var t = WX.now;
-      expect(env(1.0)).deep.equal([
-        [0.0, 1.0, 0], [0.8, 1.01, 1], [0.0, 1.3, 2]
+      expect(env(1.0, 0.5)).deep.equal([
+        [0.0, 1.0, 0], [0.4, 1.01, 1], [0.0, 1.3, 2]
       ]);
-      expect(env(t)).deep.equal([
-        [0.0, t + 0.0, 0], [0.8, t + 0.01, 1], [0.0, t + 0.3, 2]]
-      );
     });
   });
-  describe('Param', function () {
-    it('should return a WAAX parameter wrapper object.', function () {
-      var o = WX.OSC();
-      var freq = new WX.Param({
-        type: 'number', default: 440, min: 20.0, max: 1000.0,
-        target: o.frequency
+  describe('defineParams(plugin, paramDefs)', function () {
+    it('should define parameter instances in a plugin.', function () {
+      var flag = false;
+      var plugin = {
+        params: {},
+        $testParam: function () {
+          flag = true;
+        }
+      };
+      WX.defineParams(plugin, {
+        'testParam': {
+          type: 'Generic', unit: '',
+          default: 0.01, min: 0.0, max: 1.0
+        }
       });
-      var waveform = new WX.Param({
-        type: 'enum', default: 'triangle',
-        items: ['sine', 'triangle', 'square', 'sawtooth'],
-        target: o.type
-      });
-      expect(freq.get()).to.equal(440);
-      expect(freq.get()).to.equal(freq.default);
-      expect(waveform.get()).to.equal('triangle');
+      expect(plugin.params.testParam.get()).to.equal(0.01);
+      plugin.params.testParam.set(0.5, 0, 0);
+      expect(flag).to.equal(true);
+      expect(plugin.params.testParam.get()).to.equal(0.5);
     });
   });
-  // TODO: this test should be fixed to async testing
   describe('loadClip', function () {
     it('should return a audio buffer after xhr loading success.', function (done) {
       var clip = { name: 'ziggy', url: '../sound/hochkit/fx-001.wav' };
@@ -321,29 +329,57 @@ describe('Envelope, Param and Clip loading', function () {
       });
     });
   });
+
 });
 
 
 /**
- * Plug-in: Fader
+ * Plug-in utilities
+ * - defineType
+ * - initPreset
+ * - extendPrototype
+ * - register
  */
+
+/**
+ * MUI methods
+ * -
+ */
+
+/**
+ * Plug-in: Fader
+ * - MouseResponder
+ * - KeyResponder
+ * - $
+ */
+
 describe('Plug-in: Fader', function () {
-  it('should work with essential features.', function (done) {
-
-    var fader = WX.Fader();
+  it('should set parameters correctly.', function (done) {
+    // test patch: osc is needed to run the AudioParam automation
+    var osc = WX.OSC();
+    var fader = WX.Fader({ bypass: true });
+    osc.start();
+    osc.to(fader._inlet);
     fader.to(WX.Master);
-    fader.set('active', false);
-    fader.set('inputGain', 0.25);
-    fader.set('gain', 0.5);
-
+    fader.set('input', 0.25);
+    fader.set('dB', -6.0);
+    // test preset values
+    var preset = fader.getPreset();
     expect(fader._inlet.constructor.name).to.equal('GainNode');
     expect(fader._outlet.constructor.name).to.equal('GainNode');
-    expect(fader.preset.active).to.equal(false);
-    expect(fader.preset.mute).to.equal(true);
-    expect(fader.preset.inputGain).to.equal(0.25);
-    expect(fader.preset.dB).to.equal(-6.020599913279623);
+    expect(preset.bypass).to.equal(true);
+    expect(preset.mute).to.equal(false);
+    expect(preset.input).to.equal(0.25);
+    expect(preset.dB).to.equal(-6.0);
     expect(fader.info.name).to.equal('Fader');
-    done();
-
+    // checking actual AudioParam under the hood
+    // wow this is totally weird... 1ms??
+    setTimeout(function () {
+      expect(fader._output.gain.value).to.equal(0.5011872053146362);
+      done();
+    }, 15);
   });
 });
+
+
+

@@ -1,7 +1,7 @@
 /**
  * WAAX: Web Audio API eXtension
  *
- * @version   0.0.1-alpha
+ * @version   1.0.0-alpha
  * @author    hoch(hongchan.choi@gmail.com)
  * @license   MIT
  */
@@ -22,7 +22,7 @@ window.WX = (function () {
 
   var Info = (function () {
 
-    var api_version = '0.0.1-alpha';
+    var api_version = '1.0.0-alpha';
 
     return {
       getVersion: function () {
@@ -99,8 +99,8 @@ window.WX = (function () {
       isBoolean: function (bool) {
         return toString.call(bool) === '[object Boolean]';
       },
-      hasParam: function(unit, param) {
-        return hasOwnProperty.call(unit.preset, param);
+      hasParam: function(plugin, param) {
+        return hasOwnProperty.call(plugin.params, param);
       },
       extend: function (target, source) {
         for (var prop in source) {
@@ -211,6 +211,18 @@ window.WX = (function () {
 
   /**
    * module: WAAX Core
+   *
+   * + AudioNode extension
+   * + AudioParam extension
+   * + Envelope
+   * + GenericParam
+   * + ItemizedParam
+   * + BooleanParam
+   * + createParam
+   * + loadClip
+   *
+   * + AudioContext
+   * + AudioNode shorthands
    */
 
   var Core = (function () {
@@ -339,15 +351,18 @@ window.WX = (function () {
         this.type = options.type;
         this.name = (options.name || 'Parameter');
         this.unit = (options.unit || '');
+        // TODO: check for case of '0.0'... fuck js
         this.default = (options.default || 1.0);
         this.value = this.default;
         this.min = (options.min || 0.0);
         this.max = (options.max || 1.0);
-        this.$handler = options.$handler;
+        // handler callback assignment
+        this._parent = options._parent;
+        this.$callback = options._parent['$' + options._paramId];
       },
       set: function (value, time, rampType) {
-        this.value = Math.min(Math.max(value, this.min), this.max);
-        this.$handler(this.value, time, rampType);
+        this.value = Util.clamp(value, this.min, this.max);
+        this.$callback.call(this._parent, this.value, time, rampType);
       },
       get: function () {
         return this.value;
@@ -375,12 +390,14 @@ window.WX = (function () {
         this.default = (options.default || options.items[0]);
         this.value = this.default;
         this.items = options.items;
-        this.$handler = options.$handler;
+        // handler callback assignment
+        this._parent = options._parent;
+        this.$callback = options._parent['$' + options._paramId];
       },
       set: function (value, time, rampType) {
         if (this.items.indexOf(value) > -1) {
           this.value = value;
-          this.$handler(this.value, time, rampType);
+          this.$callback.call(this._parent, this.value, time, rampType);
         }
       },
       get: function () {
@@ -403,7 +420,7 @@ window.WX = (function () {
     BooleanParam.prototype = {
       init: function (options) {
         // assertion
-        if (!Util.isBoolean(option.default)) {
+        if (!Util.isBoolean(options.default)) {
           Log.error('Invalid value for Boolean Parameter.');
         }
         this.parent = options.parent;
@@ -411,12 +428,14 @@ window.WX = (function () {
         this.name = (options.name || 'Parameter');
         this.default = (options.default || false);
         this.value = this.default;
-        this.$handler = options.$handler;
+        // handler callback assignment
+        this._parent = options._parent;
+        this.$callback = options._parent['$' + options._paramId];
       },
       set: function (value, time, rampType) {
         if (Util.isBoolean(value)) {
           this.value = value;
-          this.$handler(this.value, time, rampType);
+          this.$callback.call(this._parent, this.value, time, rampType);
         }
       },
       get: function () {
@@ -510,6 +529,10 @@ window.WX = (function () {
     }
 
 
+    /**
+     * core module public methods
+     */
+
     return {
 
       // audio context
@@ -541,10 +564,12 @@ window.WX = (function () {
       // envlope generator
       Envelope: Envelope,
       // generate parameter helper for plugin
-      defineParams: function (plugin, paramDefs) {
-        for (var name in paramDefs) {
-          paramDefs[name].$handler = plugin['$' + name];
-          plugin.params[name] = createParam(paramDefs[name]);
+      defineParams: function (plugin, paramsOption) {
+        for (var name in paramsOption) {
+          paramsOption[name]._parent = plugin;
+          paramsOption[name]._paramId = name;
+          // paramsOption[name].$handler = plugin['$' + name];
+          plugin.params[name] = createParam(paramsOption[name]);
         }
       },
       // load clip via xhr
@@ -643,7 +668,7 @@ window.WX = (function () {
         for (var param in this.params) {
           preset[param] = this.params[param].get();
         }
-        return prsset;
+        return preset;
       }
     };
 
@@ -732,8 +757,7 @@ window.WX = (function () {
           default: 1.0, min: 0.0, max: 1.0
         },
         bypass: {
-          type: 'Boolean', unit: '',
-          default: false
+          type: 'Boolean', default: false
         }
       });
 
@@ -1120,8 +1144,7 @@ window.WX = (function () {
         var i = PluginConstructor.prototype.info;
         if (Info.getVersion() > i.api_version) {
           // FATAL: pluginConstructor is incompatible with WX Core.
-          Log.error(PluginConstructor.name,
-            ': loading failed. incompatible WAAX version.');
+          Log.error(PluginConstructor.name, ': loading failed. incompatible WAAX version.');
         }
         // register pluginConstructor in WX namespace
         window.WX[PluginConstructor.name] = function (preset) {
@@ -1146,7 +1169,7 @@ window.WX = (function () {
 
   (function () {
 
-    Log.info('WAAX', Info.getVersion(), '(' + Core.context.sampleRate + 'Hz)');
+    Log.info('WAAX', Info.getVersion(), '(' + Core.ctx.sampleRate + 'Hz)');
 
   })();
 
@@ -1184,15 +1207,10 @@ window.WX = (function () {
     dbtolin: Util.dbtolin,
     veltoamp: Util.veltoamp,
 
-    // // Audio-related methods and classes
-    // Envelope: Envelope,
-    // Param: Param,
-    // loadClip: loadClip,
-
     // WAAX Core
-    context: Core.context,
-    get now () { return Core.context.currentTime; },
-    get srate () { return Core.context.sampleRate; },
+    context: Core.ctx,
+    get now () { return Core.ctx.currentTime; },
+    get srate () { return Core.ctx.sampleRate; },
     Gain: Core.Gain,
     OSC: Core.OSC,
     Delay: Core.Delay,
@@ -1390,55 +1408,60 @@ window.MUI = (function (WX) {
 
   function Fader(preset) {
     // adding modules
-    WX.Plugin.addModule(this, ['input', 'output']);
+    WX.Plugin.defineType(this, 'Processor');
+
     // do internal stuffs
     this._input.connect(this._output);
+
+    WX.defineParams(this, {
+      mute: {
+        type: 'Boolean', default: false
+      },
+      dB: {
+        type: 'Generic', unit: 'Decibels',
+        default: 0.0, min: -90, max: 12.0
+      }
+    });
+
     // initialize preset
-    WX.Plugin.initializePreset(this, preset);
+    WX.Plugin.initPreset(this, preset);
   }
 
   Fader.prototype = {
+
     info: {
       name: 'Fader',
-      api_version: '0.0.1-alpha',
-      plugin_version: '0.0.1',
+      api_version: '1.0.0-alpha',
+      plugin_version: '1.0.0',
       author: 'hoch',
-      type: 'effect',
-      description: 'a channel fader'
+      type: 'Processor',
+      description: 'channel fader'
     },
 
     defaultPreset: {
       mute: false,
-      dB: 0.0,
-      // panning: 0.0;
+      dB: 0.0
     },
 
-    $active: function (val, time, xType) {
-      this.preset.mute = !val;
-      this.params.active.set(val);
+    $mute: function (value, time, xtype) {
+      if (value) {
+        this._outlet.gain.set(0.0, WX.now, 0);
+      } else {
+        this._outlet.gain.set(1.0, WX.now, 0);
+      }
     },
 
-    $gain: function (val, time, xType) {
-      this.preset.dB = WX.lintodb(val);
-      this.params.gain.set(val, time, xType);
-    },
-
-    // simple proxies for gain and active
-    $mute: function (val, time, xType) {
-      this.set('active', !val);
-    },
-
-    $dB: function (val, time, xType) {
-      this.set('gain', [[WX.dbtolin(val), time, xType]]);
+    $dB: function (value, time, xtype) {
+      this._output.gain.set(WX.dbtolin(value), time, xtype);
     }
 
   };
 
-  WX.Plugin.addPrototype(Fader, ['input', 'output']);
+  WX.Plugin.extendPrototype(Fader, 'Processor');
   WX.Plugin.register(Fader);
 
   // built in master output fader
   WX.Master = WX.Fader();
-  WX.Master.connect(WX.context.destination);
+  WX.Master.to(WX.context.destination);
 
 })(WX);
