@@ -96,6 +96,9 @@ window.WX = (function () {
       isNumber: function (num) {
         return toString.call(num) === '[object Number]';
       },
+      isBoolean: function (bool) {
+        return toString.call(bool) === '[object Boolean]';
+      },
       hasParam: function(unit, param) {
         return hasOwnProperty.call(unit.preset, param);
       },
@@ -181,16 +184,11 @@ window.WX = (function () {
         // if (db <= 0) return 0;
         return Math.pow(10.0, db / 20.0);
       },
-
-      /**
-       * patching helper
-       */
-
-      patch: function () {
-        for (var i = 0, last = arguments.length-1; i < last; i++) {
-          arguments[i]._outlet.connect(arguments[i+1]._inlet);
-        }
+      veltoamp: function (velocity) {
+        // TODO: velocity curve here?
+        return velocity / 127;
       }
+
     };
   })();
 
@@ -217,10 +215,307 @@ window.WX = (function () {
 
   var Core = (function () {
 
+    // context
     var ctx = new AudioContext();
 
+    // WARNING: AudioNode extension
+    AudioNode.prototype.to = function () {
+      for (var i = 0; i < arguments.length; i++) {
+        this.connect(arguments[i]);
+      }
+      return arguments[0];
+    };
+
+    AudioNode.prototype.cut = function () {
+      this.disconnect();
+    };
+
+    // WARNING: AudioParam extension
+    var WAP = window.AudioParam.prototype;
+    WAP.cancel = WAP.cancelScheduledValues;
+    WAP.set = function (value, time, rampType) {
+      switch (rampType) {
+        case 0:
+        case undefined:
+          time = (time < ctx.currentTime) ? ctx.currentTime : time;
+          this.setValueAtTime(value, time);
+          break;
+        case 1:
+          time = (time < ctx.currentTime) ? ctx.currentTime : time;
+          this.linearRampToValueAtTime(value, time);
+          break;
+        case 2:
+          time = (time < ctx.currentTime) ? ctx.currentTime : time;
+          value = value <= 0.0 ? 0.00001 : value;
+          this.exponentialRampToValueAtTime(value, time);
+          break;
+        case 3:
+          time[0] = (time[0] < ctx.currentTime) ? ctx.currentTime : time[0];
+          value = value <= 0.0 ? 0.00001 : value;
+          this.setTargetAtTime(val, time[0], time[1]);
+          break;
+      }
+    };
+
+
+    /**
+     * @function Envelope generator
+     * @description Create an envelope generator function for WA audioParam
+     *   - Envelope data point: [val, offsetTimes, transition_type]
+     *   - transition types: { 0: step, 1: line, 2: expo, 3: target }
+     * @example
+     *   // build an envelope generator with relative data points
+     *   var AttRelEnv = WX.Envelope([0.0, 0.0], [0.8, 0.01, 1], [0.0, 0.3, 2]);
+     *   // creates an envelope starts at 2.0 sec with 1.2 amplification.
+     *   var env = AttRelEnv(2.0, 1.2);
+     */
+
+    function Envelope() {
+      var args = arguments;
+      return function (startTime, amplifier) {
+        var env = [];
+        startTime = (startTime || 0);
+        amplifier = (amplifier || 1.0);
+        for (var i = 0; i < args.length; i++) {
+          var val = args[i][0], time;
+          // case: target
+          if (Util.isArray(args[i][1])) {
+            time = [startTime + args[i][1][0], startTime + args[i][1][1]];
+            env.push([val * amplifier, time, 3]);
+          }
+          // case: step, line, expo
+          else {
+            time = startTime + args[i][1];
+            env.push([val * amplifier, time, (args[i][2] || 0)]);
+          }
+        }
+        return env;
+      };
+    }
+
+
+    /**
+     * @class Plug-in parameter abstraction
+     * @type {string} parameter type:
+     *       generic      all generic numbers
+     *       indexed      enums (list)
+     *       boolean      true | false
+     *       MIDINumber   0 ~ 127
+     *       custom       etc
+     */
+
+    var types = [
+      'Generic',
+      'Items',
+      'Boolean',
+      'MIDINumber',
+      'Custom'
+    ];
+
+    var units = [
+      '',
+      'Seconds',
+      'Milliseconds',
+      'Samples',
+      'Hertz',
+      'Cents',
+      'Decibels',
+      'LinearGain',
+      'Percent',
+      'BPM'
+    ];
+
+
+    /**
+     * GenericParam: all numerical parameters
+     */
+
+    function GenericParam(options) {
+      this.init(options);
+    }
+
+    GenericParam.prototype = {
+      init: function (options) {
+        this.type = options.type;
+        this.name = (options.name || 'Parameter');
+        this.unit = (options.unit || '');
+        this.default = (options.default || 1.0);
+        this.value = this.default;
+        this.min = (options.min || 0.0);
+        this.max = (options.max || 1.0);
+        this.$handler = options.$handler;
+      },
+      set: function (value, time, rampType) {
+        this.value = Math.min(Math.max(value, this.min), this.max);
+        this.$handler(this.value, time, rampType);
+      },
+      get: function () {
+        return this.value;
+      }
+    };
+
+
+    /**
+     * ItemizedParam: itemized parameter (aka list, select)
+     */
+
+    function ItemizedParam(options) {
+      this.init(options);
+    }
+
+    ItemizedParam.prototype = {
+      init: function (options) {
+        // assertion
+        if (!Util.isArray(option.items)) {
+          Log.error('Items are missing.');
+        }
+        this.type = options.type;
+        this.name = (options.name || 'Parameter');
+        this.unit = (options.unit || '');
+        this.default = (options.default || options.items[0]);
+        this.value = this.default;
+        this.items = options.items;
+        this.$handler = options.$handler;
+      },
+      set: function (value, time, rampType) {
+        if (this.items.indexOf(value) > -1) {
+          this.value = value;
+          this.$handler(this.value, time, rampType);
+        }
+      },
+      get: function () {
+        return this.value;
+      },
+      getItems: function () {
+        return this.items.slice(0);
+      }
+    };
+
+
+    /**
+     * BooleanParam: boolean parameter
+     */
+
+    function BooleanParam(options) {
+      this.init(options);
+    }
+
+    BooleanParam.prototype = {
+      init: function (options) {
+        // assertion
+        if (!Util.isBoolean(option.default)) {
+          Log.error('Invalid value for Boolean Parameter.');
+        }
+        this.parent = options.parent;
+        this.type = options.type;
+        this.name = (options.name || 'Parameter');
+        this.default = (options.default || false);
+        this.value = this.default;
+        this.$handler = options.$handler;
+      },
+      set: function (value, time, rampType) {
+        if (Util.isBoolean(value)) {
+          this.value = value;
+          this.$handler(this.value, time, rampType);
+        }
+      },
+      get: function () {
+        return this.value;
+      }
+    };
+
+    // TODO
+    // function MIDINumberParam(options) {
+    // }
+    // MIDINumberParam.prototype = {
+    // };
+    // function CustomParam (options) {
+    // }
+    // CustomParam.prototype = {
+    // };
+
+
+    // param class factory
+    function createParam(options) {
+      if (types.indexOf(options.type) < 0) {
+        Log.error('Invalid Parameter Type.');
+      }
+      switch (options.type) {
+        case 'Generic':
+          return new GenericParam(options);
+        case 'Itemized':
+          return new ItemizedParam(options);
+        case 'Boolean':
+          return new BooleanParam(options);
+      }
+    }
+
+
+    /**
+     * AudioParam Helper Class
+     */
+
+    // function AudioParamHelper(target) {
+    //   this.target = target;
+    // }
+
+    // AudioParamHelper.prototype = {
+    //   set: function (val, time, xtype) {
+    //     switch (xType) {
+    //       case 0:
+    //         this.target.setValueAtTime(val, time);
+    //         break;
+    //       case 1:
+    //         this.target.linearRampToValueAtTime(val, time);
+    //         break;
+    //       case 2:
+    //         val = val <= 0.0 ? 0.00001 : val;
+    //         this.target.exponentialRampToValueAtTime(val, time);
+    //         break;
+    //       case 3:
+    //         val = val <= 0.0 ? 0.00001 : val;
+    //         this.target.setTargetAtTime(val, time[0], time[1]);
+    //         break;
+    //     }
+    //   }
+    // };
+
+
+    /**
+     * @function    loadClip
+     * @description load audio file via xhr where clip = { name, url, buffer }
+     */
+
+    function loadClip(clip, onprogress, oncomplete) {
+      // setup
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', clip.url, true);
+      xhr.responseType = 'arraybuffer';
+      // EVENT: onprogress
+      xhr.onprogress = function (event) {
+        onprogress(event, clip);
+      };
+      // EVENT: onload
+      xhr.onload = function (event) {
+        try {
+          Core.ctx.decodeAudioData(xhr.response, function (buffer) {
+            clip.buffer = buffer;
+            oncomplete(buffer);
+          });
+        } catch (error) {
+          Info.error('Loading clip failed. (XHR failure)', error.message, clip.url);
+        }
+      };
+      xhr.send();
+    }
+
+
     return {
-      context: ctx,
+
+      // audio context
+      ctx: ctx,
+
+      // WA nodes shorthands
       Gain: function () { return ctx.createGain(); },
       OSC: function () { return ctx.createOscillator(); },
       Delay: function () { return ctx.createDelay(); },
@@ -231,415 +526,615 @@ window.WX = (function () {
       Source: function () { return ctx.createBufferSource(); },
       Analyzer: function () { return ctx.createAnalyser(); },
       Panner: function () { return ctx.createPanner(); },
+      // TODO
       // nPeriodicWave: function () { return ctx.createPeriodicWave(); },
-      Splitter: function () { return ctx.createChannelSplitter.apply(ctx, arguments); },
-      Merger: function () { return ctx.createChannelMerger.apply(ctx, arguments); },
-      Buffer: function () { return ctx.createBuffer.apply(ctx, arguments); }
+      Splitter: function () {
+        return ctx.createChannelSplitter.apply(ctx, arguments);
+      },
+      Merger: function () {
+        return ctx.createChannelMerger.apply(ctx, arguments);
+      },
+      Buffer: function () {
+        return ctx.createBuffer.apply(ctx, arguments);
+      },
+
+      // envlope generator
+      Envelope: Envelope,
+      // generate parameter helper for plugin
+      defineParams: function (plugin, paramDefs) {
+        for (var name in paramDefs) {
+          paramDefs[name].$handler = plugin['$' + name];
+          plugin.params[name] = createParam(paramDefs[name]);
+        }
+      },
+      // load clip via xhr
+      loadClip: loadClip
+
     };
 
   })();
 
 
   /**
-   * @function Envelope generator
-   * @description Create an envelope generator function for WA audioParam
-   *   - Envelope data point: [val, offsetTimes, transition_type]
-   *   - transition types: { 0: jump, 1: linear, 2: expo, 3: target }
-   * @example
-   *   // build an envelope generator with relative data points
-   *   var AttRelEnv = WX.Envelope([0.0, 0.0], [0.8, 0.01, 1], [0.0, 0.3, 2]);
-   *   // creates an envelope starts at 2.0 sec.
-   *   var env = AttRelEnv(2.0);
+   * Routing system
+   *
+   * plugin.set('param', arg):
+   *   if (arg is val):
+   *     plugin.param.set(val, 0.0, 0)
+   *
+   * if (arg is arr):
+   *   iterate(arr) => plugin.param.set(arr[i])
+   *
+   * param.set(v, t, x):
+   *   typeCheck(v)
+   *   clamp(v) with min, max
+   *   handlerCallback(v, t, x)
+   *   parent.$[paramId](v, t, x)
+   *
+   * HOW to link handerCallback??
+   *
+   * plugin.$.paramHandler(v, t, x):
+   *     node.param.$set(v, t, x);
+   *     node1.param.$set(v, t, x);
+   *     node2.param.$set(v, t, x);
    */
-
-  function Envelope() {
-    var args = arguments;
-    return function (startTime) {
-      var env = [];
-      startTime = (startTime || 0);
-      for (var i = 0; i < args.length; i++) {
-        var val = args[i][0], time;
-        // for setTargetAtTime - [t1, t2]
-        if (Util.isArray(args[i][1])) {
-          time = [startTime + args[i][1][0], startTime + args[i][1][1]];
-          env.push([val, time, 3]);
-        }
-        // for jump, linear, expo
-        else {
-          time = startTime + args[i][1];
-          env.push([val, time, (args[i][2] || 0)]);
-        }
-      }
-      return env;
-    };
-  }
 
 
   /**
-   * @class WA audioParam abstraction
-   * @type {string} parameter type: ['bool', 'number', 'enum']
-   */
-
-  function Param(options) {
-    this.type = (options.type || 'number');
-    if (this.type === 'enum') {
-      this.items = options.items;
-    }
-    this.default = options.default;
-    this.min = options.min;
-    this.max = options.max;
-    this.target = options.target; // target audioParam
-
-    this.init();
-  }
-
-  Param.prototype = {
-
-    init: function () {
-      switch (this.type) {
-        case 'bool':
-          this.set = this._setBool;
-          break;
-        case 'number':
-          this.set = this._setNumber;
-          break;
-        case 'enum':
-          this.set = this._setEnum;
-          this.get = this._getEnum;
-          break;
-      }
-      this.set(this.default, 0.0, 0);
-    },
-
-    get: function () {
-      return this.target.value;
-    },
-
-    set: null,
-
-    _setBool: function (val) {
-      val = val ? this.max : this.min;
-      this.target.setValueAtTime(val, 0.0);
-    },
-
-    _setNumber: function (val, time, xType) {
-      val = Math.min(Math.max(val, this.min), this.max);
-      switch (xType) {
-        case 0:
-          this.target.setValueAtTime(val, time);
-          break;
-        case 1:
-          this.target.linearRampToValueAtTime(val, time);
-          break;
-        case 2:
-          val = val <= 0.0 ? 0.00001 : val;
-          this.target.exponentialRampToValueAtTime(val, time);
-          break;
-        case 3:
-          val = val <= 0.0 ? 0.00001 : val;
-          this.target.setTargetAtTime(val, time[0], time[1]);
-          break;
-      }
-    },
-
-    _setEnum: function (val) {
-      if (this.items.indexOf(val) > -1) {
-        this.target = val;
-      } else {
-        return null;
-      }
-    },
-
-    _getEnum: function () {
-      return this.target;
-    }
-
-  };
-
-
-  /**
-   * @function    loadClip
-   * @description load audio file via xhr where clip = { name, url, buffer }
-   */
-
-  function loadClip(clip, onprogress, oncomplete) {
-    // setup
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', clip.url, true);
-    xhr.responseType = 'arraybuffer';
-    // EVENT: onprogress
-    xhr.onprogress = function (event) {
-      onprogress(event, clip);
-    };
-    // EVENT: onload
-    xhr.onload = function (event) {
-      try {
-        Core.context.decodeAudioData(xhr.response, function (buffer) {
-          clip.buffer = buffer;
-          oncomplete(buffer);
-        });
-      } catch (error) {
-        Info.error('Loading clip failed. (XHR failure)', error.message, clip.url);
-      }
-    };
-    xhr.send();
-  }
-
-
-  /**
-   * Plug-in module structure
-   *
-   *         inlet
-   *           |
-   *      +----+----+
-   *   _input       |
-   *      |         |
-   *   UnitBody     |
-   *      |         |
-   *   _output      |
-   *      |         |
-   *   _active   _bypass
-   *      +----+----+
-   *           |
-   *         outlet
-   *
-   * # Naming convention
-   *   - _node: web audio node starts with '_'
-   *   - $param: parameter handler starts with '$'
-   *
-   * 1) base module
-   *   - preset: active
-   *   - nodes: _active
-   *   - methods: get, set, getPreset, setPreset
-   *   - handlers: $active
-   * 2) input module
-   *   - params: inputGain
-   *   - nodes: _inlet >> _input, _bypass
-   *   - handlers: $inputGain
-   * 3) output module
-   *   - params: gain
-   *   - nodes: _output >> _active >> _outlet, _inlet >> _bypass >> _outlet
-   *   - methods: to, connect
-   *   - handlers: $gain
+   * Plug-in builder
    */
 
   var Plugin = (function () {
 
     /**
-     * BaseModule: base module for plug-in unit, mandatory
-     *
-     * @property {object} preset collection of parameters
-     * @method set
-     * @method get
-     * @method setPreset
-     * @method getPreset
-     *
-     * @param {bool} active unit state.
-     *                      when false the unit does not output sound.
+     * Abstracts (as matter of facts, mixins)
+     * - PluginAbstract
+     * - GeneratorAbstract
+     * - ProcessorAbstract
+     * - AnalyzerAbstract
      */
 
-    var BaseModule = function () {
-      // node
-      this._active = Core.Gain();
+    // plug-in types
+    var types = [
+      'Generator',
+      'Processor',
+      'Analyzer'
+    ];
 
-      // preset: parameter collection for external usage
-      this.preset = {
-        active: true
-      };
 
-      // params: internal parameter collection
-      this.params = {
-        active: new Param({
-          type: 'bool', default: true, min: 0.0, max: 1.0,
-          target: this._active.gain
-        })
-      };
-    };
+    /**
+     * Plugin Abstract: base class
+     */
 
-    BaseModule.prototype = {
-      // NOTE:
-      // this implements one-way binding (set method -> this.params)
-      // setting 'param' can control multiple WA audioParams
+    function PluginAbstract () {
+      this.params = {};
+    }
+
+    PluginAbstract.prototype = {
       set: function (param, arg) {
         if (Util.hasParam(this, param)) {
-          // if env is number or boolean, change param immediately
-          if (!Util.isArray(arg)) {
-            this['$'+param].apply(this, [arg, 0.0, 0]);
-            // change preset value
-            this.preset[param] = arg;
-          }
-          // if env is an array, iterate envelope data
-          else {
+          // check if arg is a value or array
+          if (Util.isArray(arg)) {
+            // if env is an array, iterate envelope data
             for (var i = 0; i < arg.length; i++) {
-              this['$'+param].apply(this, arg[i]);
+              this.params[param].set.apply(this, arg[i]);
             }
-            // TODO:
-            // currently change params with the last value
-            // what is the correct way of doing this?
-            this.preset[param] = arg[arg.length-1][0];
+          } else {
+            // otherwise change the value immediately
+            this.params[param].set(arg, Core.ctx.currentTime, 0);
           }
         }
         return this;
       },
-
       get: function (param) {
         if (Util.hasParam(this, param)) {
-          return this.preset[param];
+          return this.params[param].get();
         } else {
           return null;
         }
       },
-
       setPreset: function (preset) {
         for (var param in preset) {
-          this.set(param, preset[param]);
+          this.params[param].set(preset[param], Core.ctx.currentTime, 0);
+        }
+      },
+      getPreset: function () {
+        var preset = {};
+        for (var param in this.params) {
+          preset[param] = this.params[param].get();
+        }
+        return prsset;
+      }
+    };
+
+
+    /**
+     * GeneratorAbstract: extends PluginAbstract
+     */
+
+    function GeneratorAbstract() {
+
+      PluginAbstract.call(this);
+
+      this._output = Core.Gain();
+      this._outlet = Core.Gain();
+
+      this._output.to(this._outlet);
+
+      Core.defineParams(this, {
+        output: {
+          type: 'Generic', unit: 'LinearGain',
+          default: 1.0, min: 0.0, max: 1.0
+        }
+      });
+
+    }
+
+    GeneratorAbstract.prototype = {
+
+      to: function (input) {
+        // if the target is plugin with inlet
+        if (input._inlet) {
+          this._outlet.to(input._inlet);
+          return input;
+        }
+        // or it might be a WA node
+        else {
+          try {
+            this._outlet.to(input);
+            return input;
+          } catch (error) {
+            Log.error('Connection failed. Invalid patching.');
+          }
         }
       },
 
-      getPreset: function () {
-        return Util.clone(this.preset);
+      cut: function () {
+        // not recommended, this will deactivate signal stream
+        this._outlet.cut();
       },
 
-      // handler: 'active'
-      $active: function (val, time, xType) {
-        // NOTE: this is 'bool' type
-        this.params.active.set(val);
+      $output: function (value, time, xtype) {
+        this._output.gain.set(value, time, xtype);
       }
+
     };
+
+    Util.extend(GeneratorAbstract.prototype, PluginAbstract.prototype);
+
+
+    /**
+     * ProcessorAbstract: extends PluginAbstract
+     */
+
+    function ProcessorAbstract() {
+
+      PluginAbstract.call(this);
+
+      this._inlet = Core.Gain();
+      this._input = Core.Gain();
+      this._output = Core.Gain();
+      this._active = Core.Gain();
+      this._bypass = Core.Gain();
+      this._outlet = Core.Gain();
+
+      this._inlet.to(this._input, this._bypass);
+      this._output.to(this._active).to(this._outlet);
+      this._bypass.to(this._outlet);
+
+      Core.defineParams(this, {
+        input: {
+          type: 'Generic', unit: 'LinearGain',
+          default: 1.0, min: 0.0, max: 1.0
+        },
+        output: {
+          type: 'Generic', unit: 'LinearGain',
+          default: 1.0, min: 0.0, max: 1.0
+        },
+        bypass: {
+          type: 'Boolean', unit: '',
+          default: false
+        }
+      });
+
+    }
+
+    ProcessorAbstract.prototype = {
+
+      $input: function (value, time, xtype) {
+        this._input.gain.set(value, time, xtype);
+      },
+
+      $bypass: function(value, time, xtype) {
+        if (value) {
+          this._active.gain.set(0.0, time, xtype);
+          this._bypass.gain.set(1.0, time, xtype);
+        } else {
+          this._active.gain.set(1.0, time, xtype);
+          this._bypass.gain.set(0.0, time, xtype);
+        }
+      }
+
+    };
+
+    Util.extend(ProcessorAbstract.prototype, GeneratorAbstract.prototype);
+
+
+    /**
+     * AnalyzerAbstract: extends PluginAbstract
+     */
+
+    function AnalyzerAbstract() {
+
+      PluginAbstract.call(this);
+
+      this._inlet = Core.Gain();
+      this._input = Core.Gain();
+      this._outlet = Core.Gain();
+
+      this._inlet.to(this._input);
+      this._inlet.to(this._outlet);
+
+      Core.defineParams(this, {
+        input: {
+          type: 'Generic', unit: 'LinearGain',
+          default: 1.0, min: 0.0, max: 1.0
+        }
+      });
+
+    }
+
+    AnalyzerAbstract.prototype = {
+
+      to: function (input) {
+        // if the target is plugin with inlet
+        if (input._inlet) {
+          this._outlet.to(input._inlet);
+          return input;
+        }
+        // or it might be a WA node
+        else {
+          try {
+            this._outlet.to(input);
+            return input;
+          } catch (error) {
+            Log.error('Connection failed. Invalid patching.');
+          }
+        }
+      },
+
+      cut: function () {
+        this._outlet.cut();
+      },
+
+      $input: function (value, time, xtype) {
+        this._input.gain.set(value, time, xtype);
+      }
+
+    };
+
+    Util.extend(AnalyzerAbstract.prototype, PluginAbstract.prototype);
+
+
+// var OutputModule = function () {
+//       // WA nodes
+//       this._output = Core.Gain();
+//       this._outlet = Core.Gain();
+//       // preset & params
+//       this.preset.gain = 1.0;
+//       this.params.gain = new Param({
+//         type: 'number', default: 1.0, min: 0.0, max: 1.0,
+//         target: this._output.gain
+//       });
+//       // patching
+//       this._output.connect(this._active);
+//       this._active.connect(this._outlet);
+//     };
+
+//     OutputModule.prototype = {
+//       to: function (unit) {
+//         if (unit._inlet) {
+//           this._outlet.connect(unit._inlet);
+//           return unit;
+//         } else {
+//           Log.error('invalid patching.');
+//         }
+//       },
+//       connect: function (node) {
+//         this._outlet.connect(node);
+//       },
+//       // handler: gain
+//       $gain: function (val, time, xType) {
+//         this.params.gain.set(val, time, xType);
+//       }
+//     };
+
+
+    /**
+     * BaseModule: base module for plug-in, mandatory
+     */
+
+    // var BaseModule = function () {
+    //   // root params
+    //   this.params = {};
+    // };
+
+    // BaseModule.prototype = {
+
+    //   // this implements one-way binding (set method -> this.params)
+    //   // setting 'param' can control multiple WA audioParams
+    //   set: function (param, arg) {
+    //     if (Util.hasParam(this, param)) {
+    //       // check if arg is a value or array
+    //       if (Util.isArray(arg)) {
+    //         // if env is an array, iterate envelope data
+    //         for (var i = 0; i < arg.length; i++) {
+    //           this.params[param].set.apply(this, arg[i]);
+    //         }
+    //       } else {
+    //         // otherwise change the value immediately
+    //         this.params[param].set(arg, 0.0, 0);
+    //       }
+    //     }
+    //     return this;
+    //   },
+
+    //   get: function (param) {
+    //     if (Util.hasParam(this, param)) {
+    //       return this.preset[param];
+    //     } else {
+    //       return null;
+    //     }
+    //   },
+
+    //   // TODO: fix this
+    //   setPreset: function (preset) {
+    //     for (var param in preset) {
+    //       this.set(param, preset[param]);
+    //     }
+    //   },
+
+    //   // TODO: fix this
+    //   getPreset: function () {
+    //     return Util.clone(this.preset);
+    //   }
+
+    // };
+
+
+
+
+// params: internal parameter collection
+      // this.params = {
+      //   active: new Param({
+      //     type: 'bool', name: 'Active',
+      //     default: true, min: 0.0, max: 1.0
+      //   })
+      // };
+
+
+
+
+
+
+
 
 
     /**
      * InputModule: input module of plug-in unit
      */
 
-    var InputModule = function () {
-      // WA nodes
-      this._inlet = Core.Gain();
-      this._input = Core.Gain();
-      this._bypass = Core.Gain();
+    // var InputModule = function () {
+    //   // WA nodes
+    //   this._inlet = Core.Gain();
+    //   this._input = Core.Gain();
+    //   this._bypass = Core.Gain();
 
-      // preset & params
-      this.preset.inputGain = 1.0;
-      this.params.inputGain = new Param({
-        type: 'number', default: 1.0, min: 0.0, max: 1.0,
-        target: this._input.gain
-      });
+    //   // preset & params
+    //   this.preset.inputGain = 1.0;
+    //   this.params.inputGain = new Param({
+    //     type: 'number', default: 1.0, min: 0.0, max: 1.0,
+    //     target: this._input.gain
+    //   });
 
-      // patching
-      this._inlet.connect(this._input);
-      this._inlet.connect(this._bypass);
-    };
+    //   // patching
+    //   this._inlet.connect(this._input);
+    //   this._inlet.connect(this._bypass);
+    // };
 
-    InputModule.prototype = {
-      // handler: 'inputGain'
-      $inputGain: function (val, time, xType) {
-        this.params.inputGain.set(val, time, xType);
-      }
-    };
+    // InputModule.prototype = {
+    //   // handler: 'inputGain'
+    //   $inputGain: function (val, time, xType) {
+    //     this.params.inputGain.set(val, time, xType);
+    //   }
+    // };
 
 
     /**
      * OutputModule: output module of plug-in unit
      */
 
-    var OutputModule = function () {
-      // WA nodes
-      this._output = Core.Gain();
-      this._outlet = Core.Gain();
-      // preset & params
-      this.preset.gain = 1.0;
-      this.params.gain = new Param({
-        type: 'number', default: 1.0, min: 0.0, max: 1.0,
-        target: this._output.gain
-      });
-      // patching
-      this._output.connect(this._active);
-      this._active.connect(this._outlet);
-    };
+    // var OutputModule = function () {
+    //   // WA nodes
+    //   this._output = Core.Gain();
+    //   this._outlet = Core.Gain();
+    //   // preset & params
+    //   this.preset.gain = 1.0;
+    //   this.params.gain = new Param({
+    //     type: 'number', default: 1.0, min: 0.0, max: 1.0,
+    //     target: this._output.gain
+    //   });
+    //   // patching
+    //   this._output.connect(this._active);
+    //   this._active.connect(this._outlet);
+    // };
 
-    OutputModule.prototype = {
-      to: function (unit) {
-        if (unit._inlet) {
-          this._outlet.connect(unit._inlet);
-          return unit;
-        } else {
-          Log.error('invalid patching.');
-        }
-      },
-      connect: function (node) {
-        this._outlet.connect(node);
-      },
-      // handler: gain
-      $gain: function (val, time, xType) {
-        this.params.gain.set(val, time, xType);
-      }
-    };
+    // OutputModule.prototype = {
+    //   to: function (unit) {
+    //     if (unit._inlet) {
+    //       this._outlet.connect(unit._inlet);
+    //       return unit;
+    //     } else {
+    //       Log.error('invalid patching.');
+    //     }
+    //   },
+    //   connect: function (node) {
+    //     this._outlet.connect(node);
+    //   },
+    //   // handler: gain
+    //   $gain: function (val, time, xType) {
+    //     this.params.gain.set(val, time, xType);
+    //   }
+    // };
+
 
 
     /**
      * plugin utility functions
-     * @note See plugin_template.js for the example usage
+     * @note See plugins/HelloPlugin.js for the example usage
      */
 
+
     // pre procedure for plugin building
-    function addModule(unit, modules) {
-      // mandatory
-      BaseModule.call(unit);
-      // selective module loading
-      if (modules.indexOf('input') > -1) InputModule.call(unit);
-      if (modules.indexOf('output') > -1) OutputModule.call(unit);
-    }
+    // function addModules() {
+    //   // check: length should be less than 3
+    //   if (arguments.length > 2) {
+    //     Log.error('Too many arguments.');
+    //   }
+
+    //   // adding base BaseModule
+    //   BaseModule.call(arguments[0]);
+
+    //   // selective module loading
+    //   for (var i = 1; i < arguments.length; i++) {
+    //     if (arguments[i] === 'input') InputModule.call(arguments[0]);
+    //     else if (arguments[i] === 'output') InputModule.call(arguments[0]);
+    //   }
+    // }
 
     // add parameter to plugin
-    function addParam(unit, paramName, option) {
-      unit.params[paramName] = new Param(option);
-    }
+    // function addParam(unit, paramName, option) {
+    //   unit.params[paramName] = new Param(option);
+    // }
+
+    // add parameters to plugin
+    // function addParams(unit, params) {
+    //   for (var p in params) {
+    //     unit.params[p] = new Param(params[p]);
+    //   }
+    // }
 
     // post procedure for plugin building
-    function initializePreset(unit, preset) {
-      Util.extend(unit.preset, unit.defaultPreset);
-      Util.extend(unit.preset, preset);
-      unit.setPreset(unit.preset);
-    }
+    // function initializePreset(unit, preset) {
+    //   Util.extend(unit.preset, unit.defaultPreset);
+    //   Util.extend(unit.preset, preset);
+    //   unit.setPreset(unit.preset);
+    // }
 
-    // extending plugin prototype
-    function addPrototype(unit, modules) {
-      // mandatory
-      Util.extend(unit.prototype, BaseModule.prototype);
-      // selective module loading
-      if (modules.indexOf('input') > -1) {
-        Util.extend(unit.prototype, InputModule.prototype);
-      }
-      if (modules.indexOf('output') > -1) {
-        Util.extend(unit.prototype, OutputModule.prototype);
-      }
-    }
+    // // extending plugin prototype
+    // function addPrototype(unit, modules) {
+    //   // mandatory
+    //   Util.extend(unit.prototype, BaseModule.prototype);
+    //   // selective module loading
+    //   if (modules.indexOf('input') > -1) {
+    //     Util.extend(unit.prototype, InputModule.prototype);
+    //   }
+    //   if (modules.indexOf('output') > -1) {
+    //     Util.extend(unit.prototype, OutputModule.prototype);
+    //   }
+    // }
 
     // register plugin constructor to WX namespace
-    function register(Constructor) {
-      // hard check version info
-      var i = Constructor.prototype.info;
-      if (Info.getVersion() > i.api_version) {
-        // FATAL: plugin is incompatible with WX Core.
-        Log.error(Constructor.name, ': loading failed. incompatible WAAX version.');
-      }
-      // register plugin in WX namespace
-      window.WX[Constructor.name] = function (preset) {
-        return new Constructor(preset);
-      };
-    }
-
+    // function register(Constructor) {
+    //   // hard check version info
+    //   var i = Constructor.prototype.info;
+    //   if (Info.getVersion() > i.api_version) {
+    //     // FATAL: plugin is incompatible with WX Core.
+    //     Log.error(Constructor.name, ': loading failed. incompatible WAAX version.');
+    //   }
+    //   // register plugin in WX namespace
+    //   window.WX[Constructor.name] = function (preset) {
+    //     return new Constructor(preset);
+    //   };
+    // }
 
     /**
      * @namespace WX.plugin
      */
 
     return {
-      addModule: addModule,
-      addParam: addParam,
-      initializePreset: initializePreset,
-      addPrototype: addPrototype,
-      register: register,
+      // addModule: addModule,
+      // addParam: addParam,
+      // addParams: addParams,
+      // initializePreset: initializePreset,
+      // addPrototype: addPrototype,
+      // register: register,
+
+      defineType: function (plugin, type) {
+        // check: length should be less than 3
+        if (types.indexOf(type) < 0) {
+          Log.error('Invalid Plug-in type.');
+        }
+        // branch on plug-in type
+        switch (type) {
+          case 'Generator':
+            GeneratorAbstract.call(plugin);
+            break;
+          case 'Processor':
+            ProcessorAbstract.call(plugin);
+            break;
+          case 'Analyzer':
+            AnalyzerAbstract.call(plugin);
+            break;
+        }
+      },
+
+      initPreset: function (plugin, preset) {
+        var mergedPreset = {};
+        Util.extend(mergedPreset, plugin.defaultPreset);
+        Util.extend(mergedPreset, preset);
+        plugin.setPreset(preset);
+      },
+
+      extendPrototype: function (plugin, type) {
+        // check: length should be less than 3
+        if (types.indexOf(type) < 0) {
+          Log.error('Invalid Plug-in type.');
+        }
+        // branch on plug-in type
+        switch (type) {
+          case 'Generator':
+            Util.extend(plugin.prototype, GeneratorAbstract.prototype);
+            break;
+          case 'Processor':
+            Util.extend(plugin.prototype, ProcessorAbstract.prototype);
+            break;
+          case 'Analyzer':
+            Util.extend(plugin.prototype, AnalyzerAbstract.prototype);
+            break;
+        }
+      },
+
+      register: function (PluginConstructor) {
+        // hard check version info
+        var i = PluginConstructor.prototype.info;
+        if (Info.getVersion() > i.api_version) {
+          // FATAL: pluginConstructor is incompatible with WX Core.
+          Log.error(PluginConstructor.name,
+            ': loading failed. incompatible WAAX version.');
+        }
+        // register pluginConstructor in WX namespace
+        window.WX[PluginConstructor.name] = function (preset) {
+          return new PluginConstructor(preset);
+        };
+      }
+
+      // patch: function () {
+      //   for (var i = 0, i < arguments.length-1; i++) {
+      //     arguments[i]._outlet.to(arguments[i+1]._inlet);
+      //   }
+      // }
+
     };
 
   })();
@@ -662,17 +1157,20 @@ window.WX = (function () {
 
   return {
 
-    // Info & Log
+    // Info, Log
     Info: Info,
     Log: Log,
 
-    // Utilities
+    // Util: Object
     isObject: Util.isObject,
     isArray: Util.isArray,
     isNumber: Util.isNumber,
+    isBoolean: Util.isBoolean,
     hasParam: Util.hasParam,
     extend: Util.extend,
     clone: Util.clone,
+
+    // Util: Music Math
     clamp: Util.clamp,
     random2f: Util.random2f,
     random2: Util.random2,
@@ -684,12 +1182,12 @@ window.WX = (function () {
     dbtorms: Util.dbtorms,
     lintodb: Util.lintodb,
     dbtolin: Util.dbtolin,
-    patch: Util.patch,
+    veltoamp: Util.veltoamp,
 
-    // Audio-related methods and classes
-    Envelope: Envelope,
-    Param: Param,
-    loadClip: loadClip,
+    // // Audio-related methods and classes
+    // Envelope: Envelope,
+    // Param: Param,
+    // loadClip: loadClip,
 
     // WAAX Core
     context: Core.context,
@@ -709,6 +1207,10 @@ window.WX = (function () {
     Splitter: Core.Splitter,
     Merger: Core.Merger,
     Buffer: Core.Buffer,
+    Envelope: Core.Envelope,
+    defineParams: Core.defineParams,
+    loadClip: Core.loadClip,
+
 
     // Plug-in builders
     Plugin: Plugin
