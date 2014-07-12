@@ -86,11 +86,11 @@ describe('System: Utilities', function() {
       expect(WX.isBoolean(1)).to.equal(false);
     });
   });
-  describe('hasParam(unit, param)', function () {
+  describe('hasParam(plugin, param)', function () {
     it('should return true when plugin has the parameter.', function () {
-      var unit = { preset: { 'parameter': 0.0 } };
-      expect(WX.hasParam(unit, 'parameter')).to.equal(true);
-      expect(WX.hasParam(unit, 'notParameter')).to.equal(false);
+      var plugin = { params: { 'parameter': 0.0 } };
+      expect(WX.hasParam(plugin, 'parameter')).to.equal(true);
+      expect(WX.hasParam(plugin, 'notParameter')).to.equal(false);
     });
   });
   describe('extend(target, source)', function () {
@@ -311,22 +311,21 @@ describe('System: Core', function() {
     });
   });
   describe('loadClip', function () {
-    it('should return a audio buffer after xhr loading success.',
-      function (done) {
-        var clip = { name: 'ziggy', url: '../sound/hochkit/fx-001.wav' };
-        var progress = false, complete = false;
-        WX.loadClip(clip,
-          function (event) {
-            progress = true;
-            expect(event.loaded).to.be.within(0, event.totalSize);
-          },
-          function (buffer) {
-            complete = true;
-            expect(progress).to.equal(true);
-            expect(complete).to.equal(true);
-            expect(buffer.constructor.name).to.equal('AudioBuffer');
-            expect(clip.buffer.constructor.name).to.equal('AudioBuffer');
-            done();
+    it('should return a audio buffer after xhr loading success.', function (done) {
+      var clip = { name: 'ziggy', url: '../sound/hochkit/fx-001.wav' };
+      var progress = false, complete = false;
+      WX.loadClip(clip,
+        function (event) {
+          progress = true;
+          expect(event.loaded).to.be.within(0, event.totalSize);
+        },
+        function (buffer) {
+          complete = true;
+          expect(progress).to.equal(true);
+          expect(complete).to.equal(true);
+          expect(buffer.constructor.name).to.equal('AudioBuffer');
+          expect(clip.buffer.constructor.name).to.equal('AudioBuffer');
+          done();
       });
     });
   });
@@ -335,34 +334,52 @@ describe('System: Core', function() {
 
 
 /**
- * Web Audio API utils and wrappers
+ * Plug-in utilities
+ * - defineType
+ * - initPreset
+ * - extendPrototype
+ * - register
  */
-describe('', function () {
 
-});
-
+/**
+ * MUI methods
+ * -
+ */
 
 /**
  * Plug-in: Fader
+ * - MouseResponder
+ * - KeyResponder
+ * - $
  */
+
 describe('Plug-in: Fader', function () {
-  it('should work with essential features.', function (done) {
-
-    var fader = WX.Fader();
-    console.dir(fader.set);
+  it('should set parameters correctly.', function (done) {
+    // test patch: osc is needed to run the AudioParam automation
+    var osc = WX.OSC();
+    var fader = WX.Fader({ bypass: true });
+    osc.start();
+    osc.to(fader._inlet);
     fader.to(WX.Master);
-    fader.set('bypass', true);
-    // fader.set('input', 0.25);
-    // fader.set('output', 0.5);
-
-    // expect(fader._inlet.constructor.name).to.equal('GainNode');
-    // expect(fader._outlet.constructor.name).to.equal('GainNode');
-    // expect(fader.params.active.get()).to.equal(false);
-    // expect(fader.preset.mute).to.equal(true);
-    // expect(fader.preset.inputGain).to.equal(0.25);
-    // expect(fader.preset.dB).to.equal(-6.020599913279623);
-    // expect(fader.info.name).to.equal('Fader');
-    done();
-
+    fader.set('input', 0.25);
+    fader.set('dB', -6.0);
+    // test preset values
+    var preset = fader.getPreset();
+    expect(fader._inlet.constructor.name).to.equal('GainNode');
+    expect(fader._outlet.constructor.name).to.equal('GainNode');
+    expect(preset.bypass).to.equal(true);
+    expect(preset.mute).to.equal(false);
+    expect(preset.input).to.equal(0.25);
+    expect(preset.dB).to.equal(-6.0);
+    expect(fader.info.name).to.equal('Fader');
+    // checking actual AudioParam under the hood
+    // wow this is totally weird... 1ms??
+    setTimeout(function () {
+      expect(fader._output.gain.value).to.equal(0.5011872053146362);
+      done();
+    }, 15);
   });
 });
+
+
+
