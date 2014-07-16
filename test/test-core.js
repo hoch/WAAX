@@ -97,7 +97,7 @@ describe('System: Utilities', function() {
     it('should add source to target object and return the extended target.', function () {
       var source = { a: 1, b: 2 },
           target = { b: 3, c: 4 },
-          result = { a: 1, b: 3, c: 4 };
+          result = { a: 1, b: 2, c: 4 };
       expect(WX.extend(target, source)).deep.equal(result);
     });
   });
@@ -341,20 +341,134 @@ describe('System: Core', function() {
  * - register
  */
 
-/**
- * MUI methods
- * -
- */
+describe('Plug-in Utilities', function () {
+
+  // dummy setup for testing
+  function MyGenerator(preset) {
+    WX.Plugin.defineType(this, 'Generator');
+    WX.defineParams(this, {
+      p1: { type: 'Boolean', default: false },
+      p2: { type: 'Boolean', default: true }
+    });
+    WX.Plugin.initPreset(this, preset);
+  }
+  MyGenerator.prototype = {
+    info: { api_version: '1.0.0-alpha' },
+    defaultPreset: { p1: false, p2: true },
+    $p1: function (value, time, xtype) {
+      return value ? 'pass' : 'fail';
+    },
+    $p2: function (value, time, xtype) {
+      return value ? 'pass' : 'fail';
+    }
+  };
+  WX.Plugin.extendPrototype(MyGenerator, 'Generator');
+
+  function MyProcessor() {
+    WX.Plugin.defineType(this, 'Processor');
+  }
+  MyProcessor.prototype = {};
+  WX.Plugin.extendPrototype(MyProcessor, 'Processor');
+
+  function MyAnalyzer() {
+    WX.Plugin.defineType(this, 'Analyzer');
+  }
+  MyAnalyzer.prototype = {};
+  WX.Plugin.extendPrototype(MyAnalyzer, 'Analyzer');
+
+  var gen = new MyGenerator({ p1: true, p2: false });
+  var pro = new MyProcessor();
+  var ana = new MyAnalyzer();
+
+  describe('defineType(plugin, type)', function () {
+    it('should import required components to plugin based on type specifier.',
+      function () {
+        expect(gen).to.contain.keys('params', '_output', '_outlet');
+        expect(pro).to.contain.keys('params', '_inlet', '_bypass');
+        expect(ana).to.contain.keys('params', '_inlet', '_input');
+      }
+    );
+  });
+
+  describe('extendPrototype(plugin, type)', function () {
+    it('should extend prototype with core plugin methods.',
+      function () {
+        // generator
+        expect(gen).to.respondTo('get');
+        expect(gen).to.respondTo('set');
+        expect(gen).to.respondTo('getPreset');
+        expect(gen).to.respondTo('setPreset');
+        expect(gen).to.respondTo('$output');
+        expect(gen).to.respondTo('cut');
+        expect(gen).to.respondTo('to');
+        expect(gen.$p1(true)).to.equal('pass');
+        expect(gen.$p2(false)).to.equal('fail');
+        // processor
+        expect(pro).to.respondTo('get');
+        expect(pro).to.respondTo('set');
+        expect(pro).to.respondTo('getPreset');
+        expect(pro).to.respondTo('setPreset');
+        expect(pro).to.respondTo('$bypass');
+        expect(pro).to.respondTo('$input');
+        expect(pro).to.respondTo('$output');
+        expect(pro).to.respondTo('cut');
+        expect(pro).to.respondTo('to');
+        // analyzer
+        expect(ana).to.respondTo('get');
+        expect(ana).to.respondTo('set');
+        expect(ana).to.respondTo('getPreset');
+        expect(ana).to.respondTo('setPreset');
+        expect(ana).to.respondTo('$input');
+        expect(ana).to.respondTo('cut');
+        expect(ana).to.respondTo('to');
+      }
+    );
+  });
+
+  describe('initPreset(plugin, preset)', function () {
+    it('should initialize plugin preset from arguments and default preset.',
+      function () {
+        expect(gen.get('p1')).to.equal(true);
+        expect(gen.get('p2')).to.equal(false);
+      }
+    );
+  });
+
+  describe('register(pluginConstructor)', function () {
+    it('should register plugin class under namespace WX.',
+      function () {
+        WX.Plugin.register(MyGenerator);
+        var myGen = WX.MyGenerator();
+        expect(myGen).to.respondTo('get');
+        expect(myGen).to.respondTo('set');
+        expect(myGen).to.respondTo('getPreset');
+        expect(myGen).to.respondTo('setPreset');
+        expect(myGen).to.respondTo('$output');
+        expect(myGen).to.respondTo('cut');
+        expect(myGen).to.respondTo('to');
+        expect(myGen.$p1(true)).to.equal('pass');
+        expect(myGen.$p2(false)).to.equal('fail');
+      }
+    );
+  });
+
+});
+
 
 /**
- * Plug-in: Fader
+ * MUI methods??
  * - MouseResponder
  * - KeyResponder
  * - $
  */
 
+
+/**
+ * Plug-in: Fader
+ */
+
 describe('Plug-in: Fader', function () {
-  it('should set parameters correctly.', function (done) {
+  it('should set parameters correctly. (BEEP)', function (done) {
     // test patch: osc is needed to run the AudioParam automation
     var osc = WX.OSC();
     var fader = WX.Fader({ bypass: true });
@@ -376,8 +490,9 @@ describe('Plug-in: Fader', function () {
     // wow this is totally weird... 1ms??
     setTimeout(function () {
       expect(fader._output.gain.value).to.equal(0.5011872053146362);
+      osc.stop();
       done();
-    }, 15);
+    }, 100);
   });
 });
 

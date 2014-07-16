@@ -103,8 +103,10 @@ window.WX = (function () {
         return hasOwnProperty.call(plugin.params, param);
       },
       extend: function (target, source) {
+        // if source property exists in target, overwrite
+        // if not, just add source property
         for (var prop in source) {
-          if (target[prop]) continue;
+          // if (target[prop]) continue;
           target[prop] = source[prop];
         }
         return target;
@@ -471,36 +473,6 @@ window.WX = (function () {
 
 
     /**
-     * AudioParam Helper Class
-     */
-
-    // function AudioParamHelper(target) {
-    //   this.target = target;
-    // }
-
-    // AudioParamHelper.prototype = {
-    //   set: function (val, time, xtype) {
-    //     switch (xType) {
-    //       case 0:
-    //         this.target.setValueAtTime(val, time);
-    //         break;
-    //       case 1:
-    //         this.target.linearRampToValueAtTime(val, time);
-    //         break;
-    //       case 2:
-    //         val = val <= 0.0 ? 0.00001 : val;
-    //         this.target.exponentialRampToValueAtTime(val, time);
-    //         break;
-    //       case 3:
-    //         val = val <= 0.0 ? 0.00001 : val;
-    //         this.target.setTargetAtTime(val, time[0], time[1]);
-    //         break;
-    //     }
-    //   }
-    // };
-
-
-    /**
      * @function    loadClip
      * @description load audio file via xhr where clip = { name, url, buffer }
      */
@@ -840,259 +812,11 @@ window.WX = (function () {
     Util.extend(AnalyzerAbstract.prototype, PluginAbstract.prototype);
 
 
-// var OutputModule = function () {
-//       // WA nodes
-//       this._output = Core.Gain();
-//       this._outlet = Core.Gain();
-//       // preset & params
-//       this.preset.gain = 1.0;
-//       this.params.gain = new Param({
-//         type: 'number', default: 1.0, min: 0.0, max: 1.0,
-//         target: this._output.gain
-//       });
-//       // patching
-//       this._output.connect(this._active);
-//       this._active.connect(this._outlet);
-//     };
-
-//     OutputModule.prototype = {
-//       to: function (unit) {
-//         if (unit._inlet) {
-//           this._outlet.connect(unit._inlet);
-//           return unit;
-//         } else {
-//           Log.error('invalid patching.');
-//         }
-//       },
-//       connect: function (node) {
-//         this._outlet.connect(node);
-//       },
-//       // handler: gain
-//       $gain: function (val, time, xType) {
-//         this.params.gain.set(val, time, xType);
-//       }
-//     };
-
-
-    /**
-     * BaseModule: base module for plug-in, mandatory
-     */
-
-    // var BaseModule = function () {
-    //   // root params
-    //   this.params = {};
-    // };
-
-    // BaseModule.prototype = {
-
-    //   // this implements one-way binding (set method -> this.params)
-    //   // setting 'param' can control multiple WA audioParams
-    //   set: function (param, arg) {
-    //     if (Util.hasParam(this, param)) {
-    //       // check if arg is a value or array
-    //       if (Util.isArray(arg)) {
-    //         // if env is an array, iterate envelope data
-    //         for (var i = 0; i < arg.length; i++) {
-    //           this.params[param].set.apply(this, arg[i]);
-    //         }
-    //       } else {
-    //         // otherwise change the value immediately
-    //         this.params[param].set(arg, 0.0, 0);
-    //       }
-    //     }
-    //     return this;
-    //   },
-
-    //   get: function (param) {
-    //     if (Util.hasParam(this, param)) {
-    //       return this.preset[param];
-    //     } else {
-    //       return null;
-    //     }
-    //   },
-
-    //   // TODO: fix this
-    //   setPreset: function (preset) {
-    //     for (var param in preset) {
-    //       this.set(param, preset[param]);
-    //     }
-    //   },
-
-    //   // TODO: fix this
-    //   getPreset: function () {
-    //     return Util.clone(this.preset);
-    //   }
-
-    // };
-
-
-
-
-// params: internal parameter collection
-      // this.params = {
-      //   active: new Param({
-      //     type: 'bool', name: 'Active',
-      //     default: true, min: 0.0, max: 1.0
-      //   })
-      // };
-
-
-
-
-
-
-
-
-
-    /**
-     * InputModule: input module of plug-in unit
-     */
-
-    // var InputModule = function () {
-    //   // WA nodes
-    //   this._inlet = Core.Gain();
-    //   this._input = Core.Gain();
-    //   this._bypass = Core.Gain();
-
-    //   // preset & params
-    //   this.preset.inputGain = 1.0;
-    //   this.params.inputGain = new Param({
-    //     type: 'number', default: 1.0, min: 0.0, max: 1.0,
-    //     target: this._input.gain
-    //   });
-
-    //   // patching
-    //   this._inlet.connect(this._input);
-    //   this._inlet.connect(this._bypass);
-    // };
-
-    // InputModule.prototype = {
-    //   // handler: 'inputGain'
-    //   $inputGain: function (val, time, xType) {
-    //     this.params.inputGain.set(val, time, xType);
-    //   }
-    // };
-
-
-    /**
-     * OutputModule: output module of plug-in unit
-     */
-
-    // var OutputModule = function () {
-    //   // WA nodes
-    //   this._output = Core.Gain();
-    //   this._outlet = Core.Gain();
-    //   // preset & params
-    //   this.preset.gain = 1.0;
-    //   this.params.gain = new Param({
-    //     type: 'number', default: 1.0, min: 0.0, max: 1.0,
-    //     target: this._output.gain
-    //   });
-    //   // patching
-    //   this._output.connect(this._active);
-    //   this._active.connect(this._outlet);
-    // };
-
-    // OutputModule.prototype = {
-    //   to: function (unit) {
-    //     if (unit._inlet) {
-    //       this._outlet.connect(unit._inlet);
-    //       return unit;
-    //     } else {
-    //       Log.error('invalid patching.');
-    //     }
-    //   },
-    //   connect: function (node) {
-    //     this._outlet.connect(node);
-    //   },
-    //   // handler: gain
-    //   $gain: function (val, time, xType) {
-    //     this.params.gain.set(val, time, xType);
-    //   }
-    // };
-
-
-
-    /**
-     * plugin utility functions
-     * @note See plugins/HelloPlugin.js for the example usage
-     */
-
-
-    // pre procedure for plugin building
-    // function addModules() {
-    //   // check: length should be less than 3
-    //   if (arguments.length > 2) {
-    //     Log.error('Too many arguments.');
-    //   }
-
-    //   // adding base BaseModule
-    //   BaseModule.call(arguments[0]);
-
-    //   // selective module loading
-    //   for (var i = 1; i < arguments.length; i++) {
-    //     if (arguments[i] === 'input') InputModule.call(arguments[0]);
-    //     else if (arguments[i] === 'output') InputModule.call(arguments[0]);
-    //   }
-    // }
-
-    // add parameter to plugin
-    // function addParam(unit, paramName, option) {
-    //   unit.params[paramName] = new Param(option);
-    // }
-
-    // add parameters to plugin
-    // function addParams(unit, params) {
-    //   for (var p in params) {
-    //     unit.params[p] = new Param(params[p]);
-    //   }
-    // }
-
-    // post procedure for plugin building
-    // function initializePreset(unit, preset) {
-    //   Util.extend(unit.preset, unit.defaultPreset);
-    //   Util.extend(unit.preset, preset);
-    //   unit.setPreset(unit.preset);
-    // }
-
-    // // extending plugin prototype
-    // function addPrototype(unit, modules) {
-    //   // mandatory
-    //   Util.extend(unit.prototype, BaseModule.prototype);
-    //   // selective module loading
-    //   if (modules.indexOf('input') > -1) {
-    //     Util.extend(unit.prototype, InputModule.prototype);
-    //   }
-    //   if (modules.indexOf('output') > -1) {
-    //     Util.extend(unit.prototype, OutputModule.prototype);
-    //   }
-    // }
-
-    // register plugin constructor to WX namespace
-    // function register(Constructor) {
-    //   // hard check version info
-    //   var i = Constructor.prototype.info;
-    //   if (Info.getVersion() > i.api_version) {
-    //     // FATAL: plugin is incompatible with WX Core.
-    //     Log.error(Constructor.name, ': loading failed. incompatible WAAX version.');
-    //   }
-    //   // register plugin in WX namespace
-    //   window.WX[Constructor.name] = function (preset) {
-    //     return new Constructor(preset);
-    //   };
-    // }
-
     /**
      * @namespace WX.plugin
      */
 
     return {
-      // addModule: addModule,
-      // addParam: addParam,
-      // addParams: addParams,
-      // initializePreset: initializePreset,
-      // addPrototype: addPrototype,
-      // register: register,
 
       defineType: function (plugin, type) {
         // check: length should be less than 3
@@ -1114,10 +838,9 @@ window.WX = (function () {
       },
 
       initPreset: function (plugin, preset) {
-        var mergedPreset = {};
-        Util.extend(mergedPreset, plugin.defaultPreset);
-        Util.extend(mergedPreset, preset);
-        plugin.setPreset(preset);
+        var merged = Util.clone(plugin.defaultPreset);
+        Util.extend(merged, preset);
+        plugin.setPreset(merged);
       },
 
       extendPrototype: function (plugin, type) {
@@ -1228,7 +951,6 @@ window.WX = (function () {
     Envelope: Core.Envelope,
     defineParams: Core.defineParams,
     loadClip: Core.loadClip,
-
 
     // Plug-in builders
     Plugin: Plugin
@@ -1351,6 +1073,7 @@ window.MUI = (function (WX) {
 
   return {
 
+    // TODO: these are dupes...
     clamp: function (value, min, max) {
       return Math.max(Math.min(value, max), min);
     },
@@ -1365,6 +1088,8 @@ window.MUI = (function (WX) {
       return obj;
     },
 
+    // TODO: collection has been changed with 0.0.1.
+    //       reconsider this.
     findValueByKey: function (collection, key) {
       for (var i = 0; i < collection.length; i++) {
         if (collection[i].key === key) {
