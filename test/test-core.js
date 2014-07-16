@@ -1,9 +1,9 @@
 /**
  * test-core.js
  *
- * @description   mocha + chai test suite for WAAX Core (0.0.1)
+ * @description   mocha + chai test suite for WAAX Core 1.0.0-alpha
  * @author        hoch (hongchan.choi@gmail.com)
- * @version       0.0.1
+ * @version       1.0.0
  */
 
 
@@ -20,7 +20,7 @@ describe('System: Info and Log', function() {
 
   describe('Info.getVersion()', function () {
     it('should return API version number.', function () {
-      expect(WX.Info.getVersion()).to.equal('0.0.1-alpha');
+      expect(WX.Info.getVersion()).to.equal('1.0.0-alpha');
     });
   });
   describe('Log.info(arg)', function () {
@@ -79,18 +79,25 @@ describe('System: Utilities', function() {
       expect(WX.isNumber({})).to.equal(false);
     });
   });
-  describe('hasParam(unit, param)', function () {
+  describe('isBoolean(arg)', function () {
+    it('should return true when input is Boolean.', function () {
+      expect(WX.isBoolean(true)).to.equal(true);
+      expect(WX.isBoolean(false)).to.equal(true);
+      expect(WX.isBoolean(1)).to.equal(false);
+    });
+  });
+  describe('hasParam(plugin, param)', function () {
     it('should return true when plugin has the parameter.', function () {
-      var unit = { preset: { 'parameter': 0.0 } };
-      expect(WX.hasParam(unit, 'parameter')).to.equal(true);
-      expect(WX.hasParam(unit, 'notParameter')).to.equal(false);
+      var plugin = { params: { 'parameter': 0.0 } };
+      expect(WX.hasParam(plugin, 'parameter')).to.equal(true);
+      expect(WX.hasParam(plugin, 'notParameter')).to.equal(false);
     });
   });
   describe('extend(target, source)', function () {
     it('should add source to target object and return the extended target.', function () {
       var source = { a: 1, b: 2 },
           target = { b: 3, c: 4 },
-          result = { a: 1, b: 3, c: 4 };
+          result = { a: 1, b: 2, c: 4 };
       expect(WX.extend(target, source)).deep.equal(result);
     });
   });
@@ -102,7 +109,7 @@ describe('System: Utilities', function() {
     });
   });
 
-  // Musicmath utilities
+  // Music Math utilities
   describe('clamp(value, min, max)', function () {
     it('should clamp value into between min and max.', function () {
       expect(WX.clamp(1.5, 0.0, 1.0)).to.equal(1.0);
@@ -161,11 +168,20 @@ describe('System: Utilities', function() {
       expect(WX.dbtorms(100.0)).to.equal(1.0);
     });
   });
-  describe('patch(args)', function () {
-    it('TBD: should patch plugin units in arguments.', function () {
-      // TBD
+  describe('veltoamp(vel)', function () {
+    it('should return linear amp from velocity.', function () {
+      expect(WX.veltoamp(0)).to.equal(0);
+      expect(WX.veltoamp(63)).to.equal(0.49606299212598426);
+      expect(WX.veltoamp(64)).to.equal(0.5039370078740157);
+      expect(WX.veltoamp(127)).to.equal(1.0);
     });
   });
+
+  // describe('patch(args)', function () {
+  //   it('TBD: should patch plugin units in arguments.', function () {
+  //     // TBD
+  //   });
+  // });
 
 });
 
@@ -264,44 +280,36 @@ describe('System: Core', function() {
       expect(WX.Buffer(1, 2.0, 48000).constructor.name).to.equal('AudioBuffer');
     });
   });
-
-});
-
-
-/**
- * Web Audio API utils and wrappers
- */
-describe('Envelope, Param and Clip loading', function () {
-  describe('Envelope', function () {
+  describe('Envelope(arg)', function () {
     it('should return an envelope generator.', function () {
       var env = WX.Envelope([0.0, 0.0], [0.8, 0.01, 1], [0.0, 0.3, 2]);
       var t = WX.now;
-      expect(env(1.0)).deep.equal([
-        [0.0, 1.0, 0], [0.8, 1.01, 1], [0.0, 1.3, 2]
+      expect(env(1.0, 0.5)).deep.equal([
+        [0.0, 1.0, 0], [0.4, 1.01, 1], [0.0, 1.3, 2]
       ]);
-      expect(env(t)).deep.equal([
-        [0.0, t + 0.0, 0], [0.8, t + 0.01, 1], [0.0, t + 0.3, 2]]
-      );
     });
   });
-  describe('Param', function () {
-    it('should return a WAAX parameter wrapper object.', function () {
-      var o = WX.OSC();
-      var freq = new WX.Param({
-        type: 'number', default: 440, min: 20.0, max: 1000.0,
-        target: o.frequency
+  describe('defineParams(plugin, paramDefs)', function () {
+    it('should define parameter instances in a plugin.', function () {
+      var flag = false;
+      var plugin = {
+        params: {},
+        $testParam: function () {
+          flag = true;
+        }
+      };
+      WX.defineParams(plugin, {
+        'testParam': {
+          type: 'Generic', unit: '',
+          default: 0.01, min: 0.0, max: 1.0
+        }
       });
-      var waveform = new WX.Param({
-        type: 'enum', default: 'triangle',
-        items: ['sine', 'triangle', 'square', 'sawtooth'],
-        target: o.type
-      });
-      expect(freq.get()).to.equal(440);
-      expect(freq.get()).to.equal(freq.default);
-      expect(waveform.get()).to.equal('triangle');
+      expect(plugin.params.testParam.get()).to.equal(0.01);
+      plugin.params.testParam.set(0.5, 0, 0);
+      expect(flag).to.equal(true);
+      expect(plugin.params.testParam.get()).to.equal(0.5);
     });
   });
-  // TODO: this test should be fixed to async testing
   describe('loadClip', function () {
     it('should return a audio buffer after xhr loading success.', function (done) {
       var clip = { name: 'ziggy', url: '../sound/hochkit/fx-001.wav' };
@@ -321,29 +329,172 @@ describe('Envelope, Param and Clip loading', function () {
       });
     });
   });
+
 });
+
+
+/**
+ * Plug-in utilities
+ * - defineType
+ * - initPreset
+ * - extendPrototype
+ * - register
+ */
+
+describe('Plug-in Utilities', function () {
+
+  // dummy setup for testing
+  function MyGenerator(preset) {
+    WX.Plugin.defineType(this, 'Generator');
+    WX.defineParams(this, {
+      p1: { type: 'Boolean', default: false },
+      p2: { type: 'Boolean', default: true }
+    });
+    WX.Plugin.initPreset(this, preset);
+  }
+  MyGenerator.prototype = {
+    info: { api_version: '1.0.0-alpha' },
+    defaultPreset: { p1: false, p2: true },
+    $p1: function (value, time, xtype) {
+      return value ? 'pass' : 'fail';
+    },
+    $p2: function (value, time, xtype) {
+      return value ? 'pass' : 'fail';
+    }
+  };
+  WX.Plugin.extendPrototype(MyGenerator, 'Generator');
+
+  function MyProcessor() {
+    WX.Plugin.defineType(this, 'Processor');
+  }
+  MyProcessor.prototype = {};
+  WX.Plugin.extendPrototype(MyProcessor, 'Processor');
+
+  function MyAnalyzer() {
+    WX.Plugin.defineType(this, 'Analyzer');
+  }
+  MyAnalyzer.prototype = {};
+  WX.Plugin.extendPrototype(MyAnalyzer, 'Analyzer');
+
+  var gen = new MyGenerator({ p1: true, p2: false });
+  var pro = new MyProcessor();
+  var ana = new MyAnalyzer();
+
+  describe('defineType(plugin, type)', function () {
+    it('should import required components to plugin based on type specifier.',
+      function () {
+        expect(gen).to.contain.keys('params', '_output', '_outlet');
+        expect(pro).to.contain.keys('params', '_inlet', '_bypass');
+        expect(ana).to.contain.keys('params', '_inlet', '_input');
+      }
+    );
+  });
+
+  describe('extendPrototype(plugin, type)', function () {
+    it('should extend prototype with core plugin methods.',
+      function () {
+        // generator
+        expect(gen).to.respondTo('get');
+        expect(gen).to.respondTo('set');
+        expect(gen).to.respondTo('getPreset');
+        expect(gen).to.respondTo('setPreset');
+        expect(gen).to.respondTo('$output');
+        expect(gen).to.respondTo('cut');
+        expect(gen).to.respondTo('to');
+        expect(gen.$p1(true)).to.equal('pass');
+        expect(gen.$p2(false)).to.equal('fail');
+        // processor
+        expect(pro).to.respondTo('get');
+        expect(pro).to.respondTo('set');
+        expect(pro).to.respondTo('getPreset');
+        expect(pro).to.respondTo('setPreset');
+        expect(pro).to.respondTo('$bypass');
+        expect(pro).to.respondTo('$input');
+        expect(pro).to.respondTo('$output');
+        expect(pro).to.respondTo('cut');
+        expect(pro).to.respondTo('to');
+        // analyzer
+        expect(ana).to.respondTo('get');
+        expect(ana).to.respondTo('set');
+        expect(ana).to.respondTo('getPreset');
+        expect(ana).to.respondTo('setPreset');
+        expect(ana).to.respondTo('$input');
+        expect(ana).to.respondTo('cut');
+        expect(ana).to.respondTo('to');
+      }
+    );
+  });
+
+  describe('initPreset(plugin, preset)', function () {
+    it('should initialize plugin preset from arguments and default preset.',
+      function () {
+        expect(gen.get('p1')).to.equal(true);
+        expect(gen.get('p2')).to.equal(false);
+      }
+    );
+  });
+
+  describe('register(pluginConstructor)', function () {
+    it('should register plugin class under namespace WX.',
+      function () {
+        WX.Plugin.register(MyGenerator);
+        var myGen = WX.MyGenerator();
+        expect(myGen).to.respondTo('get');
+        expect(myGen).to.respondTo('set');
+        expect(myGen).to.respondTo('getPreset');
+        expect(myGen).to.respondTo('setPreset');
+        expect(myGen).to.respondTo('$output');
+        expect(myGen).to.respondTo('cut');
+        expect(myGen).to.respondTo('to');
+        expect(myGen.$p1(true)).to.equal('pass');
+        expect(myGen.$p2(false)).to.equal('fail');
+      }
+    );
+  });
+
+});
+
+
+/**
+ * MUI methods??
+ * - MouseResponder
+ * - KeyResponder
+ * - $
+ */
 
 
 /**
  * Plug-in: Fader
  */
+
 describe('Plug-in: Fader', function () {
-  it('should work with essential features.', function (done) {
-
-    var fader = WX.Fader();
+  it('should set parameters correctly. (BEEP)', function (done) {
+    // test patch: osc is needed to run the AudioParam automation
+    var osc = WX.OSC();
+    var fader = WX.Fader({ bypass: true });
+    osc.start();
+    osc.to(fader._inlet);
     fader.to(WX.Master);
-    fader.set('active', false);
-    fader.set('inputGain', 0.25);
-    fader.set('gain', 0.5);
-
+    fader.set('input', 0.25);
+    fader.set('dB', -6.0);
+    // test preset values
+    var preset = fader.getPreset();
     expect(fader._inlet.constructor.name).to.equal('GainNode');
     expect(fader._outlet.constructor.name).to.equal('GainNode');
-    expect(fader.preset.active).to.equal(false);
-    expect(fader.preset.mute).to.equal(true);
-    expect(fader.preset.inputGain).to.equal(0.25);
-    expect(fader.preset.dB).to.equal(-6.020599913279623);
+    expect(preset.bypass).to.equal(true);
+    expect(preset.mute).to.equal(false);
+    expect(preset.input).to.equal(0.25);
+    expect(preset.dB).to.equal(-6.0);
     expect(fader.info.name).to.equal('Fader');
-    done();
-
+    // checking actual AudioParam under the hood
+    // wow this is totally weird... 1ms??
+    setTimeout(function () {
+      expect(fader._output.gain.value).to.equal(0.5011872053146362);
+      osc.stop();
+      done();
+    }, 100);
   });
 });
+
+
+
