@@ -1,0 +1,51 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<polymer-element name="mui-panel-row" attributes="title opened" noscript>
+
+  <template>
+
+    <style>
+      :host {
+        display: block;
+        overflow: hidden;
+      }
+      button:active {
+        color: #fff;
+      }
+      .c-tab {
+        background-color: #ddd;
+      }
+      .c-content {
+        background-color: #eee;
+      }
+    </style>
+
+    <div class="hey" id="eContainer" layout horizontal>
+      <!-- <button on-click="{{toggle}}"></button> -->
+      <content select=".c-body"></content>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer('mui-panel-row', {
+
+      // title: null,
+      // opened: true,
+
+      // ready: function() {
+      // },
+
+      // toggle: function () {
+      //   this.opened = !this.opened;
+      //   if (this.opened) {
+      //     this.$.eContainer.style.height = "auto";
+      //   } else {
+      //     this.$.eContainer.style.height = "20px";
+      //   }
+      // }
+
+    });
+  </script>
+
+</polymer-element>
