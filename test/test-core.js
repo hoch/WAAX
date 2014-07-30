@@ -16,7 +16,7 @@ var expect = chai.expect,
  * Info and Log
  */
 
-describe('System: Info and Log', function() {
+describe('Core: Info and Log', function() {
 
   describe('Info.getVersion()', function () {
     it('should return API version number.', function () {
@@ -54,7 +54,7 @@ describe('System: Info and Log', function() {
  * patch(TBD)
  */
 
-describe('System: Utilities', function() {
+describe('Core: Utilities', function() {
 
   // Object utilities
   describe('isObject(arg)', function () {
@@ -190,7 +190,7 @@ describe('System: Utilities', function() {
  * Core
  */
 
-describe('System: Core', function() {
+describe('Core', function() {
 
   describe('context', function () {
     it('should be AudioContext.', function () {
@@ -341,7 +341,7 @@ describe('System: Core', function() {
  * - register
  */
 
-describe('Plug-in Utilities', function () {
+describe('Core: Plug-in Utilities', function () {
 
   // dummy setup for testing
   function MyGenerator(preset) {
