@@ -66,8 +66,8 @@ For sequencer functionality and Web MIDI support, the following components shoul
 The complete WAAX development setup requires [NPM](http://nodejs.org/), [Bower](http://bower.io/) and [Grunt](http://gruntjs.com/). If you have them installed, then simply execute the following commands in the terminal to install and configure WAAX. Make sure to substitute `YOUR_DIRECTORY` to your installation directory.
 
 ~~~bash
-git clone https://github.com/hoch/WAAX YOUR_DIRECTORY
-cd YOUR_DIRECTORY
+git clone https://github.com/hoch/WAAX $YOUR_DIRECTORY
+cd $YOUR_DIRECTORY
 make
 ~~~
 
