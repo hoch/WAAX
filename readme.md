@@ -55,6 +55,8 @@ For sequencer functionality and Web MIDI support, the following components shoul
 - [Thought behind: Rebirth of WAAX](https://ccrma.stanford.edu/~hongchan/posts/thoughts-behind-rebirth-of-waax/) : design choices and concepts.
 - [Creating WAAX Plug-in](https://ccrma.stanford.edu/~hongchan/posts/creating-waax-plugin/) : step-by-step tutorial on how to create plug-in for WAAX.
 
+<br>
+
 ---
 
 # Development
