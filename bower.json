@@ -12,8 +12,9 @@
     "tests"
   ],
   "dependencies": {
+    "polymer": "Polymer/polymer#~0.3.4",
+    "core-elements": "Polymer/core-elements#~0.3.4",
     "foundation": "~5.3.0",
-    "polymer": "~0.3.3",
     "chai": "~1.9.1",
     "mocha": "~1.20.1"
   }
