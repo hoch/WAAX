@@ -81,43 +81,7 @@ grunt build         # build minimized core, plug-in scripts
 
 ## Documentation
 
-_Coming soon..._
-
-## Directory Structure
-
-        .
-        |
-        +- bower_components/
-        +- build/                       // flattened, minified js files
-        |   +- waax.min.js
-        |   +- plugins/
-        |       +- TestPlugin.js
-        +- doc/                         // documentation
-        |   +- index.html
-        |   +- ...       
-        +- examples/
-        +- mui/                         // MUI elements
-        |   +- mui-knob.html
-        |   +- mui-knobh.html
-        |   +- mui-toggle.html
-        |   +- mui-select.html
-        |   +- ...
-        +- node_modules/
-        +- sound/                       // audio (sample) files
-        +- src/                         // development files
-        |   +- waax.js
-        |   +- plugins/
-        |       +- TestPlugin.js        // plug-in boilerplate file 
-        |       +- ...
-        +- test/                        // client-side testing (mocha + chai)
-        |   +- index.html
-        |   +- test-core.js
-        |   +- test-timebase.js
-        +- bower.json           
-        +- Gruntfiles.js        
-        +- index.html                   // project landing page
-        +- package.json
-        +- README.md
+The newer version of documentation will be posted soon, and the previous version is still accessible [here](http://hoch.github.io/WAAX/docs/).
 
 
 ## License and Contact
