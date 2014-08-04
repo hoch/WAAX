@@ -2,7 +2,7 @@
 
 #### Framework for Web-based Music Apps (1.0.0-alpha)
 
-> Currently the repository is under the active development as alpha status. It has passed the initial experimental implementation and is stabilizing to version 1.0.0. With that said, please use at your own risk.
+> Currently the repository is under the active development as alpha status. It has passed the initial experimental implementation and is settling down to version 1.0.0. With that said, please use at your own risk.
 
 <!-- travis build image -->
 
@@ -21,10 +21,10 @@ __WAAX__ is a JavaScript library that offers a comprehensive framework for web-b
 - Tested with Mocha and Chai: [In-browser Test](http://hoch.github.io/WAAX/test/)
 
 
-### [Play WAAX!](http://playwaax.appspot.com)
+<!-- ### [Play WAAX!](http://playwaax.appspot.com)
 
 You can find playable demos and examples at [PlayWAAX](http://playwaax.appspot.com).
-
+ -->
 
 ## Basic Usage
 
