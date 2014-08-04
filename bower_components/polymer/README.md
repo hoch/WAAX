@@ -1,17 +1,18 @@
-# Polymer
+Polymer
+=======
 
-[![Analytics](https://ga-beacon.appspot.com/UA-39334307-2/Polymer/polymer/README)](https://github.com/igrigorik/ga-beacon)
+Shim repository for [Polymer](http://www.polymer-project.org).
 
-Build Status: [http://build.chromium.org/p/client.polymer/waterfall](http://build.chromium.org/p/client.polymer/waterfall)
+For Docs, License, Tests, and pre-packed downloads, see:
+http://www.polymer-project.org/
 
-## Brief Overview
+Many thanks to our contributors:
+https://github.com/Polymer/platform/contributors
 
-For more detailed info goto [http://polymer-project.org/](http://polymer-project.org/).
 
-Polymer is a new type of library for the web, designed to leverage the existing browser infrastructure to provide the encapsulation and extendability currently only available in JS libraries.
+Package Managers
+----------------
 
-Polymer is based on a set of future technologies, including [Shadow DOM](https://dvcs.w3.org/hg/webcomponents/raw-file/tip/spec/shadow/index.html), [Custom Elements](https://dvcs.w3.org/hg/webcomponents/raw-file/tip/spec/custom/index.html) and Model Driven Views. Currently these technologies are implemented as polyfills or shims, but as browsers adopt these features natively, the platform code that drives Polymer evacipates, leaving only the value-adds.
-
-## Tools & Testing
-
-For running tests or building minified files, consult the [tooling information](http://www.polymer-project.org/resources/tooling-strategy.html).
+* [Bower](http://bower.io): `polymer`
+* [Composer](http://packagist.org/packages/components/polymer): `components/polymer`
+* [Component](https://github.com/component/component): `components/polymer`
