@@ -266,7 +266,7 @@ window.WX = (function () {
         case 3:
           time[0] = (time[0] < ctx.currentTime) ? ctx.currentTime : time[0];
           value = value <= 0.0 ? 0.00001 : value;
-          this.setTargetAtTime(val, time[0], time[1]);
+          this.setTargetAtTime(value, time[0], time[1]);
           break;
       }
     };

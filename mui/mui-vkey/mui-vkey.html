@@ -1,0 +1,235 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../mui-button/mui-button.html">
+
+<polymer-element name="mui-vkey" attributes="">
+
+<template>
+
+  <style>
+    :host {
+      display: block;
+      overflow: hidden;
+    }
+    .container {
+    }
+    .header {
+
+    }
+    .header .button {
+      padding: 2px;
+      color: #03a9f4;
+      width: 28px;
+      height: 32px;
+      line-height: 28px;
+      box-shadow: none;
+    }
+    .header .button:hover {
+      box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.1);
+    }
+    .content {
+      margin-top: 4px;
+    }
+    .status-bar {
+      float: right;
+      width: 25%;
+      height: 20px;
+      padding: 0 5px;
+      font-size: 9px;
+      line-height: 20px;
+      color: #fff;
+      background-color: #666;
+    }
+
+    .c-vkey {
+      display: block;
+      cursor: move;
+      background-color: #ddd;
+    }
+    .c-wheel {
+      stroke: #ccc;
+      stroke-width: 2px;
+      fill: #fff;
+    }
+    .c-wheel:hover {
+      stroke: #999;
+    }
+    .c-white-key {
+      fill: #fff;
+    }
+    .c-black-key {
+      fill: #666;
+    }
+    .active {
+      fill: #669;
+    }
+  </style>
+
+  <div class="container">
+    <div class="header">
+      <div id="eStatusBar" class="status-bar">OUT > Pitch 60 Velo 64</div>
+      <mui-button class="button" icon="hardware:keyboard" on-click="{{toggleKeyboardInput}}"></mui-button>
+      <mui-button class="button" icon="expand-more" on-click="{{octaveUp}}"></mui-button>
+      <mui-button class="button" icon="expand-more" on-click="{{octaveDown}}"></mui-button>
+
+    </div>
+    <svg id="eTouchable" class="c-vkey" height="100" version="1.1" xmlns="http://www.w3.org/2000/svg">
+      <rect class="c-wheel" x="6" y="6" width="32" height="88" rx="4" ry="4"></rect>
+      <rect class="c-wheel" x="44" y="6" width="32" height="88" rx="4" ry="4"></rect>
+    </svg>
+  </div>
+
+</template>
+
+<script>
+  Polymer('mui-vkey', {
+
+    svg: null,
+
+    label: 'virtual keys',
+
+    keys: [],
+    areaMap: [],
+    keyRects: [],
+    prevPitch: null,
+
+    targetOsc: null,
+    targetGain: null,
+
+    _svgWidth: 787,
+    _offset: 84,
+    _keyUpperY: 6,
+    _keyLowerY: 52,
+    _keyWidth: 16,
+    _keyHeight: 42,
+    _keyPaddingX: 4,
+    _keyRadius: 2,
+
+    _createRect: function (key) {
+      var rect = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+      rect.setAttribute('x', key.x1);
+      rect.setAttribute('y', key.y1);
+      rect.setAttribute('rx', this._keyRadius);
+      rect.setAttribute('ry', this._keyRadius);
+      rect.setAttribute('width', this._keyWidth);
+      rect.setAttribute('height', this._keyHeight);
+      rect.setAttribute('class', key.white ? 'c-white-key' : 'c-black-key');
+      this.svg.appendChild(rect);
+      return rect;
+    },
+
+    _renderKeys: function () {
+      var i = 0, count = 0;
+      while (count < 58) {
+        var pclass = i % 14;
+        i++;
+        if (pclass === 5 || pclass === 13) continue;
+        var white = (pclass % 2 === 0),
+            x1 = this._offset + i * ((this._keyWidth + this._keyPaddingX) / 2),
+            y1 = white ? this._keyLowerY : this._keyUpperY,
+            x2 = x1 + this._keyWidth,
+            y2 = y1 + this._keyHeight;
+        var key = {
+          white: white, prevState: false, state: false,
+          x1: x1, y1: y1, x2: x2, y2: y2
+        };
+        key.rect = this._createRect(key);
+        this.keys[count] = key;
+        count++;
+      }
+    },
+
+    _checkKeyArea: function (data) {
+      if (data) {
+        for (var i = 0; i < 57; i++) {
+          var key = this.keys[i];
+          // check y first
+          if (key.y1 <= data.y && data.y <= key.y2) {
+            // then check x
+            if (key.x1 <= data.x && data.x <= key.x2) {
+              return i;
+            }
+          }
+        }
+      }
+      return null;
+    },
+
+    update: function () {
+    },
+
+    created: function () {
+    },
+
+    ready: function() {
+      // box size
+      this.svg = this.$.eTouchable;
+      this.svg.setAttribute('width', 787);
+
+      this._renderKeys();
+
+      var mouseResponder = MUI.MouseResponder(
+        this.label,
+        this.svg,
+        function (sender, action, data) {
+          var pitch = this._checkKeyArea(data);
+          switch (action) {
+            case 'clicked':
+              if (pitch !== null) {
+                this.targetGain.gain.set(1.0, [WX.now, 0.02], 3);
+                this.targetOsc.frequency.set(WX.mtof(pitch + 24), WX.now + 0.01, 1);
+                this.setStatusBar('NOTEON : ' + pitch);
+                this.highlight(pitch);
+                this.prevPitch = pitch;
+              }
+              break;
+            case 'dragged':
+              if (pitch !== null && this.prevPitch !== pitch) {
+                this.targetOsc.frequency.set(WX.mtof(pitch + 24), WX.now + 0.01, 1);
+                this.setStatusBar('GLIDE  : ' + pitch);
+                this.highlight(pitch);
+                this.prevPitch = pitch;
+              }
+              break;
+            case 'released':
+              this.targetGain.gain.set(0.0, [WX.now, 0.1], 3);
+              this.setStatusBar('NOTEOFF');
+              this.highlight(null);
+              this.prevPitch = null;
+              break;
+          }
+          this.update();
+        }.bind(this)
+      );
+    },
+
+    highlight: function (pitch) {
+      if (pitch !== null) {
+        var key = this.keys[pitch];
+        key.rect.setAttribute('class', key.rect.getAttribute('class') + ' active');
+      }
+      if (this.prevPitch !== null) {
+        key = this.keys[this.prevPitch];
+        key.rect.setAttribute('class', key.rect.getAttribute('class').slice(0, 11));
+      }
+    },
+
+    toggle: function () {
+      this.opened = !this.opened;
+      this.update();
+    },
+
+    setStatusBar: function (msg) {
+      this.$.eStatusBar.textContent = msg;
+    },
+
+    setTarget: function (oscnode, gainnode) {
+      this.targetOsc = oscnode;
+      this.targetGain = gainnode;
+      this.targetOsc.frequency.set(WX.mtof(60), WX.now);
+      this.targetGain.gain.set(0.0, WX.now);
+    }
+
+  });
+</script>
+
+</polymer-element>

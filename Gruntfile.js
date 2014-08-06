@@ -1,18 +1,9 @@
 module.exports = function(grunt) {
 
-
   /**
-   * workflow
-   *
-   * 1. dev
-   *   - start dev server and start to watch
-   *   - edit and save 'waax.js' will trigger uglify to '/build'
-   *   - edit and save anything in 'src/plugins'
-   *
-   * 2. build
-   *   - uglify 'src/waax.js' to '/build'
-   *   - uglify all the plugins in 'src/plugins' to '/build/plugins'
-   *
+   * TODOs
+   * 1. gh-pages task
+   *   - copy: build, docs, examples, sounds, bower_components, test
    */
 
   grunt.initConfig({
@@ -27,24 +18,28 @@ module.exports = function(grunt) {
     },
 
     watch: {
-      development: {
+      options: {
+        livereload: true
+      },
+      src: {
+        files: [
+          './src/**'
+        ],
+        tasks: ['build']
+      },
+      others: {
         files: [
           './index.html',
           './examples/**',
           './mui/**',
-          './src/**',
           './test/**'
-        ],
-        tasks: ['build'],
-        options: {
-          livereload: true
-        }
+        ]
       }
     },
 
     uglify: {
       options: {
-        // to reserve 'WX' name space
+        // to keep 'WX' name space intact
         mangle: false
       },
       my_target: {
@@ -53,8 +48,8 @@ module.exports = function(grunt) {
           sourceMapName: 'build/waax.map'
         },
         files: {
-          'build/waax.js': ['src/waax.js'],
-          'build/plugins/TestPlugin.js': ['src/plugins/TestPlugin.js']
+          'build/waax.min.js': ['src/waax.js'],
+          'build/plug_ins/TestPlugin.js': ['src/plug_ins/TestPlugin.js']
         }
       }
     }
@@ -65,7 +60,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
-  grunt.registerTask('dev', ['connect', 'watch']);
+  grunt.registerTask('serve', ['connect', 'watch']);
   grunt.registerTask('build', ['uglify']);
   grunt.registerTask('default', ['build']);
 };
