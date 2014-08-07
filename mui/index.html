@@ -13,12 +13,15 @@
 
   <script src="../bower_components/platform/platform.js"></script>
   <script src="../build/waax.min.js"></script>
+  <script src="../../build/plug_ins/SimpleOsc.js"></script>
+
   <link rel="import" href="mui-blade/mui-blade.html">
   <link rel="import" href="mui-section/mui-section.html">
   <link rel="import" href="mui-knob/mui-knob.html">
   <link rel="import" href="mui-knobh/mui-knobh.html">
   <link rel="import" href="mui-dropdown/mui-dropdown.html">
   <link rel="import" href="mui-button/mui-button.html">
+  <link rel="import" href="mui-vkey/mui-vkey.html">
 
   <style>
     body {
@@ -95,14 +98,16 @@
           </mui-section>
         </mui-blade>
 
+        <mui-blade title="Keyboard" opened="true">
+          <mui-vkey id="vkey"></mui-vkey>
+        </mui-blade>
+
       </div>
     </div>
   </article>
 
   <script>
     function init() {
-      // var osc = WX.Oscil({ pType: 'triangle', pActive: true, pGain: 0.1 });
-      // osc.to(WX.DAC);
 
       var presets = [
         { key: 'Power Saw', value: 'power-saw' },
@@ -111,7 +116,11 @@
         { key: 'Mellow Lead', value: 'mellow-lead' }
       ];
 
+      var simOsc = WX.SimpleOsc();
+      simOsc.to(WX.Master);
+
       MUI.$('dropdown-1').setModel(presets);
+      MUI.$('vkey').addTarget(simOsc);
 
     }
 
