@@ -1,110 +1,131 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
 <head>
-  <!-- waax 0.0.1-alpha -->
-  <script src="../src/waax.js"></script>
-  <!-- polymer core -->
+
+  <title>MUI | Web Audio API eXtension</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WAAX: Web Audio API eXtension</title>
+  <link rel="stylesheet" href="../bower_components/foundation/css/normalize.css">
+  <link rel="stylesheet" href="../bower_components/foundation/css/foundation.css">
+  <script src="../bower_components/foundation/js/vendor/modernizr.js"></script>
+
   <script src="../bower_components/platform/platform.js"></script>
-  <link rel="stylesheet" type="text/css" href="css/mui-core.css">
-  <!-- mui elements -->
-  <link rel="import" href="mui-knob.html">
-  <link rel="import" href="mui-knobh.html">
-  <link rel="import" href="mui-button.html">
-  <link rel="import" href="mui-toggle.html">
-  <link rel="import" href="mui-select.html">
-  <!-- index style, srcipt -->
-  <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
-  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <script src="../build/waax.min.js"></script>
+  <script src="../../build/plug_ins/SimpleOsc.js"></script>
+
+  <link rel="import" href="mui-blade/mui-blade.html">
+  <link rel="import" href="mui-section/mui-section.html">
+  <link rel="import" href="mui-knob/mui-knob.html">
+  <link rel="import" href="mui-knobh/mui-knobh.html">
+  <link rel="import" href="mui-dropdown/mui-dropdown.html">
+  <link rel="import" href="mui-button/mui-button.html">
+  <link rel="import" href="mui-vkey/mui-vkey.html">
+
+  <style>
+    body {
+      background-color: #fafafa;
+    }
+    header {
+      margin-top: 30px;
+    }
+    h2 {
+      margin-top: 40px;
+    }
+  </style>
+
 </head>
+<body unresolved>
 
-<body>
-  <div class="c-content">
-    <h2>MUI</h2>
-    <h3>Musical User Interface: Polymer-WAAX UI elements</h3>
-    <div class="c-mui-panel">
-      <div class="c-mui-section">
-        <h2>Knobs</h2>
-        <mui-knob id="knob-freq" label="Freq" min="40" max="2500"></mui-knob>
-        <mui-knobh id="knob-gain" label="Gain" min="0.0" max="1.0"></mui-knobh>
-      </div>
-
-      <div class="c-mui-section">
-        <h2>Buttons</h2>
-        <mui-button id="btn-csave" icon="&#x55;"></mui-button>
-        <mui-button id="btn-rewind" icon="&#x52;"></mui-button>
-        <mui-button id="btn-stop" icon="&#x53;"></mui-button>
-        <mui-button id="btn-play" icon="&#x50;"></mui-button>
-        <mui-button id="btn-record" icon="&#x43;"></mui-button>
-      </div>
-
-      <div class="c-mui-section">
-        <h2>Toggle</h2>
-        <mui-toggle id="tgl-osc" label="M"></mui-toggle>
-      </div>
-
-      <div class="c-mui-section">
-        <h2>Selector</h2>
-        <mui-select id="select-preset" label="Preset"></mui-select>
+  <header>
+    <div class="row">
+      <div class="small-10 large-centered columns">
+        <ul class="breadcrumbs">
+          <li><a href="..">Home</a></li>
+          <li><a href="#">Getting Started</a></li>
+          <li><a href="#">API Reference</a></li>
+          <li class="current">MUI Elements</li>
+          <li><a href="#">Test</a></li>
+        </ul>
+        <h2>MUI Elements <small>1.0.0-alpha</small></h2>
       </div>
     </div>
+  </header>
 
-    <h3>Markup</h3>
-    <pre class="prettyprint">
-&lt;mui-knob id=&quot;knob-freq&quot; label=&quot;Freq&quot; min=&quot;40&quot; max=&quot;2500&quot;&gt;&lt;/mui-knob&gt;
-&lt;mui-knobh id=&quot;knob-gain&quot; label=&quot;Gain&quot; min=&quot;0.0&quot; max=&quot;1.0&quot;&gt;&lt;/mui-knobh&gt;
-&lt;mui-button id=&quot;btn-csave&quot; icon=&quot;&amp;#x55;&quot;&gt;&lt;/mui-button&gt;
-&lt;mui-toggle id=&quot;tgl-osc&quot; label=&quot;M&quot;&gt;&lt;/mui-toggle&gt;
-&lt;mui-select id=&quot;select-preset&quot; label=&quot;Preset&quot;&gt;&lt;/mui-select&gt;</pre>
+  <article>
+    <div class="row">
+      <div class="small-10 large-centered columns">
 
-    <h3>Script</h3>
-<pre class="prettyprint">
-var osc = WX.Oscil();
-MUI.$(&#039;knob-freq&#039;).link(osc, &#039;pFreq&#039;);
-MUI.$(&#039;knob-gain&#039;).link(osc, &#039;pGain&#039;);
-MUI.$(&#039;tgl-osc&#039;).link(WX.DAC, &#039;pMute&#039;);
-MUI.$(&#039;select-preset&#039;).link(osc, &#039;pType&#039;);</pre>
+        <mui-blade title="Control" opened="true">
+          <mui-section title="Tempo">
+            <mui-knobh id="knob-tempo" label="BPM" min="20" max="200" value="120"></mui-knobh>
+            <mui-knobh id="knob-quant" label="Qunatize" min="0" max="100" value="0"></mui-knobh>
+            <mui-knobh id="knob-swing" label="Swing" min="0" max="100" value="0"></mui-knobh>
+          </mui-section>
+          <mui-section title="Transport">
+            <mui-button icon="av:skip-previous"></mui-button>
+            <mui-button icon="av:stop"></mui-button>
+            <mui-button icon="av:pause"></mui-button>
+            <mui-button icon="av:play-arrow" type="toggle"></mui-button>
+            <mui-button icon="av:loop" type="toggle"></mui-button>
+          </mui-section>
+          <mui-section title="Collaboration">
+            <mui-button icon="work" title="Pattern Collection"></mui-button>
+            <mui-button icon="social:person-add" title="Add Collaborator"></mui-button>
+            <mui-button icon="social:share" title="Share Pattern"></mui-button>
+          </mui-section>
+        </mui-blade>
 
-  </div>
-  <!-- script -->
-  <script type="text/javascript">
+        <mui-blade title="SubSyn 1" opened="true">
+          <mui-section title="Preset">
+            <mui-dropdown label="Preset" id="dropdown-1"></mui-dropdown>
+          </mui-section>
+          <mui-section title="OSC 1">
+            <mui-knob id="knob-freq" label="Freq" min="40" max="2500"></mui-knob>
+            <mui-knob id="knob-gain" label="Gain" min="0.0" max="1.0" value="0.25"></mui-knob>
+          </mui-section>
+          <mui-section title="Filter">
+            <mui-knob id="knob-a1" label="Cutoff" min="40" max="5000" value="1000"></mui-knob>
+            <mui-knob id="knob-a2" label="Q" min="0.0" max="12.0" value="0.25"></mui-knob>
+            <mui-knob id="knob-a3" label="Gain" min="0.0" max="1.0" value="0.25"></mui-knob>
+          </mui-section>
+          <mui-section title="Envelope">
+            <mui-knob id="knob-envA" label="Att" min="0.01" max="20" value="1"></mui-knob>
+            <mui-knob id="knob-envD" label="Dec" min="0.05" max="20" value="0.5"></mui-knob>
+            <mui-knob id="knob-envS" label="Sus" min="0.0" max="1.0" value="0.4"></mui-knob>
+            <mui-knob id="knob-envR" label="Rel" min="0.01" max="2000" value="20"></mui-knob>
+          </mui-section>
+        </mui-blade>
+
+        <mui-blade title="Keyboard" opened="true">
+          <mui-vkey id="vkey"></mui-vkey>
+        </mui-blade>
+
+      </div>
+    </div>
+  </article>
+
+  <script>
     function init() {
-      var osc = WX.Oscil({ pType: 'triangle', pActive: true, pGain: 0.1 });
-      osc.to(WX.DAC);
 
       var presets = [
-        { key: 'Sine', value: 'sine' },
-        { key: 'Square', value: 'square' },
-        { key: 'Sawtooth', value: 'sawtooth' },
-        { key: 'Triangle', value: 'triangle' }
+        { key: 'Power Saw', value: 'power-saw' },
+        { key: 'Warm Pads', value: 'warm-pads' },
+        { key: 'Hammerhead', value: 'hammerhead' },
+        { key: 'Mellow Lead', value: 'mellow-lead' }
       ];
 
-      MUI.$('knob-freq').link(osc, 'pFreq');
-      MUI.$('knob-gain').link(osc, 'pGain');
+      var simOsc = WX.SimpleOsc();
+      simOsc.to(WX.Master);
 
-      MUI.$('btn-rewind').onclick = function () {
-        console.log('rewind!');
-      };
-
-      MUI.$('tgl-osc').link(WX.DAC, 'pMute');
-
-      MUI.$('select-preset').setModel(presets);
-      MUI.$('select-preset').link(osc, 'pType');
+      MUI.$('dropdown-1').setModel(presets);
+      MUI.$('vkey').addTarget(simOsc);
 
     }
-    // window.addEventListener('polymer-ready', init);
-  </script>
 
-  <!-- ga analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-    ga('create', 'UA-7423687-10', 'auto');
-    ga('send', 'pageview');
+    window.addEventListener('polymer-ready', init);
   </script>
 
 </body>
-
 </html>

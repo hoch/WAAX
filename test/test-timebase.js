@@ -12,7 +12,7 @@ var expect = chai.expect,
     should = chai.should();
 
 // test setup
-var TB = Timebase;
+var TB = Timebase, TX = Timebase.Transport;
 var TEST_DATA = [
   [0, 0, 997, 1007], [1, 1, 534, 613], [2, 2, 988, 1102],
   [3, 3, 85, 141], [4, 4, 1001, 1108], [5, 5, 722, 832],
@@ -194,8 +194,7 @@ describe('Timebase: Note', function() {
 describe('Timebase: NoteList', function() {
 
   describe('add(note)', function () {
-
-    it('should test method performance on ordered linked list impl.', function (done) {
+    it('should test method performance on ordered linked list impl.', function () {
       var notelist = TB.createNoteList();
       for (var i = 0; i < TEST_DATA.length; i++) {
         notelist.add(TB.createNote.apply(TB, TEST_DATA[i]));
@@ -205,14 +204,11 @@ describe('Timebase: NoteList', function() {
       expect(notelist.head.next.next).to.have.property('start', 35);
       expect(notelist.head.next.next.next).to.have.property('start', 55);
       expect(notelist.size).to.equal(127);
-      done();
     });
-
   });
 
   describe('empty()', function () {
-
-    it('should empty the list.', function (done) {
+    it('should empty the list.', function () {
       var input = [];
       for (var n = 0; n < 10; n++) {
         var start = ~~(Math.random() * 1200);
@@ -225,28 +221,22 @@ describe('Timebase: NoteList', function() {
       notelist.empty();
       expect(notelist.head).to.equal(null);
       expect(notelist.size).to.equal(0);
-      done();
     });
-
   });
 
   describe('findNoteAtPosition(pitch, tick)', function () {
-
-    it('should return a note at pitch/tick position.', function (done) {
+    it('should return a note at pitch/tick position.', function () {
       var notelist = TB.createNoteList();
       for (var n = 0; n < 10; n++) {
         notelist.add(TB.createNote(60 + n, 64, 120 * n, 120 * n + 120));
       }
       expect(notelist.findNoteAtPosition(60, 60)).to.not.equal(null);
       expect(notelist.findNoteAtPosition(61, 60)).to.equal(null);
-      done();
     });
-
   });
 
   describe('findNotesInTimeSpan(start, end)', function () {
-
-    it('should return notes at between start/end time.', function (done) {
+    it('should return notes at between start/end time.', function () {
       var notelist = TB.createNoteList();
       for (var n = 0; n < 10; n++) {
         notelist.add(TB.createNote(60 + n, 64, 120 * n, 120 * n + 120));
@@ -254,14 +244,11 @@ describe('Timebase: NoteList', function() {
       expect(notelist.findNotesInTimeSpan(60, 240)).to.have.length(2);
       expect(notelist.findNotesInTimeSpan(600, 960)).to.have.length(4);
       expect(notelist.findNotesInTimeSpan(0, 1200)).to.have.length(10);
-      done();
     });
-
   });
 
   describe('findNotesInArea(minPitch, maxPitch, start, end)', function () {
-
-    it('should return notes at in pitch/time area.', function (done) {
+    it('should return notes at in pitch/time area.', function () {
       var notelist = TB.createNoteList();
       for (var n = 0; n < 10; n++) {
         notelist.add(TB.createNote(60 + n, 64, 120 * n, 120 * n + 120));
@@ -269,14 +256,11 @@ describe('Timebase: NoteList', function() {
       expect(notelist.findNotesInArea(62, 64, 60, 240)).to.have.length(1);
       expect(notelist.findNotesInArea(66, 69, 600, 960)).to.have.length(3);
       expect(notelist.findNotesInArea(60, 69, 0, 1200)).to.have.length(10);
-      done();
     });
-
   });
 
   describe('getSize()', function () {
-
-    it('should return notes at in pitch/time area.', function (done) {
+    it('should return notes at in pitch/time area.', function () {
       var notelist = TB.createNoteList();
       var data = [];
       for (var n = 0; n < 10; n++) {
@@ -292,14 +276,11 @@ describe('Timebase: NoteList', function() {
       expect(notelist.getSize()).to.equal(1);
       notelist.empty();
       expect(notelist.getSize()).to.equal(0);
-      done();
     });
-
   });
 
   describe('getArray()', function () {
-
-    it('should return a flattened array from list.', function (done) {
+    it('should return a flattened array from list.', function () {
       var notelist = TB.createNoteList();
       for (var n = 0; n < 10; n++) {
         notelist.add(TB.createNote(60 + n, 64, 120 * n, 120 * n + 120));
@@ -309,14 +290,11 @@ describe('Timebase: NoteList', function() {
       expect(notes[0]).to.have.property('pitch', 60);
       expect(notes[1]).to.have.property('start', 120);
       expect(notes[2]).to.have.property('end', 360);
-      done();
     });
-
   });
 
   describe('iterate(fn)', function () {
-
-    it('should iterate all items with callback function.', function (done) {
+    it('should iterate all items with callback function.', function () {
       var notelist = TB.createNoteList();
       for (var n = 0; n < 10; n++) {
         notelist.add(TB.createNote(60 + n, 64, 120 * n, 120 * n + 120));
@@ -331,14 +309,11 @@ describe('Timebase: NoteList', function() {
       expect(notes[0]).to.have.property('start',0);
       expect(notes[1]).to.have.property('start', 60);
       expect(notes[2]).to.have.property('end', 180);
-      done();
     });
-
   });
 
   describe('remove(note)', function () {
-
-    it('should remove items from NoteList.', function (done) {
+    it('should remove items from NoteList.', function () {
       var input = [], notelist = TB.createNoteList();
       for (var i = 0; i < TEST_DATA.length; i++) {
         input.push(TB.createNote.apply(TB, TEST_DATA[i]));
@@ -351,9 +326,47 @@ describe('Timebase: NoteList', function() {
       }
       var rest = TEST_DATA.length - ~~(TEST_DATA.length / 2);
       expect(notelist.getSize()).deep.equal(rest);
-      done();
     });
+  });
 
+  describe('rewind()', function () {
+    it('should rewind playhead in NoteList.', function () {
+      var notelist = TB.createNoteList();
+      for (var i = 0; i < TEST_DATA.length; i++) {
+        notelist.add(TB.createNote.apply(TB, TEST_DATA[i]));
+      }
+      for (i = 0; i < 10; i++) {
+        notelist.playhead = notelist.playhead.next;
+      }
+      notelist.rewind();
+      expect(notelist.playhead).to.equal(notelist.head);
+    });
+  });
+
+  describe('setPlayheadAtTick(tick)', function () {
+    it('should set playhead at tick.', function () {
+      var notelist = TB.createNoteList();
+      for (var i = 0; i < TEST_DATA.length; i++) {
+        notelist.add(TB.createNote.apply(TB, TEST_DATA[i]));
+      }
+      notelist.setPlayheadAtTick(480);
+      expect(notelist.playhead.start).to.be.above(479);
+      notelist.setPlayheadAtTick(700);
+      expect(notelist.playhead.start).to.be.above(699);
+    });
+  });
+
+  describe('scan(end)', function () {
+    it('should return scanned notes between playhead and end.', function () {
+      var notelist = TB.createNoteList();
+      for (var i = 0; i < TEST_DATA.length; i++) {
+        notelist.add(TB.createNote.apply(TB, TEST_DATA[i]));
+      }
+      notelist.rewind(0);
+      expect(notelist.scan(480)).to.have.length(49); // 49 notes in 0~480 tick
+      expect(notelist.scan(480)).to.equal(null); // already scanned, null
+      expect(notelist.scan(600)).to.have.length(20); // 20 notes 480~600 tick
+    });
   });
 
   // FOR HEAP VERSION:
@@ -380,5 +393,204 @@ describe('Timebase: NoteList', function() {
   //     expect(notelist.data[3]).to.have.property('start', 180);
   //   });
   // });
+
+});
+
+
+/**
+ * @class  Transporter
+ */
+
+// var bucket1, bucket2;
+
+describe('Timebase: Transport', function() {
+
+  beforeEach(function () {
+    // this will reset BPM/oldBPM to 120
+    TX.setBPM(120);
+    TX.setBPM(120);
+    TX.setNowInSec(0.0);
+  });
+
+  // OK
+  describe('tick2sec(tick)', function () {
+    it('should convert tick to second.', function () {
+      expect(TX.tick2sec(480)).to.equal(0.5);
+      TX.setBPM(60);
+      expect(TX.tick2sec(480)).to.equal(1.0);
+    });
+  });
+
+  // OK
+  describe('sec2tick(sec)', function () {
+    it('should convert second to tick.', function () {
+      expect(TX.sec2tick(1.0)).to.equal(960);
+      TX.setBPM(60);
+      expect(TX.sec2tick(1.0)).to.equal(480);
+    });
+  });
+
+  // OK
+  describe('setBPM(BPM)', function () {
+    it('should set current BPM and rearrange timeline.', function () {
+      TX.setBPM(60); // BPM 120 -> BPM 60
+      expect(TX.BPM).to.equal(60);
+      expect(TX.BIS).to.equal(1);
+      expect(TX.TIS).to.be.within(0.002083, 0.002084);
+      expect(TX.lookahead).to.be.within(0.066666, 0.666667);
+    });
+  });
+
+  // OK
+  describe('setNowInSec(sec)', function () {
+    it('should set current playback position in sec.', function () {
+      TX.setNowInSec(1.0);
+      expect(TX.now).to.equal(1.0);
+      TX.setBPM(60);
+      TX.setNowInSec(1.0);
+      expect(TX.now).to.equal(1.0);
+    });
+  });
+
+  // OK
+  describe('setNow(tick)', function () {
+    it('should set current playback position in tick.', function () {
+      TX.setNow(240);
+      expect(TX.now).to.equal(0.25);
+      TX.setBPM(60);
+      TX.setNow(240);
+      expect(TX.now).to.equal(0.5);
+    });
+  });
+
+  // OK
+  describe('setLoop(start, end)', function () {
+    it('should set loop points in tick.', function () {
+      TX.setLoop(120, 480);
+      expect(TX.loopStart).to.equal(0.125);
+      expect(TX.loopEnd).to.equal(0.5);
+    });
+  });
+
+  //
+  describe('getAbsTimeInSec(tick)', function () {
+    it('should convert tick to audio context time.', function () {
+      // this test tolerates timing mismatch by 1 ms
+      var a = TX.getAbsTimeInSec(960),
+          b = TX.getAbsTimeInSec(480);
+      expect(a - b).to.be.within(0.499, 0.501);
+      TX.setBPM(60);
+      a = TX.getAbsTimeInSec(960);
+      b = TX.getAbsTimeInSec(480);
+      expect(a - b).to.be.within(0.999, 1.001);
+    });
+  });
+
+  describe('getBPM()', function () {
+    it('should return current BPM.', function () {
+      expect(TX.getBPM()).to.equal(120);
+      TX.setBPM(60);
+      expect(TX.getBPM()).to.equal(60);
+    });
+  });
+
+  // CHECK THIS METHOD
+  describe('getNowInSec()', function () {
+    it('should return current playhead position in seconds.', function () {
+      TX.setNowInSec(1.0);
+      // logic: second is linear unit, change on BPM change
+      expect(TX.getNowInSec()).to.equal(1.0);
+      TX.setBPM(60);
+      expect(TX.getNowInSec()).to.equal(2.0);
+      TX.setBPM(120);
+      expect(TX.getNowInSec()).to.equal(1.0);
+    });
+  });
+
+  describe('getNow()', function () {
+    it('should return current playhead position in tick.', function () {
+      TX.setNow(480);
+      // logic: tick is musical unit, does not change on BPM change
+      TX.setBPM(60);
+      expect(TX.getNow()).to.equal(480);
+      TX.setBPM(120);
+      expect(TX.getNow()).to.equal(480);
+    });
+  });
+
+  describe('getLoopDurationInSec()', function () {
+    it('should return loop duration in sec.', function () {
+      TX.setLoop(120, 480);
+      expect(TX.getLoopDurationInSec()).to.equal(0.375);
+      TX.setBPM(60);
+      expect(TX.getLoopDurationInSec()).to.equal(0.75);
+      TX.setBPM(120);
+      expect(TX.getLoopDurationInSec()).to.equal(0.375);
+    });
+  });
+
+  describe('getLoopDuration()', function () {
+    it('should set loop duration in tick.', function () {
+      TX.setLoop(120, 480);
+      expect(TX.getLoopDuration()).to.equal(360);
+      TX.setBPM(60);
+      expect(TX.getLoopDuration()).to.equal(360);
+      TX.setBPM(120);
+      expect(TX.getLoopDuration()).to.equal(360);
+    });
+  });
+
+  describe('scanNotes()', function () {
+    it('should scan notes from connected notelists.', function () {
+      // generate and register notelists
+      var notelist1 = TB.createNoteList(),
+          notelist2 = TB.createNoteList();
+      for (var i = 0; i < TEST_DATA.length; i++) {
+        if (i % 2) {
+          notelist1.add(TB.createNote.apply(TB, TEST_DATA[i]));
+        } else {
+          notelist2.add(TB.createNote.apply(TB, TEST_DATA[i]));
+        }
+      }
+      TX.addNoteList(notelist1);
+      TX.addNoteList(notelist2);
+      // test
+      TX.scanNotes();
+      expect(TX.playbackQ).to.have.length(0);
+      TX.setNow(240);
+      TX.scanNotes();
+      expect(TX.playbackQ).to.have.length(9);
+      TX.setNow(480);
+      TX.scanNotes();
+      expect(TX.playbackQ).to.have.length(17);
+      TX.setNow(960);
+      TX.scanNotes();
+      expect(TX.playbackQ).to.have.length(20);
+    });
+  });
+
+  describe('TIMED: start(), pause(), rewind()', function () {
+    it('should start, pause and rewind properly.', function (done) {
+      TX.start();
+      setTimeout(function () {
+        expect(TX.isRunning()).to.equal(true);
+        expect(TX.getNowInSec()).to.be.within(0.45, 0.55);
+        setTimeout(function () {
+          TX.pause();
+          expect(TX.isRunning()).to.equal(false);
+          expect(TX.getNowInSec()).to.be.within(0.95, 1.05);
+          TX.rewind();
+          expect(TX.getNowInSec()).to.be.equal(0.0);
+          done();
+        }, 500);
+      }, 500);
+    });
+  });
+
+  /**
+   * TODO: how to test?
+   * step
+   * toggleLoop
+   */
 
 });
