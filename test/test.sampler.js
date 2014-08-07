@@ -2,7 +2,35 @@ describe("Sampler", function(){
   "use strict";
 
   var sampler,
-    bufferLoader;
+    load_buffer;
+
+  load_buffer = function (url, done_callback) {
+    var xhr;
+
+    // request to fetch the audio buffer
+    xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.responseType = "arraybuffer";
+
+    // when the buffer is finished loading
+    xhr.onload = function() {
+      // create the audio buffer
+      WX.context.decodeAudioData(xhr.response, function (buffer) {
+        done_callback(buffer);
+      }, function (error) {
+        throw new Error(
+          "Failed to create buffer from response when loading `" +
+          url + "'! " + error.message
+        );
+      });
+    };
+
+    // start the request
+    xhr.send();
+    
+  };
+
+
 
   before(function(done){
     // create the sampler
@@ -10,16 +38,14 @@ describe("Sampler", function(){
     sampler.to(WX.DAC);
 
     // load test buffer
-    bufferLoader = WX.BufferMap({
-      "Air_EndingKeys": "/node_modules/test_wavs/Air_EndingKeys.wav"
-    }, function () {
-      sampler.setBuffer(
-        bufferLoader.getBufferByName("Air_EndingKeys")
-      );
+    load_buffer(
+      "/node_modules/test_wavs/Air_EndingKeys.wav",
+      function (buffer) {
+        sampler.setBuffer(buffer);
 
-      done();
-    });
-    bufferLoader.load();
+        done();
+      }
+    );
   });
 
   describe("oneshot", function () {
