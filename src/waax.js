@@ -1022,7 +1022,8 @@ window.MUI = (function (WX) {
     },
     released: function (event) {
       event.preventDefault();
-      this.callback(this.senderId, 'released', null);
+      var p = this.getEventData(event);
+      this.callback(this.senderId, 'released', p);
       window.removeEventListener('mousemove', this.ondragged, false);
       window.removeEventListener('mouseup', this.onreleased, false);
     }
