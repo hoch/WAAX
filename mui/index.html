@@ -13,7 +13,9 @@
 
   <script src="../bower_components/platform/platform.js"></script>
   <script src="../build/waax.min.js"></script>
-  <script src="../build/plug_ins/SimpleOsc.js"></script>
+  <script src="../build/plug_ins/WXS1.js"></script>
+  <!--<script src="../src/waax.js"></script>-->
+  <!--<script src="../src/plug_ins/WXS1.js"></script>-->
 
   <link rel="import" href="mui-blade/mui-blade.html">
   <link rel="import" href="mui-section/mui-section.html">
@@ -40,7 +42,7 @@
 
   <header>
     <div class="row">
-      <div class="small-10 large-centered columns">
+      <div class="small-10 small-centered columns">
         <ul class="breadcrumbs">
           <li><a href="..">Home</a></li>
           <li><a href="#">Getting Started</a></li>
@@ -48,16 +50,53 @@
           <li class="current">MUI Elements</li>
           <li><a href="#">Test</a></li>
         </ul>
-        <h2>MUI Elements <small>1.0.0-alpha</small></h2>
+        <h3>MUI Elements <small>1.0.0-alpha</small></h3>
       </div>
     </div>
   </header>
 
   <article>
     <div class="row">
-      <div class="small-10 large-centered columns">
+      <div class="small-10 small-centered columns">
 
-        <mui-blade title="Control" opened="true">
+        <mui-blade title="WXS-1" opened="true">
+          <mui-section title="OSC1">
+            <mui-dropdown id="select-osc1type" label="Type"></mui-dropdown>
+            <mui-knob id="knob-osc1octave" label="Octave"></mui-knob>
+            <mui-knob id="knob-osc1gain" label="Volume"></mui-knob>
+          </mui-section>
+          <mui-section title="OSC2">
+            <mui-dropdown id="select-osc2type" label="Type"></mui-dropdown>
+            <mui-knob id="knob-osc2detune" label="Detune"></mui-knob>
+            <mui-knob id="knob-osc2gain" label="Volume"></mui-knob>
+          </mui-section>
+          <mui-section title="Master">
+            <mui-knob id="knob-output" label="Volume"></mui-knob>
+          </mui-section>
+          <mui-section title="Filter">
+            <mui-knob id="knob-cutoff" label="Cutoff"></mui-knob>
+            <mui-knob id="knob-reso" label="Reso"></mui-knob>
+            <mui-knob id="knob-filterAmt" label="Mod Amt"></mui-knob>
+          </mui-section>
+          <mui-section title="Filter Envelope">
+            <mui-knob id="knob-filterA" label="Att"></mui-knob>
+            <mui-knob id="knob-filterD" label="Dec"></mui-knob>
+            <mui-knob id="knob-filterS" label="Sus"></mui-knob>
+            <mui-knob id="knob-filterR" label="Rel"></mui-knob>
+          </mui-section>
+          <mui-section title="Amp Envelope">
+            <mui-knob id="knob-ampA" label="Att"></mui-knob>
+            <mui-knob id="knob-ampD" label="Dec"></mui-knob>
+            <mui-knob id="knob-ampS" label="Sus"></mui-knob>
+            <mui-knob id="knob-ampR" label="Rel"></mui-knob>
+          </mui-section>
+        </mui-blade>
+
+        <mui-blade title="Keyboard" opened="true">
+          <mui-vkey id="vkey"></mui-vkey>
+        </mui-blade>
+
+        <mui-blade title="Control" opened="true" disabled="true">
           <mui-section title="Tempo">
             <mui-knobh id="knob-tempo" label="BPM" min="20" max="200" value="120"></mui-knobh>
             <mui-knobh id="knob-quant" label="Qunatize" min="0" max="100" value="0"></mui-knobh>
@@ -77,31 +116,6 @@
           </mui-section>
         </mui-blade>
 
-        <mui-blade title="SubSyn 1" opened="true">
-          <mui-section title="Preset">
-            <mui-dropdown label="Preset" id="dropdown-1"></mui-dropdown>
-          </mui-section>
-          <mui-section title="OSC 1">
-            <mui-knob id="knob-freq" label="Freq" min="40" max="2500"></mui-knob>
-            <mui-knob id="knob-gain" label="Gain" min="0.0" max="1.0" value="0.25"></mui-knob>
-          </mui-section>
-          <mui-section title="Filter">
-            <mui-knob id="knob-a1" label="Cutoff" min="40" max="5000" value="1000"></mui-knob>
-            <mui-knob id="knob-a2" label="Q" min="0.0" max="12.0" value="0.25"></mui-knob>
-            <mui-knob id="knob-a3" label="Gain" min="0.0" max="1.0" value="0.25"></mui-knob>
-          </mui-section>
-          <mui-section title="Envelope">
-            <mui-knob id="knob-envA" label="Att" min="0.01" max="20" value="1"></mui-knob>
-            <mui-knob id="knob-envD" label="Dec" min="0.05" max="20" value="0.5"></mui-knob>
-            <mui-knob id="knob-envS" label="Sus" min="0.0" max="1.0" value="0.4"></mui-knob>
-            <mui-knob id="knob-envR" label="Rel" min="0.01" max="2000" value="20"></mui-knob>
-          </mui-section>
-        </mui-blade>
-
-        <mui-blade title="Keyboard" opened="true">
-          <mui-vkey id="vkey"></mui-vkey>
-        </mui-blade>
-
       </div>
     </div>
   </article>
@@ -109,18 +123,42 @@
   <script>
     function init() {
 
-      var presets = [
-        { key: 'Power Saw', value: 'power-saw' },
-        { key: 'Warm Pads', value: 'warm-pads' },
-        { key: 'Hammerhead', value: 'hammerhead' },
-        { key: 'Mellow Lead', value: 'mellow-lead' }
+      // this.waveforms = ['sine', 'square', 'sawtooth', 'triangle'];
+
+      var waveforms = [
+        { key: 'Sine', value: 'sine' },
+        { key: 'Square', value: 'square' },
+        { key: 'Sawtooth', value: 'sawtooth' },
+        { key: 'Triangle', value: 'triangle' }
       ];
 
-      var simOsc = WX.SimpleOsc();
-      simOsc.to(WX.Master);
+      var wxs1 = WX.WXS1();
+      wxs1.to(WX.Master);
 
-      MUI.$('dropdown-1').setModel(presets);
-      MUI.$('vkey').addTarget(simOsc);
+      MUI.$('select-osc1type').setModel(waveforms);
+      MUI.$('select-osc1type').link(wxs1, 'osc1type');
+      MUI.$('knob-osc1octave').link(wxs1, 'osc1octave');
+      MUI.$('knob-osc1gain').link(wxs1, 'osc1gain');
+      MUI.$('select-osc2type').setModel(waveforms);
+      MUI.$('select-osc2type').link(wxs1, 'osc2type');
+      MUI.$('knob-osc2detune').link(wxs1, 'osc2detune');
+      MUI.$('knob-osc2gain').link(wxs1, 'osc2gain');
+      MUI.$('knob-output').link(wxs1, 'output');
+
+      MUI.$('knob-cutoff').link(wxs1, 'cutoff');
+      MUI.$('knob-reso').link(wxs1, 'reso');
+      MUI.$('knob-filterAmt').link(wxs1, 'filterModAmount');
+
+      MUI.$('knob-filterA').link(wxs1, 'filterAttack');
+      MUI.$('knob-filterD').link(wxs1, 'filterDecay');
+      MUI.$('knob-filterS').link(wxs1, 'filterSustain');
+      MUI.$('knob-filterR').link(wxs1, 'filterRelease');
+      MUI.$('knob-ampA').link(wxs1, 'ampAttack');
+      MUI.$('knob-ampD').link(wxs1, 'ampDecay');
+      MUI.$('knob-ampS').link(wxs1, 'ampSustain');
+      MUI.$('knob-ampR').link(wxs1, 'ampRelease');
+
+      MUI.$('vkey').addTarget(wxs1);
 
     }
 

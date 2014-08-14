@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../mui-button/mui-button.html">
 
-<polymer-element name="mui-blade" attributes="title target opened">
+<polymer-element name="mui-blade" attributes="title target opened disabled">
 
 <template>
 
@@ -41,6 +41,10 @@
     .content {
       margin-top: 4px;
     }
+    :host(.disabled) {
+      opacity: 0.5;
+      pointer-events: none;
+    }
   </style>
 
   <div class="container">
@@ -62,6 +66,7 @@
     target: null,
     button: null,
     opened: true,
+    disabled: false,
 
     update: function () {
       if (this.opened) {
@@ -82,6 +87,10 @@
     toggle: function() {
       this.opened = !this.opened;
       this.update();
+    },
+
+    disabledChanged: function() {
+      this.classList.toggle('disabled', this.disabled);
     }
 
   });
