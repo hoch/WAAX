@@ -49,7 +49,8 @@ module.exports = function(grunt) {
         },
         files: {
           'build/waax.min.js': ['src/waax.js'],
-          'build/plug_ins/SimpleOsc.js': ['src/plug_ins/SimpleOsc.js']
+          'build/plug_ins/SimpleOsc.js': ['src/plug_ins/SimpleOsc.js'],
+          'build/plug_ins/WXS1.js': ['src/plug_ins/WXS1.js']
         }
       }
     }

@@ -133,8 +133,12 @@
       // post: knob => model
       post: function () {
         this.value = MUI.findValueByKey(this.$.eItems.model, this.key);
+        // if (this.linked) {
+        //   this.targetUnit.set(this.targetParam, this.value);
+        // }
         if (this.linked) {
-          this.targetUnit.set(this.targetParam, this.value);
+          // do not call the handler directly. invoke 'xxxxxParam.set' method
+          this.targetParam.set(this.value, WX.now + 0.05, 1);
         }
         this.render();
       },
@@ -168,15 +172,17 @@
 
       link: function (unit, paramName) {
         // setting reference to unit (ui => unitparam)
-        this.targetUnit = unit;
-        this.targetParam = paramName;
+        this.targetParam = unit.params[paramName];
         this.linked = true;
 
-        // handling parameter change in unit (unitparam => ui)
-        // will invoke attributeChange when unitparam changed
-        // this.bind('value', unit.params, paramName);
-        // fix for Polymer 0.2.0
-        this.bind('value', new PathObserver(unit.params, paramName));
+        this.value = this.targetParam.value;
+        this.update();
+
+        var ob = new PathObserver(unit.params[paramName], 'value');
+        ob.open(function (newValue, oldValue) {
+          this.value = newValue;
+          this.update();
+        }.bind(this));
       }
     });
   </script>

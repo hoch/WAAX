@@ -328,6 +328,8 @@ window.WX = (function () {
 
     var units = [
       '',
+      'Octave',
+      'Semitone',
       'Seconds',
       'Milliseconds',
       'Samples',
@@ -364,7 +366,10 @@ window.WX = (function () {
       },
       set: function (value, time, rampType) {
         this.value = Util.clamp(value, this.min, this.max);
-        this.$callback.call(this._parent, this.value, time, rampType);
+        // call hander if it's defined
+        if (this.$callback) {
+          this.$callback.call(this._parent, this.value, time, rampType);
+        }
       },
       get: function () {
         return this.value;
@@ -383,11 +388,11 @@ window.WX = (function () {
     ItemizedParam.prototype = {
       init: function (options) {
         // assertion
-        if (!Util.isArray(option.items)) {
+        if (!Util.isArray(options.items)) {
           Log.error('Items are missing.');
         }
         this.type = options.type;
-        this.name = (options.name || 'Parameter');
+        this.label = (options.label || 'Select');
         this.unit = (options.unit || '');
         this.default = (options.default || options.items[0]);
         this.value = this.default;
@@ -464,7 +469,7 @@ window.WX = (function () {
       switch (options.type) {
         case 'Generic':
           return new GenericParam(options);
-        case 'Itemized':
+        case 'Items':
           return new ItemizedParam(options);
         case 'Boolean':
           return new BooleanParam(options);
@@ -632,6 +637,7 @@ window.WX = (function () {
       },
       setPreset: function (preset) {
         for (var param in preset) {
+          // console.log(param);
           this.params[param].set(preset[param], Core.ctx.currentTime, 0);
         }
       },
