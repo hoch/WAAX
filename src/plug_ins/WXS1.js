@@ -34,6 +34,9 @@
     this._osc1.start(0);
     this._osc2.start(0);
 
+    // flag
+    this.BUSY = false;
+
     this.waveforms = ['sine', 'square', 'sawtooth', 'triangle'];
 
     WX.defineParams(this, {

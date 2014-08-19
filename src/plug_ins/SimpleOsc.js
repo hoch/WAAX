@@ -9,6 +9,8 @@
 
   'use strict';
 
+  var waveforms = ['sine', 'square', 'sawtooth', 'triangle'];
+
   /** REQUIRED: plug-in constructor **/
   function SimpleOsc(preset) {
 
@@ -20,7 +22,12 @@
     this._osc.to(this._env).to(this._output);
     this._osc.start(0);
 
+
+
     WX.defineParams(this, {
+      type: { type: 'Items', label: 'Waveform',
+        default: 'sine', items: waveforms
+      },
       freq: { type: 'Generic', unit: 'Hertz',
         default: WX.mtof(60), min: 20.0, max: 5000.0
       },
@@ -48,12 +55,16 @@
 
     // REQUIRED: plug-in default preset
     defaultPreset: {
+      type: 'sine',
       freq: WX.mtof(60),
       env: 0.0
     },
 
-    // REQUIRED: if you have a parameter,
-    //           corresponding handler is required.
+    // REQUIRED: parameter handlers
+    $type: function (value, time, rampType) {
+      this._osc.type = value;
+    },
+
     $freq: function (value, time, rampType) {
       this._osc.frequency.set(value, time, rampType);
     },
@@ -62,7 +73,7 @@
       this._env.gain.set(value, time, rampType);
     },
 
-    // realtime event handler from router
+    // other methods
     onData: function (action, data) {
       switch (action) {
         case 'noteon':

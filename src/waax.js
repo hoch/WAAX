@@ -355,7 +355,7 @@ window.WX = (function () {
         this.type = options.type;
         this.name = (options.name || 'Parameter');
         this.unit = (options.unit || '');
-        // TODO: check for case of '0.0'... fuck js
+        // TODO: check for case of '0.0'...
         this.default = (options.default || 1.0);
         this.value = this.default;
         this.min = (options.min || 0.0);
@@ -365,8 +365,9 @@ window.WX = (function () {
         this.$callback = options._parent['$' + options._paramId];
       },
       set: function (value, time, rampType) {
+        // set value in this parameter instance
         this.value = Util.clamp(value, this.min, this.max);
-        // call hander if it's defined
+        // then call hander if it's defined
         if (this.$callback) {
           this.$callback.call(this._parent, this.value, time, rampType);
         }
@@ -404,7 +405,9 @@ window.WX = (function () {
       set: function (value, time, rampType) {
         if (this.items.indexOf(value) > -1) {
           this.value = value;
-          this.$callback.call(this._parent, this.value, time, rampType);
+          if (this.$callback) {
+            this.$callback.call(this._parent, this.value, time, rampType);
+          }
         }
       },
       get: function () {
@@ -442,7 +445,9 @@ window.WX = (function () {
       set: function (value, time, rampType) {
         if (Util.isBoolean(value)) {
           this.value = value;
-          this.$callback.call(this._parent, this.value, time, rampType);
+          if (this.$callback) {
+            this.$callback.call(this._parent, this.value, time, rampType);
+          }
         }
       },
       get: function () {
@@ -526,8 +531,9 @@ window.WX = (function () {
       Source: function () { return ctx.createBufferSource(); },
       Analyzer: function () { return ctx.createAnalyser(); },
       Panner: function () { return ctx.createPanner(); },
-      // TODO
-      // nPeriodicWave: function () { return ctx.createPeriodicWave(); },
+      PeriodicWave: function () {
+        return ctx.createPeriodicWave.apply(ctx, arguments);
+      },
       Splitter: function () {
         return ctx.createChannelSplitter.apply(ctx, arguments);
       },
@@ -618,6 +624,7 @@ window.WX = (function () {
           // check if arg is a value or array
           if (Util.isArray(arg)) {
             // if env is an array, iterate envelope data
+            // where array is arg_i = [value, time, rampType]
             for (var i = 0; i < arg.length; i++) {
               this.params[param].set.apply(this, arg[i]);
             }
