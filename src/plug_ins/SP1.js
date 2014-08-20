@@ -22,7 +22,6 @@
 
     this.ready = false;
     this.bufferRef = null;
-    this.playbackRate = 1.0;
 
     // patching
     this._filter = WX.Filter();
@@ -215,40 +214,57 @@
           fHld = p.filterHold.get(),
           fRls = p.filterRelease.get();
 
+      // start sample
       _buffer.start(time);
-
+      // attack
       _env.gain.set(1.0, [time, aAtt], 3);
       this.$filterDetune(fAmt, [time, fAtt], 3);
-
-      _env.gain.set(1.0, [t + aAtt, dHld], 3);
-      _env.gain.set(0.0, [t + aAtt, dDec], 3);
-
-      this.$filterDetune(fAmt * p.filterSustain.get(), [t + fAtt, fHld], 3);
-      this.$filterDetune(0.0, [t + fAtt + fHld, fRls], 3);
-
+      // hold
+      _env.gain.set(1.0, [time + aAtt, aHld], 3);
+      this.$filterDetune(fAmt, [time + fAtt, fHld], 3);
+      // release
+      _env.gain.set(0.0, [time + aAtt + aHld, aRls], 3);
+      this.$filterDetune(0.0, [time + fAtt + fHld, fRls], 3);
+      // stop sample
+      _buffer.stop(time + fAtt + fHld + fRls);
     },
 
-    noteOff: function () {
-      var t = WX.now;
-      this._amp.gain.cancel(t);
-      this._lowpass.frequency.cancel(t);
-      this.$amp(0.0, [t, this.params.ampRelease.get()], 3);
-      this.$filterDetune(0.0, [t, this.params.filterRelease.get()], 3);
-    },
-
-    // realtime event handler from router
+    // realtime input data responder
     onData: function (action, data) {
       switch (action) {
         case 'noteon':
-          this.noteOn(data.pitch, data.velocity);
-          break;
-        case 'glide':
-          this.glide(data.pitch);
-          break;
-        case 'noteoff':
-          this.noteOff();
+          this.play(data.pitch, data.velocity);
           break;
       }
+    },
+
+    onLoaded: function () {},
+
+    isReady: function () {
+      return this.ready;
+    },
+
+    setBuffer: function (bufferRef) {
+      this.bufferRef = bufferRef;
+      this.ready = true;
+    },
+
+    loadClip: function (clip, onloaded) {
+      // set on loaded function
+      if (WX.isFunction(onloaded)) {
+        this.onLoaded = onloaded;
+      }
+      // start loading clip
+      WX.loadClip(
+        clip,
+        function (event, clip) {
+          // TODO
+        },
+        function (bufferRef) {
+          this.setBuffer(bufferRef);
+          this.onLoaded();
+        }.bind(this)
+      );
     }
   };
 

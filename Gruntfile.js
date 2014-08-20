@@ -1,13 +1,36 @@
 module.exports = function(grunt) {
 
-  /**
-   * TODOs
-   * 1. gh-pages task
-   *   - copy: build, docs, examples, sounds, bower_components, test
-   */
-
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+
+    clean: [
+      'build/**/*',
+      'dist/**/*',
+      '!build',
+      '!dist'
+    ],
+
+    copy: {
+      dist: {
+        files: [
+          {
+            src: [
+              '**/*',
+              '!node_modules/**',
+              '!src/**',
+              '!.gitignore',
+              '!bower.json',
+              '!Gruntfile.js',
+              '!LICENSE',
+              '!NOTES.md',
+              '!package.json',
+              '!readme.md'
+            ],
+            dest: 'dist/'
+          }
+        ]
+      }
+    },
 
     connect: {
       server: {
@@ -23,16 +46,16 @@ module.exports = function(grunt) {
       },
       src: {
         files: [
-          './src/**'
+          'src/**/*.js'
         ],
         tasks: ['build']
       },
       others: {
         files: [
-          './index.html',
-          './examples/**',
-          './mui/**',
-          './test/**'
+          'index.html',
+          'examples/**',
+          'mui/**',
+          'test/**'
         ]
       }
     },
@@ -45,23 +68,35 @@ module.exports = function(grunt) {
       my_target: {
         options: {
           sourceMap: true,
-          sourceMapName: 'build/waax.map'
+          sourceMapName: 'build/waax_all.map'
         },
-        files: {
-          'build/waax.min.js': ['src/waax.js'],
-          'build/plug_ins/SimpleOsc.js': ['src/plug_ins/SimpleOsc.js'],
-          'build/plug_ins/WXS1.js': ['src/plug_ins/WXS1.js']
-        }
+        files: [{
+          expand: true,
+          cwd: 'src',
+          src: '**/*.js',
+          dest: 'build'
+        }]
       }
+    },
+
+    'gh-pages': {
+      options: {
+        base: 'dist'
+      },
+      src: ['**']
     }
 
   });
 
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-gh-pages');
 
-  grunt.registerTask('serve', ['connect', 'watch']);
-  grunt.registerTask('build', ['uglify']);
   grunt.registerTask('default', ['build']);
+  grunt.registerTask('serve', ['connect', 'watch']);
+  grunt.registerTask('build', ['clean', 'uglify']);
+  grunt.registerTask('publish', ['build', 'copy', 'gh-pages']);
 };

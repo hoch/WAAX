@@ -319,11 +319,10 @@ describe('Core', function() {
           progress = true;
           expect(event.loaded).to.be.within(0, event.totalSize);
         },
-        function (buffer) {
+        function (clip) {
           complete = true;
           expect(progress).to.equal(true);
           expect(complete).to.equal(true);
-          expect(buffer.constructor.name).to.equal('AudioBuffer');
           expect(clip.buffer.constructor.name).to.equal('AudioBuffer');
           done();
       });

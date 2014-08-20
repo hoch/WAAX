@@ -32,8 +32,8 @@ To use WAAX in a web page, simply load the `waax.min.js` at the end of `<body>`.
 
 ~~~html
 <!-- load WAAX and plug-in -->
-<script src="waax.min.js"></script>
-<script src="plug-ins/samplex.js"></script>
+<script src="waax.js"></script>
+<script src="plug-ins/WXS1.js"></script>
 <!-- load Polymer and MUI elements -->
 <script src="platform.js"></script>
 <import src="mui/mui-knob.html"></script>
@@ -43,10 +43,10 @@ For sequencer functionality and Web MIDI support, the following components shoul
 
 ~~~html
 <!-- optional: for sequencer and MIDI support -->
-<script src="timebase.min.js"></script>
-<script src="ktrl.min.js"></script>
-<!-- piano roll MUI element -->
-<import src="mui/mui-pianoroll.html"></script>
+<script src="timebase.js"></script>
+<script src="ktrl.js"></script>
+<!-- virtual (on-screen) keyboard MUI element -->
+<import src="mui/mui-vkey.html"></script>
 ~~~
 
 
@@ -75,8 +75,10 @@ make
 ## Grunt Tasks
 
 ~~~bash
-grunt dev           # start dev server @ localhost:8000
-grunt build         # build minimized core, plug-in scripts
+grunt               # same as 'grunt build'
+grunt serve         # start dev server @ localhost:8000
+grunt build         # build minimized core and plug-ins files
+grunt publish       # produces deployment build in 'dist/' folder
 ~~~
 
 ## Documentation

@@ -90,6 +90,9 @@ window.WX = (function () {
       isObject: function (obj) {
         return obj === Object(obj);
       },
+      isFunction: function (fn) {
+        return toString.call(fn) === '[object Function]';
+      },
       isArray: function (arr) {
         return toString.call(arr) === '[object Array]';
       },
@@ -484,7 +487,8 @@ window.WX = (function () {
 
     /**
      * @function    loadClip
-     * @description load audio file via xhr where clip = { name, url, buffer }
+     * @description load audio file via xhr
+     *              where clip = { name:, url:, buffer: }
      */
 
     function loadClip(clip, onprogress, oncomplete) {
@@ -501,7 +505,7 @@ window.WX = (function () {
         try {
           Core.ctx.decodeAudioData(xhr.response, function (buffer) {
             clip.buffer = buffer;
-            oncomplete(buffer);
+            oncomplete(clip);
           });
         } catch (error) {
           Info.error('Loading clip failed. (XHR failure)', error.message, clip.url);
@@ -922,6 +926,7 @@ window.WX = (function () {
 
     // Util: Object
     isObject: Util.isObject,
+    isFunction: Util.isFunction,
     isArray: Util.isArray,
     isNumber: Util.isNumber,
     isBoolean: Util.isBoolean,

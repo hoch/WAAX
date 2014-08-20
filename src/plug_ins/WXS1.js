@@ -212,7 +212,7 @@
       this.$filterDetune(0.0, [t, this.params.filterRelease.get()], 3);
     },
 
-    // realtime event handler from router
+    // realtime input data responder
     onData: function (action, data) {
       switch (action) {
         case 'noteon':
