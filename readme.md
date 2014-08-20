@@ -53,15 +53,13 @@ Note that MIDI support depends on [Web MIDI API](http://www.w3.org/TR/webmidi/),
 
 By its design, WAAX tries to accommodates various use cases. As shown below, it can be as simple as possible.
 
-~~~js
-<script>
-  // creating a WXS-1 synth instance.
-  var synth = WX.WXS1();
-  // connects the synth to the master output.
-  synth.to(WX.Master);
-  // play C4 with 100 velocity for 1 second.
-  synth.noteOn(60, 100).noteOff(WX.now + 1.0);
-</script>
+~~~javascript
+// creating a WXS-1 synth instance.
+var synth = WX.WXS1();
+// connects the synth to the master output.
+synth.to(WX.Master);
+// play C4 with 100 velocity for 1 second.
+synth.noteOn(60, 100).noteOff(WX.now + 1.0);
 ~~~
 
 Also it can be as complex as a complete music application. For more examples, please check back WAAX and [MUI showcases](http://hoch.github.io/WAAX/mui/) later.
