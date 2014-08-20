@@ -92,12 +92,9 @@
       max: 1.0,
 
       // binding
-      setTarget: null,
-      targetUnit: null,
       targetParam: null,
-      linked: false,
-      cloudRef: null,
-      cloudParam: null,
+      realtimeRef: null,
+      realtimeParam: null,
 
       // private
       _normValue: 0.0,
@@ -127,14 +124,13 @@
 
       // post: knob => model
       post: function () {
-        // if (this.linked) {
-        //   this.targetUnit.set(this.targetParam, this.value, 1, WX.now + 0.20);
-        // }
-        if (this.linked) {
-          // do not call the handler directly. invoke 'xxxxxParam.set' method
+        // update target param
+        if (this.targetParam) {
+          // do not call the handler directly.
+          // invoke 'xxxxxParam.set' method instead
           this.targetParam.set(this.value, WX.now + 0.05, 1);
         }
-        // Realtime API binding
+        // TEMP: Realtime API binding
         if (this.realtimeRef) {
           this.realtimeRef._setByMUI(this.realtimeParam, this.value);
         }
@@ -230,24 +226,30 @@
         this.update();
       },
 
-      link: function (unit, paramName) {
-        // set target parameter
-        this.targetParam = unit.params[paramName];
-        this.linked = true;
-        // initialize
-        this.min = this.targetParam.min;
-        this.max = this.targetParam.max;
-        this.value = this.targetParam.value;
-        this.update();
+      loadTargetParamData: function () {
+        if (this.targetParam) {
+          this.label = this.targetParam.name;
+          this.min = this.targetParam.min;
+          this.max = this.targetParam.max;
+          this.value = this.targetParam.value;
+          this.update();
+        }
+      },
+
+      link: function (plugin, param) {
+        // get target parameter object
+        this.targetParam = plugin.params[param];
+        // load plugin param data
+        this.loadTargetParamData();
         // setup path observer to the param
-        var ob = new PathObserver(unit.params[paramName], 'value');
+        var ob = new PathObserver(plugin.params[param], 'value');
         ob.open(function (newValue, oldValue) {
           this.value = newValue;
           this.update();
         }.bind(this));
       },
 
-      // this is temporary for Music on Cloud project
+      // TEMP: this is temporary for Music on Cloud project
       linkRealtime: function (ref, param) {
         this.realtimeRef = ref;
         this.realtimeParam = param;

@@ -123,6 +123,52 @@ window.WX = (function () {
       },
 
       /**
+       * model helpers
+       * model = [
+       *   { key: ..., value: ... },
+       *   { key: ..., value: ... },
+       *   ...
+       * ]
+       */
+
+      validateModel: function (model) {
+        // no items in model
+        if (model.length === 0) {
+          return false;
+        }
+        // model must have unique keys
+        var keys = [];
+        for (var i = 0; i < model.length; i++) {
+          if (keys.indexOf(model[i].key) > -1) {
+            return false;
+          } else {
+            keys.push(model[i].key);
+          }
+        }
+        return true;
+      },
+
+      findKeyByValue: function (model, value) {
+        for (var i = 0; i < model.length; i++) {
+          if (model[i].value === value) {
+            return model[i].key;
+          }
+        }
+        // not found
+        return null;
+      },
+
+      findValueByKey: function (model, key) {
+        for (var i = 0; i < model.length; i++) {
+          if (model[i].key === key) {
+            return model[i].value;
+          }
+        }
+        // not found
+        return null;
+      },
+
+      /**
        * music math helpers, mostly grabbed from here:
        * https://github.com/libpd/libpd/blob/master/pure-data/src/x_acoustics.c
        * https://lists.cs.princeton.edu/pipermail/chuck-users/2009-May/004182.html
@@ -323,10 +369,10 @@ window.WX = (function () {
 
     var types = [
       'Generic',
-      'Items',
-      'Boolean',
-      'MIDINumber',
-      'Custom'
+      'Itemized',
+      'Boolean'
+      // 'MIDINumber',
+      // 'Custom'
     ];
 
     var units = [
@@ -344,9 +390,19 @@ window.WX = (function () {
       'BPM'
     ];
 
+    // numerical parameter config helper
+    function checkNumeric(arg, def) {
+      if (Util.isNumber(arg)) {
+        return arg;
+      } else if (arg === undefined) {
+        return def;
+      } else {
+        Info.error('Invalid parameter configuration');
+      }
+    }
 
     /**
-     * GenericParam: all numerical parameters
+     * GenericParam: all numerical, ranged parameters
      */
 
     function GenericParam(options) {
@@ -355,18 +411,18 @@ window.WX = (function () {
 
     GenericParam.prototype = {
       init: function (options) {
-        this.type = options.type;
+        this.type = 'Generic';
         this.name = (options.name || 'Parameter');
         this.unit = (options.unit || '');
-        // TODO: check for case of '0.0'...
-        this.default = (options.default || 1.0);
-        this.value = this.default;
-        this.min = (options.min || 0.0);
-        this.max = (options.max || 1.0);
-        // handler callback assignment
+        this.value = this.default = checkNumeric(options.default, 0.0);
+        this.min = checkNumeric(options.min, 0.0);
+        this.max = checkNumeric(options.max, 1.0);
+        // parent, reference to the plug-in
         this._parent = options._parent;
+        // handler callback
         this.$callback = options._parent['$' + options._paramId];
       },
+
       set: function (value, time, rampType) {
         // set value in this parameter instance
         this.value = Util.clamp(value, this.min, this.max);
@@ -375,9 +431,11 @@ window.WX = (function () {
           this.$callback.call(this._parent, this.value, time, rampType);
         }
       },
+
       get: function () {
         return this.value;
       }
+
     };
 
 
@@ -390,35 +448,45 @@ window.WX = (function () {
     }
 
     ItemizedParam.prototype = {
+
       init: function (options) {
         // assertion
-        if (!Util.isArray(options.items)) {
-          Log.error('Items are missing.');
+        if (!Util.isArray(options.model)) {
+          Log.error('Model is missing.');
         }
-        this.type = options.type;
-        this.label = (options.label || 'Select');
-        this.unit = (options.unit || '');
-        this.default = (options.default || options.items[0]);
+        if (!Util.validateModel(options.model)) {
+          Log.error('Invalid Model.');
+        }
+        // initialization
+        this.type = 'Itemized';
+        this.name = (options.name || 'Select');
+        this.model = options.model;
+        this.default = (options.default || this.model[0].value);
         this.value = this.default;
-        this.items = options.items;
-        // handler callback assignment
+        // caching parent
         this._parent = options._parent;
+        // handler callback assignment
         this.$callback = options._parent['$' + options._paramId];
       },
+
       set: function (value, time, rampType) {
-        if (this.items.indexOf(value) > -1) {
+        // check if value is valid
+        if (Util.findKeyByValue(this.model, value)) {
           this.value = value;
           if (this.$callback) {
             this.$callback.call(this._parent, this.value, time, rampType);
           }
         }
       },
+
       get: function () {
         return this.value;
       },
-      getItems: function () {
-        return this.items.slice(0);
+
+      getModel: function () {
+        return this.model;
       }
+
     };
 
 
@@ -437,8 +505,8 @@ window.WX = (function () {
           Log.error('Invalid value for Boolean Parameter.');
         }
         this.parent = options.parent;
-        this.type = options.type;
-        this.name = (options.name || 'Parameter');
+        this.type = 'Boolean';
+        this.name = (options.name || 'Toggle');
         this.default = (options.default || false);
         this.value = this.default;
         // handler callback assignment
@@ -477,7 +545,7 @@ window.WX = (function () {
       switch (options.type) {
         case 'Generic':
           return new GenericParam(options);
-        case 'Items':
+        case 'Itemized':
           return new ItemizedParam(options);
         case 'Boolean':
           return new BooleanParam(options);
@@ -550,15 +618,16 @@ window.WX = (function () {
 
       // envlope generator
       Envelope: Envelope,
+
       // generate parameter helper for plugin
-      defineParams: function (plugin, paramsOption) {
-        for (var name in paramsOption) {
-          paramsOption[name]._parent = plugin;
-          paramsOption[name]._paramId = name;
-          // paramsOption[name].$handler = plugin['$' + name];
-          plugin.params[name] = createParam(paramsOption[name]);
+      defineParams: function (plugin, paramOptions) {
+        for (var key in paramOptions) {
+          paramOptions[key]._parent = plugin;
+          paramOptions[key]._paramId = key;
+          plugin.params[key] = createParam(paramOptions[key]);
         }
       },
+
       // load clip via xhr
       loadClip: loadClip
 
@@ -623,6 +692,7 @@ window.WX = (function () {
     }
 
     PluginAbstract.prototype = {
+
       set: function (param, arg) {
         if (Util.hasParam(this, param)) {
           // check if arg is a value or array
@@ -639,6 +709,7 @@ window.WX = (function () {
         }
         return this;
       },
+
       get: function (param) {
         if (Util.hasParam(this, param)) {
           return this.params[param].get();
@@ -646,12 +717,14 @@ window.WX = (function () {
           return null;
         }
       },
+
       setPreset: function (preset) {
         for (var param in preset) {
           // console.log(param);
           this.params[param].set(preset[param], Core.ctx.currentTime, 0);
         }
       },
+
       getPreset: function () {
         var preset = {};
         for (var param in this.params) {
@@ -659,6 +732,7 @@ window.WX = (function () {
         }
         return preset;
       }
+
     };
 
 
@@ -677,8 +751,12 @@ window.WX = (function () {
 
       Core.defineParams(this, {
         output: {
-          type: 'Generic', unit: 'LinearGain',
-          default: 1.0, min: 0.0, max: 1.0
+          type: 'Generic',
+          name: 'Output',
+          default: 1.0,
+          min: 0.0,
+          max: 1.0,
+          unit: 'LinearGain'
         }
       });
 
@@ -1133,6 +1211,25 @@ window.MUI = (function (WX) {
 
     KeyResponder: function (senderID, targetElement, MUICallback) {
       return new KeyResponder(senderID, targetElement, MUICallback);
+    },
+
+    buildControls: function (plugin, targetId) {
+      var targetEl = document.getElementById(targetId);
+      for (var param in plugin.params) {
+        var p = plugin.params[param];
+        switch (p.type) {
+          case 'Generic':
+            var knob = document.createElement('mui-knob');
+            knob.link(plugin, param);
+            targetEl.appendChild(knob);
+            break;
+          case 'Itemized':
+            var select = document.createElement('mui-select');
+            select.link(plugin, param);
+            targetEl.appendChild(select);
+            break;
+        }
+      }
     },
 
     $: function (elementId) {

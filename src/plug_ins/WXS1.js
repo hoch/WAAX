@@ -9,6 +9,14 @@
 
   'use strict';
 
+  // waveform collection (model)
+  var WAVEFORMS = [
+    { key: 'Sine', value: 'sine' },
+    { key: 'Square', value: 'square' },
+    { key: 'Sawtooth', value: 'sawtooth' },
+    { key: 'Triangle', value: 'triangle' }
+  ];
+
   /** REQUIRED: plug-in constructor **/
   function WXS1(preset) {
 
@@ -34,68 +42,143 @@
     this._osc1.start(0);
     this._osc2.start(0);
 
+    // close envelope
+    this._amp.gain.value = 0.0;
+
     // flag
     this.BUSY = false;
 
-    this.waveforms = ['sine', 'square', 'sawtooth', 'triangle'];
-
+    // parameter definition
     WX.defineParams(this, {
-      osc1type: { type: 'Items', label: 'Waveform',
-        default: 'sawtooth', items: this.waveforms
+      osc1type: {
+        type: 'Itemized',
+        name: 'Waveform',
+        default: 'square',
+        model: WAVEFORMS
       },
-      osc1octave: { type: 'Generic', unit: 'Octave',
-        default: 0, min: -5, max: 5
+      osc1octave: {
+        type: 'Generic',
+        name: 'Octave',
+        default: 0,
+        min: -5,
+        max: 5,
+        unit: 'Octave'
       },
-      osc1gain: { type: 'Generic', unit: 'LinearGain',
-        default: 0.5, min: 0.0, max: 1.0
+      osc1gain: {
+        type: 'Generic',
+        name: 'Gain',
+        default: 0.5,
+        min: 0.0,
+        max: 1.0,
+        unit: 'LinearGain'
       },
-      osc2type: { type: 'Items', label: 'Waveform',
-        default: 'sawtooth', items: this.waveforms
+      osc2type: {
+        type: 'Itemized',
+        name: 'Waveform',
+        default: 'square',
+        model: WAVEFORMS
       },
-      osc2detune: { type: 'Generic', unit: 'Semitone',
-        default: 0, min: -60, max: 60
+      osc2detune: {
+        type: 'Generic',
+        name: 'Semitone',
+        default: 0,
+        min: -60,
+        max: 60,
+        unit: 'Semitone'
       },
-      osc2gain: { type: 'Generic', unit: 'LinearGain',
-        default: 0.5, min: 0.0, max: 1.0
+      osc2gain: {
+        type: 'Generic',
+        name: 'Gain',
+        default: 0.5,
+        min: 0.0,
+        max: 1.0,
+        unit: 'LinearGain'
       },
-      cutoff: { type: 'Generic', unit: 'Hertz',
-        default: 1000, min: 20, max: 5000
+      cutoff: {
+        type: 'Generic',
+        name: 'Cutoff',
+        default: 1000,
+        min: 20,
+        max: 5000,
+        unit: 'Hertz'
       },
-      reso: { type: 'Generic', unit: '',
-        default: 0.0, min: 0.0, max: 20.0
+      reso: {
+        type: 'Generic',
+        name: 'Reso',
+        default: 0.0,
+        min: 0.0,
+        max: 20.0,
+        unit: ''
       },
-      filterModAmount: { type: 'Generic', unit: '',
-        default: 1.0, min: 0.25, max: 8.0
+      filterModAmount: {
+        type: 'Generic',
+        name: 'Mod Amt',
+        default: 1.0,
+        min: 0.25,
+        max: 8.0,
+        unit: ''
       },
-      filterDetune: { type: 'Generic', unit: 'Octave',
-        default: 0.0, min: 0.0, max: 5.0
+      filterAttack: {
+        type: 'Generic',
+        name: 'Att',
+        default: 0.02,
+        min: 0.0,
+        max: 5.0,
+        unit: 'Seconds'
       },
-      filterAttack: { type: 'Generic', unit: 'Seconds',
-        default: 0.02, min: 0.0, max: 5.0
+      filterDecay: {
+        type: 'Generic',
+        name: 'Dec',
+        default: 0.04,
+        min: 0.0,
+        max: 5.0,
+        unit: 'Seconds'
       },
-      filterDecay: { type: 'Generic', unit: 'Seconds',
-        default: 0.04, min: 0.0, max: 5.0
+      filterSustain: {
+        type: 'Generic',
+        name: 'Sus',
+        default: 0.25,
+        min: 0.0,
+        max: 1.0
       },
-      filterSustain: { type: 'Generic', unit: '',
-        default: 0.25, min: 0.0, max: 1.0
+      filterRelease: {
+        type: 'Generic',
+        name: 'Rel',
+        default: 0.2,
+        min: 0.0,
+        max: 10.0,
+        unit: 'Seconds'
       },
-      filterRelease: { type: 'Generic', unit: 'Seconds',
-        default: 0.2, min: 0.0, max: 10.0
+      ampAttack: {
+        type: 'Generic',
+        name: 'Att',
+        default: 0.02,
+        min: 0.0,
+        max: 5.0,
+        unit: 'Seconds'
       },
-      amp: { type: 'Generic', unit: 'LinearGain',
-        default: 0.0, min: 0.0, max: 1.0
+      ampDecay: {
+        type: 'Generic',
+        name: 'Dec',
+        default: 0.04,
+        min: 0.0,
+        max: 5.0,
+        unit: 'Seconds'
       },
-      ampAttack: { type: 'Generic', unit: 'Seconds',
-        default: 0.02, min: 0.0, max: 5.0
+      ampSustain: {
+        type: 'Generic',
+        name: 'Sus',
+        default: 0.25,
+        min: 0.0,
+        max: 1.0
       },
-      ampDecay: { type: 'Generic', unit: 'Seconds',
-        default: 0.04, min: 0.0, max: 5.0
-      },
-      ampSustain: { type: 'Generic', unit: '',
-        default: 0.25, min: 0.0, max: 1.0
-      },
-      ampRelease: { type: 'Generic', unit: 'Seconds',
-        default: 0.2, min: 0.0, max: 10.0
+      ampRelease: {
+        type: 'Generic',
+        name: 'Rel',
+        default: 0.2,
+        min: 0.0,
+        max: 10.0,
+        unit: 'Seconds'
       }
     });
 
@@ -127,12 +210,10 @@
       cutoff: 140,
       reso: 18.0,
       filterModAmount: 7,
-      filterDetune: 0.0,
       filterAttack: 0.01,
       filterDecay: 0.07,
       filterSustain: 0.5,
       filterRelease: 0.03,
-      amp: 0.0,
       ampAttack: 0.01,
       ampDecay: 0.44,
       ampSustain: 0.2,
@@ -175,14 +256,6 @@
       this._lowpass.Q.set(value, time, rampType);
     },
 
-    $filterDetune: function (value, time, rampType) {
-      this._lowpass.detune.set(value, time, rampType);
-    },
-
-    $amp: function (value, time, rampType) {
-      this._amp.gain.set(value, time, rampType);
-    },
-
     noteOn: function (pitch, velocity, time) {
       time = (time || WX.now);
       var p = this.params,
@@ -196,11 +269,11 @@
       this._osc1.frequency.set(WX.mtof(pitch), time + 0.02, 1);
       this._osc2.frequency.set(WX.mtof(pitch), time + 0.02, 1);
       // attack
-      this.$amp(1.0, [time, aAtt], 3);
-      this.$filterDetune(fAmt, [time, fAtt], 3);
+      this._amp.gain.set(1.0, [time, aAtt], 3);
+      this._lowpass.detune.set(fAmt, [time, fAtt], 3);
       // decay
-      this.$amp(fSus, [time + aAtt, aDec], 3);
-      this.$filterDetune(fAmt * fSus, [time + fAtt, fDec], 3);
+      this._amp.gain.set(fSus, [time + aAtt, aDec], 3);
+      this._lowpass.detune.set(fAmt * fSus, [time + fAtt, fDec], 3);
       // for chaining
       return this;
     },
@@ -216,10 +289,10 @@
       var p = this.params;
       // cancel pre-programmed envelope data points
       this._amp.gain.cancel(time);
-      this._lowpass.frequency.cancel(time);
+      this._lowpass.detune.cancel(time);
       // release
-      this.$amp(0.0, [time, p.ampRelease.get()], 3);
-      this.$filterDetune(0.0, [time, p.filterRelease.get()], 3);
+      this._amp.gain.set(0.0, [time, p.ampRelease.get()], 3);
+      this._lowpass.detune.set(0.0, [time, p.filterRelease.get()], 3);
       // for chaining
       return this;
     },
