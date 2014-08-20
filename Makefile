@@ -10,7 +10,7 @@ starting:
 	@pwd
 
 dependencies:
-	@echo "$(hdr) Getting Node packages..."
+	@echo "$(hdr) Getting NPM packages..."
 	@npm install
 	@echo "$(hdr) Getting Bower components..."
 	@bower install
@@ -22,7 +22,3 @@ clean:
 	@echo "$(hdr) Cleaning up packages..."
 	@rm -rf node_modules/
 	@rm -rf bower_components/
-
-testcore:
-	@echo "$(hdr) Testing..."
-	npm test

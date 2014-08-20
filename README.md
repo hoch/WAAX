@@ -72,8 +72,8 @@ Also it can be as complex as a complete music application. For more examples, pl
 - [Creating WAAX Plug-in](https://ccrma.stanford.edu/~hongchan/posts/creating-waax-plugin/) : A step-by-step tutorial on how to create a plug-in for WAAX.
 
 <br>
-
 ---
+<br>
 
 
 # Development
@@ -81,7 +81,7 @@ Also it can be as complex as a complete music application. For more examples, pl
 
 ## Installation
 
-The complete WAAX development setup requires [NPM](http://nodejs.org/), [Bower](http://bower.io/) and [Grunt](http://gruntjs.com/). If you have them installed, then simply execute the following commands in the terminal to install and configure WAAX. Make sure to substitute `YOUR_DIRECTORY` to your installation directory.
+The complete WAAX development setup requires [NPM](http://nodejs.org/), [Bower](http://bower.io/) and [Grunt](http://gruntjs.com/). If you have them installed, then simply execute the following commands in the terminal to install and configure WAAX. Make sure to replace `$YOUR_DIRECTORY` with your installation directory.
 
 ~~~bash
 git clone https://github.com/hoch/WAAX $YOUR_DIRECTORY
@@ -102,7 +102,7 @@ grunt deploy        # produces deployment build in 'dist/' folder
 
 ## Documentation
 
-The newer version of documentation will be posted soon, and the previous version is still accessible [here](http://hoch.github.io/WAAX/docs/).
+The newer version of documentation will be posted soon and the previous version is still accessible [here](http://hoch.github.io/WAAX/docs/).
 
 
 ## License and Contact
