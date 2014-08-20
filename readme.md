@@ -1,14 +1,14 @@
 # WAAX: Web Audio API eXtension
 
-#### Framework for Web-based Music Apps (1.0.0-alpha)
+#### JavaScript Framework for Web Music Application (1.0.0-alpha)
 
-> Currently the repository is under the active development as alpha status. It has passed the initial experimental implementation and is settling down to version 1.0.0. With that said, please use at your own risk.
+> Currently the repository is under the active development as alpha status. It has passed the initial experimental phase and is settling down to version 1.0.0. With that said, please use at your own risk.
 
 <!-- travis build image -->
 
 
-
 # Introduction
+
 __WAAX__ is a JavaScript library that offers a comprehensive framework for web-based music application. Its goal is to facilitate music and audio programming on the modern web browser. The __WAAX__ features:
 
 - Extending Web Audio API for ease of use
@@ -49,9 +49,10 @@ For sequencer functionality and Web MIDI support, the following components shoul
 
 Note that MIDI support depends on [Web MIDI API](http://www.w3.org/TR/webmidi/), which is still behind the flag at the moment even in Chrome and Chrome Canary. __Ktrl__ is a part of WAAX framework for Web MIDI and more info is available [here](https://github.com/hoch/Ktrl).
 
+
 ## Playing Sound
 
-By its design, WAAX tries to accommodates various use cases. As shown below, it can be as simple as possible.
+By its design, WAAX accommodates various use cases with different levels. As shown below, it can be as simple as possible.
 
 ~~~javascript
 // creating a WXS-1 synth instance.
@@ -64,6 +65,7 @@ synth.noteOn(60, 100).noteOff(WX.now + 1.0);
 
 Also it can be as complex as a complete music application. For more examples, please check back WAAX and [MUI showcases](http://hoch.github.io/WAAX/mui/) later.
 
+
 ## Further Reading
 
 - [Thought behind: Rebirth of WAAX](https://ccrma.stanford.edu/~hongchan/posts/thoughts-behind-rebirth-of-waax/) : Concepts, design choices and the future road map.
@@ -73,7 +75,9 @@ Also it can be as complex as a complete music application. For more examples, pl
 
 ---
 
+
 # Development
+
 
 ## Installation
 
@@ -92,8 +96,9 @@ make
 grunt               # same as 'grunt build'
 grunt serve         # starts development server @ localhost:8000
 grunt build         # builds the minimized JS files into 'build/' folder
-grunt publish       # produces deployment build in 'dist/' folder
+grunt deploy        # produces deployment build in 'dist/' folder
 ~~~
+
 
 ## Documentation
 

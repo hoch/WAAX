@@ -98,5 +98,5 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['build']);
   grunt.registerTask('serve', ['connect', 'watch']);
   grunt.registerTask('build', ['clean', 'uglify']);
-  grunt.registerTask('publish', ['build', 'copy', 'gh-pages']);
+  grunt.registerTask('deploy', ['build', 'copy', 'gh-pages']);
 };
