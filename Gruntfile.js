@@ -68,7 +68,7 @@ module.exports = function(grunt) {
       my_target: {
         options: {
           sourceMap: true,
-          sourceMapName: 'build/waax_all.map'
+          sourceMapName: 'build/waax.map'
         },
         files: [{
           expand: true,

@@ -1,8 +1,8 @@
 {
   "name": "WAAX",
-  "version": "0.0.1-alpha",
+  "version": "1.0.0-alpha",
   "homepage": "https://github.com/hoch/WAAX",
-  "description": "frontend utilities for WAAX library",
+  "description": "front-end utilities for WAAX library",
   "license": "MIT",
   "ignore": [
     "**/.*",
