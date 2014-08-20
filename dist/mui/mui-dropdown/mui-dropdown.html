@@ -1,0 +1,189 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<polymer-element name="mui-dropdown" attributes="label key value" noscript>
+
+  <template>
+    <style>
+      :host {
+          display: inline-block;
+          width: 160px;
+          height: 40px;
+          margin: 8px 8px;
+          vertical-align: top;
+          -webkit-user-select: none;
+      }
+      input:focus {
+        outline: none;
+      }
+      .c-select-view {
+        display: block;
+        width: 158px;
+        height: 24px;
+        line-height: 24px;
+        border-radius: 2px;
+        color: #455a64;
+        box-shadow: 0 0 0 1px #cfd8dc;
+        cursor: pointer;
+      }
+      .c-select-view:active {
+        background-color: rgba(0, 0, 0, 0.05);
+        box-shadow: inset 0 1px 0 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.24);
+      }
+      .c-select-value {
+        width: 119px;
+        height: 24px;
+        padding: 0 4px;
+        line-height: 24px;
+        font-size: 14px;
+        font-family:'Roboto', sans-serif;
+        text-align: left;
+        color: #546e7a;
+      }
+      .c-select-button {
+        float: right;
+        width: 20px;
+        height: 24px;
+        text-align: center;
+        color: #546e7a;
+        border-left: 1px solid #cfd8dc;
+      }
+      .c-select-label {
+        display: block;
+        width: 64px;
+        height: 20px;
+        line-height: 20px;
+        font-family:'Play', sans-serif;
+        color: #546e7a;
+        font-size: 11px;
+        font-weight: 400;
+        text-align: left;
+      }
+      .c-select-dropdown {
+        display: none;
+        position: absolute;
+        font-family:'Roboto', sans-serif;
+        padding: 0;
+        background-color: #fff;
+        border-radius: 0 0 3px 3px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        vertical-align: top;
+        z-index: 1000;
+      }
+      .c-select-dropdown ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      li.c-select-dropdown-item {
+        height: 20px;
+        line-height: 20px;
+        font-size: 12px;
+        padding: 2px 5px;
+        text-align: left;
+        width: 126px;
+      }
+      li.c-select-dropdown-item:hover {
+        color: #fff;
+        background-color: #039be5;
+      }
+    </style>
+
+    <div class="c-select-label">{{ label }}</div>
+    <div id="eTouchable" class="c-select-view">
+      <div class="c-select-button" on-click="{{menuClicked}}">&blacktriangledown;</div>
+      <div class="c-select-value" on-click="{{menuClicked}}">{{ key }}</div>
+      <div id="eDropdown" class="c-select-dropdown">
+        <ul>
+          <template id="eItems" class="c-select-dropdown" repeat>
+            <li class="c-select-dropdown-item" on-click="{{itemClicked}}" id="{{ value }}">{{ key }}</li>
+          </template>
+        </ul>
+      </div>
+    </div>
+
+  </template>
+  <!-- logic -->
+  <script>
+    Polymer('mui-dropdown', {
+
+      // published
+      label: 'unlabeled',
+      key: 'not ready yet',
+      value: null,
+
+      // private
+      menuShown: false,
+      model: null,
+
+      // binding to WAAX unit
+      targetUnit: null,
+      targetParam: null,
+      linked: false,
+
+      render: function () {
+        this.$.eDropdown.style.display = (this.menuShown) ? 'block' : 'none';
+      },
+
+      // model => knob
+      update: function () {
+        this.key = MUI.findKeyByValue(this.$.eItems.model, this.value);
+        this.render();
+      },
+
+      // post: knob => model
+      post: function () {
+        this.value = MUI.findValueByKey(this.$.eItems.model, this.key);
+        // if (this.linked) {
+        //   this.targetUnit.set(this.targetParam, this.value);
+        // }
+        if (this.linked) {
+          // do not call the handler directly. invoke 'xxxxxParam.set' method
+          this.targetParam.set(this.value, WX.now + 0.05, 1);
+        }
+        this.render();
+      },
+
+      menuClicked: function (event, detail, sender) {
+        event.stopPropagation();
+        this.menuShown = !this.menuShown;
+        this.render();
+      },
+
+      itemClicked: function (event, detail, sender) {
+        event.stopPropagation();
+        this.key = sender.textContent;
+        this.value = sender.id;
+        this.menuShown = false;
+        this.post();
+      },
+
+      attributeChanged: function (attrName, oldVal, newVal) {
+        this.update();
+      },
+
+      ready: function () {
+      },
+
+      setModel: function (collection) {
+        this.$.eItems.model = collection;
+        this.key = 'Select...';
+        this.post();
+      },
+
+      link: function (unit, paramName) {
+        // setting reference to unit (ui => unitparam)
+        this.targetParam = unit.params[paramName];
+        this.linked = true;
+
+        this.value = this.targetParam.value;
+        this.update();
+
+        var ob = new PathObserver(unit.params[paramName], 'value');
+        ob.open(function (newValue, oldValue) {
+          this.value = newValue;
+          this.update();
+        }.bind(this));
+      }
+    });
+  </script>
+</polymer-element>

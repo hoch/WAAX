@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Test | WAAX: Web Audio API eXtension</title>
+  <link rel="stylesheet" media="all" href="../bower_components/mocha/mocha.css">
+</head>
+
+<body>
+
+  <!-- doms -->
+  <div id="mocha">
+    <h1>WX <small>: Web Audio API eXtension</small></h1>
+    <h2 id="client-ver"></h2>
+    <h2 id="waax-ver"></h2>
+  </div>
+  <div id="messages"></div>
+  <div id="fixtures"></div>
+
+  <!-- mocha + chai -->
+  <script src="../bower_components/mocha/mocha.js"></script>
+  <script src="../bower_components/chai/chai.js"></script>
+
+  <!-- waax core -->
+  <!-- <script src="../build/waax.js"></script> -->
+  <script src="../src/waax.js"></script>
+  <script src="../src/timebase.js"></script>
+  <script>
+    var domClientVersion = document.querySelector('#client-ver');
+    var domWAAXVersion = document.querySelector('#waax-ver');
+    domClientVersion.textContent = 'CLIENT VERSION: ' + navigator.userAgent.toLowerCase();
+    domWAAXVersion.textContent = 'WAAX VERSION: ' + WX.Info.getVersion();
+  </script>
+
+  <!-- run the code -->
+  <script>mocha.setup('bdd')</script>
+  <script src="test-core.js"></script>
+  <script src="test-timebase.js"></script>
+  <script>mocha.run();</script>
+
+  <!-- ga analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-7423687-10', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+</body>
+
+</html>
