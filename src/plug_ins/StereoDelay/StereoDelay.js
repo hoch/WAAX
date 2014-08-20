@@ -27,70 +27,79 @@
     var _splitter = WX.Splitter(2);
     var _merger = WX.Merger(2);
     // source distribution
-    this._input.to(_splitter);
-    this._input.to(this._dry);
-    // interconnection: delay, fb, Xtalk
-    _splitter.connect(this._lDelay, 0, 0);
-    this._nLDelay.to(this._lFeedback);
-    this._lFeedback.to(this._lDelay);
-    this._lFeedback.to(this._rXtalk);
-    this._rXtalk.to(this._rDelay);
-    this._lDelay.connect(nMerger, 0, 0);
-    nSplitter.connect(this._rDelay, 1, 0);
-    this._rDelay.to(this._rFeedback);
-    this._rFeedback.to(this._rDelay);
-    this._rFeedback.to(this._lXtalk);
+    this._input.to(_splitter, this._dry);
+    // left channel
+    _splitter.connect(this._lDelay, 0);
+    this._lDelay.to(this._lFeedback);
+    this._lFeedback.to(this._lDelay, this._rXtalk);
     this._lXtalk.to(this._lDelay);
-    this._rDelay.connect(nMerger, 0, 1);
+    this._lDelay.connect(_merger, 0, 0);
+    // right channel
+    // NOTE: splitter only uses left channel feed.
+    // (to be revisited)
+    _splitter.connect(this._rDelay, 0);
+    this._rDelay.to(this._rFeedback);
+    this._rFeedback.to(this._rDelay, this._lXtalk);
+    this._rXtalk.to(this._rDelay);
+    this._rDelay.connect(_merger, 0, 1);
     // summing
-    nMerger.to(this._wet);
+    _merger.to(this._wet);
     this._dry.to(this._output);
     this._wet.to(this._output);
 
     // parameters
     WX.defineParams(this, {
+
       delayTimeLeft: {
         type: 'Generic',
-        unit: 'Seconds',
+        name: 'L Delay',
         default: 0.125,
         min: 0.025,
-        max: 5
+        max: 5,
+        unit: 'Seconds'
       },
+
       delayTimeRight: {
         type: 'Generic',
-        unit: 'Seconds',
+        name: 'R Delay',
         default: 0.25,
         min: 0.025,
-        max: 5
+        max: 5,
+        unit: 'Seconds'
       },
+
       feedbackLeft: {
         type: 'Generic',
-        unit: '',
+        name: 'L FB',
         default: 0.25,
         min: 0.0,
         max: 1.0
       },
+
       feedbackRight: {
         type: 'Generic',
-        unit: '',
+        name: 'R FB',
         default: 0.125,
         min: 0.0,
         max: 1.0
       },
+
       crosstalk: {
         type: 'Generic',
-        unit: '',
+        name: 'Crosstalk',
         default: 0.1,
         min: 0.0,
         max: 1.0
       },
+
       mix: {
         type: 'Generic',
-        unit: '',
+        name: 'Mix',
         default: 1.0,
         min: 0.0,
         max: 1.0
       }
+
     });
 
     // REQUIRED: initializing instance with preset

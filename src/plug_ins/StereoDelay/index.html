@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+
+  <title>StereoDelay | WAAX: Web Audio API eXtension</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="../../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../../../mui/mui.html">
+
+  <script src="../../waax.js"></script>
+  <script src="StereoDelay.js"></script>
+
+  <script src="../Impulse/Impulse.js"></script>
+
+  <style>
+    body {
+      background-color: #fafafa;
+    }
+    header {
+      margin-top: 30px;
+    }
+    h2 {
+      margin-top: 40px;
+    }
+  </style>
+
+</head>
+
+<body unresolved>
+
+  <header>
+    <div class="row">
+      <div class="small-10 small-centered columns">
+        <h3>Plug-in: StereoDelay</h3>
+      </div>
+    </div>
+  </header>
+
+  <article>
+    <div class="row">
+      <div class="small-10 small-centered columns">
+
+        <mui-blade title="Parameters" opened="true">
+          <mui-section id="s-impulse" title="Impulse"></mui-section>
+          <mui-section id="s-sdelay" title="Stereo Delay"></mui-section>
+        </mui-blade>
+
+      </div>
+    </div>
+  </article>
+
+  <script>
+
+    function onReady() {
+
+      var imp = WX.Impulse(),
+          sdly = WX.StereoDelay();
+      imp.to(sdly).to(WX.Master);
+
+      MUI.buildControls(imp, 's-impulse');
+      MUI.buildControls(sdly, 's-sdelay');
+
+    }
+
+    window.addEventListener('polymer-ready', onReady);
+
+  </script>
+
+</body>
+</html>

@@ -1,6 +1,7 @@
 /**
- * @fileOverview a single oscillator test plug-in
- * @author Hongchan choi (hoch)
+ * @module SimpleOsc
+ * @author Hongchan Choi (hoch)
+ * @description a single oscillator with modulation
  * @version 0.0.2
  */
 

@@ -302,6 +302,11 @@ window.WX = (function () {
         case undefined:
           time = (time < ctx.currentTime) ? ctx.currentTime : time;
           this.setValueAtTime(value, time);
+          // when node is not connected, automation will not work
+          // this hack handles the error
+          if (time < ctx.currentTime && value !== this.value) {
+            this.value = value;
+          }
           break;
         case 1:
           time = (time < ctx.currentTime) ? ctx.currentTime : time;
@@ -499,20 +504,20 @@ window.WX = (function () {
     }
 
     BooleanParam.prototype = {
+
       init: function (options) {
         // assertion
         if (!Util.isBoolean(options.default)) {
           Log.error('Invalid value for Boolean Parameter.');
         }
-        this.parent = options.parent;
         this.type = 'Boolean';
         this.name = (options.name || 'Toggle');
-        this.default = (options.default || false);
-        this.value = this.default;
-        // handler callback assignment
+        this.value = this.default = options.default;
         this._parent = options._parent;
+        // handler callback assignment
         this.$callback = options._parent['$' + options._paramId];
       },
+
       set: function (value, time, rampType) {
         if (Util.isBoolean(value)) {
           this.value = value;
@@ -521,9 +526,11 @@ window.WX = (function () {
           }
         }
       },
+
       get: function () {
         return this.value;
       }
+
     };
 
     // TODO
@@ -750,6 +757,7 @@ window.WX = (function () {
       this._output.to(this._outlet);
 
       Core.defineParams(this, {
+
         output: {
           type: 'Generic',
           name: 'Output',
@@ -758,6 +766,7 @@ window.WX = (function () {
           max: 1.0,
           unit: 'LinearGain'
         }
+
       });
 
     }
@@ -814,35 +823,52 @@ window.WX = (function () {
       this._output.to(this._active).to(this._outlet);
       this._bypass.to(this._outlet);
 
+      this._active.gain.value = 1.0;
+      this._bypass.gain.value = 0.0;
+
       Core.defineParams(this, {
+
         input: {
-          type: 'Generic', unit: 'LinearGain',
-          default: 1.0, min: 0.0, max: 1.0
+          type: 'Generic',
+          name: 'Input',
+          default: 1.0,
+          min: 0.0,
+          max: 1.0,
+          unit: 'LinearGain'
         },
+
         output: {
-          type: 'Generic', unit: 'LinearGain',
-          default: 1.0, min: 0.0, max: 1.0
+          type: 'Generic',
+          name: 'Output',
+          default: 1.0,
+          min: 0.0,
+          max: 1.0,
+          unit: 'LinearGain'
         },
+
         bypass: {
-          type: 'Boolean', default: false
+          type: 'Boolean',
+          name: 'Bypass',
+          default: false
         }
+
       });
 
     }
 
     ProcessorAbstract.prototype = {
 
-      $input: function (value, time, xtype) {
-        this._input.gain.set(value, time, xtype);
+      $input: function (value, time, rampType) {
+        this._input.gain.set(value, time, rampType);
       },
 
-      $bypass: function(value, time, xtype) {
+      $bypass: function(value) {
         if (value) {
-          this._active.gain.set(0.0, time, xtype);
-          this._bypass.gain.set(1.0, time, xtype);
+          this._active.gain.value = 0.0;
+          this._bypass.gain.value = 1.0;
         } else {
-          this._active.gain.set(1.0, time, xtype);
-          this._bypass.gain.set(0.0, time, xtype);
+          this._active.gain.value = 1.0;
+          this._bypass.gain.value = 0.0;
         }
       }
 
@@ -867,10 +893,16 @@ window.WX = (function () {
       this._inlet.to(this._outlet);
 
       Core.defineParams(this, {
+
         input: {
-          type: 'Generic', unit: 'LinearGain',
-          default: 1.0, min: 0.0, max: 1.0
+          type: 'Generic',
+          name: 'Input',
+          default: 1.0,
+          min: 0.0,
+          max: 1.0,
+          unit: 'LinearGain'
         }
+
       });
 
     }
@@ -1040,7 +1072,7 @@ window.WX = (function () {
     Source: Core.Source,
     Analyzer: Core.Analyzer,
     Panner: Core.Panner,
-    // PeriodicWave: Core.PeriodicWave,
+    PeriodicWave: Core.PeriodicWave,
     Splitter: Core.Splitter,
     Merger: Core.Merger,
     Buffer: Core.Buffer,
@@ -1227,6 +1259,12 @@ window.MUI = (function (WX) {
             var select = document.createElement('mui-select');
             select.link(plugin, param);
             targetEl.appendChild(select);
+            break;
+          case 'Boolean':
+            var button = document.createElement('mui-button');
+            button.type = 'toggle';
+            button.link(plugin, param);
+            targetEl.appendChild(button);
             break;
         }
       }

@@ -1,14 +1,9 @@
 /**
- * WAPL: Impulse
- * @author hoch (Hongchan Choi)
- * @description an impulse (train) generator based on PeriodicWave
+ * @module Impulse
+ * @author Hongchan Choi (hoch)
+ * @description Impulse (train) generator
+ * @version 0.0.1
  */
-
-/**
- * TODO
- * - add LFO to impulse frequency
- */
-
 
 (function (WX) {
 
@@ -20,7 +15,7 @@
       binSize = 4096,
       mag = new Float32Array(binSize),
       phase = new Float32Array(binSize);
-  for (i = 0; i < binSize; ++i) {
+  for (var i = 0; i < binSize; ++i) {
     mag[i] = 1.0;
     phase[i] = 0.0;
   }
@@ -39,9 +34,16 @@
     this._impulse.setPeriodicWave(data);
 
     WX.defineParams(this, {
-      freq: { type: 'Generic', unit: 'Hertz',
-        default: 1.0, min: 0.1, max: 1000.0
+
+      freq: {
+        type: 'Generic',
+        name: 'Freq',
+        default: 1.0,
+        min: 0.1,
+        max: 60.0,
+        unit: 'Hertz'
       }
+
     });
 
     // REQUIRED: initializing instance with preset

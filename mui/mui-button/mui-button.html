@@ -51,13 +51,16 @@
       }
       .title {
         font-size: 11px;
+        line-height: 11px;
         text-align: center;
+        overflow: hidden;
       }
     </style>
 
     <div class="container">
-      <core-icon src="{{src}}" icon="{{icon}}"></core-icon>
+      <core-icon src="{{ src }}" icon="{{ icon }}"></core-icon>
       <div class="title">
+        {{ label }}
         <content></content>
       </div>
     </div>
@@ -102,16 +105,54 @@
       // moment or toggle
       type: 'moment',
 
+      // MUI
+      lable: 'unlabeled',
+      value: false,
+      targetParam: null,
+
       activeChanged: function() {
         this.classList.toggle('selected', this.active);
       },
 
       // if this is toggle mode, change active when clicked
+      // button => model
       buttonClicked: function () {
         if (this.type === 'toggle') {
           this.active = !this.active;
         }
-      }
+        this.value = this.active;
+        if (this.targetParam) {
+          // do not call the handler directly.
+          // invoke 'xxxxxParam.set' method instead
+          this.targetParam.set(this.value);
+        }
+      },
+
+      // model => button
+      update: function () {
+        this.active = this.value;
+      },
+
+      loadTargetParamData: function () {
+        if (this.targetParam) {
+          this.label = this.targetParam.name;
+          this.value = this.targetParam.value;
+          this.update();
+        }
+      },
+
+      link: function (plugin, param) {
+        // get target parameter object
+        this.targetParam = plugin.params[param];
+        // load plugin param data
+        this.loadTargetParamData();
+        // setup path observer to the param
+        var ob = new PathObserver(plugin.params[param], 'value');
+        ob.open(function (newValue, oldValue) {
+          this.value = newValue;
+          this.update();
+        }.bind(this));
+      },
 
     });
 
