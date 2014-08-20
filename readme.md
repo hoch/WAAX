@@ -20,40 +20,56 @@ __WAAX__ is a JavaScript library that offers a comprehensive framework for web-b
 - Complete Front-end Development setup: NPM, Bower, Grunt, Foundation, Polymer
 - Tested with Mocha and Chai: [In-browser Test](http://hoch.github.io/WAAX/test/)
 
-
 <!-- ### [Play WAAX!](http://playwaax.appspot.com)
-
 You can find playable demos and examples at [PlayWAAX](http://playwaax.appspot.com).
  -->
 
 ## Basic Usage
 
-To use WAAX in a web page, simply load the `waax.min.js` at the end of `<body>`. Note that MUI elements packages require Polymer library, so it has to be included before its usage. (Also make sure to have `plug-ins/` and `mui/` directories in the right place.)
+To use WAAX in a web page, simply load the `waax.js` in an HTML document. Note that MUI elements packages require Polymer library, so it has to be included before its usage. (Also make sure to have `plug-ins/` and `mui/` directories in the right place.)
 
 ~~~html
 <!-- load WAAX and plug-in -->
-<script src="waax.js"></script>
-<script src="plug-ins/WXS1.js"></script>
+<script src="build/waax.js"></script>
+<script src="build/plug_ins/WXS1.js"></script>
+<script src="build/plug_ins/ConVerb.js"></script>
 <!-- load Polymer and MUI elements -->
-<script src="platform.js"></script>
-<import src="mui/mui-knob.html"></script>
+<script src="bower_components/platform/platform.js"></script>
+<import src="mui/mui-knob/mui-knob.html"></script>
+<import src="mui/mui-vkey/mui-vkey.html"></script>
 ~~~
 
 For sequencer functionality and Web MIDI support, the following components should be included as well:
 
 ~~~html
 <!-- optional: for sequencer and MIDI support -->
-<script src="timebase.js"></script>
-<script src="ktrl.js"></script>
-<!-- virtual (on-screen) keyboard MUI element -->
-<import src="mui/mui-vkey.html"></script>
+<script src="build/timebase.js"></script>
+<script src="build/ktrl.js"></script>
 ~~~
 
+Note that MIDI support depends on [Web MIDI API](http://www.w3.org/TR/webmidi/), which is still behind the flag at the moment even in Chrome and Chrome Canary. __Ktrl__ is a part of WAAX framework for Web MIDI and more info is available [here](https://github.com/hoch/Ktrl).
+
+## Playing Sound
+
+By its design, WAAX tries to accommodates various use cases. As shown below, it can be as simple as possible.
+
+~~~js
+<script>
+  // creating a WXS-1 synth instance.
+  var synth = WX.WXS1();
+  // connects the synth to the master output.
+  synth.to(WX.Master);
+  // play C4 with 100 velocity for 1 second.
+  synth.noteOn(60, 100).noteOff(WX.now + 1.0);
+</script>
+~~~
+
+Also it can be as complex as a complete music application. For more examples, please check back WAAX and [MUI showcases](http://hoch.github.io/WAAX/mui/) later.
 
 ## Further Reading
 
-- [Thought behind: Rebirth of WAAX](https://ccrma.stanford.edu/~hongchan/posts/thoughts-behind-rebirth-of-waax/) : design choices and concepts.
-- [Creating WAAX Plug-in](https://ccrma.stanford.edu/~hongchan/posts/creating-waax-plugin/) : step-by-step tutorial on how to create plug-in for WAAX.
+- [Thought behind: Rebirth of WAAX](https://ccrma.stanford.edu/~hongchan/posts/thoughts-behind-rebirth-of-waax/) : Concepts, design choices and the future road map.
+- [Creating WAAX Plug-in](https://ccrma.stanford.edu/~hongchan/posts/creating-waax-plugin/) : A step-by-step tutorial on how to create a plug-in for WAAX.
 
 <br>
 
@@ -76,8 +92,8 @@ make
 
 ~~~bash
 grunt               # same as 'grunt build'
-grunt serve         # start dev server @ localhost:8000
-grunt build         # build minimized core and plug-ins files
+grunt serve         # starts development server @ localhost:8000
+grunt build         # builds the minimized JS files into 'build/' folder
 grunt publish       # produces deployment build in 'dist/' folder
 ~~~
 

@@ -130,12 +130,12 @@
       filterDetune: 0.0,
       filterAttack: 0.01,
       filterDecay: 0.07,
-      filterSustain: 0.02,
+      filterSustain: 0.5,
       filterRelease: 0.03,
       amp: 0.0,
       ampAttack: 0.01,
       ampDecay: 0.44,
-      ampSustain: 0.07,
+      ampSustain: 0.2,
       ampRelease: 0.06,
       output: 0.8
     },
@@ -183,33 +183,45 @@
       this._amp.gain.set(value, time, rampType);
     },
 
-    noteOn: function (pitch, velocity) {
-      this._osc1.frequency.set(WX.mtof(pitch), WX.now + 0.01, 1);
-      this._osc2.frequency.set(WX.mtof(pitch), WX.now + 0.01, 1);
-      var t = WX.now,
-          aAtt = this.params.ampAttack.get(),
-          dDec = this.params.ampDecay.get();
-      this.$amp(1.0, [t, aAtt], 3);
-      this.$amp(this.params.ampSustain.get(), [t + aAtt, dDec], 3);
-
-      var fAmt = this.params.filterModAmount.get() * 1200,
-          fAtt = this.params.filterAttack.get(),
-          fDec = this.params.filterDecay.get();
-      this.$filterDetune(fAmt, [t, fAtt], 3);
-      this.$filterDetune(fAmt * this.params.filterSustain.get(), [t + fAtt, fDec], 3);
+    noteOn: function (pitch, velocity, time) {
+      time = (time || WX.now);
+      var p = this.params,
+          aAtt = p.ampAttack.get(),
+          aDec = p.ampDecay.get(),
+          fAmt = p.filterModAmount.get() * 1200,
+          fAtt = p.filterAttack.get(),
+          fDec = p.filterDecay.get(),
+          fSus = p.filterSustain.get();
+      // sets frequency
+      this._osc1.frequency.set(WX.mtof(pitch), time + 0.02, 1);
+      this._osc2.frequency.set(WX.mtof(pitch), time + 0.02, 1);
+      // attack
+      this.$amp(1.0, [time, aAtt], 3);
+      this.$filterDetune(fAmt, [time, fAtt], 3);
+      // decay
+      this.$amp(fSus, [time + aAtt, aDec], 3);
+      this.$filterDetune(fAmt * fSus, [time + fAtt, fDec], 3);
+      // for chaining
+      return this;
     },
 
-    glide: function (pitch) {
-      this._osc1.frequency.set(WX.mtof(pitch), WX.now + 0.01, 1);
-      this._osc2.frequency.set(WX.mtof(pitch), WX.now + 0.01, 1);
+    glide: function (pitch, time) {
+      time = (time || WX.now) + 0.04;
+      this._osc1.frequency.set(WX.mtof(pitch), time, 1);
+      this._osc2.frequency.set(WX.mtof(pitch), time, 1);
     },
 
-    noteOff: function () {
-      var t = WX.now;
-      this._amp.gain.cancel(t);
-      this._lowpass.frequency.cancel(t);
-      this.$amp(0.0, [t, this.params.ampRelease.get()], 3);
-      this.$filterDetune(0.0, [t, this.params.filterRelease.get()], 3);
+    noteOff: function (time) {
+      time = (time || WX.now);
+      var p = this.params;
+      // cancel pre-programmed envelope data points
+      this._amp.gain.cancel(time);
+      this._lowpass.frequency.cancel(time);
+      // release
+      this.$amp(0.0, [time, p.ampRelease.get()], 3);
+      this.$filterDetune(0.0, [time, p.filterRelease.get()], 3);
+      // for chaining
+      return this;
     },
 
     // realtime input data responder
