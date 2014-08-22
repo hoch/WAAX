@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<polymer-element name="mui-dropdown" attributes="label key value" noscript>
+<polymer-element name="mui-select" attributes="label key value" noscript>
 
   <template>
     <style>
@@ -104,7 +104,7 @@
   </template>
   <!-- logic -->
   <script>
-    Polymer('mui-dropdown', {
+    Polymer('mui-select', {
 
       // published
       label: 'unlabeled',
@@ -112,16 +112,16 @@
       value: null,
 
       // private
-      menuShown: false,
-      model: null,
+      _menuShown: false,
+      _modelLoaded: false,
 
-      // binding to WAAX unit
-      targetUnit: null,
+      // binding
       targetParam: null,
-      linked: false,
+      cloudMap: null,
+      cloudParam: null,
 
       render: function () {
-        this.$.eDropdown.style.display = (this.menuShown) ? 'block' : 'none';
+        this.$.eDropdown.style.display = (this._menuShown) ? 'block' : 'none';
       },
 
       // model => knob
@@ -133,27 +133,31 @@
       // post: knob => model
       post: function () {
         this.value = MUI.findValueByKey(this.$.eItems.model, this.key);
-        // if (this.linked) {
-        //   this.targetUnit.set(this.targetParam, this.value);
-        // }
-        if (this.linked) {
-          // do not call the handler directly. invoke 'xxxxxParam.set' method
-          this.targetParam.set(this.value, WX.now + 0.05, 1);
+        // update target param
+        if (this.targetParam) {
+          // do not call the handler directly.
+          // invoke 'xxxxxParam.set' method
+          this.targetParam.set(this.value);
+        }
+        if (this.cloudMap) {
+          this.cloudMap.set(this.cloudParam, this.value);
         }
         this.render();
       },
 
       menuClicked: function (event, detail, sender) {
-        event.stopPropagation();
-        this.menuShown = !this.menuShown;
-        this.render();
+        if (this._modelLoaded) {
+          event.stopPropagation();
+          this._menuShown = !this._menuShown;
+          this.render();
+        }
       },
 
       itemClicked: function (event, detail, sender) {
         event.stopPropagation();
         this.key = sender.textContent;
         this.value = sender.id;
-        this.menuShown = false;
+        this._menuShown = false;
         this.post();
       },
 
@@ -167,22 +171,46 @@
       setModel: function (collection) {
         this.$.eItems.model = collection;
         this.key = 'Select...';
-        this.post();
+        this._modelLoaded = true;
       },
 
-      link: function (unit, paramName) {
-        // setting reference to unit (ui => unitparam)
-        this.targetParam = unit.params[paramName];
-        this.linked = true;
-
-        this.value = this.targetParam.value;
+      loadTargetParamData: function () {
+        this.setModel(this.targetParam.getModel());
+        this.value = this.targetParam.default;
+        this.label = this.targetParam.name;
         this.update();
+      },
 
-        var ob = new PathObserver(unit.params[paramName], 'value');
+      link: function (plugin, param, cloudMap) {
+        // setting reference to plugin (ui => pluginparam)
+        this.targetParam = plugin.params[param];
+        // load target param data
+        this.loadTargetParamData();
+        // establish observer
+        var ob = new PathObserver(plugin.params[param], 'value');
         ob.open(function (newValue, oldValue) {
+          if (this.value === newValue) return;
           this.value = newValue;
           this.update();
         }.bind(this));
+
+        // OPTIONAL: add param to cloud map data
+        if (cloudMap) {
+          this.cloudMap = cloudMap;
+          this.cloudParam = param;
+          // this.cloudMap.registerParam(param, this.value);
+          // setup path observer to cloud map param
+          var obsCloudMap = new PathObserver(cloudMap.localCache, param);
+          obsCloudMap.open(function (newValue, oldValue) {
+            if (this.value === newValue) return;
+            this.value = newValue;
+            this.update();
+            // TEMP: need to update target parameter in plugin too.
+            if (this.targetParam) {
+              this.targetParam.set(this.value, WX.now + 0.05, 1);
+            }
+          }.bind(this));
+        }
       }
     });
   </script>

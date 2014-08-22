@@ -3,27 +3,14 @@
 <head>
 
   <title>MUI | Web Audio API eXtension</title>
-
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WAAX: Web Audio API eXtension</title>
-  <link rel="stylesheet" href="../bower_components/foundation/css/normalize.css">
-  <link rel="stylesheet" href="../bower_components/foundation/css/foundation.css">
-  <script src="../bower_components/foundation/js/vendor/modernizr.js"></script>
 
   <script src="../bower_components/platform/platform.js"></script>
+  <link rel="import" href="mui.html">
+
   <script src="../build/waax.js"></script>
   <script src="../build/plug_ins/WXS1.js"></script>
-  <!--<script src="../src/waax.js"></script>-->
-  <!--<script src="../src/plug_ins/WXS1.js"></script>-->
-
-  <link rel="import" href="mui-blade/mui-blade.html">
-  <link rel="import" href="mui-section/mui-section.html">
-  <link rel="import" href="mui-knob/mui-knob.html">
-  <link rel="import" href="mui-knobh/mui-knobh.html">
-  <link rel="import" href="mui-dropdown/mui-dropdown.html">
-  <link rel="import" href="mui-button/mui-button.html">
-  <link rel="import" href="mui-vkey/mui-vkey.html">
 
   <style>
     body {
@@ -61,34 +48,34 @@
 
         <mui-blade title="WXS-1" opened="true">
           <mui-section title="OSC1">
-            <mui-dropdown id="select-osc1type" label="Type"></mui-dropdown>
-            <mui-knob id="knob-osc1octave" label="Octave"></mui-knob>
-            <mui-knob id="knob-osc1gain" label="Volume"></mui-knob>
+            <mui-select id="select-osc1type"></mui-select>
+            <mui-knob id="knob-osc1octave"></mui-knob>
+            <mui-knob id="knob-osc1gain"></mui-knob>
           </mui-section>
           <mui-section title="OSC2">
-            <mui-dropdown id="select-osc2type" label="Type"></mui-dropdown>
-            <mui-knob id="knob-osc2detune" label="Detune"></mui-knob>
-            <mui-knob id="knob-osc2gain" label="Volume"></mui-knob>
+            <mui-select id="select-osc2type"></mui-select>
+            <mui-knob id="knob-osc2detune"></mui-knob>
+            <mui-knob id="knob-osc2gain"></mui-knob>
           </mui-section>
           <mui-section title="Master">
-            <mui-knob id="knob-output" label="Volume"></mui-knob>
+            <mui-knob id="knob-output"></mui-knob>
           </mui-section>
           <mui-section title="Filter">
-            <mui-knob id="knob-cutoff" label="Cutoff"></mui-knob>
-            <mui-knob id="knob-reso" label="Reso"></mui-knob>
-            <mui-knob id="knob-filterAmt" label="Mod Amt"></mui-knob>
+            <mui-knob id="knob-cutoff"></mui-knob>
+            <mui-knob id="knob-reso"></mui-knob>
+            <mui-knob id="knob-filterAmt"></mui-knob>
           </mui-section>
           <mui-section title="Filter Envelope">
-            <mui-knob id="knob-filterA" label="Att"></mui-knob>
-            <mui-knob id="knob-filterD" label="Dec"></mui-knob>
-            <mui-knob id="knob-filterS" label="Sus"></mui-knob>
-            <mui-knob id="knob-filterR" label="Rel"></mui-knob>
+            <mui-knob id="knob-filterA"></mui-knob>
+            <mui-knob id="knob-filterD"></mui-knob>
+            <mui-knob id="knob-filterS"></mui-knob>
+            <mui-knob id="knob-filterR"></mui-knob>
           </mui-section>
           <mui-section title="Amp Envelope">
-            <mui-knob id="knob-ampA" label="Att"></mui-knob>
-            <mui-knob id="knob-ampD" label="Dec"></mui-knob>
-            <mui-knob id="knob-ampS" label="Sus"></mui-knob>
-            <mui-knob id="knob-ampR" label="Rel"></mui-knob>
+            <mui-knob id="knob-ampA"></mui-knob>
+            <mui-knob id="knob-ampD"></mui-knob>
+            <mui-knob id="knob-ampS"></mui-knob>
+            <mui-knob id="knob-ampR"></mui-knob>
           </mui-section>
         </mui-blade>
 
@@ -123,23 +110,12 @@
   <script>
     function init() {
 
-      // this.waveforms = ['sine', 'square', 'sawtooth', 'triangle'];
-
-      var waveforms = [
-        { key: 'Sine', value: 'sine' },
-        { key: 'Square', value: 'square' },
-        { key: 'Sawtooth', value: 'sawtooth' },
-        { key: 'Triangle', value: 'triangle' }
-      ];
-
       var wxs1 = WX.WXS1();
       wxs1.to(WX.Master);
 
-      MUI.$('select-osc1type').setModel(waveforms);
       MUI.$('select-osc1type').link(wxs1, 'osc1type');
       MUI.$('knob-osc1octave').link(wxs1, 'osc1octave');
       MUI.$('knob-osc1gain').link(wxs1, 'osc1gain');
-      MUI.$('select-osc2type').setModel(waveforms);
       MUI.$('select-osc2type').link(wxs1, 'osc2type');
       MUI.$('knob-osc2detune').link(wxs1, 'osc2detune');
       MUI.$('knob-osc2gain').link(wxs1, 'osc2gain');
