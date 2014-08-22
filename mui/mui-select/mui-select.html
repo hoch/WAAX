@@ -115,8 +115,10 @@
       _menuShown: false,
       _modelLoaded: false,
 
-      // binding to WAAX unit
+      // binding
       targetParam: null,
+      cloudMap: null,
+      cloudParam: null,
 
       render: function () {
         this.$.eDropdown.style.display = (this._menuShown) ? 'block' : 'none';
@@ -136,7 +138,9 @@
           // do not call the handler directly.
           // invoke 'xxxxxParam.set' method
           this.targetParam.set(this.value);
-          // console.log(this.value, this.targetParam.value);
+        }
+        if (this.cloudMap) {
+          this.cloudMap.set(this.cloudParam, this.value);
         }
         this.render();
       },
@@ -177,7 +181,7 @@
         this.update();
       },
 
-      link: function (plugin, param) {
+      link: function (plugin, param, cloudMap) {
         // setting reference to plugin (ui => pluginparam)
         this.targetParam = plugin.params[param];
         // load target param data
@@ -185,9 +189,28 @@
         // establish observer
         var ob = new PathObserver(plugin.params[param], 'value');
         ob.open(function (newValue, oldValue) {
+          if (this.value === newValue) return;
           this.value = newValue;
           this.update();
         }.bind(this));
+
+        // OPTIONAL: add param to cloud map data
+        if (cloudMap) {
+          this.cloudMap = cloudMap;
+          this.cloudParam = param;
+          // this.cloudMap.registerParam(param, this.value);
+          // setup path observer to cloud map param
+          var obsCloudMap = new PathObserver(cloudMap.localCache, param);
+          obsCloudMap.open(function (newValue, oldValue) {
+            if (this.value === newValue) return;
+            this.value = newValue;
+            this.update();
+            // TEMP: need to update target parameter in plugin too.
+            if (this.targetParam) {
+              this.targetParam.set(this.value, WX.now + 0.05, 1);
+            }
+          }.bind(this));
+        }
       }
     });
   </script>

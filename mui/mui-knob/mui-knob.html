@@ -93,8 +93,8 @@
 
       // binding
       targetParam: null,
-      realtimeRef: null,
-      realtimeParam: null,
+      cloudMap: null,
+      cloudParam: null,
 
       // private
       _normValue: 0.0,
@@ -130,9 +130,8 @@
           // invoke 'xxxxxParam.set' method instead
           this.targetParam.set(this.value, WX.now + 0.05, 1);
         }
-        // TEMP: Realtime API binding
-        if (this.realtimeRef) {
-          this.realtimeRef._setByMUI(this.realtimeParam, this.value);
+        if (this.cloudMap) {
+          this.cloudMap.set(this.cloudParam, this.value);
         }
         this.render();
       },
@@ -186,6 +185,7 @@
                 break;
               case 'released':
                 document.body.style.cursor = 'default';
+                this.post();
                 break;
             }
           }.bind(this)
@@ -236,28 +236,39 @@
         }
       },
 
-      link: function (plugin, param) {
+      // link to plugin, param and cloudMap
+      link: function (plugin, param, cloudMap) {
+
         // get target parameter object
         this.targetParam = plugin.params[param];
         // load plugin param data
         this.loadTargetParamData();
-        // setup path observer to the param
-        var ob = new PathObserver(plugin.params[param], 'value');
-        ob.open(function (newValue, oldValue) {
+        // setup path observer to plugin param
+        var obsPlugin = new PathObserver(plugin.params[param], 'value');
+        obsPlugin.open(function (newValue, oldValue) {
+          if (this.value === newValue) return;
           this.value = newValue;
           this.update();
         }.bind(this));
-      },
 
-      // TEMP: this is temporary for Music on Cloud project
-      linkRealtime: function (ref, param) {
-        this.realtimeRef = ref;
-        this.realtimeParam = param;
-        var ob = new PathObserver(ref._localMirror, param);
-        ob.open(function (newValue, oldValue) {
-          this.value = newValue;
-          this.update();
-        }.bind(this));
+        // OPTIONAL: add param to cloud map data
+        if (cloudMap) {
+          this.cloudMap = cloudMap;
+          this.cloudParam = param;
+          // this.cloudMap.registerParam(param, this.value);
+          // setup path observer to cloud map param
+          var obsCloudMap = new PathObserver(cloudMap.localCache, param);
+          obsCloudMap.open(function (newValue, oldValue) {
+            if (this.value === newValue) return;
+            this.value = newValue;
+            this.update();
+            // TEMP: need to update target parameter in plugin too.
+            if (this.targetParam) {
+              this.targetParam.set(this.value, WX.now + 0.05, 1);
+            }
+          }.bind(this));
+        }
+
       }
 
     });
