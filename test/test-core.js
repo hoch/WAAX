@@ -391,7 +391,8 @@ describe('Core: Plug-in Utilities', function () {
 
   MyGenerator.prototype = {
     info: {
-      api_version: '1.0.0-alpha'
+      api_version: '1.0.0-alpha',
+      type: 'Generator'
     },
     defaultPreset: {
       p1: false,
