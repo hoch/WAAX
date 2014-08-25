@@ -1,7 +1,7 @@
 {
   "name": "WAAX",
   "version": "1.0.0-alpha",
-  "author": "hoch (Hongchan Choi)",
+  "author": "Hongchan Choi (hoch, hongchan@google.com)",
   "devDependencies": {
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-connect": "^0.8.0",

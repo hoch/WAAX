@@ -3,32 +3,29 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
-    clean: [
-      'build/**/*',
-      'dist/**/*',
-      '!build',
-      '!dist'
-    ],
+    clean: {
+      build: ['build/**/*', '!build'],
+      dist: ['dist/**/*']
+    },
 
     copy: {
       dist: {
-        files: [
-          {
-            src: [
-              '**/*',
-              '!node_modules/**',
-              '!src/**',
-              '!.gitignore',
-              '!bower.json',
-              '!Gruntfile.js',
-              '!LICENSE',
-              '!NOTES.md',
-              '!package.json',
-              '!readme.md'
-            ],
-            dest: 'dist/'
-          }
-        ]
+        files: [{
+          src: [
+            '**/*',
+            '!node_modules/**',
+            '!src/**',
+            '!.gitignore',
+            '!bower.json',
+            '!Gruntfile.js',
+            '!LICENSE',
+            '!Makefile',
+            '!NOTES.md',
+            '!package.json',
+            '!README.md'
+          ],
+          dest: 'dist/'
+        }]
       }
     },
 
@@ -63,18 +60,31 @@ module.exports = function(grunt) {
     uglify: {
       options: {
         // to keep 'WX' name space intact
-        mangle: false
+        mangle: {
+          except: ['WX']
+        }
       },
-      my_target: {
+      core: {
         options: {
           sourceMap: true,
-          sourceMapName: 'build/waax.map'
+          sourceMapName: 'build/waax-core.map'
+        },
+        files: {
+          'build/waax.js': ['src/waax.js'],
+          'build/timbase.js': ['src/timebase.js'],
+          'build/ktrl.js': ['src/ktrl.js']
+        }
+      },
+      plug_ins: {
+        options: {
+          sourceMap: true,
+          sourceMapName: 'build/plug_ins/plug_ins.map'
         },
         files: [{
           expand: true,
-          cwd: 'src',
+          cwd: 'src/plug_ins',
           src: '**/*.js',
-          dest: 'build'
+          dest: 'build/plug_ins'
         }]
       }
     },
@@ -97,6 +107,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['build']);
   grunt.registerTask('serve', ['connect', 'watch']);
-  grunt.registerTask('build', ['clean', 'uglify']);
-  grunt.registerTask('deploy', ['build', 'copy', 'gh-pages']);
+  grunt.registerTask('build', ['clean:build', 'uglify']);
+  grunt.registerTask('deploy', ['build', 'copy:dist', 'gh-pages', 'clean:dist']);
 };

@@ -46,17 +46,9 @@ describe('Core: Info and Log', function() {
 });
 
 
-/**
- * Util
- *
- * isObject, isArray, isNumber, hasParam, extend, clone,
- * clamp, random2f, random2, mtof, ftom, powtodb, dbtopow, rmstodb, dbtorms,
- * patch(TBD)
- */
-
+// Core Utilities
 describe('Core: Utilities', function() {
 
-  // Object utilities
   describe('isObject(arg)', function () {
     it('should return true when input is JS object.', function () {
       expect(WX.isObject({})).to.equal(true);
@@ -94,12 +86,14 @@ describe('Core: Utilities', function() {
     });
   });
   describe('extend(target, source)', function () {
-    it('should add source to target object and return the extended target.', function () {
-      var source = { a: 1, b: 2 },
-          target = { b: 3, c: 4 },
-          result = { a: 1, b: 2, c: 4 };
-      expect(WX.extend(target, source)).deep.equal(result);
-    });
+    it('should add source to target object and return the extended target.',
+      function () {
+        var source = { a: 1, b: 2 },
+            target = { b: 3, c: 4 },
+            result = { a: 1, b: 2, c: 4 };
+        expect(WX.extend(target, source)).deep.equal(result);
+      }
+    );
   });
   describe('clone(source)', function () {
     it('should return a cloned object.', function () {
@@ -107,6 +101,46 @@ describe('Core: Utilities', function() {
           result = { a: 1, b: 2 };
       expect(WX.clone(source)).deep.equal(result);
     });
+  });
+
+  // WAAX model utils
+  describe('validateModel(model)', function () {
+    it('returns true when all the keys are unique in a model.', function () {
+      var valid = [
+        { key:'Sine', value:'sine' },
+        { key:'Sinusoid', value:'sine' }
+      ];
+      var invalid = [
+        { key:'Sine', value:'sine' },
+        { key:'Sine', value:'sinusoid' }
+      ];
+      expect(WX.validateModel(valid)).to.equal(true);
+      expect(WX.validateModel(invalid)).to.equal(false);
+    });
+  });
+  describe('findKeyByValue(model, value)', function () {
+    it('returns a key assodicated with a value. null when not found.',
+      function () {
+        var model = [
+          { key:'Sine', value:'sine' },
+          { key:'Sinusoid', value:'sine' }
+        ];
+        expect(WX.findKeyByValue(model, 'sine')).to.equal('Sine');
+        expect(WX.findKeyByValue(model, 'sinusoid')).to.equal(null);
+      }
+    );
+  });
+  describe('findValueByKey(model, key)', function () {
+    it('returns a key assodicated with a value. null when not found.',
+      function () {
+        var model = [
+          { key:'Sine', value:'sine' },
+          { key:'Sine', value:'sinusoid' }
+        ];
+        expect(WX.findValueByKey(model, 'Sine')).to.equal('sine');
+        expect(WX.findValueByKey(model, 'Sawtooth')).to.equal(null);
+      }
+    );
   });
 
   // Music Math utilities
@@ -117,18 +151,22 @@ describe('Core: Utilities', function() {
     });
   });
   describe('random2f(min, max)', function () {
-    it('should generate a floating point random value between min and max.', function () {
-      var rnd = WX.random2f(0.0, 10.0);
-      expect(rnd).to.be.within(0.0, 10.0);
-      expect(parseInt(rnd, 10) === rnd).to.equal(false);
-    });
+    it('should generate a floating point random value between min and max.',
+      function () {
+        var rnd = WX.random2f(0.0, 10.0);
+        expect(rnd).to.be.within(0.0, 10.0);
+        expect(parseInt(rnd, 10) === rnd).to.equal(false);
+      }
+    );
   });
   describe('random2(min, max)', function () {
-    it('should generate an integer random value between min and max.', function () {
-      var rnd = WX.random2(0, 10);
-      expect(rnd).to.be.within(0, 10);
-      expect(parseInt(rnd, 10) === rnd).to.equal(true);
-    });
+    it('should generate an integer random value between min and max.',
+      function () {
+        var rnd = WX.random2(0, 10);
+        expect(rnd).to.be.within(0, 10);
+        expect(parseInt(rnd, 10) === rnd).to.equal(true);
+      }
+    );
   });
   describe('mtof(midi)', function () {
     it('should return frequency from MIDI pitch.', function () {
@@ -144,7 +182,7 @@ describe('Core: Utilities', function() {
       expect(WX.ftom(22050)).to.equal(136);
     });
   });
-  describe('powtodb(pow)', function () {
+  describe('powtodb(power)', function () {
     it('should return decibel from signal power.', function () {
       expect(WX.powtodb(1.0)).to.equal(100.0);
       expect(WX.powtodb(10.0)).to.equal(110.0);
@@ -176,12 +214,6 @@ describe('Core: Utilities', function() {
       expect(WX.veltoamp(127)).to.equal(1.0);
     });
   });
-
-  // describe('patch(args)', function () {
-  //   it('TBD: should patch plugin units in arguments.', function () {
-  //     // TBD
-  //   });
-  // });
 
 });
 
@@ -260,11 +292,20 @@ describe('Core', function() {
       expect(WX.Panner().constructor.name).to.equal('PannerNode');
     });
   });
+  describe('PeriodicWave()', function () {
+    it('should return a periodic wave object.', function () {
+      var mag = new Float32Array(256),
+          phase = new Float32Array(256),
+          name = WX.PeriodicWave(mag, phase).constructor.name;
+      expect(name).to.equal('PeriodicWave');
+    });
+  });
   describe('Splitter()', function () {
     it('should return a channel splitter node.', function () {
-      expect(WX.Splitter().constructor.name).to.equal('ChannelSplitterNode');
-      expect(WX.Splitter(1, 2).constructor.name).to.equal('ChannelSplitterNode');
-      expect(WX.Splitter(1, 6).constructor.name).to.equal('ChannelSplitterNode');
+      var ctorName = 'ChannelSplitterNode';
+      expect(WX.Splitter().constructor.name).to.equal(ctorName);
+      expect(WX.Splitter(1, 2).constructor.name).to.equal(ctorName);
+      expect(WX.Splitter(1, 6).constructor.name).to.equal(ctorName);
     });
   });
   describe('Merger()', function () {
@@ -315,17 +356,18 @@ describe('Core', function() {
       var clip = { name: 'ziggy', url: '../sound/hochkit/fx-001.wav' };
       var progress = false, complete = false;
       WX.loadClip(clip,
-        function (event) {
-          progress = true;
-          expect(event.loaded).to.be.within(0, event.totalSize);
-        },
         function (clip) {
           complete = true;
           expect(progress).to.equal(true);
           expect(complete).to.equal(true);
           expect(clip.buffer.constructor.name).to.equal('AudioBuffer');
           done();
-      });
+        },
+        function (event) {
+          progress = true;
+          expect(event.loaded).to.be.within(0, event.totalSize);
+        }
+      );
     });
   });
 
