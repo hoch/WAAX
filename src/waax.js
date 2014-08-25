@@ -1139,44 +1139,12 @@ window.WX = (function () {
   })();
 
 
-  //
-  // Routing system
-  //
-  // plugin.set('param', arg):
-  //   if (arg is val):
-  //     plugin.param.set(val, 0.0, 0)
-  //
-  // if (arg is arr):
-  //   iterate(arr) => plugin.param.set(arr[i])
-  //
-  // param.set(v, t, x):
-  //   typeCheck(v)
-  //   clamp(v) with min, max
-  //   handlerCallback(v, t, x)
-  //   parent.$[paramId](v, t, x)
-  //
-  // HOW to link handerCallback??
-  //
-  // plugin.$.paramHandler(v, t, x):
-  //     node.param.$set(v, t, x);
-  //     node1.param.$set(v, t, x);
-  //     node2.param.$set(v, t, x);
-  //
-
-
-  //
-  // Plug-in builder
-  //
-
-  var Plugin = (function () {
-
-    //
-    // Abstracts (as matter of facts, mixins)
-    // - PluginAbstract
-    // - GeneratorAbstract
-    // - ProcessorAbstract
-    // - AnalyzerAbstract
-    ///
+  /**
+   * Plug-In related internal classes and utilities.
+   * @module PlugIn
+   * @memberOf WX
+   */
+  var PlugIn = (function () {
 
     // plug-in types
     var PLUGIN_TYPES = [
@@ -1185,17 +1153,69 @@ window.WX = (function () {
       'Analyzer'
     ];
 
+    // registered plug-ins
+    var registered = {
+      Generator: [],
+      Processor: [],
+      Analyzer: []
+    };
 
-    //
-    // Plugin Abstract: base class
-    ///
-
-    function PluginAbstract () {
+    /**
+     * Plug-In abstract class.
+     * @class
+     * @private
+     */
+    function PlugInAbstract () {
       this.params = {};
     }
 
-    PluginAbstract.prototype = {
+    PlugInAbstract.prototype = {
 
+      /**
+       * Connects a plug-in output to the other plug-in's input or a WA node.
+       *   Note that this does not support multiple outgoing connection.
+       *   (fanning-out)
+       * @memberOf PlugInAbstract
+       * @param {WAPLPlugIn|AudioNode} plugin WAPL(Web Audio Plug-In)
+       *   compatible plug-in or WA node.
+       */
+      to: function (plugin) {
+        // if the target is plugin with inlet
+        if (plugin._inlet) {
+          this._outlet.to(plugin._inlet);
+          return plugin;
+        }
+        // or it might be a WA node
+        else {
+          try {
+            this._outlet.to(plugin);
+            return plugin;
+          } catch (error) {
+            Log.error('Connection failed. Invalid patching.');
+          }
+        }
+      },
+
+      /**
+       * Disconnects a plug-in output.
+       * @memberOf PlugInAbstract
+       */
+      cut: function () {
+        this._outlet.cut();
+      },
+
+      /**
+       * Sets a plug-in parameter. Supports dynamic parameter assignment.
+       * @memberOf PlugInAbstract
+       * @param {String} param Parameter name.
+       * @param {Array|Number} arg An array of data points or a single value.
+       * @return {WAPL} Self-reference for method chaining.
+       * @example
+       * // setting parameter with an array
+       * myeffect.set('gain', [[0.0], [1.0, 0.01, 1], [0.0, 0.5, 2]]);
+       * // setting parameter with a value (immediate change)
+       * myeffect.set('gain', 0.0);
+       */
       set: function (param, arg) {
         if (Util.hasParam(this, param)) {
           // check if arg is a value or array
@@ -1213,6 +1233,11 @@ window.WX = (function () {
         return this;
       },
 
+      /**
+       * Gets a paramter value.
+       * @param {String} param Parameter name.
+       * @return {*} Paramter value. Returns null when a paramter not found.
+       */
       get: function (param) {
         if (Util.hasParam(this, param)) {
           return this.params[param].get();
@@ -1221,13 +1246,23 @@ window.WX = (function () {
         }
       },
 
+      /**
+       * Sets plug-in preset, which is a collection of parameters. Note that
+       *   setting a preset changes all the associated parameters immediatley.
+       * @param {Object} preset A collection of paramters.
+       */
       setPreset: function (preset) {
         for (var param in preset) {
-          // console.log(param);
           this.params[param].set(preset[param], Core.ctx.currentTime, 0);
         }
       },
 
+      /**
+       * Gets a current plug-in paramters as a collection. Note that the
+       *   collection is created on the fly. It is a clone of current parameter
+       *   values.
+       * @return {Object} Preset.
+       */
       getPreset: function () {
         var preset = {};
         for (var param in this.params) {
@@ -1239,19 +1274,25 @@ window.WX = (function () {
     };
 
 
-    //
-    // GeneratorAbstract: extends PluginAbstract
-    //
-
+    /**
+     * Generator plug-in class. No audio inlet.
+     * @class
+     * @private
+     * @extends PlugInAbstract
+     * @wxparam {Generic} output Output gain.
+     */
     function GeneratorAbstract() {
 
-      PluginAbstract.call(this);
+      // extends PlugInAbstract
+      PlugInAbstract.call(this);
 
+      // creating essential WA nodes
       this._output = Core.Gain();
       this._outlet = Core.Gain();
-
+      // and patching
       this._output.to(this._outlet);
 
+      // paramter definition
       Core.defineParams(this, {
 
         output: {
@@ -1269,58 +1310,44 @@ window.WX = (function () {
 
     GeneratorAbstract.prototype = {
 
-      to: function (input) {
-        // if the target is plugin with inlet
-        if (input._inlet) {
-          this._outlet.to(input._inlet);
-          return input;
-        }
-        // or it might be a WA node
-        else {
-          try {
-            this._outlet.to(input);
-            return input;
-          } catch (error) {
-            Log.error('Connection failed. Invalid patching.');
-          }
-        }
-      },
-
-      cut: function () {
-        // not recommended, this will deactivate signal stream
-        this._outlet.cut();
-      },
-
-      $output: function (value, time, xtype) {
-        this._output.gain.set(value, time, xtype);
+      /**
+       * @wxhandler output
+       */
+      $output: function (value, time, rampType) {
+        this._output.gain.set(value, time, rampType);
       }
 
     };
 
-    Util.extend(GeneratorAbstract.prototype, PluginAbstract.prototype);
+    // extends PlugInAbstract
+    Util.extend(GeneratorAbstract.prototype, PlugInAbstract.prototype);
 
 
-    //
-    // ProcessorAbstract: extends PluginAbstract
-    ///
-
+    /**
+     * Processor plug-in class. Features both inlet and outlet.
+     * @class
+     * @private
+     * @extends PlugInAbstract
+     * @wxparam {Generic} input Input gain.
+     * @wxparam {Generic} output Output gain.
+     * @wxparam {Boolean} bypass Bypass switch.
+     */
     function ProcessorAbstract() {
 
-      PluginAbstract.call(this);
+      // extends PlugInAbstract
+      PlugInAbstract.call(this);
 
+      // WA nodes
       this._inlet = Core.Gain();
       this._input = Core.Gain();
       this._output = Core.Gain();
       this._active = Core.Gain();
       this._bypass = Core.Gain();
       this._outlet = Core.Gain();
-
+      // patching
       this._inlet.to(this._input, this._bypass);
       this._output.to(this._active).to(this._outlet);
       this._bypass.to(this._outlet);
-
-      this._active.gain.value = 1.0;
-      this._bypass.gain.value = 0.0;
 
       Core.defineParams(this, {
 
@@ -1354,38 +1381,56 @@ window.WX = (function () {
 
     ProcessorAbstract.prototype = {
 
+      /**
+       * @wxhandler input
+       */
       $input: function (value, time, rampType) {
         this._input.gain.set(value, time, rampType);
       },
 
+      /**
+       * @wxhandler output
+       */
+      $output: function (value, time, rampType) {
+        this._output.gain.set(value, time, rampType);
+      },
+
+      /**
+       * @wxhandler bypass
+       */
       $bypass: function(value) {
         if (value) {
-          this._active.gain.value = 0.0;
-          this._bypass.gain.value = 1.0;
+          this._active.gain.set(0.0);
+          this._bypass.gain.set(1.0);
         } else {
-          this._active.gain.value = 1.0;
-          this._bypass.gain.value = 0.0;
+          this._active.gain.set(1.0);
+          this._bypass.gain.set(0.0);
         }
       }
 
     };
 
+    // extends PlugInAbstract
     Util.extend(ProcessorAbstract.prototype, GeneratorAbstract.prototype);
 
 
-    //
-    // AnalyzerAbstract: extends PluginAbstract
-    ///
-
+    /**
+     * Analyzer plug-in class. Features both inlet, outlet and analyzer.
+     * @class
+     * @private
+     * @extends PlugInAbstract
+     * @wxparam {Generic} input Input gain.
+     */
     function AnalyzerAbstract() {
 
-      PluginAbstract.call(this);
+      PlugInAbstract.call(this);
 
       this._inlet = Core.Gain();
       this._input = Core.Gain();
+      this._analyzer = Core.Analyzer();
       this._outlet = Core.Gain();
 
-      this._inlet.to(this._input);
+      this._inlet.to(this._input).to(this._analyzer);
       this._inlet.to(this._outlet);
 
       Core.defineParams(this, {
@@ -1405,42 +1450,27 @@ window.WX = (function () {
 
     AnalyzerAbstract.prototype = {
 
-      to: function (input) {
-        // if the target is plugin with inlet
-        if (input._inlet) {
-          this._outlet.to(input._inlet);
-          return input;
-        }
-        // or it might be a WA node
-        else {
-          try {
-            this._outlet.to(input);
-            return input;
-          } catch (error) {
-            Log.error('Connection failed. Invalid patching.');
-          }
-        }
-      },
-
-      cut: function () {
-        this._outlet.cut();
-      },
-
+      /**
+       * @wxhandler input
+       */
       $input: function (value, time, xtype) {
         this._input.gain.set(value, time, xtype);
       }
 
     };
 
-    Util.extend(AnalyzerAbstract.prototype, PluginAbstract.prototype);
+    // extends PlugInAbstract
+    Util.extend(AnalyzerAbstract.prototype, PlugInAbstract.prototype);
 
-
-    //
-    // @namespace WX.plugin
-    ///
-
+    // PlugIn exports
     return {
 
+      /**
+       * Defines type of a plug-in. Required in plug-in definition.
+       * @param {WAPL} plugin Target plug-in.
+       * @param {String} type Plug-in type. <code>['Generator', 'Processor',
+       *   'Analyzer']</code>
+       */
       defineType: function (plugin, type) {
         // check: length should be less than 3
         if (PLUGIN_TYPES.indexOf(type) < 0) {
@@ -1460,12 +1490,25 @@ window.WX = (function () {
         }
       },
 
+      /**
+       * Initializes plug-in preset. Merges default preset with user-defined
+       *   preset. Required in plug-in definition.
+       * @param {WAPL} plugin Target plug-in.
+       * @param {Object} preset Preset.
+       */
       initPreset: function (plugin, preset) {
         var merged = Util.clone(plugin.defaultPreset);
         Util.extend(merged, preset);
         plugin.setPreset(merged);
       },
 
+      /**
+       * Extends plug-in prototype according to the type. Required in plug-in
+       *   definition.
+       * @param {WAPL} plugin Target plug-in.
+       * @param {String} type Plug-in type. <code>['Generator', 'Processor',
+       *   'Analyzer']</code>
+       */
       extendPrototype: function (plugin, type) {
         // check: length should be less than 3
         if (PLUGIN_TYPES.indexOf(type) < 0) {
@@ -1485,24 +1528,48 @@ window.WX = (function () {
         }
       },
 
-      register: function (PluginConstructor) {
+      /**
+       * Registers the plug-in prototype to WX namespace. Required in plug-in
+       *   definition.
+       * @param {Function} PlugInClass Class reference (function name) of
+       *   plug-in.
+       */
+      register: function (PlugInClass) {
+        var info = PlugInClass.prototype.info;
         // hard check version info
-        var i = PluginConstructor.prototype.info;
-        if (Info.getVersion() > i.api_version) {
-          // FATAL: pluginConstructor is incompatible with WX Core.
-          Log.error(PluginConstructor.name, ': loading failed. incompatible WAAX version.');
+        if (Info.getVersion() > info.api_version) {
+          // FATAL: PlugInClass is incompatible with WX Core.
+          Log.error(PlugInClass.name, ': FATAL. incompatible WAAX version.');
         }
-        // register pluginConstructor in WX namespace
-        window.WX[PluginConstructor.name] = function (preset) {
-          return new PluginConstructor(preset);
+        // register PlugInClass in WX namespace
+        registered[info.type].push(PlugInClass.name);
+        window.WX[PlugInClass.name] = function (preset) {
+          return new PlugInClass(preset);
         };
-      }
+      },
 
-      // patch: function () {
-      //   for (var i = 0, i < arguments.length-1; i++) {
-      //     arguments[i]._outlet.to(arguments[i+1]._inlet);
-      //   }
-      // }
+      /**
+       * Returns a list of regsitered plug-ins of a certain type.
+       * @param {String} type Plug-in Type.
+       * @return {Array} A list of plug-ins.
+       */
+      getRegistered: function (type) {
+        var plugins = null;
+        if (PLUGIN_TYPES.indexOf(type) > -1) {
+          switch (type) {
+            case 'Generator':
+              plugins = registered.Generator.slice(0);
+              break;
+            case 'Processor':
+              plugins = registered.Processor.slice(0);
+              break;
+            case 'Analyzer':
+              plugins = registered.Analyzer.slice(0);
+              break;
+          }
+        }
+        return plugins;
+      }
 
     };
 
@@ -1579,282 +1646,8 @@ window.WX = (function () {
     loadClip: Core.loadClip,
 
     // Plug-in builders
-    Plugin: Plugin
+    PlugIn: PlugIn
 
   };
 
 })();
-
-
-//
-// MUI: Musical User Interface module (for Polymer integration)
-//
-// @description   This module includes some utilities for keyboard and mouse
-//                responders, because music-specific GUI elements require
-//                non-standard user interaction. The functionality might be
-//                integrated into Polymer custom element, but the code is
-//                currently used for bridging the gap between WAAX and Polymer.
-//
-
-window.MUI = (function (WX) {
-
-  //
-  // MouseResponder
-  ///
-
-  function MouseResponder(senderID, targetElement, MUICallback) {
-    this.senderId = senderID;
-    this.container = targetElement;
-    this.callback = MUICallback;
-    // bound function references
-    this.ondragged = this.dragged.bind(this);
-    this.onreleased = this.released.bind(this);
-    // timestamp
-    this._prevTS = 0;
-    // init with onclick
-    this.onclicked(targetElement);
-  }
-
-  MouseResponder.prototype = {
-    getEventData: function (event) {
-      var r = this.container.getBoundingClientRect();
-      return {
-        x: event.clientX - r.left,
-        y: event.clientY - r.top,
-        ctrlKey: event.ctrlKey,
-        altKey: event.altKey,
-        shiftKey: event.shiftKey,
-        metaKey: event.metaKey
-      };
-    },
-    onclicked: function (target) {
-      target.addEventListener('mousedown', function (event) {
-        event.preventDefault();
-        this._prevTS = event.timeStamp;
-        var p = this.getEventData(event);
-        this.callback(this.senderId, 'clicked', p);
-        window.addEventListener('mousemove', this.ondragged, false);
-        window.addEventListener('mouseup', this.onreleased, false);
-      }.bind(this), false);
-    },
-    dragged: function (event) {
-      event.preventDefault();
-      if (event.timeStamp - this._prevTS < 16.7) {
-        return;
-      }
-      this._prevTS = event.timeStamp;
-      var p = this.getEventData(event);
-      this.callback(this.senderId, 'dragged', p);
-    },
-    released: function (event) {
-      event.preventDefault();
-      var p = this.getEventData(event);
-      this.callback(this.senderId, 'released', p);
-      window.removeEventListener('mousemove', this.ondragged, false);
-      window.removeEventListener('mouseup', this.onreleased, false);
-    }
-  };
-
-
-  //
-  // KeyResponder
-  ///
-
-  function KeyResponder(senderID, targetElement, MUICallback) {
-    this.senderId = senderID;
-    this.container = targetElement;
-    this.callback = MUICallback;
-    // bound function references
-    this.onkeypress = this.keypressed.bind(this);
-    this.onblur = this.finished.bind(this);
-    // init with onclick
-    this.onfocus(targetElement);
-  }
-
-  KeyResponder.prototype = {
-
-    onfocus: function () {
-      this.container.addEventListener('mousedown', function (event) {
-        event.preventDefault();
-        this.callback(this.senderId, 'clicked', null);
-        this.container.addEventListener('keypress', this.onkeypress, false);
-        this.container.addEventListener('blur', this.onblur, false);
-      }.bind(this), false);
-    },
-    keypressed: function (event) {
-      // event.preventDefault();
-      this.callback(this.senderId, 'keypressed', event.keyCode);
-    },
-    finished: function (event) {
-      // event.preventDefault();
-      this.callback(this.senderId, 'finished', null);
-      this.container.removeEventListener('keypress', this.onkeypress, false);
-      this.container.removeEventListener('blur', this.onblur, false);
-    }
-  };
-
-
-  //
-  // MUI Public Methods
-  ///
-
-  return {
-
-    // TODO: these are dupes...
-    clamp: function (value, min, max) {
-      return Math.max(Math.min(value, max), min);
-    },
-
-    clone: function (obj) {
-      var cloned = {};
-      for (var p in obj) {
-        if (obj.hasOwnProperty(p)) {
-          cloned[p] = obj[p];
-        }
-      }
-      return obj;
-    },
-
-    // TODO: collection has been changed with 0.0.1.
-    //       reconsider this.
-    findValueByKey: function (collection, key) {
-      for (var i = 0; i < collection.length; i++) {
-        if (collection[i].key === key) {
-          return collection[i].value;
-        }
-      }
-      // if key not found, just return the first item
-      return collection[0].value;
-    },
-
-    findKeyByValue: function (collection, value) {
-      for (var i = 0; i < collection.length; i++) {
-        if (collection[i].value === value) {
-          return collection[i].key;
-        }
-      }
-    },
-
-    MouseResponder: function (senderID, targetElement, MUICallback) {
-      return new MouseResponder(senderID, targetElement, MUICallback);
-    },
-
-    KeyResponder: function (senderID, targetElement, MUICallback) {
-      return new KeyResponder(senderID, targetElement, MUICallback);
-    },
-
-    buildControls: function (plugin, targetId) {
-      var targetEl = document.getElementById(targetId);
-      for (var param in plugin.params) {
-        var p = plugin.params[param];
-        switch (p.type) {
-          case 'Generic':
-            var knob = document.createElement('mui-knob');
-            knob.link(plugin, param);
-            targetEl.appendChild(knob);
-            break;
-          case 'Itemized':
-            var select = document.createElement('mui-select');
-            select.link(plugin, param);
-            targetEl.appendChild(select);
-            break;
-          case 'Boolean':
-            var button = document.createElement('mui-button');
-            button.type = 'toggle';
-            button.link(plugin, param);
-            targetEl.appendChild(button);
-            break;
-        }
-      }
-    },
-
-    $: function (elementId) {
-      return document.getElementById(elementId);
-    }
-
-  };
-
-})(WX);
-
-
-/**
- * Returns an instance of Fader plug-in.
- * @name WX.Fader
- * @static
- * @method
- * @param {Object} preset Parameters
- * @param {Boolean} preset.mute
- * @param {Generic} preset.dB
- * @param {Generic} preset.input
- * @param {Generic} preset.output
- * @param {Boolean} preset.bypass
- */
-(function (WX) {
-
-
-  function Fader(preset) {
-    // adding modules
-    WX.Plugin.defineType(this, 'Processor');
-
-    // node creation and patching
-    this._input.connect(this._output);
-
-    WX.defineParams(this, {
-
-      mute: {
-        type: 'Boolean',
-        default: false
-      },
-
-      dB: {
-        type: 'Generic',
-        default: 0.0,
-        min: -90,
-        max: 12.0,
-        unit: 'Decibels'
-      }
-
-    });
-
-    // initialize preset
-    WX.Plugin.initPreset(this, preset);
-  }
-
-  Fader.prototype = {
-
-    info: {
-      name: 'Fader',
-      api_version: '1.0.0-alpha',
-      plugin_version: '0.0.1',
-      author: 'hoch',
-      type: 'Processor',
-      description: 'channel fader'
-    },
-
-    defaultPreset: {
-      mute: false,
-      dB: 0.0
-    },
-
-    $mute: function (value, time, xtype) {
-      if (value) {
-        this._outlet.gain.set(0.0, WX.now, 0);
-      } else {
-        this._outlet.gain.set(1.0, WX.now, 0);
-      }
-    },
-
-    $dB: function (value, time, xtype) {
-      this._output.gain.set(WX.dbtolin(value), time, xtype);
-    }
-
-  };
-
-  WX.Plugin.extendPrototype(Fader, 'Processor');
-  WX.Plugin.register(Fader);
-
-  // built in master output fader
-  WX.Master = WX.Fader();
-  WX.Master.to(WX.context.destination);
-
-})(WX);

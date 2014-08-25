@@ -5,7 +5,7 @@ module.exports = function(grunt) {
 
     clean: {
       build: ['build/**/*', '!build'],
-      dist: ['dist/**/*']
+      dist: ['dist']
     },
 
     copy: {
@@ -59,31 +59,26 @@ module.exports = function(grunt) {
 
     uglify: {
       options: {
-        // to keep 'WX' name space intact
-        mangle: {
-          except: ['WX']
-        }
+        // to keep module and plug in namespace intact
+        mangle: false
       },
       core: {
-        options: {
-          sourceMap: true,
-          sourceMapName: 'build/waax-core.map'
-        },
         files: {
-          'build/waax.js': ['src/waax.js'],
-          'build/timbase.js': ['src/timebase.js'],
+          'build/waax.js': [
+            'src/waax.js',
+            'src/mui.js',
+            'src/timebase.js',
+            'src/plug_ins/Fader/fader.js'
+          ],
           'build/ktrl.js': ['src/ktrl.js']
         }
       },
       plug_ins: {
-        options: {
-          sourceMap: true,
-          sourceMapName: 'build/plug_ins/plug_ins.map'
-        },
         files: [{
           expand: true,
+          flatten: true,
           cwd: 'src/plug_ins',
-          src: '**/*.js',
+          src: ['**/*.js', '!Fader/fader.js'],
           dest: 'build/plug_ins'
         }]
       }
@@ -108,5 +103,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['build']);
   grunt.registerTask('serve', ['connect', 'watch']);
   grunt.registerTask('build', ['clean:build', 'uglify']);
-  grunt.registerTask('deploy', ['build', 'copy:dist', 'gh-pages', 'clean:dist']);
+  grunt.registerTask('deploy',
+    ['clean:dist', 'build', 'copy:dist', 'gh-pages', 'clean:dist']
+  );
 };

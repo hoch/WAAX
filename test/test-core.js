@@ -1,21 +1,18 @@
-/**
- * test-core.js
- *
- * @description   mocha + chai test suite for WAAX Core 1.0.0-alpha
- * @author        hoch (hongchan.choi@gmail.com)
- * @version       1.0.0
- */
+//
+// test-core.js
+//
 
 
+//
 // caching
+//
 var expect = chai.expect,
     should = chai.should();
 
 
-/**
- * Info and Log
- */
-
+//
+// Core: Info and Log
+//
 describe('Core: Info and Log', function() {
 
   describe('Info.getVersion()', function () {
@@ -46,8 +43,10 @@ describe('Core: Info and Log', function() {
 });
 
 
-// Core Utilities
-describe('Core: Utilities', function() {
+//
+// Core: Utilities
+//
+describe('Core: Utilities - object, music math and more.', function() {
 
   describe('isObject(arg)', function () {
     it('should return true when input is JS object.', function () {
@@ -102,8 +101,6 @@ describe('Core: Utilities', function() {
       expect(WX.clone(source)).deep.equal(result);
     });
   });
-
-  // WAAX model utils
   describe('validateModel(model)', function () {
     it('returns true when all the keys are unique in a model.', function () {
       var valid = [
@@ -142,8 +139,6 @@ describe('Core: Utilities', function() {
       }
     );
   });
-
-  // Music Math utilities
   describe('clamp(value, min, max)', function () {
     it('should clamp value into between min and max.', function () {
       expect(WX.clamp(1.5, 0.0, 1.0)).to.equal(1.0);
@@ -218,11 +213,10 @@ describe('Core: Utilities', function() {
 });
 
 
-/**
- * Core
- */
-
-describe('Core', function() {
+//
+// Core: Audio System
+//
+describe('Core: Audio System', function() {
 
   describe('context', function () {
     it('should be AudioContext.', function () {
@@ -374,52 +368,67 @@ describe('Core', function() {
 });
 
 
-/**
- * Plug-in utilities
- * - defineType
- * - initPreset
- * - extendPrototype
- * - register
- */
-
+//
+// Core: Plug-in Utilities
+//
 describe('Core: Plug-in Utilities', function () {
 
   // dummy setup for testing
   function MyGenerator(preset) {
-    WX.Plugin.defineType(this, 'Generator');
+    WX.PlugIn.defineType(this, 'Generator');
     WX.defineParams(this, {
-      p1: { type: 'Boolean', default: false },
-      p2: { type: 'Boolean', default: true }
+      p1: {
+        type: 'Boolean',
+        default: false
+      },
+      p2: {
+        type: 'Boolean',
+        default: true
+      }
     });
-    WX.Plugin.initPreset(this, preset);
+    WX.PlugIn.initPreset(this, preset);
   }
+
   MyGenerator.prototype = {
-    info: { api_version: '1.0.0-alpha' },
-    defaultPreset: { p1: false, p2: true },
-    $p1: function (value, time, xtype) {
+    info: {
+      api_version: '1.0.0-alpha'
+    },
+    defaultPreset: {
+      p1: false,
+      p2: true
+    },
+    $p1: function(value, time, xtype) {
       return value ? 'pass' : 'fail';
     },
-    $p2: function (value, time, xtype) {
+    $p2: function(value, time, xtype) {
       return value ? 'pass' : 'fail';
     }
   };
-  WX.Plugin.extendPrototype(MyGenerator, 'Generator');
+
+  WX.PlugIn.extendPrototype(MyGenerator, 'Generator');
 
   function MyProcessor() {
-    WX.Plugin.defineType(this, 'Processor');
+    WX.PlugIn.defineType(this, 'Processor');
   }
+
   MyProcessor.prototype = {};
-  WX.Plugin.extendPrototype(MyProcessor, 'Processor');
+
+  WX.PlugIn.extendPrototype(MyProcessor, 'Processor');
 
   function MyAnalyzer() {
-    WX.Plugin.defineType(this, 'Analyzer');
+    WX.PlugIn.defineType(this, 'Analyzer');
   }
-  MyAnalyzer.prototype = {};
-  WX.Plugin.extendPrototype(MyAnalyzer, 'Analyzer');
 
-  var gen = new MyGenerator({ p1: true, p2: false });
-  var pro = new MyProcessor();
-  var ana = new MyAnalyzer();
+  MyAnalyzer.prototype = {};
+
+  WX.PlugIn.extendPrototype(MyAnalyzer, 'Analyzer');
+
+  var gen = new MyGenerator({
+    p1: true,
+    p2: false
+  });
+  var pro = new MyProcessor(),
+      ana = new MyAnalyzer();
 
   describe('defineType(plugin, type)', function () {
     it('should import required components to plugin based on type specifier.',
@@ -430,7 +439,6 @@ describe('Core: Plug-in Utilities', function () {
       }
     );
   });
-
   describe('extendPrototype(plugin, type)', function () {
     it('should extend prototype with core plugin methods.',
       function () {
@@ -465,7 +473,6 @@ describe('Core: Plug-in Utilities', function () {
       }
     );
   });
-
   describe('initPreset(plugin, preset)', function () {
     it('should initialize plugin preset from arguments and default preset.',
       function () {
@@ -474,11 +481,10 @@ describe('Core: Plug-in Utilities', function () {
       }
     );
   });
-
   describe('register(pluginConstructor)', function () {
     it('should register plugin class under namespace WX.',
       function () {
-        WX.Plugin.register(MyGenerator);
+        WX.PlugIn.register(MyGenerator);
         var myGen = WX.MyGenerator();
         expect(myGen).to.respondTo('get');
         expect(myGen).to.respondTo('set');
@@ -496,18 +502,10 @@ describe('Core: Plug-in Utilities', function () {
 });
 
 
-/**
- * MUI methods??
- * - MouseResponder
- * - KeyResponder
- * - $
- */
-
-
-/**
- * Plug-in: Fader
- */
-
+//
+// Stock PlugIn: Fader
+// Because Fader is included in the core as 'WX.Master'
+//
 describe('Plug-in: Fader', function () {
   it('should set parameters correctly. (BEEP)', function (done) {
     // test patch: osc is needed to run the AudioParam automation
@@ -536,6 +534,3 @@ describe('Plug-in: Fader', function () {
     }, 100);
   });
 });
-
-
-

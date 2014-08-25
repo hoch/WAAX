@@ -43,7 +43,7 @@
  * @version r1
  * @author Hongchan Choi (hoch, hongchan@google.com)
  */
-Ktrl = (function() {
+window.Ktrl = (function() {
 
   // available MIDI sources (inputs) and targets (outputs)
   var sources = [];
@@ -292,11 +292,11 @@ Ktrl = (function() {
    * @return {object} parsed MIDI message (see below for property names)
    *
    * ["noteoff", "noteon"]: { type, channel, pitch, velocity }
-   * ["polypressure"]: { type, channel, pitch, pressure } 
-   * ["controlchange"]: { type, channel, control, value } 
-   * ["programchange"]: { type, channel, program } 
-   * ["channelpressure"]: { type, channel, pressure } 
-   * ["pitchwheel"]: { type, channel, wheel } 
+   * ["polypressure"]: { type, channel, pitch, pressure }
+   * ["controlchange"]: { type, channel, control, value }
+   * ["programchange"]: { type, channel, program }
+   * ["channelpressure"]: { type, channel, pressure }
+   * ["pitchwheel"]: { type, channel, wheel }
    */
   parse = function (midimsg) {
     var data = midimsg.data;
@@ -396,4 +396,5 @@ Ktrl = (function() {
     parse: parse,
     report: report
   };
+
 })();

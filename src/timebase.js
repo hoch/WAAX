@@ -2,7 +2,7 @@
  * Timebase: eventlist and transport for WAAX audio system
  */
 
-var Timebase = (function (WX) {
+window.Timebase = (function (WX) {
 
 
   /**

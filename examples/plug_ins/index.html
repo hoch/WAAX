@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+<head>
+  <title>MUI | Web Audio API eXtension</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- MUI and WAAX core -->
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../../mui/mui.html">
+  <script src="../../build/waax.js"></script>
+
+  <!-- Generators -->
+  <script src="../../build/plug_ins/wxs1.js"></script>
+  <script src="../../build/plug_ins/simpleosc.js"></script>
+  <script src="../../build/plug_ins/impulse.js"></script>
+  <!-- Processors -->
+  <script src="../../build/plug_ins/stereodelay.js"></script>
+
+  <style>
+    body {
+      background-color: #fafafa;
+    }
+    header {
+      margin-top: 30px;
+    }
+    h2 {
+      margin-top: 40px;
+    }
+  </style>
+</head>
+
+<body unresolved>
+
+  <header>
+    <div class="row">
+      <div class="small-10 small-centered columns">
+        <ul class="breadcrumbs">
+          <li><a href="..">Home</a></li>
+          <!-- <li><a href="#">Getting Started</a></li>
+          <li><a href="#">API Reference</a></li> -->
+          <li>MUI Elements</li>
+          <li class="current">Plug-Ins</li>
+          <li><a href="../test">Test</a></li>
+        </ul>
+        <h3>Plug-In Workshop <small>1.0.0-alpha</small></h3>
+      </div>
+    </div>
+  </header>
+
+  <article>
+    <div class="row">
+      <div class="small-10 small-centered columns">
+
+        <mui-blade title="Keyboard" opened="false">
+          <mui-vkey id="vkey"></mui-vkey>
+        </mui-blade>
+        <mui-select label="Generator" id="select-gen"></mui-select>
+        <mui-select label="Processor" id="select-pro"></mui-select>
+        <mui-blade id="params-gen" title="Generator" opened="true">
+        </mui-blade>
+
+        <mui-blade id="params-pro" title="Processor" opened="true">
+        </mui-blade>
+
+      </div>
+    </div>
+  </article>
+
+  <script>
+
+    function init() {
+
+      var gens = WX.PlugIn.getRegistered('Generator'),
+          pros = WX.PlugIn.getRegistered('Processor');
+
+      var genModel = [],
+          proModel = [];
+
+      for (var i = 0; i < gens.length; i++) {
+        genModel.push({ key: gens[i], value: gens[i] });
+      }
+
+      for (i = 0; i < pros.length; i++) {
+        proModel.push({ key: pros[i], value: pros[i] });
+      }
+
+      var genSelector = MUI.$('select-gen'),
+          proSelector = MUI.$('select-pro'),
+          vkeySelector = MUI.$('vkey');
+
+      genSelector.setModel(genModel);
+      genSelector.setValue(gens[0]);
+      genSelector.onItemSelected = patch;
+
+      proSelector.setModel(proModel);
+      proSelector.setValue(pros[1]);
+      proSelector.onItemSelected = patch;
+
+      var currGen, currPro;
+
+      function patch() {
+        // clear up
+        if (currGen) {
+          currGen.cut();
+          vkeySelector.removeTarget(currGen);
+        }
+        if (currPro) {
+          currPro.cut();
+        }
+        MUI.removeChildren('params-gen');
+        MUI.removeChildren('params-pro');
+        // recreation
+        currGen = WX[genSelector.value]();
+        currPro = WX[proSelector.value]();
+        currGen.to(currPro).to(WX.Master);
+        vkeySelector.addTarget(currGen);
+        MUI.buildControls(currGen, 'params-gen');
+        MUI.buildControls(currPro, 'params-pro');
+      }
+
+      patch();
+    }
+
+    window.addEventListener('polymer-ready', init);
+  </script>
+
+</body>
+</html>

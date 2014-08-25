@@ -21,7 +21,7 @@
   function SimpleOsc(preset) {
 
     // REQUIRED: adding necessary modules
-    WX.Plugin.defineType(this, 'Generator');
+    WX.PlugIn.defineType(this, 'Generator');
 
     // patching, lfo frequency modulation
     this._lfo = WX.OSC();
@@ -82,7 +82,7 @@
     });
 
     // REQUIRED: initializing instance with preset
-    WX.Plugin.initPreset(this, preset);
+    WX.PlugIn.initPreset(this, preset);
   }
 
   /** REQUIRED: plug-in prototype **/
@@ -91,11 +91,11 @@
     // REQUIRED: plug-in info
     info: {
       name: 'SimpleOsc',
+      version: '0.0.1',
       api_version: '1.0.0-alpha',
-      plugin_version: '0.0.1',
-      author: 'hoch',
-      type: 'instrument',
-      description: '1 oscillator synth'
+      author: 'Hongchan Choi',
+      type: 'Generator',
+      description: '1 OSC with LFO'
     },
 
     // REQUIRED: plug-in default preset
@@ -162,9 +162,9 @@
   };
 
   // REQUIRED: extending plug-in prototype with modules
-  WX.Plugin.extendPrototype(SimpleOsc, 'Generator');
+  WX.PlugIn.extendPrototype(SimpleOsc, 'Generator');
 
   // REQUIRED: registering plug-in into WX ecosystem
-  WX.Plugin.register(SimpleOsc);
+  WX.PlugIn.register(SimpleOsc);
 
 })(WX);

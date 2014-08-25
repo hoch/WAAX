@@ -3,15 +3,17 @@
 <head>
 
   <title>StereoDelay | WAAX: Web Audio API eXtension</title>
+
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <script src="../../../bower_components/platform/platform.js"></script>
   <link rel="import" href="../../../mui/mui.html">
 
-  <script src="../build/waax.js"></script>
-  <script src="../Impulse/Impulse.js"></script>
+  <script src="../../waax.js"></script>
   <script src="StereoDelay.js"></script>
+
+  <script src="../Impulse/Impulse.js"></script>
 
   <style>
     body {
@@ -56,7 +58,6 @@
 
       var imp = WX.Impulse(),
           sdly = WX.StereoDelay();
-      debugger;
       imp.to(sdly).to(WX.Master);
 
       MUI.buildControls(imp, 's-impulse');

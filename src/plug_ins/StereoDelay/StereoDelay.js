@@ -1,10 +1,7 @@
 /**
- * WAPL: StereoDelay
- * @author hoch
- * @description stereo delay with feedback
+ * @wapl StereoDelay
+ * @author Hongchan Choi (hoch, hongchan.choi@gmail.com)
  */
-
-
 (function (WX) {
 
   'use strict';
@@ -13,7 +10,7 @@
   function StereoDelay(preset) {
 
     // REQUIRED: adding necessary modules
-    WX.Plugin.defineType(this, 'Processor');
+    WX.PlugIn.defineType(this, 'Processor');
 
     // patching
     this._lDelay = WX.Delay();
@@ -103,7 +100,7 @@
     });
 
     // REQUIRED: initializing instance with preset
-    WX.Plugin.initPreset(this, preset);
+    WX.PlugIn.initPreset(this, preset);
   }
 
   /** REQUIRED: plug-in prototype **/
@@ -112,11 +109,11 @@
     // REQUIRED: plug-in info
     info: {
       name: 'StereoDelay',
+      version: '0.0.3',
       api_version: '1.0.0-alpha',
-      plugin_version: '0.0.1',
-      author: 'hoch',
-      type: 'effect',
-      description: 'stereo delay with feedback'
+      author: 'Hongchan Choi',
+      type: 'Processor',
+      description: 'Pingpong Delay with Feedback Control'
     },
 
     // REQUIRED: plug-in default preset
@@ -128,8 +125,6 @@
       crosstalk: 0.1,
       mix: 1.0
     },
-
-    /** handlers **/
 
     $delayTimeLeft: function (value, time, rampType) {
       this._lDelay.delayTime.set(value, time, rampType);
@@ -160,9 +155,9 @@
   };
 
   // REQUIRED: extending plug-in prototype with modules
-  WX.Plugin.extendPrototype(StereoDelay, 'Processor');
+  WX.PlugIn.extendPrototype(StereoDelay, 'Processor');
 
   // REQUIRED: registering plug-in into WX ecosystem
-  WX.Plugin.register(StereoDelay);
+  WX.PlugIn.register(StereoDelay);
 
 })(WX);

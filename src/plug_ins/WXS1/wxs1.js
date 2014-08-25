@@ -1,10 +1,7 @@
 /**
- * WAPL: WSX1
- * @author      hoch (hongchan.choi@gmail.com)
- * @description Stock: Monophonic Subtractive Synth
+ * @wapl WXS1
+ * @author Hongchan Choi (hoch, hongchan.choi@gmail.com)
  */
-
-
 (function (WX) {
 
   'use strict';
@@ -21,7 +18,7 @@
   function WXS1(preset) {
 
     // REQUIRED: adding necessary modules
-    WX.Plugin.defineType(this, 'Generator');
+    WX.PlugIn.defineType(this, 'Generator');
 
     // 2 oscs
     this._osc1 = WX.OSC();
@@ -50,12 +47,14 @@
 
     // parameter definition
     WX.defineParams(this, {
+
       osc1type: {
         type: 'Itemized',
         name: 'Waveform',
         default: 'square',
         model: WAVEFORMS
       },
+
       osc1octave: {
         type: 'Generic',
         name: 'Octave',
@@ -64,6 +63,7 @@
         max: 5,
         unit: 'Octave'
       },
+
       osc1gain: {
         type: 'Generic',
         name: 'Gain',
@@ -72,12 +72,14 @@
         max: 1.0,
         unit: 'LinearGain'
       },
+
       osc2type: {
         type: 'Itemized',
         name: 'Waveform',
         default: 'square',
         model: WAVEFORMS
       },
+
       osc2detune: {
         type: 'Generic',
         name: 'Semitone',
@@ -86,6 +88,7 @@
         max: 60,
         unit: 'Semitone'
       },
+
       osc2gain: {
         type: 'Generic',
         name: 'Gain',
@@ -94,6 +97,7 @@
         max: 1.0,
         unit: 'LinearGain'
       },
+
       cutoff: {
         type: 'Generic',
         name: 'Cutoff',
@@ -102,6 +106,7 @@
         max: 5000,
         unit: 'Hertz'
       },
+
       reso: {
         type: 'Generic',
         name: 'Reso',
@@ -110,6 +115,7 @@
         max: 20.0,
         unit: ''
       },
+
       filterModAmount: {
         type: 'Generic',
         name: 'Mod Amt',
@@ -118,6 +124,7 @@
         max: 8.0,
         unit: ''
       },
+
       filterAttack: {
         type: 'Generic',
         name: 'Att',
@@ -126,6 +133,7 @@
         max: 5.0,
         unit: 'Seconds'
       },
+
       filterDecay: {
         type: 'Generic',
         name: 'Dec',
@@ -134,6 +142,7 @@
         max: 5.0,
         unit: 'Seconds'
       },
+
       filterSustain: {
         type: 'Generic',
         name: 'Sus',
@@ -141,6 +150,7 @@
         min: 0.0,
         max: 1.0
       },
+
       filterRelease: {
         type: 'Generic',
         name: 'Rel',
@@ -149,6 +159,7 @@
         max: 10.0,
         unit: 'Seconds'
       },
+
       ampAttack: {
         type: 'Generic',
         name: 'Att',
@@ -157,6 +168,7 @@
         max: 5.0,
         unit: 'Seconds'
       },
+
       ampDecay: {
         type: 'Generic',
         name: 'Dec',
@@ -165,6 +177,7 @@
         max: 5.0,
         unit: 'Seconds'
       },
+
       ampSustain: {
         type: 'Generic',
         name: 'Sus',
@@ -172,6 +185,7 @@
         min: 0.0,
         max: 1.0
       },
+
       ampRelease: {
         type: 'Generic',
         name: 'Rel',
@@ -183,7 +197,7 @@
     });
 
     // REQUIRED: initializing instance with preset
-    WX.Plugin.initPreset(this, preset);
+    WX.PlugIn.initPreset(this, preset);
   }
 
   /** REQUIRED: plug-in prototype **/
@@ -191,12 +205,12 @@
 
     // REQUIRED: plug-in info
     info: {
-      name: 'SimpleOsc',
+      name: 'WXS1',
+      version: '0.0.2',
       api_version: '1.0.0-alpha',
-      plugin_version: '0.0.2',
-      author: 'hoch',
-      type: 'instrument',
-      description: '2 Osc Monophonic Subtractive Synth'
+      author: 'Hongchan Choi',
+      type: 'Generator',
+      description: '2 OSC Monophonic Subtractive Synth'
     },
 
     // REQUIRED: plug-in default preset
@@ -314,9 +328,9 @@
   };
 
   // REQUIRED: extending plug-in prototype with modules
-  WX.Plugin.extendPrototype(WXS1, 'Generator');
+  WX.PlugIn.extendPrototype(WXS1, 'Generator');
 
   // REQUIRED: registering plug-in into WX ecosystem
-  WX.Plugin.register(WXS1);
+  WX.PlugIn.register(WXS1);
 
 })(WX);

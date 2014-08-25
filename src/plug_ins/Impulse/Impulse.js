@@ -1,10 +1,7 @@
 /**
- * @module Impulse
- * @author Hongchan Choi (hoch)
- * @description Impulse (train) generator
- * @version 0.0.1
+ * @wapl Impulse
+ * @author Hongchan Choi (hoch, hongchan.choi@gmail.com)
  */
-
 (function (WX) {
 
   'use strict';
@@ -25,7 +22,7 @@
   function Impulse(preset) {
 
     // REQUIRED: adding necessary modules
-    WX.Plugin.defineType(this, 'Generator');
+    WX.PlugIn.defineType(this, 'Generator');
 
     this._impulse = WX.OSC();
     this._impulse.to(this._output);
@@ -47,7 +44,7 @@
     });
 
     // REQUIRED: initializing instance with preset
-    WX.Plugin.initPreset(this, preset);
+    WX.PlugIn.initPreset(this, preset);
   }
 
   /** REQUIRED: plug-in prototype **/
@@ -56,11 +53,11 @@
     // REQUIRED: plug-in info
     info: {
       name: 'Impulse',
+      version: '0.0.1',
       api_version: '1.0.0-alpha',
-      plugin_version: '0.0.1',
-      author: 'hoch',
-      type: 'instrument',
-      description: 'a simple impulse (train) generator'
+      author: 'Hongchan Choi',
+      type: 'Generator',
+      description: 'Impulse (train) Generator'
     },
 
     // REQUIRED: plug-in default preset
@@ -77,9 +74,9 @@
   };
 
   // REQUIRED: extending plug-in prototype with modules
-  WX.Plugin.extendPrototype(Impulse, 'Generator');
+  WX.PlugIn.extendPrototype(Impulse, 'Generator');
 
   // REQUIRED: registering plug-in into WX ecosystem
-  WX.Plugin.register(Impulse);
+  WX.PlugIn.register(Impulse);
 
 })(WX);
