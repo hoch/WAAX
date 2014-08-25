@@ -1,21 +1,18 @@
-/**
- * test-core.js
- *
- * @description   mocha + chai test suite for WAAX Core 1.0.0-alpha
- * @author        hoch (hongchan.choi@gmail.com)
- * @version       1.0.0
- */
+//
+// test-core.js
+//
 
 
+//
 // caching
+//
 var expect = chai.expect,
     should = chai.should();
 
 
-/**
- * Info and Log
- */
-
+//
+// Core: Info and Log
+//
 describe('Core: Info and Log', function() {
 
   describe('Info.getVersion()', function () {
@@ -46,17 +43,11 @@ describe('Core: Info and Log', function() {
 });
 
 
-/**
- * Util
- *
- * isObject, isArray, isNumber, hasParam, extend, clone,
- * clamp, random2f, random2, mtof, ftom, powtodb, dbtopow, rmstodb, dbtorms,
- * patch(TBD)
- */
+//
+// Core: Utilities
+//
+describe('Core: Utilities - object, music math and more.', function() {
 
-describe('Core: Utilities', function() {
-
-  // Object utilities
   describe('isObject(arg)', function () {
     it('should return true when input is JS object.', function () {
       expect(WX.isObject({})).to.equal(true);
@@ -94,12 +85,14 @@ describe('Core: Utilities', function() {
     });
   });
   describe('extend(target, source)', function () {
-    it('should add source to target object and return the extended target.', function () {
-      var source = { a: 1, b: 2 },
-          target = { b: 3, c: 4 },
-          result = { a: 1, b: 2, c: 4 };
-      expect(WX.extend(target, source)).deep.equal(result);
-    });
+    it('should add source to target object and return the extended target.',
+      function () {
+        var source = { a: 1, b: 2 },
+            target = { b: 3, c: 4 },
+            result = { a: 1, b: 2, c: 4 };
+        expect(WX.extend(target, source)).deep.equal(result);
+      }
+    );
   });
   describe('clone(source)', function () {
     it('should return a cloned object.', function () {
@@ -108,8 +101,44 @@ describe('Core: Utilities', function() {
       expect(WX.clone(source)).deep.equal(result);
     });
   });
-
-  // Music Math utilities
+  describe('validateModel(model)', function () {
+    it('returns true when all the keys are unique in a model.', function () {
+      var valid = [
+        { key:'Sine', value:'sine' },
+        { key:'Sinusoid', value:'sine' }
+      ];
+      var invalid = [
+        { key:'Sine', value:'sine' },
+        { key:'Sine', value:'sinusoid' }
+      ];
+      expect(WX.validateModel(valid)).to.equal(true);
+      expect(WX.validateModel(invalid)).to.equal(false);
+    });
+  });
+  describe('findKeyByValue(model, value)', function () {
+    it('returns a key assodicated with a value. null when not found.',
+      function () {
+        var model = [
+          { key:'Sine', value:'sine' },
+          { key:'Sinusoid', value:'sine' }
+        ];
+        expect(WX.findKeyByValue(model, 'sine')).to.equal('Sine');
+        expect(WX.findKeyByValue(model, 'sinusoid')).to.equal(null);
+      }
+    );
+  });
+  describe('findValueByKey(model, key)', function () {
+    it('returns a key assodicated with a value. null when not found.',
+      function () {
+        var model = [
+          { key:'Sine', value:'sine' },
+          { key:'Sine', value:'sinusoid' }
+        ];
+        expect(WX.findValueByKey(model, 'Sine')).to.equal('sine');
+        expect(WX.findValueByKey(model, 'Sawtooth')).to.equal(null);
+      }
+    );
+  });
   describe('clamp(value, min, max)', function () {
     it('should clamp value into between min and max.', function () {
       expect(WX.clamp(1.5, 0.0, 1.0)).to.equal(1.0);
@@ -117,18 +146,22 @@ describe('Core: Utilities', function() {
     });
   });
   describe('random2f(min, max)', function () {
-    it('should generate a floating point random value between min and max.', function () {
-      var rnd = WX.random2f(0.0, 10.0);
-      expect(rnd).to.be.within(0.0, 10.0);
-      expect(parseInt(rnd, 10) === rnd).to.equal(false);
-    });
+    it('should generate a floating point random value between min and max.',
+      function () {
+        var rnd = WX.random2f(0.0, 10.0);
+        expect(rnd).to.be.within(0.0, 10.0);
+        expect(parseInt(rnd, 10) === rnd).to.equal(false);
+      }
+    );
   });
   describe('random2(min, max)', function () {
-    it('should generate an integer random value between min and max.', function () {
-      var rnd = WX.random2(0, 10);
-      expect(rnd).to.be.within(0, 10);
-      expect(parseInt(rnd, 10) === rnd).to.equal(true);
-    });
+    it('should generate an integer random value between min and max.',
+      function () {
+        var rnd = WX.random2(0, 10);
+        expect(rnd).to.be.within(0, 10);
+        expect(parseInt(rnd, 10) === rnd).to.equal(true);
+      }
+    );
   });
   describe('mtof(midi)', function () {
     it('should return frequency from MIDI pitch.', function () {
@@ -144,7 +177,7 @@ describe('Core: Utilities', function() {
       expect(WX.ftom(22050)).to.equal(136);
     });
   });
-  describe('powtodb(pow)', function () {
+  describe('powtodb(power)', function () {
     it('should return decibel from signal power.', function () {
       expect(WX.powtodb(1.0)).to.equal(100.0);
       expect(WX.powtodb(10.0)).to.equal(110.0);
@@ -177,20 +210,13 @@ describe('Core: Utilities', function() {
     });
   });
 
-  // describe('patch(args)', function () {
-  //   it('TBD: should patch plugin units in arguments.', function () {
-  //     // TBD
-  //   });
-  // });
-
 });
 
 
-/**
- * Core
- */
-
-describe('Core', function() {
+//
+// Core: Audio System
+//
+describe('Core: Audio System', function() {
 
   describe('context', function () {
     it('should be AudioContext.', function () {
@@ -260,11 +286,20 @@ describe('Core', function() {
       expect(WX.Panner().constructor.name).to.equal('PannerNode');
     });
   });
+  describe('PeriodicWave()', function () {
+    it('should return a periodic wave object.', function () {
+      var mag = new Float32Array(256),
+          phase = new Float32Array(256),
+          name = WX.PeriodicWave(mag, phase).constructor.name;
+      expect(name).to.equal('PeriodicWave');
+    });
+  });
   describe('Splitter()', function () {
     it('should return a channel splitter node.', function () {
-      expect(WX.Splitter().constructor.name).to.equal('ChannelSplitterNode');
-      expect(WX.Splitter(1, 2).constructor.name).to.equal('ChannelSplitterNode');
-      expect(WX.Splitter(1, 6).constructor.name).to.equal('ChannelSplitterNode');
+      var ctorName = 'ChannelSplitterNode';
+      expect(WX.Splitter().constructor.name).to.equal(ctorName);
+      expect(WX.Splitter(1, 2).constructor.name).to.equal(ctorName);
+      expect(WX.Splitter(1, 6).constructor.name).to.equal(ctorName);
     });
   });
   describe('Merger()', function () {
@@ -315,69 +350,86 @@ describe('Core', function() {
       var clip = { name: 'ziggy', url: '../sound/hochkit/fx-001.wav' };
       var progress = false, complete = false;
       WX.loadClip(clip,
-        function (event) {
-          progress = true;
-          expect(event.loaded).to.be.within(0, event.totalSize);
-        },
         function (clip) {
           complete = true;
           expect(progress).to.equal(true);
           expect(complete).to.equal(true);
           expect(clip.buffer.constructor.name).to.equal('AudioBuffer');
           done();
-      });
+        },
+        function (event) {
+          progress = true;
+          expect(event.loaded).to.be.within(0, event.totalSize);
+        }
+      );
     });
   });
 
 });
 
 
-/**
- * Plug-in utilities
- * - defineType
- * - initPreset
- * - extendPrototype
- * - register
- */
-
+//
+// Core: Plug-in Utilities
+//
 describe('Core: Plug-in Utilities', function () {
 
   // dummy setup for testing
   function MyGenerator(preset) {
-    WX.Plugin.defineType(this, 'Generator');
+    WX.PlugIn.defineType(this, 'Generator');
     WX.defineParams(this, {
-      p1: { type: 'Boolean', default: false },
-      p2: { type: 'Boolean', default: true }
+      p1: {
+        type: 'Boolean',
+        default: false
+      },
+      p2: {
+        type: 'Boolean',
+        default: true
+      }
     });
-    WX.Plugin.initPreset(this, preset);
+    WX.PlugIn.initPreset(this, preset);
   }
+
   MyGenerator.prototype = {
-    info: { api_version: '1.0.0-alpha' },
-    defaultPreset: { p1: false, p2: true },
-    $p1: function (value, time, xtype) {
+    info: {
+      api_version: '1.0.0-alpha',
+      type: 'Generator'
+    },
+    defaultPreset: {
+      p1: false,
+      p2: true
+    },
+    $p1: function(value, time, xtype) {
       return value ? 'pass' : 'fail';
     },
-    $p2: function (value, time, xtype) {
+    $p2: function(value, time, xtype) {
       return value ? 'pass' : 'fail';
     }
   };
-  WX.Plugin.extendPrototype(MyGenerator, 'Generator');
+
+  WX.PlugIn.extendPrototype(MyGenerator, 'Generator');
 
   function MyProcessor() {
-    WX.Plugin.defineType(this, 'Processor');
+    WX.PlugIn.defineType(this, 'Processor');
   }
+
   MyProcessor.prototype = {};
-  WX.Plugin.extendPrototype(MyProcessor, 'Processor');
+
+  WX.PlugIn.extendPrototype(MyProcessor, 'Processor');
 
   function MyAnalyzer() {
-    WX.Plugin.defineType(this, 'Analyzer');
+    WX.PlugIn.defineType(this, 'Analyzer');
   }
-  MyAnalyzer.prototype = {};
-  WX.Plugin.extendPrototype(MyAnalyzer, 'Analyzer');
 
-  var gen = new MyGenerator({ p1: true, p2: false });
-  var pro = new MyProcessor();
-  var ana = new MyAnalyzer();
+  MyAnalyzer.prototype = {};
+
+  WX.PlugIn.extendPrototype(MyAnalyzer, 'Analyzer');
+
+  var gen = new MyGenerator({
+    p1: true,
+    p2: false
+  });
+  var pro = new MyProcessor(),
+      ana = new MyAnalyzer();
 
   describe('defineType(plugin, type)', function () {
     it('should import required components to plugin based on type specifier.',
@@ -388,7 +440,6 @@ describe('Core: Plug-in Utilities', function () {
       }
     );
   });
-
   describe('extendPrototype(plugin, type)', function () {
     it('should extend prototype with core plugin methods.',
       function () {
@@ -423,7 +474,6 @@ describe('Core: Plug-in Utilities', function () {
       }
     );
   });
-
   describe('initPreset(plugin, preset)', function () {
     it('should initialize plugin preset from arguments and default preset.',
       function () {
@@ -432,11 +482,10 @@ describe('Core: Plug-in Utilities', function () {
       }
     );
   });
-
   describe('register(pluginConstructor)', function () {
     it('should register plugin class under namespace WX.',
       function () {
-        WX.Plugin.register(MyGenerator);
+        WX.PlugIn.register(MyGenerator);
         var myGen = WX.MyGenerator();
         expect(myGen).to.respondTo('get');
         expect(myGen).to.respondTo('set');
@@ -454,18 +503,10 @@ describe('Core: Plug-in Utilities', function () {
 });
 
 
-/**
- * MUI methods??
- * - MouseResponder
- * - KeyResponder
- * - $
- */
-
-
-/**
- * Plug-in: Fader
- */
-
+//
+// Stock PlugIn: Fader
+// Because Fader is included in the core as 'WX.Master'
+//
 describe('Plug-in: Fader', function () {
   it('should set parameters correctly. (BEEP)', function (done) {
     // test patch: osc is needed to run the AudioParam automation
@@ -494,6 +535,3 @@ describe('Plug-in: Fader', function () {
     }, 100);
   });
 });
-
-
-

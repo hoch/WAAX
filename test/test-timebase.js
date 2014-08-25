@@ -11,8 +11,10 @@
 var expect = chai.expect,
     should = chai.should();
 
-// test setup
-var TB = Timebase, TX = Timebase.Transport;
+var TB = Timebase,
+    TX = Timebase.Transport;
+
+// test data
 var TEST_DATA = [
   [0, 0, 997, 1007], [1, 1, 534, 613], [2, 2, 988, 1102],
   [3, 3, 85, 141], [4, 4, 1001, 1108], [5, 5, 722, 832],

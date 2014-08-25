@@ -396,6 +396,13 @@
       this._targets.push(target);
     },
 
+    removeTarget: function (target) {
+      var idx = this._targets.indexOf(target);
+      if (idx > -1) {
+        this._targets.splice(idx, 1);
+      }
+    },
+
   });
 </script>
 

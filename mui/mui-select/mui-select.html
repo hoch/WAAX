@@ -120,27 +120,35 @@
       cloudMap: null,
       cloudParam: null,
 
+      // external event handler
+      onItemSelected: null,
+
       render: function () {
         this.$.eDropdown.style.display = (this._menuShown) ? 'block' : 'none';
       },
 
       // model => knob
       update: function () {
-        this.key = MUI.findKeyByValue(this.$.eItems.model, this.value);
+        this.key = WX.findKeyByValue(this.$.eItems.model, this.value);
         this.render();
       },
 
       // post: knob => model
       post: function () {
-        this.value = MUI.findValueByKey(this.$.eItems.model, this.key);
+        this.value = WX.findValueByKey(this.$.eItems.model, this.key);
         // update target param
         if (this.targetParam) {
           // do not call the handler directly.
           // invoke 'xxxxxParam.set' method
           this.targetParam.set(this.value);
         }
+        // GDrive support
         if (this.cloudMap) {
           this.cloudMap.set(this.cloudParam, this.value);
+        }
+        // external event handler
+        if (this.onItemSelected) {
+          this.onItemSelected(this.value);
         }
         this.render();
       },
@@ -172,6 +180,15 @@
         this.$.eItems.model = collection;
         this.key = 'Select...';
         this._modelLoaded = true;
+      },
+
+      setValue: function (value) {
+        var key = WX.findKeyByValue(this.$.eItems.model, value)
+        if (key) {
+          this.value = value;
+          this.key = key;
+        }
+        this.update();
       },
 
       loadTargetParamData: function () {
