@@ -12,11 +12,11 @@
 __WAAX__ is a JavaScript library that offers a comprehensive framework for web-based music application. Its goal is to facilitate music and audio programming on the modern web browser. The __WAAX__ features:
 
 - Extending Web Audio API for ease of use
-- Web Audio Plug-in Interface
+- [Web Audio Plug-in](https://ccrma.stanford.edu/~hongchan/posts/creating-waax-plugin/) Interface
 - Parameter & Preset Management
 - Timebase, Transport and NoteList (a.k.a. Sequencer Engine)
-- Modular GUI elements powered by Polymer
-- Web MIDI API Integration _(supported behind flag)_
+- [Modular GUI elements](http://hoch.github.io/WAAX/mui/) powered by Polymer
+- [Web MIDI API Integration](https://github.com/hoch/Ktrl) _(supported behind flag)_
 - Complete Front-end Development setup: NPM, Bower, Grunt, Foundation, Polymer
 - Tested with Mocha and Chai: [In-browser Test](http://hoch.github.io/WAAX/test/)
 
@@ -26,24 +26,23 @@ You can find playable demos and examples at [PlayWAAX](http://playwaax.appspot.c
 
 ## Basic Usage
 
-To use WAAX in a web page, simply load the `waax.js` in an HTML document. Note that MUI elements packages require Polymer library, so it has to be included before its usage. (Also make sure to have `plug-ins/` and `mui/` directories in the right place.)
+To use WAAX in a web page, simply load the `waax.js` in an HTML document. Note that MUI elements packages require Polymer library, so it has to be included before its usage. The following code snippets require `build/` and `mui/` directories to be at the right place.
 
 ~~~html
-<!-- load WAAX and plug-in -->
-<script src="build/waax.js"></script>
-<script src="build/plug_ins/WXS1.js"></script>
-<script src="build/plug_ins/ConVerb.js"></script>
+<!-- load WAAX, MUI, Timebase and plug-ins -->
+<script src="/build/waax.js"></script>
+<script src="/build/plug_ins/wxs1.js"></script>
+<script src="/build/plug_ins/converb.js"></script>
+<script src="/build/plug_ins/stereodelay.js"></script>
 <!-- load Polymer and MUI elements -->
-<script src="bower_components/platform/platform.js"></script>
-<import src="mui/mui-knob/mui-knob.html"></script>
-<import src="mui/mui-vkey/mui-vkey.html"></script>
+<script src="/bower_components/platform/platform.js"></script>
+<import src="/mui/mui.html"></script>
 ~~~
 
-For sequencer functionality and Web MIDI support, the following components should be included as well:
+For Web MIDI support, the following components should be included as well:
 
 ~~~html
-<!-- optional: for sequencer and MIDI support -->
-<script src="build/timebase.js"></script>
+<!-- optional: for MIDI support -->
 <script src="build/ktrl.js"></script>
 ~~~
 
@@ -56,14 +55,15 @@ By its design, WAAX accommodates various use cases with different levels. As sho
 
 ~~~javascript
 // creating a WXS-1 synth instance.
-var synth = WX.WXS1();
+var synth = WX.WXS1(),
+    delay = WX.StereoDelay();
 // connects the synth to the master output.
-synth.to(WX.Master);
+synth.to(delay).to(WX.Master);
 // play C4 with 100 velocity for 1 second.
 synth.noteOn(60, 100).noteOff(WX.now + 1.0);
 ~~~
 
-Also it can be as complex as a complete music application. For more examples, please check back WAAX and [MUI showcases](http://hoch.github.io/WAAX/mui/) later.
+Also it can be as complex as a complete music application. For more examples, check out [MUI showcases](http://hoch.github.io/WAAX/mui/) and ![Plug-In Workshop](http://hoch.github.io/WAAX/examples/workshop/).
 
 
 ## Further Reading
