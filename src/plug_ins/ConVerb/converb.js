@@ -25,12 +25,6 @@
     this._dry.connect(this._output);
     this._wet.connect(this._output);
 
-    // load default clip
-    this.loadClip({
-      name: '960-LargeBrightRoom',
-      url: '/sound/ir/960-LargePlate.wav'
-    });
-
     // define parameters
     WX.defineParams(this, {
 

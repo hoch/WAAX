@@ -95,6 +95,14 @@
 
       var currGen, currPro;
 
+      var irClip = {
+        name: 'Plate',
+        url: '../../sound/ir/960-LargePlate.wav'
+      };
+      WX.loadClip(irClip, function (clip) {
+        WX.Log.info('clip loaded.');
+      });
+
       function patch() {
         // clear up
         if (currGen) {
@@ -113,6 +121,9 @@
         vkeySelector.addTarget(currGen);
         MUI.buildControls(currGen, 'params-gen');
         MUI.buildControls(currPro, 'params-pro');
+        if (proSelector.value === 'ConVerb') {
+          currPro.setClip(irClip);
+        }
       }
 
       patch();
