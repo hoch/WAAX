@@ -63,7 +63,7 @@ synth.to(delay).to(WX.Master);
 synth.noteOn(60, 100).noteOff(WX.now + 1.0);
 ~~~
 
-Also it can be as complex as a complete music application. For more examples, check out [MUI showcases](http://hoch.github.io/WAAX/mui/) and ![Plug-In Workshop](http://hoch.github.io/WAAX/examples/workshop/).
+Also it can be as complex as a complete music application. For more examples, check out [MUI showcases](http://hoch.github.io/WAAX/mui/) and [Plug-In Workshop](http://hoch.github.io/WAAX/examples/workshop/).
 
 
 ## Further Reading
