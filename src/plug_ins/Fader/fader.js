@@ -9,19 +9,41 @@
     WX.PlugIn.defineType(this, 'Processor');
 
     // node creation and patching
-    this._input.connect(this._output);
+    this._panner = WX.Panner();
+    this._input.to(this._panner).to(this._output);
+
+    this._panner.panningModel = 'equalpower';
 
     WX.defineParams(this, {
 
+      output: {
+        type: 'Generic',
+        name: 'Output',
+        default: 1.0,
+        min: 0.0,
+        max: 3.9810717055349722,
+        unit: 'LinearGain'
+      },
+
       mute: {
         type: 'Boolean',
+        name: 'Mute',
         default: false
+      },
+
+      pan: {
+        type: 'Generic',
+        name: 'Pan',
+        default: 0.0,
+        min: -1.0,
+        max: 1.0
       },
 
       dB: {
         type: 'Generic',
+        name: 'dB',
         default: 0.0,
-        min: -90,
+        min: -60,
         max: 12.0,
         unit: 'Decibels'
       }
@@ -45,10 +67,11 @@
 
     defaultPreset: {
       mute: false,
+      pan: 0.0,
       dB: 0.0
     },
 
-    $mute: function (value, time, xtype) {
+    $mute: function (value, time, rampType) {
       if (value) {
         this._outlet.gain.set(0.0, WX.now, 0);
       } else {
@@ -56,8 +79,15 @@
       }
     },
 
-    $dB: function (value, time, xtype) {
-      this._output.gain.set(WX.dbtolin(value), time, xtype);
+    $pan: function (value, time, rampType) {
+      // TODO: compensate pan model attenuation (z=0.5)
+      this._panner.setPosition(value, 0, 0.5);
+    },
+
+    $dB: function (value, time, rampType) {
+      this.params.output.set(WX.dbtolin(value), time, rampType);
+      // console.log(this);
+      // this._output.gain.set(WX.dbtolin(value), WX.now + 0.02, 1);
     }
 
   };
@@ -67,6 +97,7 @@
 
   // NOTE: built in master output fader
   WX.Master = WX.Fader();
+  console.log(WX.Master);
   WX.Master.to(WX.context.destination);
 
 })(WX);

@@ -2,16 +2,16 @@
 <html>
 <head>
 
-  <title>Impulse | WAAX: Web Audio API eXtension</title>
+  <title>Fader | WAAX: Web Audio API eXtension</title>
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script src="../../../bower_components/platform/platform.js"></script>
-  <link rel="import" href="../../../mui/mui.html">
+  <script src="/bower_components/platform/platform.js"></script>
+  <link rel="import" href="/mui/mui.html">
 
-  <script src="../../waax.js"></script>
-  <script src="Impulse.js"></script>
+  <script src="/build/waax.js"></script>
+  <script src="/build/plug_ins/simpleosc.js"></script>
 
   <style>
     body {
@@ -32,7 +32,7 @@
   <header>
     <div class="row">
       <div class="small-10 small-centered columns">
-        <h3>Plug-in: Impulse</h3>
+        <h3>Plug-in: Fader</h3>
       </div>
     </div>
   </header>
@@ -41,7 +41,9 @@
     <div class="row">
       <div class="small-10 small-centered columns">
 
-        <mui-blade id="b-params" title="Parameters" opened="true">
+        <mui-blade title="Parameters" opened="true">
+          <mui-section id="s-osc" title="SimpleOsc"></mui-section>
+          <mui-section id="s-fader" title="Fader"></mui-section>
         </mui-blade>
 
       </div>
@@ -52,10 +54,13 @@
 
     function onReady() {
 
-      var impulse = WX.Impulse();
-      impulse.to(WX.Master);
+      var osc = WX.SimpleOsc();
+      osc.to(WX.Master);
 
-      MUI.buildControls(impulse, 'b-params');
+      osc.noteOn(64, 100);
+
+      MUI.buildControls(osc, 's-osc');
+      MUI.buildControls(WX.Master, 's-fader');
 
     }
 

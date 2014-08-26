@@ -540,7 +540,7 @@ window.WX = (function () {
           this.setValueAtTime(value, time);
           // when node is not connected, automation will not work
           // this hack handles the error
-          if (time < ctx.currentTime && value !== this.value) {
+          if (time <= ctx.currentTime && value !== this.value) {
             this.value = value;
           }
           break;
@@ -1349,6 +1349,10 @@ window.WX = (function () {
       this._output.to(this._active).to(this._outlet);
       this._bypass.to(this._outlet);
 
+      // initialization for bypass
+      this._active.gain.value = 1.0;
+      this._bypass.gain.value = 0.0;
+
       Core.defineParams(this, {
 
         input: {
@@ -1398,13 +1402,14 @@ window.WX = (function () {
       /**
        * @wxhandler bypass
        */
-      $bypass: function(value) {
+      $bypass: function(value, time, rampType) {
+        time = (time || Core.ctx.currentTime);
         if (value) {
-          this._active.gain.set(0.0);
-          this._bypass.gain.set(1.0);
+          this._active.gain.set(0.0, time, 0);
+          this._bypass.gain.set(1.0, time, 0);
         } else {
-          this._active.gain.set(1.0);
-          this._bypass.gain.set(0.0);
+          this._active.gain.set(1.0, time, 0);
+          this._bypass.gain.set(0.0, time, 0);
         }
       }
 

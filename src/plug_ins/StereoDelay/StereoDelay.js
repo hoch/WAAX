@@ -92,7 +92,7 @@
       mix: {
         type: 'Generic',
         name: 'Mix',
-        default: 1.0,
+        default: 0.2,
         min: 0.0,
         max: 1.0
       }
@@ -123,7 +123,7 @@
       feedbackLeft: 0.250,
       feedbackRight: 0.125,
       crosstalk: 0.1,
-      mix: 1.0
+      mix: 0.2
     },
 
     $delayTimeLeft: function (value, time, rampType) {
