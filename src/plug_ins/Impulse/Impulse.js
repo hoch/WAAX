@@ -8,15 +8,14 @@
 
   // pre-generation of impulse data
   // NOTE: static data for all Impulse instances
-  var data = null,
-      binSize = 4096,
+  var binSize = 4096,
       mag = new Float32Array(binSize),
       phase = new Float32Array(binSize);
   for (var i = 0; i < binSize; ++i) {
     mag[i] = 1.0;
     phase[i] = 0.0;
   }
-  data = WX.PeriodicWave(mag, phase);
+  var DATA = WX.PeriodicWave(mag, phase);
 
   /** REQUIRED: plug-in constructor **/
   function Impulse(preset) {
@@ -28,7 +27,7 @@
     this._impulse.to(this._output);
     this._impulse.start(0);
 
-    this._impulse.setPeriodicWave(data);
+    this._impulse.setPeriodicWave(DATA);
 
     WX.defineParams(this, {
 

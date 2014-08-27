@@ -116,9 +116,9 @@
         unit: ''
       },
 
-      filterModAmount: {
+      filterMod: {
         type: 'Generic',
-        name: 'Mod Amt',
+        name: 'FiltMod',
         default: 1.0,
         min: 0.25,
         max: 8.0,
@@ -127,7 +127,7 @@
 
       filterAttack: {
         type: 'Generic',
-        name: 'Att',
+        name: 'FiltAtt',
         default: 0.02,
         min: 0.0,
         max: 5.0,
@@ -136,7 +136,7 @@
 
       filterDecay: {
         type: 'Generic',
-        name: 'Dec',
+        name: 'FiltDec',
         default: 0.04,
         min: 0.0,
         max: 5.0,
@@ -145,7 +145,7 @@
 
       filterSustain: {
         type: 'Generic',
-        name: 'Sus',
+        name: 'FiltSus',
         default: 0.25,
         min: 0.0,
         max: 1.0
@@ -153,7 +153,7 @@
 
       filterRelease: {
         type: 'Generic',
-        name: 'Rel',
+        name: 'FiltRel',
         default: 0.2,
         min: 0.0,
         max: 10.0,
@@ -223,7 +223,7 @@
       osc2gain: 0.6,
       cutoff: 140,
       reso: 18.0,
-      filterModAmount: 7,
+      filterMod: 7,
       filterAttack: 0.01,
       filterDecay: 0.07,
       filterSustain: 0.5,
@@ -275,7 +275,7 @@
       var p = this.params,
           aAtt = p.ampAttack.get(),
           aDec = p.ampDecay.get(),
-          fAmt = p.filterModAmount.get() * 1200,
+          fAmt = p.filterMod.get() * 1200,
           fAtt = p.filterAttack.get(),
           fDec = p.filterDecay.get(),
           fSus = p.filterSustain.get();

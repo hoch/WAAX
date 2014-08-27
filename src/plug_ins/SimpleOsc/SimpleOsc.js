@@ -1,21 +1,10 @@
 /**
- * @module SimpleOsc
- * @author Hongchan Choi (hoch)
- * @description a single oscillator with modulation
- * @version 0.0.2
+ * @wapl SimpleOsc
+ * @author Hongchan Choi (hoch, hongchan.choi@gmail.com)
  */
-
 (function (WX) {
 
   'use strict';
-
-  // waveform collection (model)
-  var WAVEFORMS = [
-    { key: 'Sine', value: 'sine' },
-    { key: 'Square', value: 'square' },
-    { key: 'Sawtooth', value: 'sawtooth' },
-    { key: 'Triangle', value: 'triangle' }
-  ];
 
   // REQUIRED: plug-in constructor
   function SimpleOsc(preset) {
@@ -42,7 +31,7 @@
         type: 'Itemized',
         name: 'Waveform',
         default: 'sine', // all code-side representation should be 'value'
-        model: WAVEFORMS
+        model: WX.WAVEFORMS
       },
 
       oscFreq: {
@@ -58,7 +47,7 @@
         type: 'Itemized',
         name: 'LFO Type',
         default: 'sine',
-        model: WAVEFORMS
+        model: WX.WAVEFORMS
       },
 
       lfoRate: {
@@ -91,7 +80,7 @@
     // REQUIRED: plug-in info
     info: {
       name: 'SimpleOsc',
-      version: '0.0.1',
+      version: '0.0.2',
       api_version: '1.0.0-alpha',
       author: 'Hongchan Choi',
       type: 'Generator',

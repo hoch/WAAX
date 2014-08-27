@@ -7,13 +7,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script src="../../../bower_components/platform/platform.js"></script>
-  <link rel="import" href="../../../mui/mui.html">
+  <script src="/bower_components/platform/platform.js"></script>
+  <link rel="import" href="/mui/mui.html">
 
-  <script src="../../waax.js"></script>
-  <script src="StereoDelay.js"></script>
-
-  <script src="../Impulse/Impulse.js"></script>
+  <script src="/build/waax.js"></script>
+  <script src="sp1.js"></script>
 
   <style>
     body {
@@ -34,7 +32,7 @@
   <header>
     <div class="row">
       <div class="small-10 small-centered columns">
-        <h3>Plug-in: StereoDelay</h3>
+        <h3>Plug-in: <span id="plugin-name"></span></h3>
       </div>
     </div>
   </header>
@@ -44,8 +42,11 @@
       <div class="small-10 small-centered columns">
 
         <mui-blade title="Parameters" opened="true">
-          <mui-section id="s-impulse" title="Impulse"></mui-section>
-          <mui-section id="s-sdelay" title="Stereo Delay"></mui-section>
+          <mui-section id="s-params"></mui-section>
+        </mui-blade>
+
+        <mui-blade title="Keyboard" opened="true">
+          <mui-vkey id="vkey"></mui-vkey>
         </mui-blade>
 
       </div>
@@ -56,12 +57,20 @@
 
     function onReady() {
 
-      var imp = WX.Impulse(),
-          sdly = WX.StereoDelay();
-      imp.to(sdly).to(WX.Master);
+      var sp1 = WX.SP1();
+      sp1.to(WX.Master);
 
-      MUI.buildControls(imp, 's-impulse');
-      MUI.buildControls(sdly, 's-sdelay');
+      sp1.loadClip({
+        name: 'drumloop',
+        url: '/sound/loops/drums.mp3'
+      });
+
+
+      MUI.$('plugin-name').textContent = sp1.info.name;
+      MUI.$('s-params').setAttribute('title', sp1.info.name);
+      MUI.buildControls(sp1, 's-params');
+
+      MUI.$('vkey').addTarget(sp1);
 
     }
 

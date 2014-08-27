@@ -6,15 +6,49 @@
  */
 
 
-// name reservation for JSDoc
+// some on-the-fly data abstractions
 
 /**
- * @name  WAAX Clip
+ * Contains a model for data binding.
+ * @name WXModel
+ * @example
+ * var model = [
+ *   { key:'Sine', value:'sine' },
+ *   { key:'Sawtooth', value:'sawtooth' }
+ *   ...
+ * ];
  */
 
 /**
- * @name  WAAX Model
+ * WAAX abstraction of audio sample data.
+ * @name WXClip
+ * @example
+ * var clip = {
+ *   name: 'Cool Sample',
+ *   url: 'http://mystaticdata.com/samples/coolsample.wav',
+ *   buffer: null
+ * };
  */
+
+/**
+ * WAAX abstraction of sampler instrument data.
+ * @name WXZone
+ * @example
+ * var zone = {
+ *   clip: WXClip
+ *   basePitch: 60            // samples original pitch
+ *   loop: true,
+ *   loopStart: 0.1,
+ *   loopEnd: 0.5,
+ *   pitchLow: 12,            // pitch low bound
+ *   pitchHigh: 96,           // pitch high bound
+ *   velocityLow: 12,         // velocity lower bound
+ *   velocityHigh: 127,       // velocity high bound
+ *   pitchModulation: true,   // use pitch modulation
+ *   velocityModulatio: true  // use velocity moduation
+ * };
+ */
+
 
 /**
  * @namespace WX
@@ -1593,6 +1627,24 @@ window.WX = (function () {
     // Info, Log
     Info: Info,
     Log: Log,
+
+    // const
+    WAVEFORMS: [
+      { key: 'Sine', value: 'sine' },
+      { key: 'Square', value: 'square' },
+      { key: 'Sawtooth', value: 'sawtooth' },
+      { key: 'Triangle', value: 'triangle' }
+    ],
+    FILTER_TYPES: [
+      { key:'LP' , value: 'lowpass' },
+      { key:'HP' , value: 'highpass' },
+      { key:'BP' , value: 'bandpass' },
+      { key:'LS' , value: 'lowshelf' },
+      { key:'HS' , value: 'highshelf' },
+      { key:'PK' , value: 'peaking' },
+      { key:'BR' , value: 'notch' },
+      { key:'AP' , value: 'allpass' }
+    ],
 
     // Util: Object
     isObject: Util.isObject,

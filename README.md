@@ -30,13 +30,13 @@ To use WAAX in a web page, simply load the `waax.js` in an HTML document. Note t
 
 ~~~html
 <!-- load WAAX, MUI, Timebase and plug-ins -->
-<script src="/build/waax.js"></script>
-<script src="/build/plug_ins/wxs1.js"></script>
-<script src="/build/plug_ins/converb.js"></script>
-<script src="/build/plug_ins/stereodelay.js"></script>
+<script src="build/waax.js"></script>
+<script src="build/plug_ins/wxs1.js"></script>
+<script src="build/plug_ins/converb.js"></script>
+<script src="build/plug_ins/stereodelay.js"></script>
 <!-- load Polymer and MUI elements -->
-<script src="/bower_components/platform/platform.js"></script>
-<import src="/mui/mui.html"></script>
+<script src="bower_components/platform/platform.js"></script>
+<import src="mui/mui.html"></script>
 ~~~
 
 For Web MIDI support, the following components should be included as well:
