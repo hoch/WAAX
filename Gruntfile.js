@@ -1,5 +1,7 @@
 module.exports = function(grunt) {
 
+  'use strict';
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
@@ -65,7 +67,9 @@ module.exports = function(grunt) {
       core: {
         files: {
           'build/waax.js': [
-            'src/waax.js',
+            'src/waax.header.js',
+            'src/waax.util.js',
+            'src/waax.core.js',
             'src/mui.js',
             'src/timebase.js',
             'src/plug_ins/Fader/fader.js'
@@ -89,6 +93,21 @@ module.exports = function(grunt) {
         base: 'dist'
       },
       src: ['**']
+    },
+
+    jsdoc : {
+      reference : {
+        src: [
+          'src/waax.header.js',
+          'src/waax.util.js',
+          'src/waax.core.js',
+        ],
+        options: {
+          destination: 'docs/reference',
+          // template: 'node_modules/ink-docstrap/template',
+          // configure: 'node_modules/ink-docstrap/template/jsdoc.conf.json'
+        }
+      }
     }
 
   });
@@ -99,11 +118,14 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-gh-pages');
+  grunt.loadNpmTasks('grunt-jsdoc');
 
   grunt.registerTask('default', ['build']);
-  grunt.registerTask('serve', ['connect', 'watch']);
   grunt.registerTask('build', ['clean:build', 'uglify']);
-  grunt.registerTask('deploy',
-    ['clean:dist', 'build', 'copy:dist', 'gh-pages', 'clean:dist']
+  grunt.registerTask('serve', ['build', 'connect', 'watch']);
+  grunt.registerTask(
+    'deploy',
+    ['build', 'clean:dist', 'copy:dist', 'gh-pages', 'clean:dist']
   );
+  grunt.registerTask('doc', ['jsdoc']);
 };

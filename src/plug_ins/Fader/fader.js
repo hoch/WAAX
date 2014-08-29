@@ -97,6 +97,6 @@
 
   // NOTE: built in master output fader
   WX.Master = WX.Fader();
-  WX.Master.to(WX.context.destination);
+  WX.Master.to(WX._ctx.destination);
 
 })(WX);
