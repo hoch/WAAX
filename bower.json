@@ -2,7 +2,7 @@
   "name": "WAAX",
   "version": "1.0.0-alpha",
   "homepage": "https://github.com/hoch/WAAX",
-  "description": "front-end utilities for WAAX library",
+  "description": "Web Audio API eXtension",
   "license": "MIT",
   "ignore": [
     "**/.*",
@@ -12,8 +12,8 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#~0.3.4",
-    "core-elements": "Polymer/core-elements#~0.3.4",
+    "polymer": "Polymer/polymer#~0.4.0",
+    "core-elements": "Polymer/core-elements#~0.4.0",
     "foundation": "~5.3.0",
     "chai": "~1.9.1",
     "mocha": "~1.20.1"
