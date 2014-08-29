@@ -1,6 +1,6 @@
 .DS_Store
-NOTES.md
 .grunt/
+NOTES.md
 node_modules/
 bower_components/
 dist/
