@@ -31,6 +31,7 @@
             <section class="top-bar-section">
               <ul class="left">
                 <li><a href="docs/">Documentaion</a></li>
+                <li><a href="docs/reference">API Reference</a></li>
                 <li class="has-dropdown">
                   <a href="#">Examples</a>
                   <ul class="dropdown">
@@ -63,7 +64,7 @@
   <script>
     $(document).foundation();
     var domWAAXVersion = document.querySelector('#waax-ver');
-    domWAAXVersion.textContent = WX.Info.getVersion();
+    domWAAXVersion.textContent = WX.getVersion();
   </script>
 
   <!-- ga analytics -->
