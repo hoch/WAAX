@@ -359,7 +359,7 @@ describe('Core: Audio System', function() {
         },
         function (event) {
           progress = true;
-          expect(event.loaded).to.be.within(0, event.totalSize);
+          expect(event.loaded).to.be.within(0, event.total);
         }
       );
     });
