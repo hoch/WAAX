@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../mui-button/mui-button.html">
 
-<polymer-element name="mui-blade" attributes="title target opened disabled">
+<polymer-element name="mui-blade" attributes="label opened disabled">
 
 <template>
 
@@ -21,7 +21,7 @@
       height: 28px;
       line-height: 28px;
       color: #607d8b;
-      font-size: 18px;
+      font-size: 16px;
       text-transform: uppercase;
       /* background-color: #ddd; */
       /* color: #31353D; */
@@ -50,7 +50,7 @@
   <div class="container">
     <div class="header">
       <mui-button id="eButton" class="button" icon="expand-more" on-click="{{toggle}}"></mui-button>
-      {{title}}
+      {{ label }}
     </div>
     <div class="content" id="eContent">
       <content></content>
@@ -62,7 +62,7 @@
 <script>
   Polymer('mui-blade', {
 
-    title: 'title',
+    label: 'Blade',
     target: null,
     button: null,
     opened: true,

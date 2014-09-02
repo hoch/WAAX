@@ -23,21 +23,20 @@
   <script src="../bower_components/mocha/mocha.js"></script>
   <script src="../bower_components/chai/chai.js"></script>
 
-  <!-- waax core -->
+  <!-- waax -->
   <script src="../build/waax.js"></script>
-  <!--<script src="../src/waax.header.js"></script>
-  <script src="../src/waax.util.js"></script>
-  <script src="../src/waax.core.js"></script>-->
   <script>
-    var domClientVersion = document.querySelector('#client-ver');
-    var domWAAXVersion = document.querySelector('#waax-ver');
-    domClientVersion.textContent = 'CLIENT VERSION: ' + navigator.userAgent.toLowerCase();
-    domWAAXVersion.textContent = 'WAAX VERSION: ' + WX.getVersion();
+    var domClientVersion = document.querySelector('#client-ver'),
+        domWAAXVersion = document.querySelector('#waax-ver');
+    domClientVersion.textContent =
+      'CLIENT VERSION: ' + navigator.userAgent.toLowerCase();
+    domWAAXVersion.textContent =
+      'WAAX VERSION: ' + WX.getVersion();
   </script>
 
   <!-- run the code -->
   <script>mocha.setup('bdd')</script>
-  <script src="test-new.js"></script>
+  <script src="test-core.js"></script>
   <script src="test-timebase.js"></script>
   <script>mocha.run();</script>
 

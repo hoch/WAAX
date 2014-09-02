@@ -1,23 +1,14 @@
-//
 // test-core.js
-//
 
-
-//
 // caching
-//
 var expect = chai.expect,
     should = chai.should();
 
-
-//
-// Core: Info and Log
-//
-describe('Core: Info and Log', function() {
-
-  describe('Info.getVersion()', function () {
+// Utilities
+describe('Core: Utilities - object, music math and more.', function() {
+  describe('getVersion()', function () {
     it('should return API version number.', function () {
-      expect(WX.Info.getVersion()).to.equal('1.0.0-alpha');
+      expect(WX.getVersion()).to.equal('1.0.0-alpha');
     });
   });
   describe('Log.info(arg)', function () {
@@ -39,15 +30,6 @@ describe('Core: Info and Log', function() {
       }).to.throw(Error);
     });
   });
-
-});
-
-
-//
-// Core: Utilities
-//
-describe('Core: Utilities - object, music math and more.', function() {
-
   describe('isObject(arg)', function () {
     it('should return true when input is JS object.', function () {
       expect(WX.isObject({})).to.equal(true);
@@ -212,28 +194,25 @@ describe('Core: Utilities - object, music math and more.', function() {
 
 });
 
-
-//
 // Core: Audio System
-//
 describe('Core: Audio System', function() {
 
   describe('context', function () {
     it('should be AudioContext.', function () {
-      expect(WX.context.constructor.name).to.equal('AudioContext');
+      expect(WX._ctx.constructor.name).to.equal('AudioContext');
     });
   });
   // TODO: there might be inconsistent between now and currentTime. be advise.
   describe('now (getter)', function () {
     it('should return current time in audio context.', function () {
       expect(WX.now).to.be.above(0.0);
-      expect(WX.now).to.equal(WX.context.currentTime);
+      expect(WX.now).to.equal(WX._ctx.currentTime);
     });
   });
   describe('srate (getter)', function () {
     it('should return current sample rate of audio context.', function () {
       expect(WX.srate).to.be.above(22050);
-      expect(WX.srate).to.equal(WX.context.sampleRate);
+      expect(WX.srate).to.equal(WX._ctx.sampleRate);
     });
   });
   describe('Gain()', function () {
@@ -367,10 +346,7 @@ describe('Core: Audio System', function() {
 
 });
 
-
-//
 // Core: Plug-in Utilities
-//
 describe('Core: Plug-in Utilities', function () {
 
   // dummy setup for testing
@@ -502,11 +478,8 @@ describe('Core: Plug-in Utilities', function () {
 
 });
 
-
-//
 // Stock PlugIn: Fader
 // Because Fader is included in the core as 'WX.Master'
-//
 describe('Plug-in: Fader', function () {
   it('should set parameters correctly. (BEEP)', function (done) {
     // test patch: osc is needed to run the AudioParam automation
