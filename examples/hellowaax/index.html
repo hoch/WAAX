@@ -1,29 +1,25 @@
 <!doctype html>
 <html>
+
 <head>
   <title>Examples: Hello WAAX! | WAAX</title>
-  <!-- Polymer -->
-  <script src="../../bower_components/platform/platform.js"></script>
-  <!-- MUI and WAAX core -->
-  <link rel="import" href="../../mui/mui.html">
   <script src="../../build/waax.js"></script>
   <script src="../../build/plug_ins/simpleosc.js"></script>
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../../mui/mui.html">
 </head>
+
 <body unresolved>
-
-  <!-- MUI Knob -->
+  <!-- GUI -->
   <mui-knob id="k-freq"></mui-knob>
-
-  <!-- Setup -->
+  <!-- Logic -->
   <script>
-    function start() {
-      var osc = WX.SimpleOsc();
+    MUI.start(function () {
+      var osc = WX.SimpleOsc({ 'oscFreq': 220 });
       osc.to(WX.Master);
-      osc.noteOn(60, 100);
       MUI.$('k-freq').link(osc, 'oscFreq');
-    }
-    window.addEventListener('polymer-ready', start);
+    });
   </script>
-
 </body>
+
 </html>
