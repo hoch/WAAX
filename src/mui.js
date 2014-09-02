@@ -192,6 +192,16 @@ window.MUI = (function (WX) {
 
     $: function (elementId) {
       return document.getElementById(elementId);
+    },
+
+    start: function (onreadyFn) {
+      // check up depedency: platform
+      if (WX.isObject(window.Platform)) {
+        // start function when polymer is ready
+        window.addEventListener('polymer-ready', onreadyFn);
+      } else {
+        WX.Log.error('FATAL: Platform/Polymer is not loaded.');
+      }
     }
 
   };
