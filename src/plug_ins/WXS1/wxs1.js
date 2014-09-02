@@ -6,14 +6,6 @@
 
   'use strict';
 
-  // waveform collection (model)
-  var WAVEFORMS = [
-    { key: 'Sine', value: 'sine' },
-    { key: 'Square', value: 'square' },
-    { key: 'Sawtooth', value: 'sawtooth' },
-    { key: 'Triangle', value: 'triangle' }
-  ];
-
   /** REQUIRED: plug-in constructor **/
   function WXS1(preset) {
 
@@ -52,7 +44,7 @@
         type: 'Itemized',
         name: 'Waveform',
         default: 'square',
-        model: WAVEFORMS
+        model: WX.WAVEFORMS
       },
 
       osc1octave: {
@@ -77,7 +69,7 @@
         type: 'Itemized',
         name: 'Waveform',
         default: 'square',
-        model: WAVEFORMS
+        model: WX.WAVEFORMS
       },
 
       osc2detune: {

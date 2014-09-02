@@ -8,6 +8,55 @@
 (function (WX) {
 
   //
+  // WX-specific data structure
+  //
+
+  /**
+   * Contains a model for data binding.
+   * @name WXModel
+   * @memberOf WX
+   * @example
+   * var model = [
+   *   { key:'Sine', value:'sine' },
+   *   { key:'Sawtooth', value:'sawtooth' }
+   *   ...
+   * ];
+   */
+
+  /**
+   * WAAX abstraction of audio sample data.
+   * @name WXClip
+   * @memberOf WX
+   * @example
+   * var clip = {
+   *   name: 'Cool Sample',
+   *   url: 'http://mystaticdata.com/samples/coolsample.wav',
+   *   buffer: null
+   * };
+   */
+
+  /**
+   * WAAX abstraction of sampler instrument data.
+   * @name WXZone
+   * @memberOf WX
+   * @example
+   * var zone = {
+   *   clip: WXClip
+   *   basePitch: 60            // samples original pitch
+   *   loop: true,
+   *   loopStart: 0.1,
+   *   loopEnd: 0.5,
+   *   pitchLow: 12,            // pitch low bound
+   *   pitchHigh: 96,           // pitch high bound
+   *   velocityLow: 12,         // velocity lower bound
+   *   velocityHigh: 127,       // velocity high bound
+   *   pitchModulation: true,   // use pitch modulation
+   *   velocityModulatio: true  // use velocity moduation
+   * };
+   */
+
+
+  //
   // Parameter Abstractions
   //
 

@@ -2,11 +2,14 @@
  * @wapl SP1
  * @author Hongchan Choi (hoch, hongchan.choi@gmail.com)
  */
+
+// TODO
+// - filter? mod?
+// -
+
 (function (WX) {
 
   'use strict';
-
-  // constant filter types
 
   // internal abstraction for polyphony impl
   function SP1Voice(sampler) {
@@ -20,10 +23,10 @@
     this._srcGain = WX.Gain();
     this._src.to(this._srcGain).to(this.parent._filter);
 
-    this._src.buffer = this.parent.buffer;
-    this._src.onended = function () {
-      this.parent.voiceEndedCallback(this.voiceKey);
-    }.bind(this);
+    this._src.buffer = this.parent.clip.buffer;
+    // this._src.onended = function () {
+    //   // DO SOMETHING
+    // }.bind(this);
 
   }
 
@@ -35,9 +38,10 @@
           att = p.ampAttack.get(),
           dec = p.ampDecay.get(),
           sus = p.ampSustain.get(),
-          scale = WX.veltoamp(velocity);
-      console.log(att);
-      this._src.playbackRate.value = Math.pow(2, (pitch - basePitch) / 12);
+          scale = p.velocityMod.get() ? WX.veltoamp(velocity) : 1.0;
+      if (p.pitchMod.get()) {
+        this._src.playbackRate.value = Math.pow(2, (pitch - basePitch) / 12);
+      }
       this._src.start(time);
       this._srcGain.gain.set(0.0, time, 0);
       this._srcGain.gain.set(scale, time + att, 1);
@@ -53,7 +57,6 @@
         var p = this.params,
             rel = p.ampRelease.get();
         this.voiceKey = pitch;
-        // TODO TODO TODO TODO TODO
         this._src.stop(this.minDur + rel + 1.0);
         // if noteOff happens before minDur
         // : cancel scheduled ADS envelope and then start releasing
@@ -77,13 +80,18 @@
     WX.PlugIn.defineType(this, 'Generator');
 
     this.ready = false;
-    this.voices = {};
-    this.buffer = null;
+    this.clip = null;
+    this.numVoice = 0;
+
+    // naive voice management
+    this.voices = [];
+    for (var i = 0; i < 128; i++) {
+      this.voices[i] = [];
+    }
 
     // patching
     this._filter = WX.Filter();
-    this._panner = WX.Panner();
-    this._filter.to(this._panner).to(this._output);
+    this._filter.to(this._output);
 
     // parameter definition
     WX.defineParams(this, {
@@ -148,7 +156,7 @@
       filterType: {
         type: 'Itemized',
         name: 'FiltType',
-        default: 'LP',
+        default: 'lowpass',
         model: WX.FILTER_TYPES
       },
 
@@ -176,58 +184,6 @@
         min: -40.0,
         max: 40.0,
         unit: 'LinearGain'
-      },
-
-      filterMod: {
-        type: 'Generic',
-        name: 'FiltMod',
-        default: 1.0,
-        min: 0.25,
-        max: 8.0
-      },
-
-      filterAttack: {
-        type: 'Generic',
-        name: 'FiltAtt',
-        default: 0.02,
-        min: 0.0,
-        max: 5.0,
-        unit: 'Seconds'
-      },
-
-      filterDecay: {
-        type: 'Generic',
-        name: 'FiltDec',
-        default: 0.04,
-        min: 0.0,
-        max: 5.0,
-        unit: 'Seconds'
-      },
-
-      filterSustain: {
-        type: 'Generic',
-        name: 'FiltSus',
-        default: 0.25,
-        min: 0.0,
-        max: 1.0,
-        unit: 'LinearGain'
-      },
-
-      filterRelease: {
-        type: 'Generic',
-        name: 'FiltRel',
-        default: 0.2,
-        min: 0.0,
-        max: 10.0,
-        unit: 'Seconds'
-      },
-
-      pan: {
-        type: 'Generic',
-        name: 'Pan',
-        default: 0.0,
-        min: -1.0,
-        max: 1.0,
       }
 
     });
@@ -259,16 +215,10 @@
       ampSustain: 0.06,
       ampRelease: 0.06,
       filterType: 'LP',
-      filterFrequency: 2500,
-      filterQ: 18.0,
+      filterFrequency: 5000,
+      filterQ: 0.0,
       filterGain: 0.0,
-      filterMod: 7,
-      filterAttack: 0.01,
-      filterDecay: 0.07,
-      filterSustain: 0.07,
-      filterRelease: 0.03,
-      pan: 0.0,
-      output: 0.8
+      output: 1.0
     },
 
     // REQUIRED: if you have a parameter,
@@ -289,69 +239,26 @@
       this._filter.gain.set(value, time, rampType);
     },
 
-    $filterDetune: function (value, time, rampType) {
-      this._filter.detune.set(value, time, rampType);
-    },
-
-    // play: function (pitch, velocity, time) {
-    //   if (!this.ready) return;
-    //   time = (time || WX.now);
-    //   var _buffer = WX.Source(),
-    //       _env = WX.Gain();
-    //   _buffer.to(_env).to(this._filter);
-    //   _buffer.buffer = this.bufferRef;
-    //   _buffer.playbackRate = Math.pow(2, (this.params.tune.get() + pitch) / 1200);
-    //   var p = this.params,
-    //       aAtt = p.ampAttack.get(),
-    //       aHld = p.ampHold.get(),
-    //       aRls = p.ampRelease.get(),
-    //       fAmt = p.filterModAmount.get() * 1200,
-    //       fAtt = p.filterAttack.get(),
-    //       fHld = p.filterHold.get(),
-    //       fRls = p.filterRelease.get();
-    //   // start sample
-    //   _buffer.start(time);
-    //   // attack
-    //   _env.gain.set(1.0, [time, aAtt], 3);
-    //   this.$filterDetune(fAmt, [time, fAtt], 3);
-    //   // hold
-    //   _env.gain.set(1.0, [time + aAtt, aHld], 3);
-    //   this.$filterDetune(fAmt, [time + fAtt, fHld], 3);
-    //   // release
-    //   _env.gain.set(0.0, [time + aAtt + aHld, aRls], 3);
-    //   this.$filterDetune(0.0, [time + fAtt + fHld, fRls], 3);
-    //   // stop sample
-    //   _buffer.stop(time + fAtt + fHld + fRls);
-    // },
-
     noteOn: function (pitch, velocity, time) {
       time = (time || WX.now);
       var voice = new SP1Voice(this);
-      if (this.voices.hasOwnProperty(pitch)) {
-        this.voices[pitch].push(voice);
-      } else {
-        this.voices[pitch] = [voice];
-      }
+      this.voices[pitch].push(voice);
+      this.numVoice++;
       voice.noteOn(pitch, velocity, time);
     },
 
     noteOff: function (pitch, velocity, time) {
-      if (this.voices.hasOwnProperty(pitch)) {
-        time = (time || WX.now);
-        var playing = this.voices[pitch];
-        for (var i = 0; i < playing.length; i++) {
-          playing[i].noteOff(pitch, velocity, time);
-        }
+      time = (time || WX.now);
+      var playing = this.voices[pitch];
+      for (var i = 0; i < playing.length; i++) {
+        playing[i].noteOff(pitch, velocity, time);
+        this.numVoice--;
       }
+      // TODO: is this performant enough?
+      this.voices[pitch] = [];
     },
 
-    voiceEndedCallback: function (pitch) {
-      if (this.voices.hasOwnProperty(pitch)) {
-        delete this.voices[pitch];
-      }
-    },
-
-    // realtime input data responder
+    // realtime input data responder (Ktrl responder)
     onData: function (action, data) {
       switch (action) {
         case 'noteon':
@@ -364,11 +271,12 @@
     },
 
     _onprogress: function (event, clip) {
-
+      // TODO
     },
 
     _onloaded: function (clip) {
       this.setClip(clip);
+      WX.Log.info('Clip loaded:', clip.name);
     },
 
     isReady: function () {
@@ -377,7 +285,6 @@
 
     setClip: function (clip) {
       this.clip = clip;
-      this.buffer = this.clip.buffer;
       this.ready = true;
     },
 

@@ -2,7 +2,7 @@
 <html>
 <head>
 
-  <title>SP1 | WAAX: Web Audio API eXtension</title>
+  <title>Noise | WAAX: Web Audio API eXtension</title>
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
   <link rel="import" href="/mui/mui.html">
 
   <script src="/build/waax.js"></script>
-  <script src="sp1.js"></script>
+  <script src="noise.js"></script>
 
   <style>
     body {
@@ -53,22 +53,14 @@
 
     function onReady() {
 
-      var sp1 = WX.SP1();
-      sp1.to(WX.Master);
+      var noise = WX.Noise();
+      noise.to(WX.Master);
 
-      sp1.loadClip({
-        name: 'a drum loop',
-        url: '/sound/loops/drums.mp3'
-      });
+      MUI.$('plugin-name').textContent = noise.info.name;
+      MUI.$('b-params').label = noise.info.name;
 
-
-      MUI.$('plugin-name').textContent = sp1.info.name;
-      MUI.$('b-params').label = sp1.info.name;
-
-      MUI.buildControls(sp1, 'b-params');
+      MUI.buildControls(noise, 'b-params');
       MUI.buildControls(WX.Master, 'b-master');
-
-      MUI.$('vkey').addTarget(sp1);
 
     }
 
