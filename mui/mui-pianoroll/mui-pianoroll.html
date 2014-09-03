@@ -73,7 +73,7 @@
     },
 
     _Viewport2MIDI: function (data) {
-      var pitch = ~~((this._cy + data.y) * (12 / 96));
+      var pitch = 127 - ~~((this._cy + data.y) * (12 / 96));
       var time = (this._cx + data.x - 36) * (1920 / 120);
       console.log(pitch, time);
     },
