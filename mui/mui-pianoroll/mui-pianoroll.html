@@ -1,0 +1,211 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<polymer-element name="mui-pianoroll">
+
+<template>
+
+  <style>
+    :host {
+      display: inline-block;
+      margin-bottom: 5px;
+    }
+    .container {
+      position: relative;
+      display: inline-block;
+      margin: 0 12px 0 4px;
+      /* padding-bottom: 5px; */
+      vertical-align: top;
+      /* text-align: center; */
+    }
+    .note {
+      stroke: #cfd8dc;
+      stroke-width: 1px;
+      fill: #90a4ae;
+    }
+    .selected {
+      fill: #90a4ae;
+    }
+
+  </style>
+
+  <div class="container">
+    <canvas id="eOnScreenCanvas"></canvas>
+  </div>
+
+</template>
+
+<script>
+  Polymer('mui-pianoroll', {
+
+    _ctx: null,
+    _ctxBg: null,
+    _tiles: null,
+
+    _dataRef: [],
+
+    _vpX: 0,
+    _vpY: 0,
+    _vpW: 700,
+    _vpH: 300,
+
+    _kbdW: 36,
+    _gridW: 120,
+    _gridH: 96,
+
+    _cx: 0,
+    _cy: 0,
+
+    // Tick_Per_Beat = 480
+    _pxPerTick: 120 / 1920,
+    _pxPerPitch: Math.round(96 / 12),
+
+    _MIDI2Viewport: function (note) {
+      var x0 = note[2] * this._pxPerTick - this._cx,
+          w = note[3] * this._pxPerTick,
+          y0 = note[0] * this._pxPerPitch - this._cy;
+      if ((0 <= y0 && y0 <= this._vpH) && (0 <= y0 + 8 && y0 + 8 <= this._vpH)) {
+        if ((0 <= x0 && x0 <= this._vpW) || (0 <= x0 + w && x0 + w <= this._vpW)) {
+          return [x0 + 36, y0, w, 8];
+        }
+      } else {
+        return null;
+      }
+    },
+
+    _Viewport2MIDI: function (data) {
+      var pitch = ~~((this._cy + data.y) * (12 / 96));
+      var time = (this._cx + data.x - 36) * (1920 / 120);
+      console.log(pitch, time);
+    },
+
+    drawTilesBg: function () {
+      var numRows = Math.round(this._vpH / this._gridH) + 2,
+          numCols = Math.round(this._vpW / this._gridW) + 2;
+      for (var r = 0; r < numRows; r++) {
+        this._ctxBg.drawImage(
+          this._tiles,
+          24, 24, 42, 96,
+          0, r * this._gridH, 36, 96
+        );
+        for (var c = 0; c < numCols; c++) {
+          this._ctxBg.drawImage(
+            this._tiles,
+            72, 24, 105, 96,
+            42 + c * this._gridW, r * this._gridH, this._gridW, this._gridH
+          );
+        }
+      }
+    },
+
+    debugBg: function () {
+      this._ctx.drawImage(this._ctxBg.canvas, 0, 0);
+    },
+
+    drawKeyboard: function (y0) {
+      this._ctx.drawImage(
+        this._ctxBg.canvas,
+        0,
+        this._gridH + (y0 % this._gridH),
+        36, this._vpH,
+        0, 0, 36, this._vpH
+      );
+    },
+
+    drawGrid: function (x0, y0) {
+      this._ctx.drawImage(
+        this._ctxBg.canvas,
+        44 + this._gridW + (x0 % this._gridW),
+        this._gridH + (y0 % this._gridH),
+        this._vpW, this._vpH,
+        36, 0, this._vpW, this._vpH
+      );
+    },
+
+    drawNotes: function () {
+      this._ctx.strokeStyle = "#000";
+      this._ctx.fillStyle = "#C66";
+      for (var i = 0; i < this._dataRef.length; i++) {
+        var pos = this._MIDI2Viewport(this._dataRef[i]);
+        if (pos) {
+          this._ctx.strokeRect(pos[0], pos[1], pos[2], pos[3]);
+          this._ctx.fillRect(pos[0], pos[1], pos[2], pos[3]);
+        }
+      }
+    },
+
+    update: function () {
+      this.drawGrid(this._cx, this._cy);
+      this.drawNotes();
+      this.drawKeyboard(this._cy);
+    },
+
+    _createTileMap: function () {
+      this._tiles = new Image();
+      this._tiles.onload = function () {
+        this.drawTilesBg();
+        // this.debugBg();
+        this.update();
+      }.bind(this);
+      this._tiles.src = 'imagemap.png';
+    },
+
+    ready: function () {
+
+      // create 2d context
+      this._ctx = this.$.eOnScreenCanvas.getContext('2d');
+      this.$.eOnScreenCanvas.width = 700;
+      this.$.eOnScreenCanvas.height = 500;
+      this._ctx.fillStyle = '#eceff1';
+      this._ctx.fillRect(0, 0, 1024, 768);
+
+      // create offscreen ctx
+      var canvasBg = document.createElement('canvas');
+      this._ctxBg = canvasBg.getContext('2d');
+      canvasBg.width = 1400;
+      canvasBg.height = 600;
+
+      // load image map to offscreen
+      this._createTileMap();
+
+      // mouse responder
+      var mouseResponder = MUI.MouseResponder(
+        this.label,
+        this.$.eOnScreenCanvas,
+        function (sender, action, data) {
+          switch (action) {
+            case 'clicked':
+              prevData = data;
+              document.body.style.cursor = 'move';
+              this._Viewport2MIDI(data);
+              break;
+            case 'dragged':
+              this._cx -= data.x - prevData.x;
+              this._cy -= data.y - prevData.y;
+              // boundary checking
+              this._cx = (this._cx < 0) ? 0 : this._cx;
+              this._cy = (this._cy < 0) ? 0 : this._cy;
+              if (this._cy > (this._gridH * 10) - this._vpH) {
+                this._cy = (this._gridH * 10) - this._vpH;
+              }
+              prevData = data;
+              this.update();
+              break;
+            case 'released':
+              document.body.style.cursor = 'default';
+              this.update();
+              break;
+          }
+        }.bind(this)
+      );
+
+    },
+
+    setData: function (dataRef) {
+      this._dataRef = dataRef;
+      this.update();
+    }
+
+  });
+</script>
+
+</polymer-element>

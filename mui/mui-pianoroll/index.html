@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>mui-pianoroll | Web Audio API eXtension</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../mui.html">
+  <link rel="import" href="mui-pianoroll.html">
+  <script src="../../build/waax.js"></script>
+  <!--
+  <script src="../build/plug_ins/wxs1.js"></script>
+  -->
+
+  <style>
+    body {
+      background-color: #fafafa;
+    }
+    header {
+      margin-top: 30px;
+    }
+    h2 {
+      margin-top: 40px;
+    }
+  </style>
+
+</head>
+
+<body unresolved>
+
+  <header>
+    <div class="row">
+      <div class="small-10 small-centered columns">
+        <ul class="breadcrumbs">
+          <li><a href="..">WAAX Home</a></li>
+        </ul>
+        <h3>MUI Elements <small>1.0.0-alpha</small></h3>
+      </div>
+    </div>
+  </header>
+
+  <article>
+    <div class="row">
+      <div class="small-10 small-centered columns">
+        <mui-pianoroll id="proll"></mui-pianoroll>
+      </div>
+    </div>
+  </article>
+
+  <script>
+    /**
+     * TODO:
+     * - coord transformation: MBT -> x,y -> viewport, vice versa
+     * - zoom not needed
+     * - create, edit, delete
+     * - transport features:
+     * - resizing based on parent size
+     *
+     */
+
+    MUI.start(function () {
+
+      var data = [];
+      for (var i = 0; i < 100; i++) {
+        // pitch, velo, start, dur
+        data.push([
+          ~~(Math.random() * 127),
+          100,
+          ~~(Math.random() * 480 * 4 * 16),
+          ~~(Math.random() * 480 * 4)
+        ]);
+      }
+
+      MUI.$('proll').setData(data);
+
+    });
+  </script>
+
+</body>
+</html>
