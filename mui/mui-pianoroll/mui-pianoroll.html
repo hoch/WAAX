@@ -6,29 +6,27 @@
 
   <style>
     :host {
-      display: inline-block;
+      /*width: 100%;*/
+      display: block;
+      overflow: hidden;
       margin-bottom: 5px;
     }
     .container {
+      /*width: 100%;*/
       position: relative;
-      display: inline-block;
-      margin: 0 12px 0 4px;
-      /* padding-bottom: 5px; */
+      display: block;
       vertical-align: top;
-      /* text-align: center; */
+      overflow: hidden;
     }
-    .note {
-      stroke: #cfd8dc;
-      stroke-width: 1px;
-      fill: #90a4ae;
+    .toolbar {
+      display: block;
+      height: 28px;
+      background-color: #eee;
     }
-    .selected {
-      fill: #90a4ae;
-    }
-
   </style>
 
-  <div class="container">
+  <div id="eContainer" class="container">
+    <div id="eToolbar" class="toolbar"></div>
     <canvas id="eOnScreenCanvas"></canvas>
   </div>
 
@@ -38,134 +36,244 @@
   Polymer('mui-pianoroll', {
 
     _ctx: null,
-    _ctxBg: null,
-    _tiles: null,
+    _ctxos: null,
 
     _dataRef: [],
 
-    _vpX: 0,
-    _vpY: 0,
-    _vpW: 700,
-    _vpH: 300,
-
-    _kbdW: 36,
-    _gridW: 120,
-    _gridH: 96,
-
+    // current viewpoint's virtual coord
     _cx: 0,
     _cy: 0,
 
-    // Tick_Per_Beat = 480
-    _pxPerTick: 120 / 1920,
-    _pxPerPitch: Math.round(96 / 12),
+    // area
+    _minH: 400,
+    _vp: { x: 0, y: 0, w: null, h: null },
+    _ruler: { x: 40, y: 0, w: null, h: 23 },
+    _kbd: { x: 0, y: 23, w: 40, h: null },
+    _grid: { x: 40, y: 23, w: null, h: null },
 
-    _MIDI2Viewport: function (note) {
-      var x0 = note[2] * this._pxPerTick - this._cx,
-          w = note[3] * this._pxPerTick,
-          y0 = note[0] * this._pxPerPitch - this._cy;
-      if ((0 <= y0 && y0 <= this._vpH) && (0 <= y0 + 8 && y0 + 8 <= this._vpH)) {
-        if ((0 <= x0 && x0 <= this._vpW) || (0 <= x0 + w && x0 + w <= this._vpW)) {
-          return [x0 + 36, y0, w, 8];
-        }
-      } else {
-        return null;
-      }
+    // pitchRange (keyboard): C-1 (0) ~ G9 (127)
+    _kbdMaxH: 96 * 10 + 64,
+
+    // tiles
+    _tile: {
+      ruler: { x: 40, y: 0, w: 320, h: 23 },
+      kbd: { x: 0, y: 23, w: 40, h: 96},
+      grid: { x: 40, y: 23, w: 320, h: 96 }
+      // lane: { x: 40, y: 119, w: 320, h: 74 }
     },
 
-    _Viewport2MIDI: function (data) {
-      var pitch = 127 - ~~((this._cy + data.y) * (12 / 96));
-      var time = (this._cx + data.x - 36) * (1920 / 120);
-      console.log(pitch, time);
+    // tick per pixel, pitch per pixel (tick_per_beat = 480)
+    _tickPx: (480 * 4) / 320,
+    _pitchPx: 12 / 96,
+    _pxTick: 320 / (480 * 4),
+    _pxPitch: 96 / 12,
+
+    //
+    // utilities
+    //
+
+    _MIDI2Grid: function (note) {
+      return {
+        x: Math.ceil(note.start * this._pxTick) - this._cx + this._kbd.w,
+        y: Math.floor((130 - note.pitch) * this._pxPitch) - this._cy,
+        w: Math.floor(note.dur * this._pxTick),
+        h: this._pxPitch
+      };
     },
 
-    drawTilesBg: function () {
-      var numRows = Math.round(this._vpH / this._gridH) + 2,
-          numCols = Math.round(this._vpW / this._gridW) + 2;
-      for (var r = 0; r < numRows; r++) {
-        this._ctxBg.drawImage(
-          this._tiles,
-          24, 24, 42, 96,
-          0, r * this._gridH, 36, 96
+    _grid2MIDI: function (data) {
+      var nx = this._cx + data.x - this._kbd.w,
+          ny = this._cy + data.y - this._ruler.h;
+      return {
+        pitch: 127 - Math.floor(ny * this._pitchPx),
+        tick: Math.round(nx * this._tickPx)
+      };
+    },
+
+    //
+    // Drawing related
+    //
+
+    _clearCanvas: function () {
+      this._ctx.fillStyle = '#222';
+      this._ctx.fillRect(0, 0, this._kInnerWidth, this._kInnerHeight);
+    },
+
+    _resize: function () {
+      // get current host size
+      this._kInnerWidth = this.clientWidth;
+      this._kInnerHeight =
+        this.clientHeight < this._minH ? this._minH : this.clientHeight;
+      // adjust canvas size
+      this._ctx.canvas.style.width = '100%';
+      this._ctx.canvas.width = this._kInnerWidth;
+      this._ctx.canvas.height = this._kInnerHeight;
+      // adjust key coordinates
+      this._vp.w = this._kInnerWidth;
+      this._vp.h = this._kInnerHeight;
+      this._grid.w = this._kInnerWidth - this._kbd.w;
+      this._grid.h = this._kInnerHeight - this._ruler.h;
+      this._kbd.h = this._grid.h;
+      this._ruler.w = this._grid.w;
+    },
+
+    _loadImageMap: function (callback) {
+      this._imageMap = new Image();
+      this._imageMap.onload = function () {
+        callback();
+      }.bind(this);
+      this._imageMap.src = 'imagemap.png';
+    },
+
+    _buildImageMap: function () {
+      // for smooth moving, pre-render possible workspace background tiles
+      // onto offscreen canvas
+
+      // get rows and cols for tiles with buffer area
+      var numCols = Math.round(this._grid.w / this._tile.grid.w) + 2,
+          numRows = Math.round(this._grid.h / this._tile.grid.h) + 2;
+      var r, c;
+
+      // resize offscreen canvas
+      this._ctxos.canvas.width =
+        this._tile.kbd.w + numCols * this._tile.grid.w;
+      this._ctxos.canvas.height =
+        this._tile.ruler.h + numRows * this._tile.grid.h;
+
+      // draw ruler
+      for (c = 0; c < numCols; c++) {
+        this._ctxos.drawImage(this._imageMap,
+          this._tile.ruler.x, this._tile.ruler.y,
+          this._tile.ruler.w, this._tile.ruler.h,
+          this._tile.ruler.x + c * this._tile.ruler.w, this._tile.ruler.y,
+          this._tile.ruler.w, this._tile.ruler.h
         );
-        for (var c = 0; c < numCols; c++) {
-          this._ctxBg.drawImage(
-            this._tiles,
-            72, 24, 105, 96,
-            42 + c * this._gridW, r * this._gridH, this._gridW, this._gridH
+        // lane: currently disabled
+        // this._ctxos.drawImage(this._imageMap,
+        //   this._tile.lane.x, this._tile.lane.y,
+        //   this._tile.lane.w, this._tile.lane.h,
+        //   this._tile.lane.x + c * this._tile.lane.w,
+        //   this._vp.h - this._tile.lane.h,
+        //   this._tile.lane.w, this._tile.lane.h
+        // );
+      };
+      // draw kbd
+      for (r = 0; r < numRows; r++) {
+        this._ctxos.drawImage(this._imageMap,
+          this._tile.kbd.x, this._tile.kbd.y,
+          this._tile.kbd.w, this._tile.kbd.h,
+          this._tile.kbd.x, this._tile.ruler.h + r * this._tile.kbd.h,
+          this._tile.kbd.w, this._tile.kbd.h
+        );
+      }
+      // draw grid
+      for (r = 0; r < numRows; r++) {
+        for (c = 0; c < numCols; c++) {
+          this._ctxos.drawImage(this._imageMap,
+            this._tile.grid.x, this._tile.grid.y,
+            this._tile.grid.w, this._tile.grid.h,
+            this._tile.kbd.w + c * this._tile.grid.w,
+            this._tile.ruler.h + r * this._tile.grid.h,
+            this._tile.grid.w, this._tile.grid.h
           );
         }
       }
     },
 
-    debugBg: function () {
-      this._ctx.drawImage(this._ctxBg.canvas, 0, 0);
+    _drawDebug: function () {
+      this._ctx.drawImage(this._ctxos.canvas, 0, 0);
     },
 
-    drawKeyboard: function (y0) {
-      this._ctx.drawImage(
-        this._ctxBg.canvas,
-        0,
-        this._gridH + (y0 % this._gridH),
-        36, this._vpH,
-        0, 0, 36, this._vpH
+    _drawForeground: function () {
+      // ruler
+      this._ctx.drawImage(this._ctxos.canvas,
+        // src
+        this._ruler.x + (this._cx % this._tile.ruler.w),
+        this._ruler.y,
+        this._ruler.w,
+        this._ruler.h,
+        // dst
+        this._ruler.x,
+        this._ruler.y,
+        this._ruler.w,
+        this._ruler.h
+      );
+      // keyboard (32 is for G8, 127 offset)
+      this._ctx.drawImage(this._ctxos.canvas,
+        this._kbd.x,
+        this._kbd.y + 32 + (this._cy % this._tile.kbd.h),
+        this._kbd.w,
+        this._kbd.h,
+        this._kbd.x,
+        this._kbd.y,
+        this._kbd.w,
+        this._kbd.h
+      );
+      // corner
+      this._ctx.fillStyle = '#222';
+      this._ctx.fillRect(0, 0, this._ruler.x, this._kbd.y);
+    },
+
+    _drawBackground: function () {
+      // grid
+      this._ctx.drawImage(this._ctxos.canvas,
+        this._grid.x + (this._cx % this._tile.grid.w),
+        this._grid.y + (this._cy % this._tile.grid.h),
+        this._grid.w,
+        this._grid.h,
+        this._grid.x,
+        this._grid.y,
+        this._grid.w,
+        this._grid.h
       );
     },
 
-    drawGrid: function (x0, y0) {
-      this._ctx.drawImage(
-        this._ctxBg.canvas,
-        44 + this._gridW + (x0 % this._gridW),
-        this._gridH + (y0 % this._gridH),
-        this._vpW, this._vpH,
-        36, 0, this._vpW, this._vpH
-      );
-    },
-
-    drawNotes: function () {
-      this._ctx.strokeStyle = "#000";
-      this._ctx.fillStyle = "#C66";
+    _drawNotes: function () {
+      this._ctx.strokeStyle = '#000';
+      this._ctx.fillStyle = '#C66';
       for (var i = 0; i < this._dataRef.length; i++) {
-        var pos = this._MIDI2Viewport(this._dataRef[i]);
-        if (pos) {
-          this._ctx.strokeRect(pos[0], pos[1], pos[2], pos[3]);
-          this._ctx.fillRect(pos[0], pos[1], pos[2], pos[3]);
-        }
+        // transfrom viewport
+        var pos = this._MIDI2Grid(this._dataRef[i]);
+        // filter out invisible notes
+        if (this._grid.x + this._grid.w < pos.x) continue;
+        if (pos.x + pos.w < this._grid.x) continue;
+        if (this._grid.y + this._grid.h < pos.y) continue;
+        if (pos.y + pos.h < this._grid.y) continue;
+        // draw note
+        this._ctx.strokeRect(pos.x, pos.y, pos.w, pos.h);
+        this._ctx.fillRect(pos.x, pos.y, pos.w, pos.h);
+        // console.log('drawn'); // to debug
       }
     },
 
-    update: function () {
-      this.drawGrid(this._cx, this._cy);
-      this.drawNotes();
-      this.drawKeyboard(this._cy);
+    _draw: function () {
+      this._clearCanvas();
+      this._drawBackground();
+      this._drawNotes();
+      this._drawForeground();
     },
 
-    _createTileMap: function () {
-      this._tiles = new Image();
-      this._tiles.onload = function () {
-        this.drawTilesBg();
-        // this.debugBg();
-        this.update();
-      }.bind(this);
-      this._tiles.src = 'imagemap.png';
+    update: function () {
+      this._draw();
     },
 
     ready: function () {
 
+      // create offscreen canvas
+      var offscreen = document.createElement('canvas');
+
       // create 2d context
       this._ctx = this.$.eOnScreenCanvas.getContext('2d');
-      this.$.eOnScreenCanvas.width = 700;
-      this.$.eOnScreenCanvas.height = 500;
-      this._ctx.fillStyle = '#eceff1';
-      this._ctx.fillRect(0, 0, 1024, 768);
+      this._ctxos = offscreen.getContext('2d');
 
-      // create offscreen ctx
-      var canvasBg = document.createElement('canvas');
-      this._ctxBg = canvasBg.getContext('2d');
-      canvasBg.width = 1400;
-      canvasBg.height = 600;
-
-      // load image map to offscreen
-      this._createTileMap();
+      // load+build image map and callback when done
+      this._loadImageMap(function () {
+        // resize element height to minimum and clear out
+        this._resize();
+        this._buildImageMap();
+        // this._drawDebug();
+        this.update();
+      }.bind(this));
 
       // mouse responder
       var mouseResponder = MUI.MouseResponder(
@@ -176,7 +284,7 @@
             case 'clicked':
               prevData = data;
               document.body.style.cursor = 'move';
-              this._Viewport2MIDI(data);
+              // console.log(this._grid2MIDI(data));
               break;
             case 'dragged':
               this._cx -= data.x - prevData.x;
@@ -184,8 +292,8 @@
               // boundary checking
               this._cx = (this._cx < 0) ? 0 : this._cx;
               this._cy = (this._cy < 0) ? 0 : this._cy;
-              if (this._cy > (this._gridH * 10) - this._vpH) {
-                this._cy = (this._gridH * 10) - this._vpH;
+              if (this._cy > this._kbdMaxH - this._grid.h) {
+                this._cy = this._kbdMaxH - this._grid.h;
               }
               prevData = data;
               this.update();

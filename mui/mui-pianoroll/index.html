@@ -44,33 +44,36 @@
   <article>
     <div class="row">
       <div class="small-10 small-centered columns">
-        <mui-pianoroll id="proll"></mui-pianoroll>
+        <mui-blade>
+          <mui-pianoroll id="proll"></mui-pianoroll>
+        </mui-blade>
       </div>
     </div>
   </article>
 
   <script>
+
     /**
      * TODO:
-     * - coord transformation: MBT -> x,y -> viewport, vice versa
-     * - zoom not needed
+     * - MIDI event class
+     *   : pitch, velo, start, dur, selected
+     * - MIDI event manager class
+     *   : sort by time, google RTAPI list integration
      * - create, edit, delete
      * - transport features:
-     * - resizing based on parent size
-     *
      */
 
     MUI.start(function () {
 
       var data = [];
-      for (var i = 0; i < 100; i++) {
+      for (var i = 0; i < 24; i++) {
         // pitch, velo, start, dur
-        data.push([
-          ~~(Math.random() * 127),
-          100,
-          ~~(Math.random() * 480 * 4 * 16),
-          ~~(Math.random() * 480 * 4)
-        ]);
+        data.push({
+          pitch: 60 + i,
+          velociy: 100,
+          start: 480 * i,
+          dur: 120
+        });
       }
 
       MUI.$('proll').setData(data);

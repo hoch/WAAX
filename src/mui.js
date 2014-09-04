@@ -108,6 +108,44 @@ window.MUI = (function (WX) {
     }
   };
 
+  // Box2D class
+  function Box2D(x, y, w, h) {
+    this.x1 = x;
+    this.y1 = y;
+    this.x2 = x + w;
+    this.y2 = y + h;
+    this.w = w;
+    this.h = h;
+  }
+
+  Box2D.prototype = {
+
+    containsPoint: function (p) {
+      if (this.x1 <= p.x && p.x <= this.x2) {
+        if (this.y1 <= p.y && p.y <= this.y2) {
+          return true;
+        }
+      }
+      return false;
+    },
+
+    getNormX: function (p) {
+      return (p.x - this.x1) / this.w;
+    },
+
+    getNormY: function (p) {
+      return (p.y - this.y1) / this.h;
+    },
+
+    getNormPosition: function (p) {
+      return {
+        x: (p.x - this.x1) / this.w,
+        y: (p.y - this.y1) / this.h
+      };
+    }
+
+  };
+
 
   //
   // MUI Public Methods
