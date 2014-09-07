@@ -38,7 +38,12 @@
     _ctx: null,
     _ctxos: null,
 
-    _dataRef: [],
+    _notes: [],
+    _selectedNotes: [],
+    _newNote: null,
+
+    // internal key data strcuture
+    _keys: [],
 
     // current viewpoint's virtual coord
     _cx: 0,
@@ -68,6 +73,9 @@
     _pxTick: 320 / (480 * 4),
     _pxPitch: 96 / 12,
 
+    // dirty flag
+    _needsRedraw: true,
+
     //
     // utilities
     //
@@ -88,6 +96,83 @@
         pitch: 127 - Math.floor(ny * this._pitchPx),
         tick: Math.round(nx * this._tickPx)
       };
+    },
+
+    _grid2MIDIRelative: function (dx, dy) {
+      return {
+        pitch: dy * this._pitchPx,
+        tick: Math.round(dx * this._tickPx)
+      };
+    },
+
+    _selectNote: function (posMIDI) {
+      for (var i = 0; i < this._notes.length; i++) {
+        var note = this._notes[i];
+        // if note is already selected, ignore
+        if (note && this._selectedNotes.indexOf(note) < 0) {
+          if (posMIDI.pitch == note.pitch) {
+            if (note.start <= posMIDI.tick &&
+              posMIDI.tick <= note.start + note.dur) {
+              this._selectedNotes.push(note);
+              return;
+            }
+          }
+        }
+      }
+    },
+
+    _moveSelectedNotes: function (deltaMIDI) {
+      for (var i = 0; i < this._selectedNotes.length; i++) {
+        var note = this._selectedNotes[i];
+        note.pitch = note.pitch + deltaMIDI.pitch;
+        note.start = note.start + deltaMIDI.tick;
+      }
+    },
+
+    _clearNoteSelection: function () {
+      this._selectedNotes.length = 0;
+    },
+
+    _startNewNote: function (posMIDI) {
+      this._newNote = {
+        pitch: posMIDI.pitch,
+        velociy: 100,
+        start: posMIDI.tick,
+        dur: 60
+      };
+      this._notes.push(this._newNote);
+    },
+
+    _updateNewNote: function (posMIDI) {
+      var dur = posMIDI.tick - this._newNote.start;
+      this._newNote.dur = Math.max(dur, 60);
+    },
+
+    _endNewNote: function (posMIDI) {
+      this._updateNewNote(posMIDI);
+      this._newNote = null;
+      this._defragNotelist();
+    },
+
+    _deleteSelectedNotes: function () {
+      for (var i = 0; i < this._selectedNotes.length; i++) {
+        var note = this._selectedNotes[i];
+        this._notes[this._notes.indexOf(note)] = null;
+      }
+      this._defragNotelist();
+    },
+
+    // TODO:
+    // check the amount of change and if it over threshold,
+    // defrag note list
+    _defragNotelist: function () {
+      // this._lockData();
+      this._notes = this._notes.filter(function (note) {
+        return note != null;
+      }).sort(function (a, b) {
+        return a.start - b.start;
+      });
+      // this._unlockData();
     },
 
     //
@@ -229,20 +314,38 @@
     },
 
     _drawNotes: function () {
-      this._ctx.strokeStyle = '#000';
-      this._ctx.fillStyle = '#C66';
-      for (var i = 0; i < this._dataRef.length; i++) {
-        // transfrom viewport
-        var pos = this._MIDI2Grid(this._dataRef[i]);
-        // filter out invisible notes
-        if (this._grid.x + this._grid.w < pos.x) continue;
-        if (pos.x + pos.w < this._grid.x) continue;
-        if (this._grid.y + this._grid.h < pos.y) continue;
-        if (pos.y + pos.h < this._grid.y) continue;
-        // draw note
-        this._ctx.strokeRect(pos.x, pos.y, pos.w, pos.h);
-        this._ctx.fillRect(pos.x, pos.y, pos.w, pos.h);
-        // console.log('drawn'); // to debug
+      for (var i = 0; i < this._notes.length; i++) {
+        if (this._notes[i]) {
+          // transfrom viewport
+          var pos = this._MIDI2Grid(this._notes[i]);
+          // filter out invisible notes
+          if (this._grid.x + this._grid.w < pos.x) continue;
+          if (pos.x + pos.w < this._grid.x) continue;
+          if (this._grid.y + this._grid.h < pos.y) continue;
+          if (pos.y + pos.h < this._grid.y) continue;
+          // draw note
+          if (this._selectedNotes.indexOf(this._notes[i]) == -1) {
+            this._ctx.strokeStyle = '#000';
+            this._ctx.fillStyle = '#C66';
+          } else {
+            this._ctx.strokeStyle = '#fff';
+            this._ctx.fillStyle = '#D99';
+          }
+          this._ctx.strokeRect(pos.x, pos.y, pos.w, pos.h);
+          this._ctx.fillRect(pos.x, pos.y, pos.w, pos.h);
+          // console.log('drawn'); // to debug
+        }
+      }
+    },
+
+    _scrollByDelta: function (dx, dy) {
+      this._cx -= dx;
+      this._cy -= dy;
+      // boundary checking
+      this._cx = (this._cx < 0) ? 0 : this._cx;
+      this._cy = (this._cy < 0) ? 0 : this._cy;
+      if (this._cy > this._kbdMaxH - this._grid.h) {
+        this._cy = this._kbdMaxH - this._grid.h;
       }
     },
 
@@ -254,7 +357,27 @@
     },
 
     update: function () {
-      this._draw();
+      if (this._needsRedraw) {
+        this._draw();
+        this._needsRedraw = false;
+      }
+      requestAnimationFrame(this.update.bind(this));
+    },
+
+    _listenKeyDown: function (event) {
+      if (this._keys[event.keyCode]) return;
+      this._keys[event.keyCode] = true;
+      // console.log(event.keyCode);
+      switch (event.keyCode) {
+        case 46: // delete key
+          this._deleteSelectedNotes();
+      }
+      this._needsRedraw = true;
+    },
+
+    _listenKeyUp: function (event) {
+      if (!this._keys[event.keyCode]) return;
+      this._keys[event.keyCode] = false;
     },
 
     ready: function () {
@@ -272,44 +395,82 @@
         this._resize();
         this._buildImageMap();
         // this._drawDebug();
+        this._needsRedraw = true;
         this.update();
       }.bind(this));
 
       // mouse responder
+      var prevData, uy;
       var mouseResponder = MUI.MouseResponder(
         this.label,
         this.$.eOnScreenCanvas,
         function (sender, action, data) {
           switch (action) {
             case 'clicked':
-              prevData = data;
-              document.body.style.cursor = 'move';
-              // console.log(this._grid2MIDI(data));
+              // note creation
+              if (data.altKey) {
+                document.body.style.cursor = 'crosshair';
+                this._startNewNote(this._grid2MIDI(data));
+              }
+              // note selection
+              if (!data.shiftKey) {
+                this._clearNoteSelection();
+              }
+              this._selectNote(this._grid2MIDI(data));
+              // note moving start
+              if (data.metaKey) {
+                document.body.style.cursor = 'all-scroll';
+              }
+              uy = 0;
+              this._needsRedraw = true;
               break;
             case 'dragged':
-              this._cx -= data.x - prevData.x;
-              this._cy -= data.y - prevData.y;
-              // boundary checking
-              this._cx = (this._cx < 0) ? 0 : this._cx;
-              this._cy = (this._cy < 0) ? 0 : this._cy;
-              if (this._cy > this._kbdMaxH - this._grid.h) {
-                this._cy = this._kbdMaxH - this._grid.h;
+              // creating new note
+              if (this._newNote) {
+                this._updateNewNote(this._grid2MIDI(data));
+                this._needsRedraw = true;
+                break;
               }
-              prevData = data;
-              this.update();
+              // scroll with meta (command key)
+              if (data.metaKey) {
+                this._scrollByDelta(data.x - prevData.x, data.y - prevData.y);
+              }
+              // otherwise move selected notes
+              else {
+                var dx = data.x - prevData.x,
+                    dy = 0;
+                uy -= data.y - prevData.y;
+                // quantizing ux by px per pitch
+                if (uy > this._pxPitch || uy < -this._pxPitch) {
+                  dy = Math.round(uy / this._pxPitch);
+                  uy = uy / this._pxPitch - dy;
+                }
+                // translate back to screen coord
+                dy *= this._pxPitch;
+                // move notes
+                this._moveSelectedNotes(this._grid2MIDIRelative(dx, dy));
+              }
+              this._needsRedraw = true;
               break;
             case 'released':
               document.body.style.cursor = 'default';
-              this.update();
+              if (this._newNote) {
+                this._endNewNote(this._grid2MIDI(data));
+                this._needsRedraw = true;
+              }
               break;
           }
+          prevData = data;
         }.bind(this)
       );
 
+      // keyboard responder
+      window.addEventListener('keydown', this._listenKeyDown.bind(this), false);
+      window.addEventListener('keyup', this._listenKeyUp.bind(this), false);
     },
 
-    setData: function (dataRef) {
-      this._dataRef = dataRef;
+    setNotelist: function (notelist) {
+      this._notes = notelist;
       this.update();
     }
 

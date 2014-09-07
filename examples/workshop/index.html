@@ -49,7 +49,7 @@
     <div class="row">
       <div class="small-10 small-centered columns">
 
-        <mui-blade title="Keyboard" opened="false">
+        <mui-blade label="Keyboard" opened="false">
           <mui-vkey id="vkey"></mui-vkey>
         </mui-blade>
         <mui-select label="Generator" id="select-gen"></mui-select>
@@ -70,14 +70,11 @@
 
       var gens = WX.PlugIn.getRegistered('Generator'),
           pros = WX.PlugIn.getRegistered('Processor');
-
       var genModel = [],
           proModel = [];
-
       for (var i = 0; i < gens.length; i++) {
         genModel.push({ key: gens[i], value: gens[i] });
       }
-
       for (i = 0; i < pros.length; i++) {
         proModel.push({ key: pros[i], value: pros[i] });
       }
@@ -120,6 +117,8 @@
         currPro = WX[proSelector.value]();
         currGen.to(currPro).to(WX.Master);
         vkeySelector.addTarget(currGen);
+        MUI.$('params-gen').label = currGen.info.name;
+        MUI.$('params-pro').label = currPro.info.name;
         MUI.buildControls(currGen, 'params-gen');
         MUI.buildControls(currPro, 'params-pro');
         if (proSelector.value === 'ConVerb') {

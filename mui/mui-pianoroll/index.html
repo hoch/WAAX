@@ -55,20 +55,17 @@
 
     /**
      * TODO:
-     * - MIDI event class
-     *   : pitch, velo, start, dur, selected
      * - MIDI event manager class
      *   : sort by time, google RTAPI list integration
-     * - create, edit, delete
-     * - transport features:
+     * - transport features
      */
 
     MUI.start(function () {
 
-      var data = [];
-      for (var i = 0; i < 24; i++) {
+      var notelist = [];
+      for (var i = 0; i < 100; i++) {
         // pitch, velo, start, dur
-        data.push({
+        notelist.push({
           pitch: 60 + i,
           velociy: 100,
           start: 480 * i,
@@ -76,7 +73,7 @@
         });
       }
 
-      MUI.$('proll').setData(data);
+      MUI.$('proll').setNotelist(notelist);
 
     });
   </script>
