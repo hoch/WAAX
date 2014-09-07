@@ -59,11 +59,39 @@ var synth = WX.WXS1(),
     delay = WX.StereoDelay();
 // plug-in patching: Synth => Delay => Master
 synth.to(delay).to(WX.Master);
-// play C4 with 100 velocity for 1 second.
+// plays C4 with 100 velocity for 1 second.
 synth.noteOn(60, 100).noteOff(WX.now + 1.0);
 ~~~
 
 Also it can be as complex as a complete music application. For more examples, check out [MUI showcases](http://hoch.github.io/WAAX/mui/) and [Plug-In Workshop](http://hoch.github.io/WAAX/examples/workshop/).
+
+
+## Creating UI with MUI elements
+
+MUI(Musical User Interface) package offers essential UI elements for rapid prototyping of instrument design or processing algorithm. By design, MUI supports seamless parameter binding and easy GUI building. A live demo can be found [here](http://hoch.github.io/WAAX/examples/hellowaax/).
+
+First, HTML elements should be created.
+
+~~~html
+<!-- MUI knob element -->
+<mui-knob id="knob-freq"></mui-knob>
+~~~
+
+Secondly, create any plug-in and connect the GUI to a parameter.
+
+~~~javascript
+// creates an oscillator.
+var osc = WX.SimpleOsc();
+// patching: Osc => Master
+osc.to(WX.Master);
+// starts audio.
+osc.noteOn(60, 100);
+// connects GUI element.
+// link() method neeeds target plug-in and parameter name
+MUI.$('knob-freq').link(osc, 'oscFreq');
+~~~
+
+
 
 
 ## Further Reading

@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../mui-button/mui-button.html">
 
-<polymer-element name="mui-blade" attributes="label opened disabled">
+<polymer-element name="mui-rack" attributes="label opened disabled">
 
 <template>
 
@@ -11,23 +11,25 @@
     }
     .container {
       padding: 8px;
-      margin: 12px 0;
+      margin: 8px 0;
       border-radius: 2px;
       box-shadow: 0 0 3px #898989;
       background-color: #fff;
       /*overflow: hidden;*/
     }
     .header {
-      height: 28px;
-      line-height: 28px;
-      color: #607d8b;
-      font-size: 16px;
+      font-family:'Roboto', sans-serif;
+      height: 24px;
+      line-height: 24px;
+      color: #b0bec5;
+      font-size: 0.9rem;
       text-transform: uppercase;
       /* background-color: #ddd; */
       /* color: #31353D; */
     }
     .header .button {
       float: right;
+      margin: 0;
       padding: 0;
       color: #03a9f4;
       width: 24px;
@@ -36,7 +38,7 @@
       box-shadow: none;
     }
     .header .button:hover {
-      box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.12);
     }
     .content {
       margin-top: 4px;
@@ -60,9 +62,9 @@
 </template>
 
 <script>
-  Polymer('mui-blade', {
+  Polymer('mui-rack', {
 
-    label: 'Blade',
+    label: 'RACK',
     target: null,
     button: null,
     opened: true,

@@ -1,38 +1,29 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<polymer-element name="mui-section" attributes="title">
+<polymer-element name="mui-group" attributes="title">
 
 <template>
 
   <style>
     :host {
       display: inline-block;
-      margin-bottom: 5px;
     }
     .container {
       position: relative;
       display: inline-block;
-      margin: 0 12px 0 4px;
-      /* padding-bottom: 5px; */
+      margin: 0 6px 10px 0;
+      padding: 0;
       vertical-align: top;
-      /* text-align: center; */
     }
     .header {
-      padding-bottom: 4px;
-      margin-bottom: 10px;
-      color: #78909c;
-      font-size: 12px;
-      /* text-transform: uppercase; */
+      font-family: 'Roboto Condensed', sans-serif;
+      color: #90a4ae;
+      font-size: 0.7rem;
+      line-height: 0.8rem;
+      padding-bottom: 2px;
       text-align: center;
-      border-bottom: 1px solid #b0bec5;
-    }
-    .header .title {
-      background-color: #fff;
-      position: relative;
-      top: 10px;
-      padding: 0 4px;
-    }
-    .content {
+      border-bottom: 1px solid #cfd8dc;
+      /* text-transform: uppercase; */
     }
   </style>
 
@@ -48,7 +39,7 @@
 </template>
 
 <script>
-  Polymer('mui-section', {
+  Polymer('mui-group', {
 
     title: 'title'
 

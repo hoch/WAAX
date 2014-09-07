@@ -10,15 +10,18 @@
 </head>
 
 <body unresolved>
+  <h3>Hello WAAX!</h3>
+
   <!-- GUI -->
-  <mui-knob id="b-osc"></mui-knob>
+  <mui-knob id="knob-freq"></mui-knob>
+
   <!-- Logic -->
   <script>
     MUI.start(function () {
       var osc = WX.SimpleOsc();
       osc.to(WX.Master);
-      osc.noteOn(72, 100);
-      MUI.$('b-osc').link(osc, 'oscFreq');
+      osc.noteOn(60, 100);
+      MUI.$('knob-freq').link(osc, 'oscFreq');
     });
   </script>
 </body>

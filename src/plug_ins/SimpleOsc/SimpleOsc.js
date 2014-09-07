@@ -123,12 +123,12 @@
       this._amp.gain.set(velocity / 127, [time, 0.02], 3);
       this.params.oscFreq.set(WX.mtof(pitch), time + 0.02, 0);
       // this.$oscFreq(WX.mtof(pitch), time + 0.02, 0);
-      // this.set('oscFreq', [WX.mtof(pitch), time + 0.02, 0]);
     },
 
     glide: function (pitch, time) {
       time = (time || WX.now);
-      this.$oscFreq(WX.mtof(pitch), time + 0.02, 1);
+      this.params.oscFreq.set(WX.mtof(pitch), time + 0.02, 0);
+      // this.$oscFreq(WX.mtof(pitch), time + 0.02, 1);
     },
 
     noteOff: function (time) {

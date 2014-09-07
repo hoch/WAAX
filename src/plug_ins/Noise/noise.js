@@ -52,7 +52,7 @@
       }
       noiseFloat32[i] = sample / pASum;
     }
-    console.log(noiseFloat32);
+    // console.log(noiseFloat32); // debug
     var noiseBuffer = WX.Buffer(2, length, WX.srate);
     noiseBuffer.getChannelData(0).set(noiseFloat32, 0);
     noiseBuffer.getChannelData(1).set(noiseFloat32, 0);
