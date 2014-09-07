@@ -54,10 +54,10 @@ Note that MIDI support depends on [Web MIDI API](http://www.w3.org/TR/webmidi/),
 By its design, WAAX accommodates various use cases with different levels. As shown below, it can be as simple as possible.
 
 ~~~javascript
-// creating a WXS-1 synth instance.
+// creating a WXS-1 synth and a stereo delay instance.
 var synth = WX.WXS1(),
     delay = WX.StereoDelay();
-// connects the synth to the master output.
+// plug-in patching: Synth => Delay => Master
 synth.to(delay).to(WX.Master);
 // play C4 with 100 velocity for 1 second.
 synth.noteOn(60, 100).noteOff(WX.now + 1.0);
@@ -100,7 +100,7 @@ grunt deploy        # produces deployment build in 'dist/' folder
 ~~~
 
 
-## Documentation
+## Documentation and API Reference
 
 The newer version of documentation will be posted soon and the previous version is still accessible [here](http://hoch.github.io/WAAX/docs/).
 
