@@ -1,13 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<polymer-element name="mui-knobh" attributes="value min max label">
-  <!-- global style -->
-
+<polymer-element name="mui-knobh" attributes="value min max label" noscript>
   <template>
     <style>
       :host {
         display: inline-block;
         vertical-align: middle;
-        margin: 2px;
+        margin: 6px 2px;
         width: 100px;
         height: 48px;
         -webkit-user-select: none;
@@ -17,29 +15,27 @@
       }
       .c-knob-label {
         display: block;
-        font-family:'Play', sans-serif;
-        font-size: 10px;
-        font-weight: 400;
+        color: #607d8b;
+        font-family:'Roboto Condensed', sans-serif;
+        font-size: 0.7rem;
         height: 16px;
         line-height: 16px;
         text-align: center;
       }
       .c-knob-flat {
-        /*display: inline-block;*/
         display: block;
         cursor: move;
-        /*vertical-align: top;*/
       }
       .c-knob-value {
         display: block;
         font-family:'Roboto', sans-serif;
-        font-size: 11px;
-        font-weight: 400;
+        font-size: 0.725rem;
         height: 16px;
         width: 48px;
         line-height: 16px;
         text-align: center;
-        background-color: #e0e0e0;
+        color: #37474f;
+        background-color: #cfd8dc;
         border-radius: 3px;
         margin-top: 3px;
         padding: 0;
@@ -47,8 +43,8 @@
       }
       .c-knob-value-select {
         color: #fff;
-        background-color: #666;
-        box-shadow: inset 0 0 5px #000;
+        background-color: #546e7a;
+        box-shadow: inset 0 0 5px #263238;
       }
       .c-right {
         display: block;
@@ -59,20 +55,22 @@
         /*fill: #353D42;*/
         /*fill: #7E8AA2;*/
         /*fill: #374140;*/
-        fill: #31353D;
+        stroke: #cfd8dc;
+        stroke-width: 0.75px;
+        fill: none;
       }
       .c-knob-flat-inner {
         /*fill: #505455;*/
         /*fill: #EEE;*/
         /*fill: #D9CB9E;*/
-        fill: #445878;
+        fill: #b0bec5;
       }
       .c-knob-flat-gauge {
         /*stroke: #0CB4F5;*/
         /*stroke: #FF9800;*/
         /*stroke: #DC3522;*/
-        stroke: #92CDCF;
-        stroke-width: 5px;
+        stroke: #039be5;
+        stroke-width: 4px;
         fill: none;
       }
     </style>
@@ -84,7 +82,7 @@
     <svg id="eTouchable" class="c-knob-flat" width="48" height="48" version="1.1" xmlns="http://www.w3.org/2000/svg">
       <circle cx="23.5" cy="23.5" r="23" class="c-knob-flat-outer" />
       <path id="eKnob" class="c-knob-flat-gauge" />
-      <circle cx="23.5" cy="23.5" r="15" class="c-knob-flat-inner" />
+      <circle cx="23.5" cy="23.5" r="16" class="c-knob-flat-inner" />
     </svg>
   </template>
   <!-- logic -->
@@ -98,9 +96,9 @@
       max: 1.0,
 
       // binding
-      targetUnit: null,
       targetParam: null,
-      linked: false,
+      cloudMap: null,
+      cloudParam: null,
 
       // private
       _normValue: 0.0,
@@ -130,8 +128,14 @@
 
       // post: knob => model
       post: function () {
-        if (this.linked) {
-          this.targetUnit.set(this.targetParam, this.value, 1, WX.now+0.20);
+        // update target param
+        if (this.targetParam) {
+          // do not call the handler directly.
+          // invoke 'xxxxxParam.set' method instead
+          this.targetParam.set(this.value, WX.now + 0.05, 1);
+        }
+        if (this.cloudMap) {
+          this.cloudMap.set(this.cloudParam, this.value);
         }
         this.render();
       },
@@ -179,12 +183,13 @@
                 prevData = data;
                 // norm => val => post
                 this._normValue += delta;
-                this._normValue = MUI.clamp(this._normValue, 0.0, 1.0);
+                this._normValue = Math.min(Math.max(this._normValue, 0.0), 1.0);
                 this.value = this._normValue * (this.max - this.min) + this.min;
                 this.post();
                 break;
               case 'released':
                 document.body.style.cursor = 'default';
+                this.post();
                 break;
             }
           }.bind(this)
@@ -207,7 +212,7 @@
                   // sanity check
                   if (!isNaN(v)) {
                     // val => norm => post
-                    this.value = MUI.clamp(v, this.min, this.max);
+                    this.value = Math.min(Math.max(v, this.min), this.max);
                     this._normValue = (this.value - this.min) / (this.max - this.min);
                     this.post();
                   }
@@ -225,20 +230,51 @@
         this.update();
       },
 
-      link: function (unit, paramName) {
-        // setting reference to unit (ui => unitparam)
-        this.targetUnit = unit;
-        this.targetParam = paramName;
-        this.linked = true;
+      loadTargetParamData: function () {
+        if (this.targetParam) {
+          this.label = this.targetParam.name;
+          this.min = this.targetParam.min;
+          this.max = this.targetParam.max;
+          this.value = this.targetParam.value;
+          this.update();
+        }
+      },
 
-        // handling parameter change in unit (unitparam => ui)
-        // will invoke attributeChange when unitparam changed
-        // this.bind('value', unit.params, paramName);
-        // fix for Polymer 0.2.0
-        this.bind('value', new PathObserver(unit.params, paramName));
+      // link to plugin, param and cloudMap
+      link: function (plugin, param, cloudMap) {
+
+        // get target parameter object
+        this.targetParam = plugin.params[param];
+        // load plugin param data
+        this.loadTargetParamData();
+        // setup path observer to plugin param
+        var obsPlugin = new PathObserver(plugin.params[param], 'value');
+        obsPlugin.open(function (newValue, oldValue) {
+          if (this.value === newValue) return;
+          this.value = newValue;
+          this.update();
+        }.bind(this));
+
+        // OPTIONAL: add param to cloud map data
+        if (cloudMap) {
+          this.cloudMap = cloudMap;
+          this.cloudParam = param;
+          // this.cloudMap.registerParam(param, this.value);
+          // setup path observer to cloud map param
+          var obsCloudMap = new PathObserver(cloudMap.localCache, param);
+          obsCloudMap.open(function (newValue, oldValue) {
+            if (this.value === newValue) return;
+            this.value = newValue;
+            this.update();
+            // TEMP: need to update target parameter in plugin too.
+            if (this.targetParam) {
+              this.targetParam.set(this.value, WX.now + 0.05, 1);
+            }
+          }.bind(this));
+        }
+
       }
 
     });
   </script>
-
 </polymer-element>

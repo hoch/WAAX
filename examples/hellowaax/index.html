@@ -5,26 +5,23 @@
   <title>Examples: Hello WAAX! | WAAX</title>
   <script src="../../build/waax.js"></script>
   <script src="../../build/plug_ins/simpleosc.js"></script>
-  <script src="../../build/plug_ins/stereodelay.js"></script>
   <script src="../../bower_components/platform/platform.js"></script>
   <link rel="import" href="../../mui/mui.html">
 </head>
 
 <body unresolved>
+  <h3>Hello WAAX!</h3>
+
   <!-- GUI -->
-  <mui-blade id="b-osc"></mui-blade>
-  <mui-blade id="b-dly"></mui-blade>
-  <mui-vkey id="vkey"></mui-vkey>
+  <mui-knob id="knob-freq"></mui-knob>
+
   <!-- Logic -->
   <script>
     MUI.start(function () {
-      var osc = WX.SimpleOsc(),
-          dly = WX.StereoDelay();
-      osc.to(dly).to(WX.Master);
+      var osc = WX.SimpleOsc();
+      osc.to(WX.Master);
       osc.noteOn(60, 100);
-      MUI.$('vkey').addTarget(osc);
-      MUI.buildControls(osc, 'b-osc');
-      MUI.buildControls(dly, 'b-dly');
+      MUI.$('knob-freq').link(osc, 'oscFreq');
     });
   </script>
 </body>

@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>mui-pianoroll | Web Audio API eXtension</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../mui.html">
+  <link rel="import" href="mui-pianoroll.html">
+  <script src="../../build/waax.js"></script>
+  <!--
+  <script src="../build/plug_ins/wxs1.js"></script>
+  -->
+
+  <style>
+    body {
+      background-color: #fafafa;
+    }
+    header {
+      margin-top: 30px;
+    }
+    h2 {
+      margin-top: 40px;
+    }
+  </style>
+
+</head>
+
+<body unresolved>
+
+  <header>
+    <div class="row">
+      <div class="small-10 small-centered columns">
+        <ul class="breadcrumbs">
+          <li><a href="..">WAAX Home</a></li>
+        </ul>
+        <h3>MUI Elements <small>1.0.0-alpha</small></h3>
+      </div>
+    </div>
+  </header>
+
+  <article>
+    <div class="row">
+      <div class="small-10 small-centered columns">
+        <mui-blade>
+          <mui-pianoroll id="proll"></mui-pianoroll>
+        </mui-blade>
+      </div>
+    </div>
+  </article>
+
+  <script>
+
+    /**
+     * TODO:
+     * - MIDI event manager class
+     *   : sort by time, google RTAPI list integration
+     * - transport features
+     */
+
+    MUI.start(function () {
+
+      var notelist = [];
+      for (var i = 0; i < 100; i++) {
+        // pitch, velo, start, dur
+        notelist.push({
+          pitch: 60 + i,
+          velociy: 100,
+          start: 480 * i,
+          dur: 120
+        });
+      }
+
+      MUI.$('proll').setNotelist(notelist);
+
+    });
+  </script>
+
+</body>
+</html>

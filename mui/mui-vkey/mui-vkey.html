@@ -16,11 +16,12 @@
       margin: 0 0 6px 0;
     }
     .header .button {
-      padding: 2px;
+      padding: 2px 2px;
       width: 28px;
       height: 28px;
       box-shadow: none;
       box-shadow: 0 0 0 1px #cfd8dc;
+      margin: 1px;
     }
     /*.header .button:hover {
       box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.1);
@@ -29,13 +30,15 @@
       display: inline-block;
       vertical-align: middle;
       text-align: center;
-      font-size: 11px;
-      height: 28px;
-      line-height: 28px;
+      font-family:'Roboto Condensed', sans-serif;
+      font-size: 0.7rem;
+      height: 25px;
+      line-height: 25px;
+      padding-top: 3px;
       border-radius: 1px;
-      color: #558b2f;
-      background-color: #c5e1a5;
-      box-shadow: inset 0 1px 2px 1px rgba(0, 0, 0, 0.2), 0px 0px 1px 0px rgba(0, 0, 0, 0.24);
+      color: #00796b;
+      background-color: #b2dfdb;
+      box-shadow: inset 0 1px 1px 1px rgba(0, 0, 0, 0.2), 0px 0px 1px 0px rgba(0, 0, 0, 0.24);
     }
     .octave {
       width: 48px;
@@ -43,13 +46,13 @@
     .message {
       float: right;
       width: 100px;
-      margin: 0 1px;
+      margin: 1px;
     }
     .c-vkey {
       display: block;
       cursor: move;
       background-color: #cfd8dc;
-      border-radius: 2px;
+      border-radius: 1px;
     }
     .c-wheel {
       stroke: #78909c;
@@ -79,10 +82,10 @@
       <mui-button class="button" icon="chevron-right" on-click="{{ octaveUp }}"></mui-button>
     </div>
     <svg id="eTouchable" class="c-vkey" height="100" version="1.1" xmlns="http://www.w3.org/2000/svg">
-      <rect class="c-wheel" x="6" y="6" width="32" height="88" rx="4" ry="4"></rect>
-      <rect class="c-wheel" x="44" y="6" width="32" height="88" rx="4" ry="4"></rect>
+      <rect class="c-wheel" x="6" y="6" width="32" height="88" rx="2" ry="2"></rect>
+      <rect class="c-wheel" x="44" y="6" width="32" height="88" rx="2" ry="2"></rect>
       <rect id="ePitWhlPos" class="c-wheel-pos" x="7" y="50" width="30" height="2"></rect>
-      <rect id="eModWhlPos" class="c-wheel-pos" x="45" y="88" width="30" height="2" ry="2"></rect>
+      <rect id="eModWhlPos" class="c-wheel-pos" x="45" y="88" width="30" height="2"></rect>
     </svg>
   </div>
 
@@ -99,17 +102,17 @@
     // internal parameter
     _octaveOffset: 24,
     _octaveStr: '0',
-    _numKeys: 60, // 5 octaves
+    _numKeys: 53, // 61keys, 5 octaves
 
     // key rendering parameters
     _svgWidth: 787,
-    _offset: 72,
+    _offset: 77,
     _keyUpperY: 6,
     _keyLowerY: 52,
-    _keyWidth: 18,
+    _keyWidth: 16,
     _keyHeight: 42,
     _keyPaddingX: 2,
-    _keyRadius: 2,
+    _keyRadius: 1,
 
     // primary svg DOM object
     _svg: null,
