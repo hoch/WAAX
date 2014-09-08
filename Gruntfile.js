@@ -104,8 +104,8 @@ module.exports = function(grunt) {
         ],
         options: {
           destination: 'docs/reference',
-          // template: 'node_modules/ink-docstrap/template',
-          // configure: 'node_modules/ink-docstrap/template/jsdoc.conf.json'
+          template: 'docs/template',
+          configure: 'docs/template/jsdoc.conf.json'
         }
       }
     }
