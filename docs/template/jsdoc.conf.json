@@ -1,0 +1,28 @@
+{
+	"tags"      : {
+		"allowUnknownTags" : true
+	},
+	"plugins"   : ["plugins/markdown"],
+
+	"templates" : {
+		"cleverLinks"           : false,
+		"monospaceLinks"        : false,
+		"dateFormat"            : "ddd MMM Do YYYY",
+		"outputSourceFiles"     : false,
+		"outputSourcePath"      : false,
+		"systemName"            : "WAAX API Reference",
+		"footer"                : "",
+		"copyright"             : "Copyright © 2012-2014 Hongchan Choi (hoch)",
+		"navType"               : "vertical",
+		"theme"                 : "waax",
+		"linenums"              : true,
+		"collapseSymbols"       : false,
+		"inverseNav"            : true,
+		"highlightTutorialCode" : true,
+		"protocol": "fred://"
+	},
+	"markdown"  : {
+		"parser"   : "gfm",
+		"hardwrap" : true
+	}
+}
