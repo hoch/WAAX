@@ -70,6 +70,7 @@ module.exports = function(grunt) {
             'src/waax.header.js',
             'src/waax.util.js',
             'src/waax.core.js',
+            'src/waax.timebase.js',
             'src/mui.js',
             'src/timebase.js',
             'src/plug_ins/Fader/fader.js'

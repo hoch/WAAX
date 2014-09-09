@@ -38,7 +38,7 @@
     _ctx: null,
     _ctxos: null,
 
-    _notes: [],
+    _notelist: null,
     _selectedNotes: [],
     _newNote: null,
 
@@ -106,18 +106,9 @@
     },
 
     _selectNote: function (posMIDI) {
-      for (var i = 0; i < this._notes.length; i++) {
-        var note = this._notes[i];
-        // if note is already selected, ignore
-        if (note && this._selectedNotes.indexOf(note) < 0) {
-          if (posMIDI.pitch == note.pitch) {
-            if (note.start <= posMIDI.tick &&
-              posMIDI.tick <= note.start + note.dur) {
-              this._selectedNotes.push(note);
-              return;
-            }
-          }
-        }
+      var note = this._notelist.findNoteAtPosition(posMIDI.pitch, posMIDI.tick);
+      if (note && this._selectedNotes.indexOf(note) < 0) {
+        this._selectedNotes.push(note);
       }
     },
 
@@ -134,13 +125,8 @@
     },
 
     _startNewNote: function (posMIDI) {
-      this._newNote = {
-        pitch: posMIDI.pitch,
-        velociy: 100,
-        start: posMIDI.tick,
-        dur: 60
-      };
-      this._notes.push(this._newNote);
+      this._newNote = WX.Note(posMIDI.pitch, 100, posMIDI.tick, 60);
+      this._notelist.add(this._newNote);
     },
 
     _updateNewNote: function (posMIDI) {
@@ -151,28 +137,12 @@
     _endNewNote: function (posMIDI) {
       this._updateNewNote(posMIDI);
       this._newNote = null;
-      this._defragNotelist();
     },
 
     _deleteSelectedNotes: function () {
       for (var i = 0; i < this._selectedNotes.length; i++) {
-        var note = this._selectedNotes[i];
-        this._notes[this._notes.indexOf(note)] = null;
+        this._notelist.remove(this._selectedNotes[i]);
       }
-      this._defragNotelist();
-    },
-
-    // TODO:
-    // check the amount of change and if it over threshold,
-    // defrag note list
-    _defragNotelist: function () {
-      // this._lockData();
-      this._notes = this._notes.filter(function (note) {
-        return note != null;
-      }).sort(function (a, b) {
-        return a.start - b.start;
-      });
-      // this._unlockData();
     },
 
     //
@@ -283,6 +253,15 @@
         this._ruler.w,
         this._ruler.h
       );
+      // playhead
+      if (this._vp.x <= this._playheadPos &&
+        this._playheadPos < this._vp.x + this._vp.w) {
+        this._ctx.beginPath();
+        this._ctx.moveTo(this._playheadPos, this._vp.y);
+        this._ctx.lineTo(this._playheadPos, this._vp.h);
+        this._ctx.strokeStyle = '#fff';
+        this._ctx.stroke();
+      }
       // keyboard (32 is for G8, 127 offset)
       this._ctx.drawImage(this._ctxos.canvas,
         this._kbd.x,
@@ -314,28 +293,30 @@
     },
 
     _drawNotes: function () {
-      for (var i = 0; i < this._notes.length; i++) {
-        if (this._notes[i]) {
-          // transfrom viewport
-          var pos = this._MIDI2Grid(this._notes[i]);
-          // filter out invisible notes
-          if (this._grid.x + this._grid.w < pos.x) continue;
-          if (pos.x + pos.w < this._grid.x) continue;
-          if (this._grid.y + this._grid.h < pos.y) continue;
-          if (pos.y + pos.h < this._grid.y) continue;
-          // draw note
-          if (this._selectedNotes.indexOf(this._notes[i]) == -1) {
-            this._ctx.strokeStyle = '#000';
-            this._ctx.fillStyle = '#C66';
-          } else {
-            this._ctx.strokeStyle = '#fff';
-            this._ctx.fillStyle = '#D99';
+      this._ctx.lineWidth = 1.0;
+      this._notelist.iterate(function (idx, note) {
+          if (note) {
+            // transfrom viewport
+            var pos = this._MIDI2Grid(note);
+            // filter out invisible notes
+            if (this._grid.x + this._grid.w < pos.x) return;
+            if (pos.x + pos.w < this._grid.x) return;
+            if (this._grid.y + this._grid.h < pos.y) return;
+            if (pos.y + pos.h < this._grid.y) return;
+            // draw note
+            if (this._selectedNotes.indexOf(note) == -1) {
+              this._ctx.strokeStyle = '#000';
+              this._ctx.fillStyle = '#C66';
+            } else {
+              this._ctx.strokeStyle = '#fff';
+              this._ctx.fillStyle = '#D99';
+            }
+            this._ctx.strokeRect(pos.x, pos.y, pos.w, pos.h);
+            this._ctx.fillRect(pos.x, pos.y, pos.w, pos.h);
+            // console.log('drawn', note); // to debug
           }
-          this._ctx.strokeRect(pos.x, pos.y, pos.w, pos.h);
-          this._ctx.fillRect(pos.x, pos.y, pos.w, pos.h);
-          // console.log('drawn'); // to debug
-        }
-      }
+        }.bind(this)
+      );
     },
 
     _scrollByDelta: function (dx, dy) {
@@ -346,6 +327,14 @@
       this._cy = (this._cy < 0) ? 0 : this._cy;
       if (this._cy > this._kbdMaxH - this._grid.h) {
         this._cy = this._kbdMaxH - this._grid.h;
+      }
+    },
+
+    setPlayhead: function (tick) {
+      var pos = Math.ceil(tick * this._pxTick) - this._cx + this._kbd.w;
+      if (pos !== this._playheadPos) {
+        this._playheadPos = pos;
+        this._needsRedraw = true;
       }
     },
 
@@ -399,8 +388,10 @@
         this.update();
       }.bind(this));
 
-      // mouse responder
+      // UI specific vars
       var prevData, uy;
+
+      // mouse responder
       var mouseResponder = MUI.MouseResponder(
         this.label,
         this.$.eOnScreenCanvas,
@@ -416,8 +407,12 @@
               if (!data.shiftKey) {
                 this._clearNoteSelection();
               }
-              this._selectNote(this._grid2MIDI(data));
-              // note moving start
+              // if click selects a note, make selection
+              var pos = this._grid2MIDI(data)
+              if (pos) {
+                this._selectNote(pos);
+              }
+              // with meta key, scroll the view.
               if (data.metaKey) {
                 document.body.style.cursor = 'all-scroll';
               }
@@ -458,6 +453,7 @@
                 this._endNewNote(this._grid2MIDI(data));
                 this._needsRedraw = true;
               }
+              marqueeMode = false;
               break;
           }
           prevData = data;
@@ -469,8 +465,8 @@
       window.addEventListener('keyup', this._listenKeyUp.bind(this), false);
     },
 
-    setNotelist: function (notelist) {
-      this._notes = notelist;
+    setNoteList: function (notelist) {
+      this._notelist = notelist;
       this.update();
     }
 
