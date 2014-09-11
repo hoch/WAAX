@@ -198,6 +198,7 @@ window.MUI = (function (WX) {
 
     buildControls: function (plugin, targetId) {
       var targetEl = document.getElementById(targetId);
+      targetEl.label = plugin.info.name;
       for (var param in plugin.params) {
         var p = plugin.params[param];
         switch (p.type) {

@@ -307,13 +307,13 @@
     onData: function (action, data) {
       switch (action) {
         case 'noteon':
-          this.noteOn(data.pitch, data.velocity);
+          this.noteOn(data.pitch, data.velocity, data.time);
           break;
         case 'glide':
           this.glide(data.pitch);
           break;
         case 'noteoff':
-          this.noteOff();
+          this.noteOff(data.time);
           break;
       }
     }
