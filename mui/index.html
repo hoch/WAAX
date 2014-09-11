@@ -42,31 +42,31 @@
       <div class="small-10 small-centered columns">
 
         <mui-rack label="WXS-1" opened="true">
-          <mui-group title="OSC1">
+          <mui-group label="OSC1">
             <mui-select id="select-osc1type"></mui-select>
             <mui-knob id="knob-osc1octave"></mui-knob>
             <mui-knob id="knob-osc1gain"></mui-knob>
           </mui-group>
-          <mui-group title="OSC2">
+          <mui-group label="OSC2">
             <mui-select id="select-osc2type"></mui-select>
             <mui-knob id="knob-osc2detune"></mui-knob>
             <mui-knob id="knob-osc2gain"></mui-knob>
           </mui-group>
-          <mui-group title="Master">
+          <mui-group label="Master">
             <mui-knob id="knob-output"></mui-knob>
           </mui-group>
-          <mui-group title="Filter">
+          <mui-group label="Filter">
             <mui-knob id="knob-cutoff"></mui-knob>
             <mui-knob id="knob-reso"></mui-knob>
             <mui-knob id="knob-filterMod"></mui-knob>
           </mui-group>
-          <mui-group title="Filter Envelope">
+          <mui-group label="Filter Envelope">
             <mui-knob id="knob-filterA"></mui-knob>
             <mui-knob id="knob-filterD"></mui-knob>
             <mui-knob id="knob-filterS"></mui-knob>
             <mui-knob id="knob-filterR"></mui-knob>
           </mui-group>
-          <mui-group title="Amp Envelope">
+          <mui-group label="Amp Envelope">
             <mui-knob id="knob-ampA"></mui-knob>
             <mui-knob id="knob-ampD"></mui-knob>
             <mui-knob id="knob-ampS"></mui-knob>
@@ -79,19 +79,19 @@
         </mui-rack>
 
         <mui-rack label="Control" opened="true">
-          <mui-group title="Tempo">
+          <mui-group label="Tempo">
             <mui-knobh id="knob-tempo" label="BPM" min="20" max="200" value="120"></mui-knobh>
             <mui-knobh id="knob-quant" label="Qunatize" min="0" max="100" value="0"></mui-knobh>
             <mui-knobh id="knob-swing" label="Swing" min="0" max="100" value="0"></mui-knobh>
           </mui-group>
-          <mui-group title="Transport">
+          <mui-group label="Transport">
             <mui-button icon="av:skip-previous"></mui-button>
             <mui-button icon="av:stop"></mui-button>
             <mui-button icon="av:pause"></mui-button>
             <mui-button icon="av:play-arrow" type="toggle"></mui-button>
             <mui-button icon="av:loop" type="toggle"></mui-button>
           </mui-group>
-          <mui-group title="Collaboration">
+          <mui-group label="Collaboration">
             <mui-button icon="work" title="Pattern Collection"></mui-button>
             <mui-button icon="social:person-add" title="Add Collaborator"></mui-button>
             <mui-button icon="social:share" title="Share Pattern"></mui-button>

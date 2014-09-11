@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<polymer-element name="mui-group" attributes="title">
+<polymer-element name="mui-group" attributes="label">
 
 <template>
 
@@ -29,7 +29,7 @@
 
   <div class="container">
     <div class="header">
-      <span class="title">{{title}}</span>
+      <span class="label">{{label}}</span>
     </div>
     <div class="content">
       <content></content>
@@ -41,7 +41,7 @@
 <script>
   Polymer('mui-group', {
 
-    title: 'title'
+    label: 'Unlabeled'
 
   });
 </script>
