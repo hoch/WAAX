@@ -4,8 +4,7 @@
 <head>
   <title>Examples: Hello WAAX! | WAAX</title>
   <script src="../../build/waax.js"></script>
-  <script src="../../build/plug_ins/wxs1.js"></script>
-  <script src="../../build/plug_ins/stereodelay.js"></script>
+  <script src="../../build/plug_ins/simpleosc.js"></script>
   <script src="../../bower_components/platform/platform.js"></script>
   <link rel="import" href="../../mui/mui.html">
 </head>
@@ -14,22 +13,15 @@
   <h3>Hello WAAX!</h3>
 
   <!-- GUI -->
-  <mui-rack id="r-synth"></mui-rack>
-  <mui-rack id="r-delay"></mui-rack>
-  <mui-rack>
-    <mui-vkey id="vkey"></mui-vkey>
-  </mui-rack>
+  <mui-knob id="k-freq"></mui-knob>
 
   <!-- Logic -->
   <script>
     MUI.start(function () {
-      var wxs1 = WX.WXS1(),
-          delay = WX.StereoDelay();
-      wxs1.to(delay).to(WX.Master);
-      wxs1.noteOn(60, 100);
-      MUI.buildControls(wxs1, 'r-synth');
-      MUI.buildControls(delay, 'r-delay');
-      MUI.$('vkey').addTarget(wxs1);
+      var osc = WX.SimpleOsc();
+      osc.to(WX.Master);
+      osc.noteOn(60, 100);
+      MUI.$('k-freq').link(osc, 'oscFreq');
     });
   </script>
 </body>
