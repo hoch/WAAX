@@ -1,5 +1,3 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-
 <polymer-element name="mui-pianoroll">
 
 <template>
@@ -76,6 +74,9 @@
     // dirty flag
     _needsRedraw: true,
 
+    // cloud realtime model ref
+    cloudModel: null,
+
     //
     // utilities
     //
@@ -117,6 +118,12 @@
         var note = this._selectedNotes[i];
         note.pitch = note.pitch + deltaMIDI.pitch;
         note.start = note.start + deltaMIDI.tick;
+        if (this.cloudModel) {
+          this.cloudModel._callbackMUI('set', {
+            index: this._notelist.notes.indexOf(note),
+            note: note
+          });
+        }
       }
     },
 
@@ -125,23 +132,38 @@
     },
 
     _startNewNote: function (posMIDI) {
-      this._newNote = WX.Note(posMIDI.pitch, 100, posMIDI.tick, 60);
+      var start = ~~(posMIDI.tick / 120) * 120;
+      start += (posMIDI.tick % 120) > 60 ? 120 : 0;
+      this._newNote = WX.Note(posMIDI.pitch, 100, start, 120);
       this._notelist.add(this._newNote);
     },
 
     _updateNewNote: function (posMIDI) {
       var dur = posMIDI.tick - this._newNote.start;
+      dur = ~~(dur / 120) * 120;
+      dur += (dur % 120) > 60 ? 120 : 0;
       this._newNote.dur = Math.max(dur, 60);
     },
 
     _endNewNote: function (posMIDI) {
       this._updateNewNote(posMIDI);
+      if (this.cloudModel) {
+        this.cloudModel._callbackMUI('add',
+          {
+            index: this._notelist.notes.length - 1,
+            note: this._newNote
+          }
+        );
+      }
       this._newNote = null;
     },
 
     _deleteSelectedNotes: function () {
       for (var i = 0; i < this._selectedNotes.length; i++) {
-        this._notelist.remove(this._selectedNotes[i]);
+        var idx = this._notelist.remove(this._selectedNotes[i]);
+        if (this.cloudModel) {
+          this.cloudModel._callbackMUI('remove', { index: idx });
+        }
       }
     },
 
@@ -468,6 +490,40 @@
     setNoteList: function (notelist) {
       this._notelist = notelist;
       this.update();
+    },
+
+
+    //
+    // realtime sync features
+    //
+
+    link: function (rtModel) {
+      this.cloudModel = rtModel;
+      rtModel.view = this;
+    },
+
+    onRealtimeChange: function (index, note) {
+      // console.log('realtimechange', index, note);
+      if (note) {
+        if (this._notelist.notes.length <= index) {
+          var newNote = WX.Note(note.pitch, note.velocity, note.start, note.dur);
+          this._notelist.add(newNote);
+        } else {
+          this._notelist.update(index, note);
+        }
+        this._needsRedraw = true;
+      } else {
+        this._notelist.removeNoteAtIndex(index);
+        this._needsRedraw = true;
+      }
+    },
+
+    loadNote: function (index, note) {
+      if (note) {
+        var newNote = WX.Note(note.pitch, note.velocity, note.start, note.dur);
+        this._notelist.add(newNote);
+        this._needsRedraw = true;
+      }
     }
 
   });
