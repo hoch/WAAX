@@ -1,0 +1,47 @@
+<polymer-element name="mui-group" attributes="label">
+
+<template>
+
+  <style>
+    :host {
+      display: inline-block;
+    }
+    .container {
+      position: relative;
+      display: inline-block;
+      margin: 0 6px 10px 0;
+      padding: 0;
+      vertical-align: top;
+    }
+    .header {
+      font-family: 'Roboto Condensed', sans-serif;
+      color: #90a4ae;
+      font-size: 0.7rem;
+      line-height: 0.8rem;
+      padding-bottom: 2px;
+      text-align: center;
+      border-bottom: 1px solid #cfd8dc;
+      /* text-transform: uppercase; */
+    }
+  </style>
+
+  <div class="container">
+    <div class="header">
+      <span class="label">{{label}}</span>
+    </div>
+    <div class="content">
+      <content></content>
+    </div>
+  </div>
+
+</template>
+
+<script>
+  Polymer('mui-group', {
+
+    label: 'Unlabeled'
+
+  });
+</script>
+
+</polymer-element>

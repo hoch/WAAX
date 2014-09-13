@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>WAAX.DOC</title>
+
+    <link type="text/css" rel="stylesheet" href="assets/css/reset.css">
+    <link type="text/css" rel="stylesheet" href="http://yandex.st/highlightjs/6.1/styles/sunburst.min.css">
+    <link type="text/css" rel="stylesheet" href="assets/css/docs.css">
+    <link type="text/css" rel="stylesheet" href="assets/css/print.css" media="print">
+    <link type="text/css" rel="stylesheet" href="./docs/src/waax-doc-base.css">
+
+    <script type="text/javascript" src="assets/js/jquery-1.10.1.min.js"></script>
+    <script type="text/javascript" src="http://yandex.st/highlightjs/6.1/highlight.min.js"></script>
+    <script type="text/javascript" src="assets/js/lunr.min.js"></script>
+
+    
+
+    <script type="text/javascript">var BASE_URL = "";</script>
+    <script type="text/javascript" src="assets/js/viewer.js"></script>
+
+    
+</head>
+<body>
+    <div id="page">
+        <a name="top" />
+        <header id="header">
+            <h1><a href="">WAAX.DOC</a></h1>
+        </header>
+        
+
+<div id="sidebar">
+    <form action="search.html"><input id="search" type="text" placeholder="Search" name="q" /></form>
+    <nav id="toc">
+        
+    <ol>
+    
+        <li>
+            <a href="what-is-waax.html#what-is-waax">What is WAAX?</a>
+            
+        </li>
+    
+        <li>
+            <a href="getting-started.html#getting-started">Getting Started</a>
+            
+        </li>
+    
+        <li>
+            <a href="parameter-control.html#parameter-control">Parameter Control</a>
+            
+        </li>
+    
+        <li>
+            <a href="mui.html#mui-musical-user-interface">MUI (Musical User Interface)</a>
+            
+        </li>
+    
+        <li>
+            <a href="midi.html#using-midi">Using MIDI</a>
+            
+        </li>
+    
+        <li>
+            <a href="unit-reference.html#unit-reference">Unit Reference</a>
+            
+        </li>
+    
+        <li>
+            <a href="license-and-acknowledgement.html#license-acknowledgement">License &amp; Acknowledgement</a>
+            
+        </li>
+    
+</ol>
+
+    </nav>
+    
+    <nav id="links">
+        <ul>
+            
+        </ul>
+    </nav>
+    
+</div>
+
+        <div id="content">
+            <h1 id="unit-reference">Unit Reference</h1>
+<h3 id="unit-common-parameters-unit-base-class-">Unit Common Parameters (Unit Base Class)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pActive</code></td>
+<td style="text-align:center">boolean</td>
+<td style="text-align:center">unit status (bypass on false)</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pGain</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">unit output gain</td>
+<td style="text-align:center">yes</td>
+</tr>
+</tbody>
+</table>
+<h3 id="unit-common-methods-unit-base-class-">Unit Common Methods (Unit Base Class)</h3>
+<h4 id="-set-paramname-value-"><code>set(paramName, value)</code></h4>
+<p>sets value of target parameter immediately.</p>
+<ul>
+<li><code>paramName</code> <em>(string)</em> target parameter name</li>
+<li><code>value</code> <em>(float)</em> target value</li>
+</ul>
+<h4 id="-set-paramname-value-transtype-time-"><code>set(paramName, value, transType, time)</code></h4>
+<p>schedules value of target parameter with specified transition and end time.</p>
+<ul>
+<li><code>paramName</code> <em>(string)</em> target parameter name</li>
+<li><code>value</code> <em>(float)</em> target value</li>
+<li><code>transType</code> <em>(int, string)</em> transition type: [1, 2, 3] or [&#39;line&#39;, &#39;expo&#39;, &#39;target&#39;]</li>
+<li><code>time</code> <em>(float)</em> transition end time</li>
+</ul>
+<h4 id="-set-paramname-value-target-time1-time2-"><code>set(paramName, value, &quot;target&quot;, time1, time2)</code></h4>
+<p>schedules value of target parameter with exponential transition between start and end time.</p>
+<ul>
+<li><code>paramName</code> <em>(string)</em> target parameter name</li>
+<li><code>value</code> <em>(float)</em> target value</li>
+<li><code>time1</code> <em>(float)</em> transition start time</li>
+<li><code>time2</code> <em>(float)</em> transition end time</li>
+</ul>
+<h4 id="-to-unit-"><code>to(unit)</code></h4>
+<p>connects to WAAX unit.</p>
+<ul>
+<li><code>unit</code> <em>(wxunit)</em> WAAX Unit with inlet</li>
+</ul>
+<h4 id="-connect-audionode-"><code>connect(audioNode)</code></h4>
+<p>connects to Web Audio API node.</p>
+<ul>
+<li><code>unit</code> <em>(wxunit)</em> WAAX Unit (with inlet)</li>
+</ul>
+<h4 id="-modulate-unit-paramname-"><code>modulate(unit, paramName)</code></h4>
+<p>modulates a parameter in target WAAX unit.</p>
+<ul>
+<li><code>unit</code> <em>(wxunit)</em> WAAX Unit</li>
+<li><code>paramName</code> <em>(string)</em> unit parameter</li>
+</ul>
+<h2 id="wx-adsr">WX.ADSR</h2>
+<p>Multi-phase envelope generator: attack, decay, sustain, release.</p>
+<h3 id="wx-adsr-parameters">WX.ADSR: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pAttack</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">attacking time in seconds</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pDecay</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">decay time in seconds</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pSustain</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">gain in sustain phase</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pRelease</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">release time in seconds</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pTimeConstant</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">time constant of exponential curve for release phase</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="wx-adsr-methods">WX.ADSR: Methods</h3>
+<h4 id="-setadsr-attack-decay-sustain-release-"><code>setADSR(attack, decay, sustain, release)</code></h4>
+<ul>
+<li><code>attack</code> <em>(float)</em> attack time in seconds</li>
+<li><code>decay</code> <em>(float)</em> decay time in seconds</li>
+<li><code>sustain</code> <em>(float)</em> gain in sustain phase</li>
+<li><code>release</code> <em>(float)</em> release time in seconds</li>
+</ul>
+<h2 id="wx-chorus">WX.Chorus</h2>
+<p>Chorus effect based on <a href="https://ccrma.stanford.edu/~dattorro/EffectDesignPart2.pdf">the paper by Jon Dattorro</a>.</p>
+<h3 id="wx-chorus-parameters">WX.Chorus: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pRate</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">LFO speed for modulation</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pDepth</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">LFO depth for modulation</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pIntensity</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">internal feedback intensity</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pBlend</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">blend amount between feedback and feedforward</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pMix</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">mix amount between wet and dry signal</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="wx-comp">WX.Comp</h2>
+<p>Compressor with variable knee setting. DynamicCompressor node in WAAX wrapper.</p>
+<h3 id="wx-comp-parameters">WX.Comp: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pThreshold</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">threshold in decibles</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pKnee</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">knee (in decibels)</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pRatio</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">compression ratio</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pAttack</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">attack time</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pRelease</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">release time</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="wx-converb">WX.Converb</h2>
+<p>Convolution reverb with mix balance control.</p>
+<h3 id="wx-converb-parameters">WX.Converb: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pMix</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">mix amount between wet and dry signal</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="wx-converb-methods">WX.Converb: Methods</h3>
+<h4 id="-setimpulseresponse-impulseresponse-"><code>setImpulseResponse(impulseResponse)</code></h4>
+<ul>
+<li><code>impulseResponse</code> <em>(audioBuffer)</em> impulse response buffer</li>
+</ul>
+<h2 id="wx-fader">WX.Fader</h2>
+<p>Fader abstraction. Supports muting, gain control in decibels. Note that <code>WX.Master</code> is a pre-declared instance of this unit class.</p>
+<h3 id="wx-fader-parameters">WX.Fader: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pMute</code></td>
+<td style="text-align:center">boolean</td>
+<td style="text-align:center">muted when true</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pdB</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">gain in decibels</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="wx-filterbank">WX.FilterBank</h2>
+<p>Filterbank with 16 bandpass filters. Custom design for FrostPad demo.</p>
+<h3 id="wx-filterbank-parameters">WX.FilterBank: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pPitch</code></td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">base pitch of filterbank</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pChord</code></td>
+<td style="text-align:center">string</td>
+<td style="text-align:center">chord type* for harmonic structure</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pSlope</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">gain balance between high end and low end</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pWidth</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">bandwidth of filters</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pDetune</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">detune of filter frequency</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>chord type: &#39;ionian&#39;, &#39;lydian&#39;, &#39;mixolydian&#39;, &#39;aeolian&#39;</li>
+</ul>
+<h2 id="wx-fmop">WX.FMop</h2>
+<p>FM operator consists of 2 sine oscillator.</p>
+<h3 id="wx-fmop-parameters">WX.FMop: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pFreq</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">frequency of carrier, related to base pitch</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pHarmonicRatio</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">harmonic coefficient between modulator and carrier frequency</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pModulationIndex</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">gain coefficient of modulator output</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="wx-fmop-methods">WX.FMop: Methods</h3>
+<h4 id="-start-time-"><code>start(time)</code></h4>
+<ul>
+<li><code>time</code> <em>(float)</em> time in seconds for unit activation. optional.</li>
+</ul>
+<h4 id="-stop-time-"><code>stop(time)</code></h4>
+<ul>
+<li><code>time</code> <em>(float)</em> time in seconds for unit deactivation. optional.</li>
+</ul>
+<h2 id="wx-formantv">WX.FormantV</h2>
+<p>Formant filter for simple vowel synthesis based on 2D vector positioning. It is heavily inspired by Ge Wang&#39;s joystick-formant demo.</p>
+<h3 id="wx-formantv-parameters">WX.FormantV: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pPositionX</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">x position of 2d vector</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pPositionY</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">y position of 2d vector</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="wx-formantv-methods">WX.FormantV: Methods</h3>
+<h4 id="-setposition-x-y-transtype-time1-time2-"><code>setPosition(x, y, transType, time1, time2)</code></h4>
+<ul>
+<li><code>x</code> <em>(float)</em> x position of 2d vector</li>
+<li><code>y</code> <em>(float)</em> y position of 2d vector</li>
+<li><code>transType</code> <em>(string | int)</em> additional argument for <code>.set()</code> method</li>
+<li><code>time1</code> <em>(float)</em> additional argument for <code>.set()</code> method</li>
+<li><code>time2</code> <em>(float)</em> additional argument for <code>.set()</code> method</li>
+</ul>
+<h2 id="wx-impulsetrain">WX.ImpulseTrain</h2>
+<p>Impulse train generator based on oscillator node.</p>
+<h3 id="wx-impulsetrain-parameters">WX.ImpulseTrain: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pFreq</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">frequency of impulse train</td>
+<td style="text-align:center">yes</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pDynamic</code></td>
+<td style="text-align:center">boolean</td>
+<td style="text-align:center">use dynamic mode</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="wx-impulsetrain-methods">WX.ImpulseTrain: Methods</h3>
+<h4 id="-start-time-"><code>start(time)</code></h4>
+<ul>
+<li><code>time</code> <em>(float)</em> time in seconds for unit activation. optional.</li>
+</ul>
+<h4 id="-stop-time-"><code>stop(time)</code></h4>
+<ul>
+<li><code>time</code> <em>(float)</em> time in seconds for unit deactivation. optional.</li>
+</ul>
+<h2 id="wx-lpf">WX.LPF</h2>
+<p>Low pass filter based on two biquad filter nodes. Enhanced mode will cascade two filters in serial resulting higher and narrow resonance.</p>
+<h3 id="wx-lpf-parameters">WX.LPF: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pCutoff</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">filter frequency</td>
+<td style="text-align:center">yes</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pQ</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">filter resonance</td>
+<td style="text-align:center">yes</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pEnhanced</code></td>
+<td style="text-align:center">boolean</td>
+<td style="text-align:center">enhanced mode</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="wx-noise">WX.Noise</h2>
+<p>White noise (gaussian distribution) generator. The implementation is based on buffer source node to unsure the optimum performance.</p>
+<h3 id="wx-noise-parameters">WX.Noise: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pGrain</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">granularity of noise</td>
+<td style="text-align:center">yes</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pDynamic</code></td>
+<td style="text-align:center">boolean</td>
+<td style="text-align:center">use dynamic mode</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="wx-noise-methods">WX.Noise: Methods</h3>
+<h4 id="-start-time-"><code>start(time)</code></h4>
+<ul>
+<li><code>time</code> <em>(float)</em> time in seconds for unit activation. optional.</li>
+</ul>
+<h4 id="-stop-time-"><code>stop(time)</code></h4>
+<ul>
+<li><code>time</code> <em>(float)</em> time in seconds for unit deactivation. optional.</li>
+</ul>
+<h2 id="wx-oscil">WX.Oscil</h2>
+<p>Multi-waveform oscillator with gain control.</p>
+<h3 id="wx-oscil-parameters">WX.Oscil: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pType</code></td>
+<td style="text-align:center">string</td>
+<td style="text-align:center">waveform type*</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pFreq</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">oscillator frequency</td>
+<td style="text-align:center">yes</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pDynamic</code></td>
+<td style="text-align:center">boolean</td>
+<td style="text-align:center">use dynamic mode</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>waveform type: &#39;sine&#39;, &#39;square&#39;, &#39;sawtooth&#39;, &#39;triangle&#39;</li>
+</ul>
+<h3 id="wx-oscil-methods">WX.Oscil: Methods</h3>
+<h4 id="-start-time-"><code>start(time)</code></h4>
+<ul>
+<li><code>time</code> <em>(float)</em> time in seconds for unit activation. optional.</li>
+</ul>
+<h4 id="-stop-time-"><code>stop(time)</code></h4>
+<ul>
+<li><code>time</code> <em>(float)</em> time in seconds for unit deactivation. optional.</li>
+</ul>
+<h2 id="wx-phasor">WX.Phasor</h2>
+<p>Phasor implementation based on Chris Roger&#39;s idea of cascaded notch filters.</p>
+<h3 id="wx-phasor-parameters">WX.Phasor: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pRate</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">LFO modulation speed</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pDepth</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">LFO modulation depth</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pBaseFrequency</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">base frequency of filter group</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pSpacing</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">spacing factor for filter frequencies</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pMix</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">mix amount between wet and dry signal</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="wx-pingpong">WX.Pingpong</h2>
+<p>Stereo ping-pong delay with variable crosstalk between channels.</p>
+<h3 id="wx-pingpong-parameters">WX.pingpong: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pDelayTimeLeft</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">left delay time in seconds</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pDelayTimeRight</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">right delay time in seconds</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pFeedbackLeft</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">feedback amount for left delay channel</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pFeedbackRight</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">feedback amount for right delay channel</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pCrosstlak</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">crosstalk amount</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pMix</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">mix amount between wet and dry signal</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="wx-pingpong-methods">WX.pingpong: Methods</h3>
+<h4 id="-setdelaytime-left-right-transtype-time1-time2-"><code>setDelayTime(left, right, transtype, time1, time2)</code></h4>
+<ul>
+<li><code>left</code> <em>(float)</em> left delay time in seconds</li>
+<li><code>right</code> <em>(float)</em> right delay time in seconds</li>
+</ul>
+<h4 id="-setfeedback-left-right-transtype-time1-time2-"><code>setFeedback(left, right, transtype, time1, time2)</code></h4>
+<ul>
+<li><code>left</code> <em>(float)</em> feedback amount for left delay channel</li>
+<li><code>right</code> <em>(float)</em> feedback amount for right delay channel</li>
+</ul>
+<h2 id="wx-sampler">WX.Sampler</h2>
+<p>Buffer source node abstraction with additional features.</p>
+<h3 id="wx-sampler-parameters">WX.Sampler: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pPitch</code></td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">MIDI pitch for sample playback</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pBasePitch</code></td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">base pitch for sample</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pLoop</code></td>
+<td style="text-align:center">boolean</td>
+<td style="text-align:center">loop mode</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="wx-sampler-methods">WX.Sampler: Methods</h3>
+<h4 id="-onload-fn-"><code>onload(fn)</code></h4>
+<p>Specifies callback function for sample buffer &#39;onload&#39; event.</p>
+<ul>
+<li><code>fn</code> <em>(function)</em> function to be executed on sample loaded</li>
+</ul>
+<h4 id="-setbuffer-buffer-"><code>setBuffer(buffer)</code></h4>
+<p>Assigns a sample buffer to sampler.</p>
+<ul>
+<li><code>buffer</code> <em>(audioBuffer)</em> sample buffer for sampler</li>
+</ul>
+<h4 id="-getdruation-"><code>getDruation()</code></h4>
+<p>Returns duration of sample buffer in seconds.</p>
+<h4 id="-oneshot-time-duration-"><code>oneshot(time, duration)</code></h4>
+<p>Starts sample playback at specified time for duration. Useful for <em>trigger and forget</em> approach.</p>
+<ul>
+<li><code>time</code> <em>(float)</em> function to be executed on sample loaded</li>
+<li><code>duration</code> <em>(float)</em> function to be executed on sample loaded</li>
+</ul>
+<h4 id="-start-time-"><code>start(time)</code></h4>
+<ul>
+<li><code>time</code> <em>(float)</em> time in seconds for unit activation. optional.</li>
+</ul>
+<h4 id="-stop-time-"><code>stop(time)</code></h4>
+<ul>
+<li><code>time</code> <em>(float)</em> time in seconds for unit deactivation. optional.</li>
+</ul>
+<h2 id="wx-saturator">WX.Saturator</h2>
+<p>Implements saturation effect based on WaveShaper node.</p>
+<h3 id="wx-saturator-parameters">WX.Saturator: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pQuality</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">saturation quality</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pDrive</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">saturation amount</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="wx-spectrum">WX.Spectrum</h2>
+<p>Spectrum visualizer based on Analyser node.</p>
+<h3 id="wx-spectrum-parameters">WX.Spectrum: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pSmoothingTimeConstant</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">smoothing factor between succesive frames</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pMaxDecibels</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">maximum gain in decibels</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pMinDecibels</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">minimum gain in decibels</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pScale</code></td>
+<td style="text-align:center">string</td>
+<td style="text-align:center">frequency axis scale*</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pAutoClear</code></td>
+<td style="text-align:center">boolean</td>
+<td style="text-align:center">clear drawn visualization every frame</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pShowGrid</code></td>
+<td style="text-align:center">boolean</td>
+<td style="text-align:center">show reference(frequency/decibels) grid</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>scale: log | linear</li>
+</ul>
+<h3 id="wx-spectrum-methods">WX.Spectrum: Methods</h3>
+<h4 id="-setcontext2d-context-"><code>setContext2D(context)</code></h4>
+<p>Sets 2d context (canvas) for visualization.</p>
+<ul>
+<li><code>context</code> <em>(context2d)</em> 2d context from canvas</li>
+</ul>
+<h4 id="-draw-color-gridcolor-"><code>draw(color, gridColor)</code></h4>
+<p>Draws visualization and reference grid with color setting. Use inside animation rendering loop.</p>
+<ul>
+<li><code>color</code> <em>(string)</em> visualization color</li>
+<li><code>gridColor</code> <em>(string)</em> reference grid color</li>
+</ul>
+<h2 id="wx-step">WX.Step</h2>
+<p>Control signal (DC offset) generator. Use with oscillator or envelope to generate modulation source signal.</p>
+<h3 id="wx-step-methods">WX.Step: Methods</h3>
+<h4 id="-stop-time-"><code>stop(time)</code></h4>
+<ul>
+<li><code>time</code> <em>(float)</em> time in seconds for unit deactivation. optional.</li>
+</ul>
+<h2 id="wx-stereovisualizer">WX.StereoVisualizer</h2>
+<p>Stereo visualizer with user-defined render method.</p>
+<h3 id="wx-stereovisualizer-parameters">WX.StereoVisualizer: Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">name</th>
+<th style="text-align:center">type</th>
+<th style="text-align:center">description</th>
+<th style="text-align:center">modulatable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>pSmoothingTimeConstant</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">smoothing factor between succesive frames</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pMaxDecibels</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">maximum gain in decibels</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>pMinDecibels</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">minimum gain in decibels</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="wx-stereovisualizer-methods">WX.StereoVisualizer: Methods</h3>
+<h4 id="-drawspectrum-"><code>drawSpectrum()</code></h4>
+<p>Draws frequency-domain visualization with user-defined render method. Use inside animation rendering loop.</p>
+<h4 id="-drawwaveform-"><code>drawWaveform()</code></h4>
+<p>Draws time-domain visualization with user-defined render method. Use inside animation rendering loop.</p>
+<h4 id="-ondraw-fn-"><code>onDraw(fn)</code></h4>
+<p>Defines render algorithm for drawing methods.</p>
+<ul>
+<li><code>fn</code> <em>(function)</em> function to be executed every animation frame.</li>
+</ul>
+<h4 id="-_ondraw-buffer1-buffer2-"><code>_ondraw(buffer1, buffer2)</code></h4>
+<p>Callback function for frame rendering. Defined by &#39;.onDraw()&#39; method.</p>
+<ul>
+<li><code>buffer1</code> <em>(Float32Array | Uint8Array)</em> buffer data for left channel</li>
+<li><code>buffer2</code> <em>(Float32Array | Uint8Array)</em> buffer data for right channel</li>
+</ul>
+
+
+
+
+        </div>
+        <footer id="footer">
+            Powered by <a href="http://github.com/maximebf/beautiful-docs">beautiful-docs</a> -
+            <a href="#top">Back to top</a> - <a href="all.html">Everything on a single page</a>
+            - <a href="?print=1">Print current page</a> - <a href="all.html?print=1">Print all pages</a>
+            
+        </footer>
+    </div>
+</body>
+</html>

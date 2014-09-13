@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>mui-pianoroll | Web Audio API eXtension</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../mui.html">
+  <link rel="import" href="mui-pianoroll.html">
+  <script src="../../build/waax.js"></script>
+  <script src="../../build/plug_ins/wxs1.js"></script>
+
+  <style>
+    body {
+      background-color: #fafafa;
+    }
+    header {
+      margin-top: 30px;
+    }
+    h2 {
+      margin-top: 40px;
+    }
+  </style>
+
+</head>
+
+<body unresolved>
+
+  <header>
+    <div class="row">
+      <div class="small-10 small-centered columns">
+        <ul class="breadcrumbs">
+          <li><a href="..">WAAX Home</a></li>
+        </ul>
+        <h3>MUI Elements <small>1.0.0-alpha</small></h3>
+      </div>
+    </div>
+  </header>
+
+  <article>
+    <div class="row">
+      <div class="small-10 small-centered columns">
+        <mui-rack id="r-synth"></mui-rack>
+        <mui-rack label="Pianoroll">
+          <mui-pianoroll id="proll"></mui-pianoroll>
+        </mui-rack>
+        <mui-rack label="Transport">
+          <mui-button id="b-rew" icon="av:skip-previous"></mui-button>
+          <mui-button id="b-pause" icon="av:pause"></mui-button>
+          <mui-button id="b-play" icon="av:play-arrow"></mui-button>
+        </mui-rack>
+      </div>
+    </div>
+  </article>
+
+  <script>
+    MUI.start(function () {
+
+      var wxs1 = WX.WXS1();
+      var notelist = WX.NoteList();
+
+      for (var i = 0; i < 100; i++) {
+        notelist.add(WX.Note(60 + i, 100, 240 * i, 120));
+      }
+
+      MUI.$('proll').setNoteList(notelist);
+      WX.Transport.addNoteList(notelist);
+      WX.Transport.addView(MUI.$('proll'));
+      WX.Transport.addTarget(wxs1);
+
+      MUI.$('b-rew').onclick = WX.Transport.rewind.bind(WX.Transport);
+      MUI.$('b-pause').onclick = WX.Transport.pause.bind(WX.Transport);
+      MUI.$('b-play').onclick = WX.Transport.start.bind(WX.Transport);
+
+      MUI.buildControls(wxs1, 'r-synth');
+
+      wxs1.to(WX.Master);
+
+    });
+  </script>
+
+</body>
+</html>
