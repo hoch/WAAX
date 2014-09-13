@@ -94,21 +94,6 @@ module.exports = function(grunt) {
         base: 'dist'
       },
       src: ['**']
-    },
-
-    jsdoc : {
-      reference : {
-        src: [
-          'src/waax.header.js',
-          'src/waax.util.js',
-          'src/waax.core.js',
-        ],
-        options: {
-          destination: 'docs/reference',
-          template: 'docs/template',
-          configure: 'docs/template/jsdoc.conf.json'
-        }
-      }
     }
 
   });
@@ -119,7 +104,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-gh-pages');
-  grunt.loadNpmTasks('grunt-jsdoc');
 
   grunt.registerTask('default', ['build']);
   grunt.registerTask('build', ['clean:build', 'uglify']);
@@ -128,5 +112,4 @@ module.exports = function(grunt) {
     'deploy',
     ['build', 'clean:dist', 'copy:dist', 'gh-pages', 'clean:dist']
   );
-  grunt.registerTask('doc', ['jsdoc']);
 };

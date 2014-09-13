@@ -2,34 +2,18 @@
 <html>
 <head>
   <title>MUI | Web Audio API eXtension</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- MUI and WAAX core -->
-  <script src="../../bower_components/platform/platform.js"></script>
-  <link rel="import" href="../../mui/mui.html">
   <script src="../../build/waax.js"></script>
-
-  <!-- Generators -->
   <script src="../../build/plug_ins/wxs1.js"></script>
   <script src="../../build/plug_ins/simpleosc.js"></script>
   <script src="../../build/plug_ins/noise.js"></script>
   <script src="../../build/plug_ins/impulse.js"></script>
-  <!-- Processors -->
   <script src="../../build/plug_ins/stereodelay.js"></script>
   <script src="../../build/plug_ins/converb.js"></script>
 
-  <style>
-    body {
-      background-color: #fafafa;
-    }
-    header {
-      margin-top: 30px;
-    }
-    h2 {
-      margin-top: 40px;
-    }
-  </style>
+  <link rel="import" href="../../mui/mui.html">
+  <link rel="import" href="../../mui/mui-style.html">
+
 </head>
 
 <body unresolved>
@@ -49,27 +33,27 @@
     <div class="row">
       <div class="small-10 small-centered columns">
 
+        <mui-select label="Generator" id="select-gen"></mui-select>
+        <mui-rack id="params-gen" title="Generator" opened="true">
+        </mui-rack>
+        <mui-select label="Processor" id="select-pro"></mui-select>
+        <mui-rack id="params-pro" title="Processor" opened="true">
+        </mui-rack>
         <mui-rack label="Keyboard" opened="true">
           <mui-vkey id="vkey"></mui-vkey>
         </mui-rack>
-        <mui-select label="Generator" id="select-gen"></mui-select>
-        <mui-select label="Processor" id="select-pro"></mui-select>
-        <mui-rack id="params-gen" title="Generator" opened="true">
-        </mui-rack>
-
-        <mui-rack id="params-pro" title="Processor" opened="true">
-        </mui-rack>
-
       </div>
     </div>
   </article>
 
   <script>
+    MUI.start(function () {
 
-    function init() {
-
+      // Get registered WX plug-ins: Generator and Processor
       var gens = WX.PlugIn.getRegistered('Generator'),
           pros = WX.PlugIn.getRegistered('Processor');
+
+      // Create data model for mui-select
       var genModel = [],
           proModel = [];
       for (var i = 0; i < gens.length; i++) {
@@ -79,29 +63,34 @@
         proModel.push({ key: pros[i], value: pros[i] });
       }
 
+      // Get DOM handles with MUI.$ selector
       var genSelector = MUI.$('select-gen'),
           proSelector = MUI.$('select-pro'),
           vkeySelector = MUI.$('vkey');
 
+      // Set data model and event handler
       genSelector.setModel(genModel);
       genSelector.setValue(gens[0]);
-      genSelector.onItemSelected = patch;
-
+      genSelector.onItemSelected = onPatch;
       proSelector.setModel(proModel);
       proSelector.setValue(pros[1]);
-      proSelector.onItemSelected = patch;
+      proSelector.onItemSelected = onPatch;
 
-      var currGen, currPro;
-
-      var irClip = {
-        name: 'Plate',
+      // loading WXClip for convolution reverb
+      var reverbClip = {
+        name: '960 Large Plate',
         url: '../../sound/ir/960-LargePlate.wav'
       };
-      WX.loadClip(irClip, function (clip) {
+      WX.loadClip(reverbClip, function (clip) {
         WX.Log.info('clip loaded.');
       });
 
-      function patch() {
+      // Current generator and processor references
+      var currGen, currPro;
+
+      // Event handler: onPatch
+      function onPatch() {
+
         // clear up
         if (currGen) {
           currGen.cut();
@@ -112,27 +101,31 @@
         }
         MUI.removeChildren('params-gen');
         MUI.removeChildren('params-pro');
+
         // recreation
         currGen = WX[genSelector.value]();
         currPro = WX[proSelector.value]();
         currGen.to(currPro).to(WX.Master);
+
         // connecting keyboard input
         if (currGen.onData) {
           vkeySelector.addTarget(currGen);
         }
-        MUI.$('params-gen').label = currGen.info.name;
-        MUI.$('params-pro').label = currPro.info.name;
+
+        // parse and build GUI elements
         MUI.buildControls(currGen, 'params-gen');
         MUI.buildControls(currPro, 'params-pro');
+
         if (proSelector.value === 'ConVerb') {
-          currPro.setClip(irClip);
+          currPro.setClip(reverbClip);
         }
+
       }
 
-      patch();
-    }
+      // Initial patching
+      onPatch();
 
-    window.addEventListener('polymer-ready', init);
+    });
   </script>
 
 </body>

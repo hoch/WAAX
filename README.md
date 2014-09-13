@@ -2,7 +2,8 @@
 
 #### JavaScript Framework for Web Music Application (1.0.0-alpha)
 
-> Currently the repository is under the active development as alpha status. It has passed the initial experimental phase and is settling down to version 1.0.0. With that said, please use at your own risk.
+> NOTE: WAAX and MUI require recent web technology such as __Web Audio API, Web MIDI API and Web Components__ (HTML import, Shadow DOM, Custom Elements). Chrome is the only browser that fully supports these APIs at the moment. Check [here](http://caniuse.com/#search=Component) for the browser support.
+
 
 <!-- travis build image -->
 
@@ -34,8 +35,7 @@ To use WAAX in a web page, simply load the `waax.js` in an HTML document. Note t
 <script src="build/plug_ins/wxs1.js"></script>
 <script src="build/plug_ins/converb.js"></script>
 <script src="build/plug_ins/stereodelay.js"></script>
-<!-- load Polymer and MUI elements -->
-<script src="bower_components/platform/platform.js"></script>
+<!-- load MUI elements -->
 <import src="mui/mui.html"></script>
 ~~~
 
@@ -54,13 +54,14 @@ Note that MIDI support depends on [Web MIDI API](http://www.w3.org/TR/webmidi/),
 By its design, WAAX accommodates various use cases with different levels. As shown below, it can be as simple as possible.
 
 ~~~javascript
-// creating a WXS-1 synth and a stereo delay instance.
+// Creating a WXS-1 synth and a stereo delay instance.
 var synth = WX.WXS1(),
     delay = WX.StereoDelay();
-// plug-in patching: Synth => Delay => Master
+// Plug-in patching: Synth => Delay => Master
 synth.to(delay).to(WX.Master);
-// plays C4 with 100 velocity for 1 second.
-synth.noteOn(60, 100).noteOff(WX.now + 1.0);
+// Plays C4 with 100 velocity for 1 second.
+synth.noteOn(60, 100);
+synth.noteOff(WX.now + 1.0);
 ~~~
 
 Also it can be as complex as a complete music application. For more examples, check out [MUI showcases](http://hoch.github.io/WAAX/mui/) and [Plug-In Workshop](http://hoch.github.io/WAAX/examples/workshop/).
@@ -70,7 +71,7 @@ Also it can be as complex as a complete music application. For more examples, ch
 
 MUI(Musical User Interface) package offers essential UI elements for rapid prototyping of instrument design or processing algorithm. By design, MUI supports seamless parameter binding and easy GUI building. A live demo can be found [here](http://hoch.github.io/WAAX/examples/hellowaax/).
 
-First, HTML elements should be created.
+First, MUI elements, which are custom HTML elements, should be declared.
 
 ~~~html
 <!-- MUI knob element -->
@@ -80,18 +81,15 @@ First, HTML elements should be created.
 Secondly, create any plug-in and connect the GUI to a parameter.
 
 ~~~javascript
-// creates an oscillator.
+// Creates an oscillator plug-in.
 var osc = WX.SimpleOsc();
-// patching: Osc => Master
+// Patching: Osc => Master
 osc.to(WX.Master);
-// starts audio.
+// Starts audio.
 osc.noteOn(60, 100);
-// connects GUI element.
-// link() method neeeds target plug-in and parameter name
+// Links the knob and a parameter: link(target_plugin, parameter_name)
 MUI.$('knob-freq').link(osc, 'oscFreq');
 ~~~
-
-
 
 
 ## Further Reading
@@ -126,11 +124,6 @@ grunt serve         # starts development server @ localhost:8000
 grunt build         # builds the minimized JS files into 'build/' folder
 grunt deploy        # produces deployment build in 'dist/' folder
 ~~~
-
-
-## Documentation and API Reference
-
-The newer version of documentation will be posted soon and the previous version is still accessible [here](http://hoch.github.io/WAAX/docs/).
 
 
 ## License and Contact

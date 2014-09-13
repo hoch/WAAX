@@ -1,29 +1,14 @@
 <!doctype html>
 <html>
+
 <head>
   <title>MUI | Web Audio API eXtension</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- MUI and WAAX core -->
-  <script src="../bower_components/platform/platform.js"></script>
-  <link rel="import" href="mui.html">
   <script src="../build/waax.js"></script>
   <script src="../build/plug_ins/wxs1.js"></script>
-
-  <style>
-    body {
-      background-color: #fafafa;
-    }
-    header {
-      margin-top: 30px;
-    }
-    h2 {
-      margin-top: 40px;
-    }
-  </style>
-
+  <link rel="import" href="mui.html">
+  <link rel="import" href="mui-style.html">
 </head>
+
 <body unresolved>
 
   <header>
@@ -33,6 +18,9 @@
           <li><a href="..">WAAX Home</a></li>
         </ul>
         <h3>MUI Elements <small>1.0.0-alpha</small></h3>
+        <div class="alert-box secondary radius">
+          NOTE: MUI Elements requires <a target="_blank" href="http://www.polymer-project.org/">Polymer projects</a> to utilize Web Components technology. Check <a target="_blank" href="http://caniuse.com/#search=Component">CanIUse.com</a> for the browser support.
+        </div>
       </div>
     </div>
   </header>
@@ -92,9 +80,9 @@
             <mui-button icon="av:loop" type="toggle"></mui-button>
           </mui-group>
           <mui-group label="Collaboration">
-            <mui-button icon="work" title="Pattern Collection"></mui-button>
-            <mui-button icon="social:person-add" title="Add Collaborator"></mui-button>
-            <mui-button icon="social:share" title="Share Pattern"></mui-button>
+            <mui-button icon="work"></mui-button>
+            <mui-button icon="social:person-add"></mui-button>
+            <mui-button icon="social:share"></mui-button>
           </mui-group>
         </mui-rack>
 
@@ -103,7 +91,7 @@
   </article>
 
   <script>
-    function init() {
+    MUI.start(function () {
 
       var wxs1 = WX.WXS1();
       wxs1.to(WX.Master);
@@ -131,10 +119,9 @@
 
       MUI.$('vkey').addTarget(wxs1);
 
-    }
-
-    window.addEventListener('polymer-ready', init);
+    });
   </script>
 
 </body>
+
 </html>

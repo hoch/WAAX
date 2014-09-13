@@ -26,6 +26,13 @@
 
   Note.prototype = {
 
+    setNote: function (note) {
+      this.pitch = note.pitch;
+      this.velocity = note.velocity;
+      this.start = note.start;
+      this.dur = note.dur;
+    },
+
     getEnd: function () {
       return this.start + this.dur;
     },
@@ -67,6 +74,12 @@
       this.rearrange();
     },
 
+    update: function (index, note) {
+      if (index < this.notes.length && this.notes[index]) {
+        this.notes[index].setNote(note);
+      }
+    },
+
     remove: function (note) {
       var idx = this.notes.indexOf(note);
       if (idx > -1) {
@@ -74,19 +87,26 @@
       }
       this.diffScore += 2;
       this.rearrange();
+      return idx;
+    },
+
+    removeNoteAtIndex: function (index) {
+      if (index < this.notes.length) {
+        this.notes[index] = null;
+      }
     },
 
     rearrange: function () {
-      if (this.diffScore > 50) {
-        // this._lockData();
-        this.notes = this.notes.filter(function (note) {
-          return note !== null;
-        }).sort(function (a, b) {
-          return a.start - b.start;
-        });
-        this.diffScore = 0;
-        // this._unlockData();
-      }
+      // if (this.diffScore > 50) {
+      //   // this._lockData();
+      //   this.notes = this.notes.filter(function (note) {
+      //     return note !== null;
+      //   }).sort(function (a, b) {
+      //     return a.start - b.start;
+      //   });
+      //   this.diffScore = 0;
+      //   // this._unlockData();
+      // }
     },
 
     findNoteAtPosition: function (pitch, tick) {
