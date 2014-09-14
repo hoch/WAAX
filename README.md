@@ -2,11 +2,9 @@
 
 #### JavaScript Framework for Web Music Application (1.0.0-alpha)
 
-> NOTE: WAAX and MUI require recent web technology such as __Web Audio API, Web MIDI API and Web Components__ (HTML import, Shadow DOM, Custom Elements). Chrome is the only browser that fully supports these APIs at the moment. Check [here](http://caniuse.com/#search=Component) for the browser support.
-
+> NOTE: WAAX and MUI require Chrome because they are built on top of Web Audio API, Web MIDI API and Web Components. Check [here](http://caniuse.com) for the browser support.
 
 <!-- travis build image -->
-
 
 # Introduction
 
@@ -18,7 +16,7 @@ __WAAX__ is a JavaScript library that offers a comprehensive framework for web-b
 - Timebase, Transport and NoteList (a.k.a. Sequencer Engine)
 - [Modular GUI elements](http://hoch.github.io/WAAX/mui/) powered by Polymer
 - [Web MIDI API Integration](https://github.com/hoch/Ktrl) _(supported behind flag)_
-- Complete Front-end Development setup: NPM, Bower, Grunt, Foundation, Polymer
+- Complete Front-end Development setup: NPM, Bower, Gulp, Foundation, Polymer
 - Tested with Mocha and Chai: [In-browser Test](http://hoch.github.io/WAAX/test/)
 
 <!-- ### [Play WAAX!](http://playwaax.appspot.com)
@@ -107,7 +105,7 @@ MUI.$('knob-freq').link(osc, 'oscFreq');
 
 ## Installation
 
-The complete WAAX development setup requires [NPM](http://nodejs.org/), [Bower](http://bower.io/) and [Grunt](http://gruntjs.com/). If you have them installed, then simply execute the following commands in the terminal to install and configure WAAX. Make sure to replace `$YOUR_DIRECTORY` with your installation directory.
+The complete WAAX development setup requires [NPM](http://nodejs.org/), [Bower](http://bower.io/) and [Gulp](http://gulpjs.com/). If you have them installed, then simply execute the following commands in the terminal to install and configure WAAX. Make sure to replace `$YOUR_DIRECTORY` with your installation directory.
 
 ~~~bash
 git clone https://github.com/hoch/WAAX $YOUR_DIRECTORY
@@ -116,16 +114,20 @@ make
 ~~~
 
 
-## Grunt Tasks
+## Gulp Tasks
 
 ~~~bash
-grunt               # same as 'grunt build'
-grunt serve         # starts development server @ localhost:8000
-grunt build         # builds the minimized JS files into 'build/' folder
-grunt deploy        # produces deployment build in 'dist/' folder
+gulp clean              # cleans dist, build path
+gulp serve              # starts dev server 127.0.0.1:3000 and opens Canary
+gulp scripts:core       # minifies and concats WAAX core JS files to build
+gulp scripts:plugins    # minifies plug-in JS files to build/plug-ins
+gulp scripts:ktrl       # minifies ktrl library
+gulp build              # all above
+gulp deploy             # build and deploy to gh-pages
+gulp                    # cleans, builds and starts dev server
 ~~~
 
 
 ## License and Contact
 
-MIT License. Copyright (c) 2014 [Hongchan Choi](https://ccrma.stanford.edu/~hongchan)
+MIT License. Copyright (c) 2011-2014 [Hongchan Choi](http://www.hoch.io)

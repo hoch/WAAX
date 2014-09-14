@@ -17,7 +17,11 @@
     html body {
       background-color: #eceff1;
     }
-    h1, h2, h3, h4, h5, h6, body,
+    h1, h2, h3, h4, h5, h6, body
+    {
+      font-family: 'Roboto', sans-serif;
+      color: #37474f;
+    }
     .top-bar-section ul li > a
     {
       font-family: 'Roboto', sans-serif;
@@ -27,17 +31,21 @@
     .top-bar-section ul li,
     .top-bar-section li:not(.has-form) a:not(.button)
     {
+      font-size: 1rem;
+      font-weight: 300;
+      color: #e0f2f1;
       background-color: #009688;
     }
     .top-bar-section li:not(.has-form) a:not(.button):hover,
     .top-bar-section .dropdown li:not(.has-form):hover > a:not(.button),
     .top-bar-section ul li:hover:not(.has-form) > a
     {
-      background-color: #00695c;
+      color: #fff;
+      background-color: #00897b;
     }
     .top-bar-section .dropdown li:not(.has-form) a:not(.button)
     {
-      background-color: #26a69a;
+      background-color: #009688;
     }
 
     .alert-box.warning {
@@ -46,37 +54,77 @@
       font-size: 0.9rem;
       margin-bottom: 4rem;
     }
+    .container {
+      width: 100%;
+    }
     h1 {
-      font-size: 4rem;
+      font-family: 'Roboto Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 4.4rem;
+      letter-spacing: 0.6rem;
+      margin: 0 1rem;
+      color: #37474f;
+    }
+    h2 {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 2.4rem;
+      margin: 2.4rem 0 1.8rem 0;
+      color: #37474f;
     }
     h3 {
-      font-size: 1.4rem;
-      margin-top: 1.2rem;
+      font-family: 'Roboto Condensed', sans-serif;
+      font-weight: 300;
+      font-size: 1.8rem;
+      margin-top: 0.6rem;
+      padding-top: 0;
+      color: #546e7a;
     }
     h4 {
-      font-size: 1.0rem;
+      font-size: 1rem;
       font-weight: 700;
-      margin-top: 1.8rem;
     }
     h1 small {
-      font-size: 0.9rem;
+      font-size: 1.0rem;
+      font-weight: 400;
+      letter-spacing: 0.05rem;
+    }
+    p {
+      font-size: 0.95rem;
     }
     nav.top-bar {
       margin-bottom: 2rem;
+      box-shadow: 3px 1px 3px 0 rgba(0, 0, 0, 0.23);
     }
     .panel {
       border: none;
       background: #fff;
       box-shadow: 0 1px 2px 2px rgba(96, 125, 139, 0.23);
     }
-    .panel h1 {
-      font-weight: 700;
-      font-size: 1.4rem;
-      margin-bottom: 0.9rem;
+    .panel.code {
+      border: none;
+      background: #fff;
+      box-shadow: none;
+    }
+    pre {
+      font-size: 0.925rem;
+      line-height: 1.25rem;
+    }
+    .panel h3 {
+      font-weight: 300;
+      font-size: 1.6rem;
+      margin-bottom: 1.2rem;
+      color: #546e7a;
     }
     .panel p {
+      color: #455a64;
+      font-family: 'Roboto', sans-serif;
       font-weight: 300;
-      font-size: 0.9rem;
+      font-size: 0.925rem;
+      line-height: 1.6rem
+    }
+    ul.feature-highlights li {
+      font-size: 1.05rem;
+      line-height: 2rem;
     }
     hr {
       border-color: #cfd8dc;
@@ -85,41 +133,28 @@
       font-weight: 300;
       font-size: 0.85rem;
     }
-
   </style>
 
 </head>
 
 <body>
 
+  <div data-alert class="alert-box warning">
+    <strong>NOTE</strong>: WAAX and MUI require <strong>Chrome</strong> because they are built on top of <strong>Web Audio API, Web MIDI API and Web Components</strong>. Check <a target="_blank" href="http://caniuse.com">CanIUse.com</a> for the browser support.
+    <a href="#" class="close">&times;</a>
+  </div>
+
+  <div class="container">
+
   <header>
 
-    <div data-alert class="alert-box warning">
-      <strong>NOTE</strong>: WAAX and MUI require <strong>Chrome</strong> because they are built on top of <strong>Web Audio API, Web MIDI API and Web Components</strong>. Check <a target="_blank" href="http://caniuse.com">CanIUse.com</a> for the browser support.
-      <a href="#" class="close">&times;</a>
-    </div>
-
     <div class="row">
-      <div class="small-10 small-centered columns">
-        <span class="label secondary radius right" id="waax-ver"></span>
-        <h1>WAAX <small>Web Music Framework</small></h1>
-
+      <div class="large-12 columns">
+        <h1>WAAX<small>Web Music Framework</small></h1>
         <nav class="top-bar" data-topbar role="navigation">
-
           <section class="top-bar-section">
-
-            <!-- Right Nav Section -->
-            <ul class="right">
-              <li><a href="https://github.com/hoch/WAAX">GitHub</a></li>
-            </ul>
-
-            <!-- Left Nav Section -->
             <ul class="left">
-              <li><a href="docs/">Documentation</a></li>
-              <li><a href="docs/reference/WX.html">API Reference</a></li>
-              <li><a href="mui/">MUI Elements</a></li>
-              <li><a href="test/">Test Suite</a></li>
-
+              <li><a href="#getstarted">Get Started</a></li>
               <li class="has-dropdown">
                 <a href="#">Examples</a>
                 <ul class="dropdown">
@@ -127,68 +162,144 @@
                   <li><a href="examples/workshop/">Plug-In Workshop</a></li>
                 </ul>
               </li>
+              <li><a href="#">Plug-ins</a></li>
+              <li><a href="mui/">MUI Elements</a></li>
+              <li class="has-dropdown">
+                <a href="#">Develop</a>
+                <ul class="dropdown">
+                  <li><a href="docs/reference/WX.html">API Reference</a></li>
+                  <li><a href="test/">Test Suite</a></li>
+                  <li><a href="https://github.com/hoch/WAAX">GitHub</a></li>
+                </ul>
+              </li>
             </ul>
-
           </section>
         </nav>
-
       </div>
     </div>
   </header>
 
   <article>
     <div class="row">
-      <div class="small-10 large-centered columns">
-
-        <!-- copied from github -->
-
-        <div class="panel">
-          <p><strong>WAAX</strong> (Web Audio API eXtension) is a JavaScript library built on top of Web Audio/MIDI API to facilitate audio programming on Blink-based web browsers - Chrome, Chrome Canary and Chromium. The project started from a small wrapper for Web Audio API and now it has grown to a comprehensive framework for web music application including features such as Web Audio/MIDI abstraction, Polymer-powered modular GUI, Timebase(sequencer, tempo) and real-time collaboration support.</p>
-        </div>
-
-        <h3>WAAX feature highlights:</h3>
-        <ul>
-        <li>Extending Web Audio API for ease of use</li>
-        <li>
-        <a href="https://ccrma.stanford.edu/%7Ehongchan/posts/creating-waax-plugin/">Web Audio Plug-in</a> (WAPL) Interface</li>
-        <li>Parameter &amp; Preset Management</li>
-        <li>Timebase, Transport and NoteList (a.k.a. Sequencer Engine)</li>
-        <li>
-        <a href="mui/">Modular GUI elements</a> powered by Polymer</li>
-        <li>
-        <a href="https://github.com/hoch/Ktrl">Web MIDI API Integration</a> <em>(supported behind flag)</em>
-        </li>
-        <li>Complete Front-end Development setup: NPM, Bower, Grunt, Foundation, Polymer</li>
-        <li>Tested with Mocha and Chai: <a href="test/">In-browser Test</a>
-        </li>
+      <div class="large-5 columns">
+        <h3>Feature Highlights</h3>
+        <ul class="feature-highlights">
+          <li>Modular and extensible architecture</li>
+          <li><a href="https://ccrma.stanford.edu/%7Ehongchan/posts/creating-waax-plugin/">Web Audio Plug-in</a> (WAPL) Interface</li>
+          <li><a href="mui/">Modular GUI elements</a> powered by Polymer</li>
+          <li>Sequencing: Timebase, Transport and NoteList</li>
+          <li><a href="https://github.com/hoch/Ktrl">Web MIDI API Integration</a> <em>(experimental)</em></li>
+          <li>Create, build and deploy: Bower and Gulp</li>
         </ul>
-
+      </div>
+      <div class="large-7 columns">
+        <div class="panel">
+          <h3>What is WAAX?</h3>
+          <p><strong>WAAX</strong> (Web Audio API eXtension) is a comprehensive JavaScript framework that facilitates and supports the development of web music applications as well as various collaborative music creation scenarios.</p>
+          <p>At the moment, <strong>WAAX</strong> and <strong>MUI</strong> require Blink-based web browsers - <em>Chrome, Chrome Canary or Chromium</em> - because they are built on top of <strong>Web Audio API</strong>, <strong>Web Component</strong> and <strong>Web MIDI API</strong>.</p>
+        </div>
       </div>
     </div>
 
     <div class="row">
-      <div class="small-10 large-centered columns">
-        <hr>
-        <h3>Media</h3>
+      <div class="large-12 columns">
+        <h2 id="getstarted">Get Started</h2>
+      </div>
+    </div>
 
-        <h4>Talk @ Sound of Denmark <small>2013, Nov</small></h4>
-        <iframe width="560" height="315" src="//www.youtube.com/embed/f4oDUwEoOzc" frameborder="0" allowfullscreen></iframe>
+    <div class="row">
+      <div class="large-4 columns">
+        <h4>Install.</h4>
+        <p>The complete WAAX development setup requires NPM, Bower and Gulp. If you have them installed, the installation is simple.</p>
+      </div>
+      <div class="large-8 columns">
+        <div class="panel code">
+          <pre>
+git clone https://github.com/hoch/WAAX $YOUR_DIRECTORY
+cd $YOUR_DIRECTORY
+make</pre>
+        </div>
+      </div>
+    </div>
 
+    <div class="row">
+      <div class="large-4 columns">
+        <h4>Load.</h4>
+        <p>To use WAAX in a web page, simply load the <code>waax.js</code> in an HTML document. You can also add WAAX plug-ins that you want to play with.</p>
+      </div>
+      <div class="large-8 columns">
+        <div class="panel code">
+          <pre>
+&lt;!-- load WAAX, MUI, Timebase and plug-ins --&gt;
+&lt;script src=&quot;build/waax.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;build/plug_ins/wxs1.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;build/plug_ins/stereodelay.js&quot;&gt;&lt;/script&gt;</pre>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="large-4 columns">
+        <h4>Play.</h4>
+        <p>Once you load the core library and plug-ins. Using them is straight-forward and does not ask you to have audio hacking experience. Just create instances and path them to make sounds. NOTE: Adjust your audio volume before you do this step!</p>
+      </div>
+      <div class="large-8 columns">
+        <div class="panel code">
+          <pre>
+// Creating a WXS-1 synth and a stereo delay instance.
+var synth = WX.WXS1(),
+    delay = WX.StereoDelay();
+// Plug-in patching: Synth =&gt; Delay =&gt; Master
+synth.to(delay).to(WX.Master);
+// Plays C4 with 100 velocity for 1 second.
+synth.noteOn(60, 100);
+synth.noteOff(WX.now + 1.0);</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="large-4 columns">
+        <h4>Iterate. Fast.</h4>
+        <p>Then start rolling wit Gulp! WAAX offers basic Gulp commands so you can iterate and deploy rapidly.</p>
+      </div>
+      <div class="large-8 columns">
+        <div class="panel code">
+          <pre>
+gulp build           # generates distribution package
+gulp deploy          # builds and deploys to gh-pages
+gulp                 # cleans, builds and starts dev server</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="large-12 columns">
+        <h2>Talks</h2>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="large-6 columns">
+        <h4>WAAX @ Sound of Denmark <small>2013, Nov</small></h4>
+        <iframe width="470" height="315" src="//www.youtube.com/embed/f4oDUwEoOzc" frameborder="0" allowfullscreen></iframe>
+      </div>
+      <div class="large-6 columns">
         <h4>CCRMA Colloquium <small>2013, May</small></h4>
-        <iframe width="560" height="315" src="//www.youtube.com/embed/mcl7HPbWXlE#t=40m12s" frameborder="0" allowfullscreen></iframe>
-
+        <iframe width="470" height="315" src="//www.youtube.com/embed/mcl7HPbWXlE#t=40m12s" frameborder="0" allowfullscreen></iframe>
       </div>
     </div>
 
-
-
     <div class="row">
-      <div class="small-10 large-centered columns">
+      <div class="large-12 columns">
         <hr>
         <p class="copyright text-center">MIT License. Copyright (c) 2011-2014 <a href="http://www.hoch.io">Hongchan Choi</a></p>
       </div>
     </div>
   </article>
+
+  </div>
 
   <!-- scripts -->
   <script src="bower_components/foundation/js/vendor/jquery.js"></script>
