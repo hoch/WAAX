@@ -103,12 +103,10 @@ gulp.task('serve', function () {
 
 // build
 gulp.task('build', function (cb) {
-  runSequence('clean', [
-    'scripts:core',
-    'scripts:plugins',
-    'scripts:ktrl',
-    'copy'
-  ], cb);
+  runSequence('clean',
+    ['scripts:core', 'scripts:plugins', 'scripts:ktrl'],
+    'copy',
+    cb);
 });
 
 // deploy
@@ -119,10 +117,5 @@ gulp.task('deploy', ['build'], function () {
 
 // default
 gulp.task('default', function (cb) {
-  runSequence('clean', [
-    'scripts:core',
-    'scripts:plugins',
-    'scripts:ktrl',
-    'serve'
-  ], cb);
+  runSequence('build', 'serve', cb);
 });
