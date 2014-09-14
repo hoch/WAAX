@@ -1,8 +1,8 @@
 <!doctype html>
 <html>
+
 <head>
   <title>MUI | Web Audio API eXtension</title>
-
   <script src="../../build/waax.js"></script>
   <script src="../../build/plug_ins/wxs1.js"></script>
   <script src="../../build/plug_ins/simpleosc.js"></script>
@@ -10,13 +10,16 @@
   <script src="../../build/plug_ins/impulse.js"></script>
   <script src="../../build/plug_ins/stereodelay.js"></script>
   <script src="../../build/plug_ins/converb.js"></script>
-
   <link rel="import" href="../../mui/mui.html">
   <link rel="import" href="../../mui/mui-style.html">
-
 </head>
 
 <body unresolved>
+
+  <div data-alert class="alert-box warning">
+    <strong>NOTE</strong>: WAAX and MUI require <strong>Chrome</strong> because they are built on top of <strong>Web Audio API, Web MIDI API and Web Components</strong>. Check <a target="_blank" href="http://caniuse.com">CanIUse.com</a> for the browser support.
+    <a href="#" class="close">&times;</a>
+  </div>
 
   <header>
     <div class="row">
@@ -24,7 +27,7 @@
         <ul class="breadcrumbs">
           <li><a href="../..">WAAX Home</a></li>
         </ul>
-        <h3>Plug-In Workshop <small>1.0.0-alpha</small></h3>
+        <h3>Plug-In Workshop</h3>
       </div>
     </div>
   </header>

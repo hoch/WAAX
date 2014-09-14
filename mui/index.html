@@ -11,16 +11,18 @@
 
 <body unresolved>
 
+  <div data-alert class="alert-box warning">
+    <strong>NOTE</strong>: WAAX and MUI require <strong>Chrome</strong> because they are built on top of <strong>Web Audio API, Web MIDI API and Web Components</strong>. Check <a target="_blank" href="http://caniuse.com">CanIUse.com</a> for the browser support.
+    <a href="#" class="close">&times;</a>
+  </div>
+
   <header>
     <div class="row">
       <div class="small-10 small-centered columns">
         <ul class="breadcrumbs">
           <li><a href="..">WAAX Home</a></li>
         </ul>
-        <h3>MUI Elements <small>1.0.0-alpha</small></h3>
-        <div class="alert-box secondary radius">
-          NOTE: MUI Elements requires <a target="_blank" href="http://www.polymer-project.org/">Polymer projects</a> to utilize Web Components technology. Check <a target="_blank" href="http://caniuse.com/#search=Component">CanIUse.com</a> for the browser support.
-        </div>
+        <h3>MUI Elements Showcase</h3>
       </div>
     </div>
   </header>
@@ -67,11 +69,6 @@
         </mui-rack>
 
         <mui-rack label="Control" opened="true">
-          <mui-group label="Tempo">
-            <mui-knobh id="knob-tempo" label="BPM" min="20" max="200" value="120"></mui-knobh>
-            <mui-knobh id="knob-quant" label="Qunatize" min="0" max="100" value="0"></mui-knobh>
-            <mui-knobh id="knob-swing" label="Swing" min="0" max="100" value="0"></mui-knobh>
-          </mui-group>
           <mui-group label="Transport">
             <mui-button icon="av:skip-previous"></mui-button>
             <mui-button icon="av:stop"></mui-button>
@@ -84,6 +81,11 @@
             <mui-button icon="social:person-add"></mui-button>
             <mui-button icon="social:share"></mui-button>
           </mui-group>
+          <mui-group label="Tempo">
+            <mui-knobh id="knob-tempo" label="BPM" min="20" max="200" value="120"></mui-knobh>
+            <mui-knobh id="knob-quant" label="Qunatize" min="0" max="100" value="0"></mui-knobh>
+            <mui-knobh id="knob-swing" label="Swing" min="0" max="100" value="0"></mui-knobh>
+          </mui-group>
         </mui-rack>
 
       </div>
@@ -92,10 +94,8 @@
 
   <script>
     MUI.start(function () {
-
       var wxs1 = WX.WXS1();
       wxs1.to(WX.Master);
-
       MUI.$('select-osc1type').link(wxs1, 'osc1type');
       MUI.$('knob-osc1octave').link(wxs1, 'osc1octave');
       MUI.$('knob-osc1gain').link(wxs1, 'osc1gain');
@@ -103,11 +103,9 @@
       MUI.$('knob-osc2detune').link(wxs1, 'osc2detune');
       MUI.$('knob-osc2gain').link(wxs1, 'osc2gain');
       MUI.$('knob-output').link(wxs1, 'output');
-
       MUI.$('knob-cutoff').link(wxs1, 'cutoff');
       MUI.$('knob-reso').link(wxs1, 'reso');
       MUI.$('knob-filterMod').link(wxs1, 'filterMod');
-
       MUI.$('knob-filterA').link(wxs1, 'filterAttack');
       MUI.$('knob-filterD').link(wxs1, 'filterDecay');
       MUI.$('knob-filterS').link(wxs1, 'filterSustain');
@@ -116,12 +114,12 @@
       MUI.$('knob-ampD').link(wxs1, 'ampDecay');
       MUI.$('knob-ampS').link(wxs1, 'ampSustain');
       MUI.$('knob-ampR').link(wxs1, 'ampRelease');
-
       MUI.$('vkey').addTarget(wxs1);
-
     });
-  </script>
 
+    // for foundation
+    $(document).foundation();
+  </script>
 </body>
 
 </html>

@@ -1,6 +1,14 @@
 /**
- *  WAAX 1.0.0-alpha
- *  Gulf task runner
+ * WAAX 1.0.0-alpha
+ *
+ * gulp clean           # cleans dist, build path
+ * gulp serve           # starts dev server 127.0.0.1:3000 and opens Canary
+ * gulp scripts:core    # minifies and concats WAAX core JS files to build
+ * gulp scripts:plugins # minifies plug-in JS files to build/plug-ins
+ * gulp scripts:ktrl    # minifies ktrl library
+ * gulp build           # all above
+ * gulp deploy          # build and deploy to gh-pages
+ * gulp                 # cleans, builds and starts dev server
  */
 
 var gulp        = require('gulp'),
@@ -13,10 +21,12 @@ var deploy      = require('gulp-gh-pages');
 
 var reload      = browserSync.reload;
 
-
-// clean: clean up dist or build path
+// clean
 gulp.task('clean', del.bind(null, [
-  'gulpdist/**/*', 'gulpbuild/**/*', '!gulpdist', '!gulpbuild'
+  'dist/**/*',
+  'build/**/*',
+  '!dist',
+  '!build'
 ]));
 
 // copy: copy files to dist/
@@ -33,11 +43,11 @@ gulp.task('copy', function () {
   ], {
     base: '.'
   })
-    .pipe(gulp.dest('gulpdist'))
+    .pipe(gulp.dest('dist'))
     .pipe(plugins.size({ title: 'copy' }));
 });
 
-// scripts:core - core library minification
+// scripts:core
 gulp.task('scripts:core', function () {
   return gulp.src([
     'src/waax.header.js',
@@ -48,30 +58,30 @@ gulp.task('scripts:core', function () {
     'src/timebase.js',
     'src/plug_ins/Fader/fader.js'
   ])
-    .pipe(plugins.uglify())
+    .pipe(plugins.uglify({ mangle: false }))
     .pipe(plugins.concat('waax.js'))
-    .pipe(gulp.dest('gulpbuild'))
+    .pipe(gulp.dest('build'))
     .pipe(plugins.size({ title: 'scripts:core' }));
 });
 
-// scripts:ktrl - ktlr library minification
-gulp.task('scripts:ktrl', function () {
-  return gulp.src(['src/ktrl.js'])
-    .pipe(plugins.uglify())
-    .pipe(gulp.dest('gulpbuild'))
-    .pipe(plugins.size({ title: 'scripts:ktrl' }));
-});
-
-// scripts:plugins - plug-in minification
+// scripts:plugins
 gulp.task('scripts:plugins', function () {
   return gulp.src([
     'src/plug_ins/**/*.js',
     '!src/plug_ins/Fader/fader.js'
   ])
-    .pipe(plugins.uglify())
+    .pipe(plugins.uglify({ mangle: false }))
     .pipe(plugins.flatten())
-    .pipe(gulp.dest('gulpbuild/plug_ins'))
+    .pipe(gulp.dest('build/plug_ins'))
     .pipe(plugins.size({ title: 'scripts:plugins' }));
+});
+
+// scripts:ktrl
+gulp.task('scripts:ktrl', function () {
+  return gulp.src(['src/ktrl.js'])
+    .pipe(plugins.uglify({ mangle: false }))
+    .pipe(gulp.dest('build'))
+    .pipe(plugins.size({ title: 'scripts:ktrl' }));
 });
 
 // serve
@@ -85,27 +95,25 @@ gulp.task('serve', function () {
     // browser: 'google chrome'
   });
 
-  gulp.watch([
-    'index.html',
-    'examples/**/*.html',
-    'mui/**/*.html'
-  ], reload);
-  gulp.watch(['src/*.js'], ['scripts:core', reload]);
+  gulp.watch(['index.html', 'examples/**/*.html'], reload);
+  gulp.watch(['src/*.js', '!src/ktrl.js'], ['scripts:core', reload]);
+  gulp.watch(['src/ktrl.js'], ['scripts:ktrl', reload]);
   gulp.watch(['src/plug-ins/**/*.js'], ['scripts:plugins', reload]);
 });
 
-// build & export dist
+// build
 gulp.task('build', function (cb) {
   runSequence('clean', [
     'scripts:core',
     'scripts:plugins',
+    'scripts:ktrl',
     'copy'
   ], cb);
 });
 
 // deploy
 gulp.task('deploy', ['build'], function () {
-  return gulp.src('gulpdist/**/*')
+  return gulp.src('dist/**/*')
     .pipe(deploy());
 });
 
@@ -114,6 +122,7 @@ gulp.task('default', function (cb) {
   runSequence('clean', [
     'scripts:core',
     'scripts:plugins',
+    'scripts:ktrl',
     'serve'
   ], cb);
 });
