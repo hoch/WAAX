@@ -305,6 +305,7 @@
 
     // realtime input data responder
     onData: function (action, data) {
+      // console.log('wxs1', action, data);
       switch (action) {
         case 'noteon':
           this.noteOn(data.pitch, data.velocity, data.time);

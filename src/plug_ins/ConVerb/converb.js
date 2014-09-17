@@ -22,8 +22,8 @@
     this._convolver = WX.Convolver();
     this._input.to(this._dry, this._convolver);
     this._convolver.to(this._wet);
-    this._dry.connect(this._output);
-    this._wet.connect(this._output);
+    this._dry.to(this._output);
+    this._wet.to(this._output);
 
     // define parameters
     WX.defineParams(this, {

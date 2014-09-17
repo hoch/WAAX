@@ -16,6 +16,17 @@
     return mbt.beat * TICKS_PER_BEAT + mbt.tick;
   }
 
+  // 4bytes uid generator
+  function uid4(){
+    var t = performance.now();
+    var id = 'xxxx'.replace(/[x]/g, function(c) {
+      var r = (t + Math.random()*16) % 16 | 0;
+      t = Math.floor(t/16);
+      return (c == 'x' ? r : (r & 0x7|0x8)).toString(16);
+    });
+    return id;
+  }
+
   // class Note
   function Note(pitch, velocity, start, dur) {
     this.pitch = (pitch || 60);
@@ -37,25 +48,127 @@
       return this.start + this.dur;
     },
 
-    movePitch: function (delta) {
+    translatePitch: function (delta) {
       this.pitch += delta;
       this.pitch = WX.clamp(this.pitch, 0, 127);
     },
 
-    moveStart: function (delta) {
+    translateStart: function (delta) {
       this.start += delta;
       this.start = Math.max(this.start, 0);
     },
 
-    changeDur: function (delta) {
+    translateDur: function (delta) {
       this.dur += delta;
-      this.dur = Math.max(this.dur, 1);
+      this.dur = Math.max(this.dur, 60);
+    },
+
+    toString: function () {
+      return this.pitch + ',' + this.velocity + ',' +
+        this.start + ',' + this.dur;
     }
 
   };
 
 
+  /**
+   * @class NoteMap
+   */
+  function NoteMap() {
+    this.notes = {};
+    this.size = 0;
+  }
 
+  NoteMap.prototype = {
+
+    clear: function () {
+      this.notes = {};
+      this.size = 0;
+    },
+
+    delete: function (id) {
+      if (this.notes.hasOwnProperty(id)) {
+        var note = this.notes[id];
+        delete this.notes[id];
+        this.size--;
+        return note;
+      }
+      return null;
+    },
+
+    get: function (id) {
+      if (this.notes.hasOwnProperty(id)) {
+        return this.notes[id];
+      }
+      return null;
+    },
+
+    push: function (note) {
+      var id = uid4();
+      while (this.notes.hasOwnProperty(id)) {
+        id = uid4();
+      }
+      this.notes[id] = note;
+      this.size++;
+      return id;
+    },
+
+    set: function (id, note) {
+      if (this.notes.hasOwnProperty(id)) {
+        this.notes[id].setNote(note);
+      } else {
+        this.notes[id] = note;
+      }
+    },
+
+    // NOTE: this returns IDs, not actual note object
+    findNoteIdAtPosition: function (pitch, tick) {
+      for (var id in this.notes) {
+        var note = this.notes[id];
+        if (note && note.pitch === pitch) {
+          if (note.start <= tick && tick <= note.start + note.dur) {
+            return id;
+          }
+        }
+      }
+      return null;
+    },
+
+    // NOTE: this returns note, not note id
+    scanNotesInTimeSpan: function (start, end) {
+      var bucket = [];
+      for (var id in this.notes) {
+        var note = this.notes[id];
+        if (note) {
+          if (start <= note.start && note.start <= end) {
+            bucket.push(note);
+          }
+        }
+      }
+      return (bucket.length > 0) ? bucket : null;
+    },
+
+    iterate: function (callback) {
+      var index = 0;
+      for (var id in this.notes) {
+        callback(id, this.notes[id], index++);
+      }
+    },
+
+    getSize: function () {
+      return this.size;
+    },
+
+    hasId: function (id) {
+      return this.notes.hasOwnProperty(id);
+    }
+
+  };
+
+
+  /**
+   * @class NoteList
+   */
   function NoteList() {
     this.notes = [];
     this.diffScore = 0;
@@ -183,6 +296,7 @@
     // playback queue, connected notelists, views
     this.playbackQ = [];
     this.notelists = [];
+    this.notemaps = [];
     // plugin target
     this.targets = [];
     // mui element: pianoroll or score
@@ -339,13 +453,15 @@
       if (this.needsScan) {
         var start = this.sec2tick(this.scanStart),
             end = this.sec2tick(this.scanEnd);
-        for (var i = 0; i < this.notelists.length; i++) {
-          var notes = this.notelists[i].scanNotes(start, end);
-          // push notes into playbackQ
+        // iterate multiple notemap
+        for (var i = 0; i < this.notemaps.length; i++) {
+          // var notes = this.notelists[i].scanNotes(start, end);
+          var notes = this.notemaps[i].scanNotesInTimeSpan(start, end);
+          // push note into playbackQ
           if (notes) {
-            for (var n = 0; n < notes.length; n++) {
-              if (this.playbackQ.indexOf(notes[n]) < 0) {
-                this.playbackQ.push(notes[n]);
+            for (var j = 0; j < notes.length; j++) {
+              if (this.playbackQ.indexOf(notes[j]) < 0) {
+                this.playbackQ.push(notes[j]);
               }
             }
           }
@@ -424,9 +540,9 @@
       this.notelists.push(notelist);
     },
 
-    // removeNoteList: function (notelist) {
-    //   //
-    // },
+    addNoteMap: function (notemap) {
+      this.notemaps.push(notemap);
+    },
 
     flushPlaybackQ: function () {
       this.playbackQ.length = 0;
@@ -434,6 +550,7 @@
 
     addView: function (muiElement) {
       this.views.push(muiElement);
+      muiElement._transport = this;
     },
 
     /**
@@ -453,12 +570,19 @@
   };
 
 
+  /**
+   * exports
+   */
   WX.Note = function (pitch, velocity, start, dur) {
     return new Note(pitch, velocity, start, dur);
   };
 
   WX.NoteList = function () {
     return new NoteList();
+  };
+
+  WX.NoteMap = function () {
+    return new NoteMap();
   };
 
   WX.Transport = new Transport(120);

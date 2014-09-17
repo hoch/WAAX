@@ -128,7 +128,7 @@
           this.targetParam.set(this.value, WX.now + 0.05, 1);
         }
         if (this.cloudMap) {
-          this.cloudMap.set(this.cloudParam, this.value);
+          this.cloudMap._callbackMUI(this.cloudParam, this.value);
         }
         this.render();
       },

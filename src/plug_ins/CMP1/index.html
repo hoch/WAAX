@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+  <title>CMP1 | WAAX: Web Audio API eXtension</title>
+  <script src="../../../build/waax.js"></script>
+  <script src="../../../build/plug_ins/sp1.js"></script>
+  <link rel="import" href="../../../mui/mui.html">
+  <link rel="import" href="../../../mui/mui-style.html">
+  <!-- target plugin -->
+  <script src="cmp1.js"></script>
+</head>
+
+<body unresolved>
+
+  <header>
+    <div class="row">
+      <div class="small-10 small-centered columns">
+        <h3>Plug-in: <span id="plugin-name"></span></h3>
+      </div>
+    </div>
+  </header>
+
+  <article>
+    <div class="row">
+      <div class="small-10 small-centered columns">
+        <mui-rack id="r-params"></mui-rack>
+        <mui-rack label="Keyboard">
+          <mui-vkey id="vkey"></mui-vkey>
+        </mui-rack>
+      </div>
+    </div>
+  </article>
+
+  <script>
+    MUI.start(function () {
+
+      var sp1 = WX.SP1(),
+          cmp1 = WX.CMP1();
+
+      sp1.to(cmp1).to(WX.Master);
+
+      sp1.loadClip({
+        name: 'a drum loop',
+        url: '../../../sound/loops/drums.mp3'
+      });
+
+      MUI.$('plugin-name').textContent = cmp1.info.name;
+      MUI.$('r-params').label = cmp1.info.name;
+
+      MUI.buildControls(cmp1, 'r-params');
+
+      MUI.$('vkey').addTarget(sp1);
+
+    });
+  </script>
+
+</body>
+</html>

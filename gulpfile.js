@@ -95,10 +95,10 @@ gulp.task('serve', function () {
     // browser: 'google chrome'
   });
 
-  gulp.watch(['index.html', 'examples/**/*.html'], reload);
+  gulp.watch(['index.html', 'examples/**/*.html', 'mui/**/*.html'], reload);
   gulp.watch(['src/*.js', '!src/ktrl.js'], ['scripts:core', reload]);
   gulp.watch(['src/ktrl.js'], ['scripts:ktrl', reload]);
-  gulp.watch(['src/plug-ins/**/*.js'], ['scripts:plugins', reload]);
+  gulp.watch(['src/plug_ins/**/*.js'], ['scripts:plugins', reload]);
 });
 
 // build
