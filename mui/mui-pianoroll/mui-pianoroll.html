@@ -104,7 +104,7 @@
       };
     },
 
-    _grid2MIDIRelative: function (dx, dy) {
+    _grid2MIDIDelta: function (dx, dy) {
       return {
         pitch: dy * this._pitchPx,
         tick: Math.round(dx * this._tickPx)
@@ -527,12 +527,12 @@
                   // translate back to screen coord
                   dy *= this._pxPitch;
                   // move notes
-                  this._moveSelectedNotes(this._grid2MIDIRelative(dx, dy));
+                  this._moveSelectedNotes(this._grid2MIDIDelta(dx, dy));
                 }
                 // resize mode
                 else if (this._dragMode === 'RESIZE') {
                   var dx = data.x - prevData.x;
-                  this._changeNoteLength(this._grid2MIDIRelative(dx, dy));
+                  this._changeNoteLength(this._grid2MIDIDelta(dx, dy));
                 }
               }
               this._needsRedraw = true;
