@@ -108,44 +108,6 @@ window.MUI = (function (WX) {
     }
   };
 
-  // Box2D class
-  function Box2D(x, y, w, h) {
-    this.x1 = x;
-    this.y1 = y;
-    this.x2 = x + w;
-    this.y2 = y + h;
-    this.w = w;
-    this.h = h;
-  }
-
-  Box2D.prototype = {
-
-    containsPoint: function (p) {
-      if (this.x1 <= p.x && p.x <= this.x2) {
-        if (this.y1 <= p.y && p.y <= this.y2) {
-          return true;
-        }
-      }
-      return false;
-    },
-
-    getNormX: function (p) {
-      return (p.x - this.x1) / this.w;
-    },
-
-    getNormY: function (p) {
-      return (p.y - this.y1) / this.h;
-    },
-
-    getNormPosition: function (p) {
-      return {
-        x: (p.x - this.x1) / this.w,
-        y: (p.y - this.y1) / this.h
-      };
-    }
-
-  };
-
 
   //
   // MUI Public Methods
@@ -154,38 +116,43 @@ window.MUI = (function (WX) {
   return {
 
     // TODO: these are dupes...
-    clamp: function (value, min, max) {
-      return Math.max(Math.min(value, max), min);
-    },
+    // clamp: function (value, min, max) {
+    //   return Math.max(Math.min(value, max), min);
+    // },
 
-    clone: function (obj) {
-      var cloned = {};
-      for (var p in obj) {
-        if (obj.hasOwnProperty(p)) {
-          cloned[p] = obj[p];
-        }
-      }
-      return obj;
-    },
+    // clone: function (obj) {
+    //   var cloned = {};
+    //   for (var p in obj) {
+    //     if (obj.hasOwnProperty(p)) {
+    //       cloned[p] = obj[p];
+    //     }
+    //   }
+    //   return obj;
+    // },
 
     // TODO: collection has been changed with 0.0.1.
     //       reconsider this.
-    findValueByKey: function (collection, key) {
-      for (var i = 0; i < collection.length; i++) {
-        if (collection[i].key === key) {
-          return collection[i].value;
-        }
-      }
-      // if key not found, just return the first item
-      return collection[0].value;
-    },
+    // findValueByKey: function (collection, key) {
+    //   for (var i = 0; i < collection.length; i++) {
+    //     if (collection[i].key === key) {
+    //       return collection[i].value;
+    //     }
+    //   }
+    //   // if key not found, just return the first item
+    //   return collection[0].value;
+    // },
 
-    findKeyByValue: function (collection, value) {
-      for (var i = 0; i < collection.length; i++) {
-        if (collection[i].value === value) {
-          return collection[i].key;
-        }
-      }
+    // findKeyByValue: function (collection, value) {
+    //   for (var i = 0; i < collection.length; i++) {
+    //     if (collection[i].value === value) {
+    //       return collection[i].key;
+    //     }
+    //   }
+    // },
+
+    isPointInArea: function (point, area) {
+      return (area.x <= point.x && point.x <= area.x + area.w) &&
+        (area.y <= point.y && point.y <= area.y + area.h);
     },
 
     MouseResponder: function (senderID, targetElement, MUICallback) {

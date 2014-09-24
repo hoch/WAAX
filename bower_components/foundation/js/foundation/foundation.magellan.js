@@ -4,7 +4,7 @@
   Foundation.libs['magellan-expedition'] = {
     name : 'magellan-expedition',
 
-    version : '5.3.3',
+    version : '5.3.0',
 
     settings : {
       active_class: 'active',
@@ -38,12 +38,10 @@
           
           if (target.length === 0) {
             target = $('#'+hash);
-            
           }
 
-
           // Account for expedition height if fixed position
-          var scroll_top = target.offset().top - settings.destination_threshold + 1;
+          var scroll_top = target.offset().top - settings.destination_threshold;
           scroll_top = scroll_top - expedition.outerHeight();
 
           $('html, body').stop().animate({
@@ -75,15 +73,10 @@
         var expedition = $(this),
             settings = expedition.data('magellan-expedition-init'),
             styles = expedition.attr('styles'), // save styles
-            top_offset, fixed_top;
+            top_offset;
 
         expedition.attr('style', '');
         top_offset = expedition.offset().top + settings.threshold;
-
-        //set fixed-top by attribute
-        fixed_top = parseInt(expedition.data('magellan-fixed-top'));
-        if(!isNaN(fixed_top))
-            self.settings.fixed_top = fixed_top;
 
         expedition.data(self.data_attr('magellan-top-offset'), top_offset);
         expedition.attr('style', styles);
@@ -97,11 +90,9 @@
       $('[' + this.attr_name() + '=fixed]', self.scope).each(function() {
         var expedition = $(this),
             settings = expedition.data('magellan-expedition-init'),
-            styles = expedition.attr('style'), // save styles
             top_offset = expedition.data('magellan-top-offset');
 
-        //scroll to the top distance
-        if (window_top_offset+self.settings.fixed_top >= top_offset) {
+        if (window_top_offset >= top_offset) {
           // Placeholder allows height calculations to be consistent even when
           // appearing to switch between fixed/non-fixed placement
           var placeholder = expedition.prev('[' + self.add_namespace('data-magellan-expedition-clone') + ']');
@@ -114,7 +105,7 @@
           expedition.css({position:'fixed', top: settings.fixed_top});
         } else {
           expedition.prev('[' + self.add_namespace('data-magellan-expedition-clone') + ']').remove();
-          expedition.attr('style',styles).css('position','').css('top','').removeClass('fixed');
+          expedition.attr('style','').removeClass('fixed');
         }
       });
     },
@@ -152,7 +143,7 @@
         var name = $(this).data(self.data_attr('magellan-arrival')),
             dest = $('[' + self.add_namespace('data-magellan-destination') + '=' + name + ']');
         if (dest.length > 0) {
-          var top_offset = Math.floor(dest.offset().top - settings.destination_threshold - expedition.outerHeight());
+          var top_offset = dest.offset().top - settings.destination_threshold - expedition.outerHeight();
           return {
             destination : dest,
             arrival : $(this),

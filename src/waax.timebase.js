@@ -134,6 +134,21 @@
       return null;
     },
 
+    findNotesIdInArea: function (minPitch, maxPitch, startTick, endTick) {
+      var bucket = [];
+      for (var id in this.notes) {
+        var note = this.notes[id];
+        if (note) {
+          if (minPitch <= note.pitch && note.pitch <= maxPitch) {
+            if (startTick <= note.start && note.start <= endTick) {
+              bucket.push(id);
+            }
+          }
+        }
+      }
+      return (bucket.length > 0) ? bucket : null;
+    },
+
     // NOTE: this returns note, not note id
     scanNotesInTimeSpan: function (start, end) {
       var bucket = [];
