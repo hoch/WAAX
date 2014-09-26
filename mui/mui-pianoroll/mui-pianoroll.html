@@ -8,6 +8,7 @@
       display: block;
       overflow: hidden;
       margin-bottom: 5px;
+      height: 300px;
     }
     .container {
       /*width: 100%;*/
@@ -394,29 +395,31 @@
 
     _drawNotes: function () {
       this._ctx.lineWidth = 1.0;
-      this._notemap.iterate(function (id, note) {
-          if (note) {
-            // transfrom viewport
-            var pos = this._MIDI2Grid(note);
-            // filter out invisible notes
-            if (this._grid.x + this._grid.w < pos.x) return;
-            if (pos.x + pos.w < this._grid.x) return;
-            if (this._grid.y + this._grid.h < pos.y) return;
-            if (pos.y + pos.h < this._grid.y) return;
-            // draw note
-            if (this._selectedNotesId.indexOf(id) == -1) {
-              this._ctx.strokeStyle = '#000';
-              this._ctx.fillStyle = '#C66';
-            } else {
-              this._ctx.strokeStyle = '#fff';
-              this._ctx.fillStyle = '#D99';
+      if (this._notemap) {
+        this._notemap.iterate(function (id, note) {
+            if (note) {
+              // transfrom viewport
+              var pos = this._MIDI2Grid(note);
+              // filter out invisible notes
+              if (this._grid.x + this._grid.w < pos.x) return;
+              if (pos.x + pos.w < this._grid.x) return;
+              if (this._grid.y + this._grid.h < pos.y) return;
+              if (pos.y + pos.h < this._grid.y) return;
+              // draw note
+              if (this._selectedNotesId.indexOf(id) == -1) {
+                this._ctx.strokeStyle = '#000';
+                this._ctx.fillStyle = '#C66';
+              } else {
+                this._ctx.strokeStyle = '#fff';
+                this._ctx.fillStyle = '#D99';
+              }
+              this._ctx.strokeRect(pos.x, pos.y, pos.w, pos.h);
+              this._ctx.fillRect(pos.x, pos.y, pos.w, pos.h);
+              // console.log('drawn', note); // to debug
             }
-            this._ctx.strokeRect(pos.x, pos.y, pos.w, pos.h);
-            this._ctx.fillRect(pos.x, pos.y, pos.w, pos.h);
-            // console.log('drawn', note); // to debug
-          }
-        }.bind(this)
-      );
+          }.bind(this)
+        );
+      }
     },
 
     _scrollByDelta: function (dx, dy) {
@@ -463,6 +466,7 @@
       // console.log(event.keyCode);
       switch (event.keyCode) {
         case 46: // delete key
+          event.preventDefault();
           this._deleteSelectedNotes();
       }
       this._needsRedraw = true;
@@ -603,7 +607,7 @@
       window.addEventListener('keyup', this._listenKeyUp.bind(this), false);
 
       // initiali location
-      this._scrollByDelta(0, this._kbdMaxH * -0.3);
+      this._scrollByDelta(0, this._kbdMaxH * -0.4);
     },
 
     setNoteMap: function (notemap) {

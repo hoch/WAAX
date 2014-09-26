@@ -144,7 +144,7 @@
         }
         // GDrive support
         if (this.cloudMap) {
-          this.cloudMap.set(this.cloudParam, this.value);
+          this.cloudMap._callbackMUI(this.cloudParam, this.value);
         }
         // external event handler
         if (this.onItemSelected) {

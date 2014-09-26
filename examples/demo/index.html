@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>WAAX Demo | WAAX</title>
+  <script src="../../build/waax.js"></script>
+  <script src="../../build/plug_ins/simpleosc.js"></script>
+  <script src="../../build/plug_ins/fmkey7.js"></script>
+  <script src="../../build/plug_ins/stereodelay.js"></script>
+  <link rel="import" href="../../mui/mui.html">
+  <link rel="import" href="../../mui/mui-style.html">
+</head>
+<body unresolved>
+<div class="row">
+<div class="small-10 small-centered columns">
+
+
+
+  <h3>Hello WAAX!</h3>
+
+  <!-- OVER HERE! -->
+  <mui-rack id="synth"></mui-rack>
+  <mui-rack id="effect"></mui-rack>
+
+  <mui-rack>
+    <mui-spectrum id="spec"></mui-spectrum>
+  </mui-rack>
+
+  <mui-rack>
+    <mui-vkey id="vkey"></mui-vkey>
+  </mui-rack>
+
+  <script>
+    MUI.start(function () {
+
+      /**
+       * OVER HERE!
+       */
+
+      var synth = WX.FMKey7(),
+          delay = WX.StereoDelay();
+      synth.to(delay).to(WX.Master);
+      MUI.buildControls(synth, 'synth');
+      MUI.buildControls(delay, 'effect');
+      MUI.$('vkey').addTarget(synth);
+
+      var spec = MUI.$('spec');
+      synth.to(spec);
+
+
+    });
+  </script>
+
+
+
+</div>
+</div>
+</body>
+</html>
