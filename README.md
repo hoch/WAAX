@@ -12,7 +12,7 @@
 __WAAX__ is a JavaScript library that offers a comprehensive framework for web-based music application. Its goal is to facilitate and support the development of web-based music application.
 
 
-# Feature Highlight
+## Feature Highlight
 
 - Web Audio API Wrapper and audio/music utilities 
 - Flexible parameter control and preset management
@@ -24,7 +24,32 @@ __WAAX__ is a JavaScript library that offers a comprehensive framework for web-b
 - [Web MIDI API Integration](https://github.com/hoch/Ktrl) _(supported behind flag)_
 
 
-## Basic Usage
+# Installation
+
+The complete WAAX development setup requires [NPM](http://nodejs.org/), [Bower](http://bower.io/) and [Gulp](http://gulpjs.com/). If you have them installed, then simply execute the following commands in the terminal to install and configure WAAX. Make sure to replace `$YOUR_DIRECTORY` with your installation directory.
+
+~~~bash
+git clone https://github.com/hoch/WAAX $YOUR_DIRECTORY
+cd $YOUR_DIRECTORY
+make
+~~~
+
+
+## Quick Start with Gulp
+
+~~~bash
+gulp                    # cleans, builds and starts dev server
+
+gulp clean              # cleans dist, build path
+gulp serve              # starts dev server 127.0.0.1:3000 and opens Canary
+gulp scripts:core       # minifies and concats WAAX core JS files to build
+gulp scripts:plugins    # minifies plug-in JS files to build/plug-ins
+gulp scripts:ktrl       # minifies ktrl library
+gulp build              # all above
+~~~
+
+
+# Basic Usage
 
 To use WAAX in a web page, simply load the `waax.js` in an HTML document. Note that MUI elements packages require Polymer library, so it has to be included before its usage. The following code snippets require `build/` and `mui/` directories to be at the right place.
 
@@ -95,38 +120,6 @@ MUI.$('knob-freq').link(osc, 'oscFreq');
 
 - [Thought behind: Rebirth of WAAX](https://ccrma.stanford.edu/~hongchan/posts/thoughts-behind-rebirth-of-waax/) : Concepts, design choices and the future road map.
 - [Creating WAAX Plug-in](https://ccrma.stanford.edu/~hongchan/posts/creating-waax-plugin/) : A step-by-step tutorial on how to create a plug-in for WAAX.
-
-<br>
----
-<br>
-
-
-# Development
-
-
-## Installation
-
-The complete WAAX development setup requires [NPM](http://nodejs.org/), [Bower](http://bower.io/) and [Gulp](http://gulpjs.com/). If you have them installed, then simply execute the following commands in the terminal to install and configure WAAX. Make sure to replace `$YOUR_DIRECTORY` with your installation directory.
-
-~~~bash
-git clone https://github.com/hoch/WAAX $YOUR_DIRECTORY
-cd $YOUR_DIRECTORY
-make
-~~~
-
-
-## Gulp Tasks
-
-~~~bash
-gulp clean              # cleans dist, build path
-gulp serve              # starts dev server 127.0.0.1:3000 and opens Canary
-gulp scripts:core       # minifies and concats WAAX core JS files to build
-gulp scripts:plugins    # minifies plug-in JS files to build/plug-ins
-gulp scripts:ktrl       # minifies ktrl library
-gulp build              # all above
-gulp deploy             # build and deploy to gh-pages
-gulp                    # cleans, builds and starts dev server
-~~~
 
 
 ## License and Contact
