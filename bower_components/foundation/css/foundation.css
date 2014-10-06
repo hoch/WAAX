@@ -1,5 +1,5 @@
 meta.foundation-version {
-  font-family: "/5.2.3/"; }
+  font-family: "/5.3.3/"; }
 
 meta.foundation-mq-small {
   font-family: "/only screen/";
@@ -43,7 +43,7 @@ body {
   font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
-  line-height: 1;
+  line-height: 150%;
   position: relative;
   cursor: default; }
 
@@ -847,34 +847,6 @@ select {
     right: 91.66667%;
     left: auto; } }
 
-/* 
-  Mixin: accordion-container() 
-
-  Decription: Responsible for the container component of accordions, generating styles relating to a margin of zero and a clearfix
-
-  Explicit Dependencies: a clearfix mixin *is* defined. 
-
-  Implicit Dependencies: None 
-
-*/
-/*
-  Mixin: accordion-navigation( $bg, $hover-bg, $active-bg, $padding, $active_class,  $font-color, $font-size, $font-family){
-  
-    @params $bg-color: [ color or string ]: Specify the background color for the navigation element
-    @params $hover-bg-color [ color or string ]: Specify the background color for the navigation element when hovered
-    @params $active-bg [ color or string ]: Specify the background color for the navigation element when clicked and not released. 
-    @params $active_class [ string ]: Specify the class name used to keep track of which accordion tab should be visible 
-    @params $font-color [ color or string ]: Color of the font for accordion 
-    @params $font-size [ number ]: Specifiy the font-size of the text inside the navigation element 
-    @params $font-family [ string ]: Specify the font family for the text of the navigation of the accorion
-*/
-/*
-
-  Mixin: accordion-content($bg, $padding, $active-class) 
-    @params $padding [ number ]: Padding for the content of the container 
-    @params $bg [ color  ]: Background color for the content when it's visible 
-    @params $active_class [ string ]: Class name used to keep track of which accordion tab should be visible. 
-*/
 .accordion {
   margin-bottom: 0; }
   .accordion:before, .accordion:after {
@@ -1411,6 +1383,10 @@ button, .button {
         color: #fff; }
       button.disabled.alert:hover, button.disabled.alert:focus, button[disabled].alert:hover, button[disabled].alert:focus, .button.disabled.alert:hover, .button.disabled.alert:focus, .button[disabled].alert:hover, .button[disabled].alert:focus {
         background-color: #f04124; }
+
+button::-moz-focus-inner {
+  border: 0;
+  padding: 0; }
 
 @media only screen and (min-width:40.063em) {
   button, .button {
@@ -2104,6 +2080,7 @@ span.postfix, label.postfix {
 /* We use this to get basic styling on all basic form elements */
 input[type="text"], input[type="password"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="month"], input[type="week"], input[type="email"], input[type="number"], input[type="search"], input[type="tel"], input[type="time"], input[type="url"], textarea {
   -webkit-appearance: none;
+  -webkit-border-radius: 0px;
   background-color: #fff;
   font-family: inherit;
   border: 1px solid #cccccc;
@@ -2126,13 +2103,18 @@ input[type="text"], input[type="password"], input[type="date"], input[type="date
     background: #fafafa;
     border-color: #999999;
     outline: none; }
-  input[type="text"][disabled], fieldset[disabled] input[type="text"], input[type="password"][disabled], fieldset[disabled] input[type="password"], input[type="date"][disabled], fieldset[disabled] input[type="date"], input[type="datetime"][disabled], fieldset[disabled] input[type="datetime"], input[type="datetime-local"][disabled], fieldset[disabled] input[type="datetime-local"], input[type="month"][disabled], fieldset[disabled] input[type="month"], input[type="week"][disabled], fieldset[disabled] input[type="week"], input[type="email"][disabled], fieldset[disabled] input[type="email"], input[type="number"][disabled], fieldset[disabled] input[type="number"], input[type="search"][disabled], fieldset[disabled] input[type="search"], input[type="tel"][disabled], fieldset[disabled] input[type="tel"], input[type="time"][disabled], fieldset[disabled] input[type="time"], input[type="url"][disabled], fieldset[disabled] input[type="url"], textarea[disabled], fieldset[disabled] textarea {
-    background-color: #ddd; }
+  input[type="text"]:disabled, input[type="password"]:disabled, input[type="date"]:disabled, input[type="datetime"]:disabled, input[type="datetime-local"]:disabled, input[type="month"]:disabled, input[type="week"]:disabled, input[type="email"]:disabled, input[type="number"]:disabled, input[type="search"]:disabled, input[type="tel"]:disabled, input[type="time"]:disabled, input[type="url"]:disabled, textarea:disabled {
+    background-color: #ddd;
+    cursor: default; }
+  input[type="text"][disabled], input[type="text"][readonly], fieldset[disabled] input[type="text"], input[type="password"][disabled], input[type="password"][readonly], fieldset[disabled] input[type="password"], input[type="date"][disabled], input[type="date"][readonly], fieldset[disabled] input[type="date"], input[type="datetime"][disabled], input[type="datetime"][readonly], fieldset[disabled] input[type="datetime"], input[type="datetime-local"][disabled], input[type="datetime-local"][readonly], fieldset[disabled] input[type="datetime-local"], input[type="month"][disabled], input[type="month"][readonly], fieldset[disabled] input[type="month"], input[type="week"][disabled], input[type="week"][readonly], fieldset[disabled] input[type="week"], input[type="email"][disabled], input[type="email"][readonly], fieldset[disabled] input[type="email"], input[type="number"][disabled], input[type="number"][readonly], fieldset[disabled] input[type="number"], input[type="search"][disabled], input[type="search"][readonly], fieldset[disabled] input[type="search"], input[type="tel"][disabled], input[type="tel"][readonly], fieldset[disabled] input[type="tel"], input[type="time"][disabled], input[type="time"][readonly], fieldset[disabled] input[type="time"], input[type="url"][disabled], input[type="url"][readonly], fieldset[disabled] input[type="url"], textarea[disabled], textarea[readonly], fieldset[disabled] textarea {
+    background-color: #ddd;
+    cursor: default; }
   input[type="text"].radius, input[type="password"].radius, input[type="date"].radius, input[type="datetime"].radius, input[type="datetime-local"].radius, input[type="month"].radius, input[type="week"].radius, input[type="email"].radius, input[type="number"].radius, input[type="search"].radius, input[type="tel"].radius, input[type="time"].radius, input[type="url"].radius, textarea.radius {
     border-radius: 3px; }
 
 input[type="submit"] {
-  -webkit-appearance: none; }
+  -webkit-appearance: none;
+  -webkit-border-radius: 0px; }
 
 /* Respect enforced amount of rows for textarea */
 textarea[rows] {
@@ -2141,6 +2123,7 @@ textarea[rows] {
 /* Add height value for select elements to match text input height */
 select {
   -webkit-appearance: none !important;
+  -webkit-border-radius: 0px;
   background-color: #fafafa;
   background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeD0iMTJweCIgeT0iMHB4IiB3aWR0aD0iMjRweCIgaGVpZ2h0PSIzcHgiIHZpZXdCb3g9IjAgMCA2IDMiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDYgMyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBvbHlnb24gcG9pbnRzPSI1Ljk5MiwwIDIuOTkyLDMgLTAuMDA4LDAgIi8+PC9zdmc+);
   background-position: 100% center;
@@ -2157,6 +2140,9 @@ select {
   select:hover {
     background-color: #f3f3f3;
     border-color: #999999; }
+  select:disabled {
+    background-color: #ddd;
+    cursor: default; }
 
 /* Adjust margin for form elements below */
 input[type="file"], input[type="checkbox"], input[type="radio"], select {
@@ -2173,6 +2159,9 @@ input[type="checkbox"] + label, input[type="radio"] + label {
 input[type="file"] {
   width: 100%; }
 
+/* HTML5 Number spinners settings */
+
+
 /* We add basic fieldset styling */
 fieldset {
   border: 1px solid #ddd;
@@ -2186,7 +2175,7 @@ fieldset {
     margin-left: -0.1875rem; }
 
 /* Error Handling */
-[data-abide] .error small.error, [data-abide] span.error, [data-abide] small.error {
+[data-abide] .error small.error, [data-abide] .error span.error, [data-abide] span.error, [data-abide] small.error {
   display: block;
   padding: 0.375rem 0.5625rem 0.5625rem;
   margin-top: -1px;
@@ -2238,18 +2227,18 @@ span.error, small.error {
 .error span.error-message {
   display: block; }
 
-input.error, textarea.error {
+input.error, textarea.error, select.error {
   margin-bottom: 0; }
 
 label.error {
   color: #f04124; }
 
-div.icon-bar {
+.icon-bar {
   width: 100%;
   font-size: 0;
   display: inline-block;
   background: #333; }
-  div.icon-bar > * {
+  .icon-bar > * {
     text-align: center;
     font-size: 1rem;
     width: 25%;
@@ -2257,51 +2246,50 @@ div.icon-bar {
     display: block;
     padding: 1.25rem;
     float: left; }
-    div.icon-bar > * i, div.icon-bar > * img {
+    .icon-bar > * i, .icon-bar > * img {
       display: block;
       margin: 0 auto; }
-      div.icon-bar > * i + label, div.icon-bar > * img + label {
+      .icon-bar > * i + label, .icon-bar > * img + label {
         margin-top: 0.0625rem; }
-    div.icon-bar > * i {
+    .icon-bar > * i {
       font-size: 1.875rem;
       vertical-align: middle; }
-    div.icon-bar > * img {
+    .icon-bar > * img {
       width: 1.875rem;
       height: 1.875rem; }
-  div.icon-bar.label-right > * i, div.icon-bar.label-right > * img {
+  .icon-bar.label-right > * i, .icon-bar.label-right > * img {
     margin: 0 0.0625rem 0 0;
     display: inline-block; }
-    div.icon-bar.label-right > * i + label, div.icon-bar.label-right > * img + label {
+    .icon-bar.label-right > * i + label, .icon-bar.label-right > * img + label {
       margin-top: 0; }
-  div.icon-bar.label-right > * label {
+  .icon-bar.label-right > * label {
     display: inline-block; }
-  div.icon-bar.vertical.label-right > * {
+  .icon-bar.vertical.label-right > * {
     text-align: left; }
-  div.icon-bar.vertical {
+  .icon-bar.vertical {
     height: 100%;
     width: auto; }
-    div.icon-bar.vertical .item {
+    .icon-bar.vertical .item {
       width: auto;
       margin: auto;
       float: none; }
-  div.icon-bar > * {
+  .icon-bar > * {
     font-size: 1rem;
     padding: 1.25rem; }
-    div.icon-bar > * i + label, div.icon-bar > * img + label {
+    .icon-bar > * i + label, .icon-bar > * img + label {
       margin-top: 0.0625rem; }
-    div.icon-bar > * i {
+    .icon-bar > * i {
       font-size: 1.875rem; }
-    div.icon-bar > * img {
+    .icon-bar > * img {
       width: 1.875rem;
       height: 1.875rem; }
-  div.icon-bar > *:hover {
+  .icon-bar > *:hover {
     background: #008CBA; }
-  div.icon-bar > * label {
+  .icon-bar > * label {
     color: #fff; }
-  div.icon-bar > * i {
+  .icon-bar > * i {
     color: #fff; }
 
-/* toolbar styles */
 .icon-bar.two-up .item {
   width: 50%; }
 .icon-bar.two-up.vertical .item {
@@ -2365,6 +2353,8 @@ div.icon-bar {
   padding: 1.125rem 1.25rem 1.5rem; }
   .joyride-content-wrapper .button {
     margin-bottom: 0 !important; }
+  .joyride-content-wrapper .joyride-prev-tip {
+    margin-right: 10px; }
 
 /* Add a little css triangle pip, older browser just miss out on the fanciness of it */
 .joyride-tip-guide .joyride-nub {
@@ -2518,6 +2508,9 @@ div.icon-bar {
     border-radius: 1000px; }
   .label.alert {
     background-color: #f04124;
+    color: #fff; }
+  .label.warning {
+    background-color: #f08a24;
     color: #fff; }
   .label.success {
     background-color: #43AC6A;
@@ -2780,24 +2773,29 @@ ul.pagination {
     color: #222;
     font-size: 0.875rem;
     margin-left: 0.3125rem; }
-    ul.pagination li a {
+    ul.pagination li a, ul.pagination li button {
       display: block;
       padding: 0.0625rem 0.625rem 0.0625rem;
       color: #999;
-      border-radius: 3px; }
-    ul.pagination li:hover a, ul.pagination li a:focus {
+      background: none;
+      border-radius: 3px;
+      font-weight: normal;
+      font-size: 1em;
+      line-height: inherit;
+      transition: background-color 300ms ease-out; }
+    ul.pagination li:hover a, ul.pagination li a:focus, ul.pagination li:hover button, ul.pagination li button:focus {
       background: #e6e6e6; }
-    ul.pagination li.unavailable a {
+    ul.pagination li.unavailable a, ul.pagination li.unavailable button {
       cursor: default;
       color: #999; }
-    ul.pagination li.unavailable:hover a, ul.pagination li.unavailable a:focus {
+    ul.pagination li.unavailable:hover a, ul.pagination li.unavailable a:focus, ul.pagination li.unavailable:hover button, ul.pagination li.unavailable button:focus {
       background: transparent; }
-    ul.pagination li.current a {
+    ul.pagination li.current a, ul.pagination li.current button {
       background: #008CBA;
       color: #fff;
       font-weight: bold;
       cursor: default; }
-      ul.pagination li.current a:hover, ul.pagination li.current a:focus {
+      ul.pagination li.current a:hover, ul.pagination li.current a:focus, ul.pagination li.current button:hover, ul.pagination li.current button:focus {
         background: #008CBA; }
   ul.pagination li {
     float: left;
@@ -3013,7 +3011,7 @@ ul.pagination {
   width: 100%;
   background: #000;
   background: rgba(0, 0, 0, 0.45);
-  z-index: 99;
+  z-index: 1004;
   display: none;
   top: 0;
   left: 0; }
@@ -3022,7 +3020,7 @@ dialog, .reveal-modal {
   visibility: hidden;
   display: none;
   position: absolute;
-  z-index: 100;
+  z-index: 1005;
   width: 100vw;
   top: 0;
   left: 0;
@@ -3063,45 +3061,46 @@ dialog[open] {
   display: block;
   visibility: visible; }
 
-@media only screen and (min-width:40.063em) {
-  dialog, .reveal-modal {
-    padding: 1.875rem; }
-    dialog.radius, .reveal-modal.radius {
-      border-radius: 3px; }
-    dialog.round, .reveal-modal.round {
-      border-radius: 1000px; }
-    dialog.collapse, .reveal-modal.collapse {
-      padding: 0; }
-    @media only screen and (min-width:40.063em) {
-      dialog.tiny, .reveal-modal.tiny {
-        margin-left: -15%;
-        width: 30%; } }
-    @media only screen and (min-width:40.063em) {
-      dialog.small, .reveal-modal.small {
-        margin-left: -20%;
-        width: 40%; } }
-    @media only screen and (min-width:40.063em) {
-      dialog.medium, .reveal-modal.medium {
-        margin-left: -30%;
-        width: 60%; } }
-    @media only screen and (min-width:40.063em) {
-      dialog.large, .reveal-modal.large {
-        margin-left: -35%;
-        width: 70%; } }
-    @media only screen and (min-width:40.063em) {
-      dialog.xlarge, .reveal-modal.xlarge {
-        margin-left: -47.5%;
-        width: 95%; } }
-  dialog.full, .reveal-modal.full {
-    top: 0;
-    left: 0;
-    height: 100vh;
-    min-height: 100vh;
-    margin-left: 0 !important; }
-    @media only screen and (min-width:40.063em) {
-      dialog.full, .reveal-modal.full {
-        margin-left: -50vw;
-        width: 100vw; } } }
+dialog, .reveal-modal {
+  padding: 1.875rem; }
+  dialog.radius, .reveal-modal.radius {
+    border-radius: 3px; }
+  dialog.round, .reveal-modal.round {
+    border-radius: 1000px; }
+  dialog.collapse, .reveal-modal.collapse {
+    padding: 0; }
+  @media only screen and (min-width:40.063em) {
+    dialog.tiny, .reveal-modal.tiny {
+      margin-left: -15%;
+      width: 30%; } }
+  @media only screen and (min-width:40.063em) {
+    dialog.small, .reveal-modal.small {
+      margin-left: -20%;
+      width: 40%; } }
+  @media only screen and (min-width:40.063em) {
+    dialog.medium, .reveal-modal.medium {
+      margin-left: -30%;
+      width: 60%; } }
+  @media only screen and (min-width:40.063em) {
+    dialog.large, .reveal-modal.large {
+      margin-left: -35%;
+      width: 70%; } }
+  @media only screen and (min-width:40.063em) {
+    dialog.xlarge, .reveal-modal.xlarge {
+      margin-left: -47.5%;
+      width: 95%; } }
+
+dialog.full, .reveal-modal.full {
+  top: 0;
+  left: 0;
+  height: 100%;
+  height: 100vh;
+  min-height: 100vh;
+  margin-left: 0 !important; }
+  @media only screen and (min-width:40.063em) {
+    dialog.full, .reveal-modal.full {
+      margin-left: -50vw;
+      width: 100vw; } }
 
 @media print {
   dialog, .reveal-modal {
@@ -3575,8 +3574,13 @@ small {
 
 code {
   font-family: Consolas, 'Liberation Mono', Courier, monospace;
-  font-weight: bold;
-  color: #bd240d; }
+  font-weight: normal;
+  color: #333;
+  background-color: #f8f8f8;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #dfdfdf;
+  padding: 0.125rem 0.3125rem 0.0625rem; }
 
 /* Lists */
 ul, ol, dl {
@@ -3808,12 +3812,15 @@ blockquote, blockquote p {
 @media only screen and (min-width:40.063em) {
   .tabs.vertical {
     width: 20%;
+    max-width: 20%;
     float: left;
-    margin-bottom: 1.25rem; }
+    margin: 0 0 1.25rem; }
   .tabs-content.vertical {
     width: 80%;
+    max-width: 80%;
     float: left;
-    margin-left: -1px; } }
+    margin-left: -1px;
+    padding-left: 1rem; } }
 
 .no-js .tabs-content > .content {
   display: block;
@@ -3953,7 +3960,7 @@ meta.foundation-mq-topbar {
   .top-bar form, .top-bar input {
     margin-bottom: 0; }
   .top-bar input {
-    height: auto;
+    height: 1.8rem;
     padding-top: 0.35rem;
     padding-bottom: 0.35rem;
     font-size: 0.75rem; }
@@ -4183,13 +4190,15 @@ meta.foundation-mq-topbar {
         padding: 8px 15px; }
         .top-bar-section .dropdown li a.parent-link {
           font-weight: normal; }
-      .top-bar-section .dropdown li.title h5 {
+      .top-bar-section .dropdown li.title h5, .top-bar-section .dropdown li.parent-link {
         margin-bottom: 0;
         margin-top: 0; }
-        .top-bar-section .dropdown li.title h5 a {
+        .top-bar-section .dropdown li.title h5 a, .top-bar-section .dropdown li.parent-link a {
           color: #fff;
           line-height: 22.5px;
           display: block; }
+          .top-bar-section .dropdown li.title h5 a:hover, .top-bar-section .dropdown li.parent-link a:hover {
+            background: none; }
       .top-bar-section .dropdown li.has-form {
         padding: 8px 15px; }
       .top-bar-section .dropdown li .button, .top-bar-section .dropdown li button {
@@ -4258,7 +4267,8 @@ meta.foundation-mq-topbar {
       color: #fff;
       background: #008CBA; }
       .top-bar-section li.active:not(.has-form) a:not(.button):hover {
-        background: #007ba0; }
+        background: #007ba0;
+        color: #fff; }
     .top-bar-section .has-dropdown > a {
       padding-right: 35px !important; }
       .top-bar-section .has-dropdown > a:after {
@@ -4464,12 +4474,12 @@ meta.foundation-mq-topbar {
   box-sizing: content-box;
   transition: transform 500ms ease 0s;
   -webkit-overflow-scrolling: touch;
-  -ms-transform: translate(-100%, 0);
-  -webkit-transform: translate3d(-100%, 0, 0);
-  -moz-transform: translate3d(-100%, 0, 0);
-  -ms-transform: translate3d(-100%, 0, 0);
-  -o-transform: translate3d(-100%, 0, 0);
-  transform: translate3d(-100%, 0, 0);
+  -ms-transform: translate(-100.5%, 0);
+  -webkit-transform: translate3d(-100.5%, 0, 0);
+  -moz-transform: translate3d(-100.5%, 0, 0);
+  -ms-transform: translate3d(-100.5%, 0, 0);
+  -o-transform: translate3d(-100.5%, 0, 0);
+  transform: translate3d(-100.5%, 0, 0);
   left: 0; }
   .left-off-canvas-menu * {
     -webkit-backface-visibility: hidden; }
@@ -4486,12 +4496,12 @@ meta.foundation-mq-topbar {
   box-sizing: content-box;
   transition: transform 500ms ease 0s;
   -webkit-overflow-scrolling: touch;
-  -ms-transform: translate(100%, 0);
-  -webkit-transform: translate3d(100%, 0, 0);
-  -moz-transform: translate3d(100%, 0, 0);
-  -ms-transform: translate3d(100%, 0, 0);
-  -o-transform: translate3d(100%, 0, 0);
-  transform: translate3d(100%, 0, 0);
+  -ms-transform: translate(100.5%, 0);
+  -webkit-transform: translate3d(100.5%, 0, 0);
+  -moz-transform: translate3d(100.5%, 0, 0);
+  -ms-transform: translate3d(100.5%, 0, 0);
+  -o-transform: translate3d(100.5%, 0, 0);
+  transform: translate3d(100.5%, 0, 0);
   right: 0; }
   .right-off-canvas-menu * {
     -webkit-backface-visibility: hidden; }
@@ -4577,7 +4587,7 @@ ul.off-canvas-list {
   -o-transform: none;
   transform: none;
   z-index: 1003; }
-.offcanvas-overlap .exit-offcanvas-menu {
+.offcanvas-overlap .exit-off-canvas {
   -webkit-backface-visibility: hidden;
   transition: background 300ms ease;
   cursor: pointer;
@@ -4590,10 +4600,9 @@ ul.off-canvas-list {
   left: 0;
   right: 0;
   z-index: 1002;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  z-index: 1002; }
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
   @media only screen and (min-width:40.063em) {
-    .offcanvas-overlap .exit-offcanvas-menu:hover {
+    .offcanvas-overlap .exit-off-canvas:hover {
       background: rgba(255, 255, 255, 0.05); } }
 
 .no-csstransforms .left-off-canvas-menu {

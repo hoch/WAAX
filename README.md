@@ -1,27 +1,28 @@
 # WAAX: Web Audio API eXtension
 
-#### JavaScript Framework for Web Music Application (1.0.0-alpha)
+#### JavaScript Web Music Framework (1.0.0-alpha)
 
-> NOTE: WAAX and MUI require Chrome because they are built on top of Web Audio API, Web MIDI API and Web Components. Check [here](http://caniuse.com) for the browser support.
+> NOTE: WAAX and MUI require Web Audio API, Web MIDI API and Web Components. Currently Chrome or Chrome Canary is the only browser that supports them. Run [the client test](http://hoch.github.io/WAAX/test/) to check the platform compatibility.
 
 <!-- travis build image -->
 
+
 # Introduction
 
-__WAAX__ is a JavaScript library that offers a comprehensive framework for web-based music application. Its goal is to facilitate music and audio programming on the modern web browser. The __WAAX__ features:
+__WAAX__ is a JavaScript library that offers a comprehensive framework for web-based music application. Its goal is to facilitate and support the development of web-based music application.
 
-- Extending Web Audio API for ease of use
-- [Web Audio Plug-in](https://ccrma.stanford.edu/~hongchan/posts/creating-waax-plugin/) Interface
-- Parameter & Preset Management
-- Timebase, Transport and NoteList (a.k.a. Sequencer Engine)
-- [Modular GUI elements](http://hoch.github.io/WAAX/mui/) powered by Polymer
+
+# Feature Highlight
+
+- Web Audio API Wrapper and audio/music utilities 
+- Flexible parameter control and preset management
+- Built-in transport function (i.e. sequencer)
+- Modular and extensible architecture
+    - [WAPL(Web Audio PLug-in)](https://ccrma.stanford.edu/~hongchan/posts/creating-waax-plugin/) interface
+    - [MUI(Musical User Interface)](http://hoch.github.io/WAAX/mui/)
+- Robust development setup: Pre-configured with Bower and Gulp
 - [Web MIDI API Integration](https://github.com/hoch/Ktrl) _(supported behind flag)_
-- Complete Front-end Development setup: NPM, Bower, Gulp, Foundation, Polymer
-- Tested with Mocha and Chai: [In-browser Test](http://hoch.github.io/WAAX/test/)
 
-<!-- ### [Play WAAX!](http://playwaax.appspot.com)
-You can find playable demos and examples at [PlayWAAX](http://playwaax.appspot.com).
- -->
 
 ## Basic Usage
 
