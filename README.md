@@ -1,4 +1,4 @@
-> NOTE: This branch has been deprecated. Use it only for the reference purpose. Somehow you landed on this page, please visit [the master branch](https://github.com/hoch/WAAX) for the latest progress.
+> NOTE: This branch has been deprecated and is not maintained any more. Use it only for the reference purpose. Somehow you landed on this page, please visit [the master branch](https://github.com/hoch/WAAX) for the latest progress.
 
 <hr>
 
