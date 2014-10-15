@@ -1,9 +1,13 @@
-WAAX (Web Audio API eXtension)
-------------------------------
+> NOTE: This branch has been deprecated. Use it only for the reference purpose. Somehow you landed on this page, please visit [the master branch](https://github.com/hoch/WAAX) for the latest progress.
+
+<hr>
+
+#### WAAX (Web Audio API eXtension)
+
 **JavaScript library for music and audio programming on Chrome**
 
-Building
---------
+#### Building
+
 The included grunt script will build all of the WAAX files and minify them.
 
 First install grunt and other dev dependencies:
@@ -20,16 +24,16 @@ $ grunt
 
 Both `waax.js` and `waax.min.js` will be generated in the `build/` directory.
 
-Documentation
--------------
+#### Documentation
+
 To generate the documentation:
 
 ```bash
 $ grunt bfdocs
 ```
 
-Tests
------
+#### Tests
+
 To run the unit tests, first install the development dependencies:
 
 ```bash
