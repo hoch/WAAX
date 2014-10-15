@@ -1,6 +1,6 @@
 {
   "name": "WAAX",
-  "version": "1.0.0-alpha",
+  "version": "1.0.0-alpha2",
   "homepage": "https://github.com/hoch/WAAX",
   "description": "Web Audio API eXtension",
   "license": "MIT",

@@ -1,5 +1,5 @@
 /**
- * WAAX 1.0.0-alpha
+ * WAAX 1.0.0-alpha2
  *
  * gulp clean           # cleans dist, build path
  * gulp serve           # starts dev server 127.0.0.1:3000 and opens Canary

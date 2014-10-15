@@ -1,5 +1,4 @@
 .DS_Store
-.grunt/
 NOTES.md
 node_modules/
 dist/
