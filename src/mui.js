@@ -5,8 +5,11 @@
  *   interaction. The functionality might be integrated into Polymer custom
  *   element, but the code is currently used for bridging the gap between WAAX
  *   and Polymer.
- * @version 1.0.0-alpha
+ * @version 1.0.0-alpha2
  */
+
+
+
 window.MUI = (function (WX) {
 
   /**

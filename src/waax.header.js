@@ -1,6 +1,6 @@
 /**
  * @fileOverview WX Namespace and basic Web Audio API wrapper.
- * @version 1.0.0-alpha
+ * @version 1.0.0-alpha2
  * @author Hongchan Choi (hoch)
  * @license MIT
  */
@@ -28,19 +28,19 @@ window.WX = {};
 
 
   // Feature detection and monkey patching: AudioContext
-  var _acFlagWebKit = window.hasOwnProperty('webkitAudioContext'),
-      _acFlagNonPrefix = window.hasOwnProperty('AudioContext');
-  if (!_acFlagWebKit && !_acFlagNonPrefix) {
+  var _audioContextFlagWebKit = window.hasOwnProperty('webkitAudioContext'),
+      _audioContextFlagNonPrefixed = window.hasOwnProperty('AudioContext');
+  if (!_audioContextFlagWebKit && !_audioContextFlagNonPrefixed) {
     // FATAL: non-supported browser. stop everything and escape.
     // console.log('FATAL: Web Audio API is not supported.');
     throw new Error('FATAL: Web Audio API is not supported.');
   } else {
-    if (_acFlagWebKit && !_acFlagNonPrefix) {
+    if (_audioContextFlagWebKit && !_audioContextFlagNonPrefixed) {
       window.AudioContext = window.webkitAudioContext;
     }
   }
 
-  // internal audio context
+  // WAAX internal audio context
   WX._ctx = new AudioContext();
 
   // ECMA Script 5 getter for current time and srate
@@ -372,4 +372,3 @@ window.WX = {};
   ];
 
 })(WX);
-

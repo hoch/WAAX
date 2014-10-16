@@ -1,20 +1,23 @@
 /**
- * Timebase: eventlist and transport for WAAX audio system
+ * @fileOverview Data structure for notes(events) and Transport system.
+ * @version 1.0.0-alpha2
+ * @author Hongchan Choi (hoch)
+ * @license MIT
  */
 
-window.Timebase = (function (WX) {
+ /**
+  * @namespace Timebase
+  */
+ window.Timebase = (function (WX) {
 
+  // Notes on time units
+  // - MBT(measure, beat, tick): aka musical timebase
+  // - Tick: timebase atom
 
-  /**
-   * NOTES:
-   * - MBT(measure, beat, tick): aka musical timebase
-   * - Tick: timebase atom
-   */
+  // internal constants for ticks per beat
+  // similar to PPQ (http://en.wikipedia.org/wiki/Pulses_per_quarter_note)
+  var _TICKS_PER_BEAT = 480;
 
-  // internal constants
-  var TICKS_PER_BEAT = 480;
-
-  // internal helpers
   // tick to MBT
   function tick2mbt (tick) {
     return {
