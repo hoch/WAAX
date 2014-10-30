@@ -2,11 +2,13 @@
 <html>
 
 <head>
-  <title>Examples: Hello WAAX! | WAAX</title>
+  <title>Hello WAAX! | WAAX Examples</title>
+  <!-- MUI -->
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../../build/mui/mui.html">
+  <!-- WAAX -->
   <script src="../../build/waax.js"></script>
   <script src="../../build/plug_ins/simpleosc.js"></script>
-  <link rel="import" href="../../mui/mui.html">
-  <link rel="import" href="../../mui/mui-style.html">
 </head>
 
 <body unresolved>
@@ -16,7 +18,17 @@
   <h3>Hello WAAX!</h3>
 
   <!-- GUI -->
-  <mui-knob id="k-freq"></mui-knob>
+  <mui-rack label="Rack">
+    <mui-group label="Test">
+      <mui-button icon="av:pause"></mui-button>
+      <mui-knob id="k-freq"></mui-knob>
+      <mui-knobh id="k-gain"></mui-knobh>
+      <mui-select label="Waveform" id="s-waveform"></mui-select>
+    </mui-group>
+    <mui-spectrum id="k-spec"></mui-spectrum>
+  </mui-rack>
+  <mui-vkey id="k-key"></mui-vkey>
+
 
   <!-- Logic -->
   <script>
@@ -24,7 +36,20 @@
       var osc = WX.SimpleOsc();
       osc.to(WX.Master);
       osc.noteOn(60, 100);
+
       MUI.$('k-freq').link(osc, 'oscFreq');
+      MUI.$('k-gain').link(osc, 'output');
+      MUI.$('s-waveform').setModel(WX.WAVEFORMS);
+      MUI.$('s-waveform').link(osc, 'oscType')
+
+      osc.to(MUI.$('k-spec'));
+      MUI.$('k-key').addTarget(osc);
+
+      // MUI.link([
+      //   { source: 'k-freq', target: 'osc#oscFreq' },
+      //   { source: 'k-gain', target: 'osc#output' },
+      //   { source: 's-waveform', target: 'osc#oscType' },
+      // ]);
     });
   </script>
 

@@ -8,7 +8,7 @@ var expect = chai.expect,
 describe('Core: Utilities - object, music math and more.', function() {
   describe('getVersion()', function () {
     it('should return API version number.', function () {
-      expect(WX.getVersion()).to.equal('1.0.0-alpha');
+      expect(WX.getVersion()).to.equal('1.0.0-alpha2');
     });
   });
   describe('Log.info(arg)', function () {
@@ -326,7 +326,7 @@ describe('Core: Audio System', function() {
   });
   describe('loadClip', function () {
     it('should return a audio buffer after xhr loading success.', function (done) {
-      var clip = { name: 'ziggy', url: '../sound/hochkit/fx-001.wav' };
+      var clip = { name: 'ziggy', url: '../snd/hochkit/fx-001.wav' };
       var progress = false, complete = false;
       WX.loadClip(clip,
         function (clip) {

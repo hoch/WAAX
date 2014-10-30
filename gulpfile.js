@@ -1,14 +1,13 @@
 /**
  * WAAX 1.0.0-alpha2
  *
+ * gulp                 # cleans, builds and starts dev server
+ *
  * gulp clean           # cleans dist, build path
  * gulp serve           # starts dev server 127.0.0.1:3000 and opens Canary
  * gulp scripts:core    # minifies and concats WAAX core JS files to build
  * gulp scripts:plugins # minifies plug-in JS files to build/plug-ins
- * gulp scripts:ktrl    # minifies ktrl library
  * gulp build           # all above
- * gulp deploy          # build and deploy to gh-pages
- * gulp                 # cleans, builds and starts dev server
  */
 
 var gulp        = require('gulp'),
@@ -36,8 +35,7 @@ gulp.task('copy', function () {
     'build/**/*',
     'docs/**/*',
     'examples/**/*',
-    'mui/**/*',
-    'sound/**/*',
+    'snd/**/*',
     'test/**/*',
     'index.html'
   ], {
@@ -76,13 +74,15 @@ gulp.task('scripts:plugins', function () {
     .pipe(plugins.size({ title: 'scripts:plugins' }));
 });
 
-// scripts:ktrl
-gulp.task('scripts:ktrl', function () {
-  return gulp.src(['src/ktrl.js'])
-    .pipe(plugins.uglify({ mangle: false }))
-    .pipe(gulp.dest('build'))
-    .pipe(plugins.size({ title: 'scripts:ktrl' }));
-});
+// mui
+gulp.task('mui', function () {
+  return gulp.src([
+    'src/mui/**/*',
+    '!src/mui/**/index.html',
+  ])
+    .pipe(gulp.dest('build/mui'))
+    .pipe(plugins.size({ title: 'mui' }));
+})
 
 // serve
 gulp.task('serve', function () {
@@ -98,25 +98,25 @@ gulp.task('serve', function () {
   gulp.watch(['index.html', 'mui/**/*.html'], reload);
   gulp.watch(['examples/**/*.html', 'examples/**/*.js'], reload);
   gulp.watch(['src/*.js', '!src/ktrl.js'], ['scripts:core', reload]);
-  gulp.watch(['src/ktrl.js'], ['scripts:ktrl', reload]);
   gulp.watch(['src/plug_ins/**/*.js'], ['scripts:plugins', reload]);
+  gulp.watch(['test/**/*.html', 'test/**/*.js'], reload);
 });
 
 // build
 gulp.task('build', function (cb) {
   runSequence('clean',
-    ['scripts:core', 'scripts:plugins', 'scripts:ktrl'],
+    ['scripts:core', 'scripts:plugins', 'mui'],
     'copy',
     cb);
-});
-
-// deploy
-gulp.task('deploy', ['build'], function () {
-  return gulp.src('dist/**/*')
-    .pipe(deploy());
 });
 
 // default
 gulp.task('default', function (cb) {
   runSequence('build', 'serve', cb);
+});
+
+// Only for Hoch: deploy
+gulp.task('deploy', ['build'], function () {
+  return gulp.src('dist/**/*')
+    .pipe(deploy());
 });

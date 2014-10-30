@@ -11,8 +11,9 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer",
-    "core-icon": "Polymer/core-icon",
-    "chai": "~1.9.1",
-    "mocha": "~1.20.1"
+    "polymer": "Polymer/polymer#~0.4.2",
+    "core-icon": "Polymer/core-icon#~0.4.2",
+    "chai": "~1.9.2",
+    "mocha": "~2.0.1"
   }
+}

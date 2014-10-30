@@ -1,125 +1,90 @@
-# WAAX: Web Audio API eXtension
+## WAAX (Web Audio API eXtension)
 
-#### JavaScript Web Music Framework (1.0.0-alpha)
+Web Music Framework (1.0.0-alpha2)
 
-> NOTE: WAAX and MUI require Web Audio API, Web MIDI API and Web Components. Currently Chrome or Chrome Canary is the only browser that supports them. Run [the client test](http://hoch.github.io/WAAX/test/) to check the platform compatibility.
+> NOTE: WAAX requires Web Audio API and Web Components. Run [the test suite](http://hoch.github.io/WAAX/test/) to check the browser compatibility.
 
 <!-- travis build image -->
 
+## Introduction
 
-# Introduction
-
-__WAAX__ is a JavaScript library that offers a comprehensive framework for web-based music application. Its goal is to facilitate and support the development of web-based music application.
-
-
-## Feature Highlight
-
-- Web Audio API Wrapper and audio/music utilities 
-- Flexible parameter control and preset management
-- Built-in transport function (i.e. sequencer)
-- Modular and extensible architecture
-    - [WAPL(Web Audio PLug-in)](https://ccrma.stanford.edu/~hongchan/posts/creating-waax-plugin/) interface
-    - [MUI(Musical User Interface)](http://hoch.github.io/WAAX/mui/)
-- Robust development setup: Pre-configured with Bower and Gulp
-- [Web MIDI API Integration](https://github.com/hoch/Ktrl) _(supported behind flag)_
+__WAAX__ offers a comprehensive framework for web-based music application. Its goal is to facilitate and support the development of web-based music application.
 
 
-# Installation
+## Feature Highlights
 
-The complete WAAX development setup requires [NPM](http://nodejs.org/), [Bower](http://bower.io/) and [Gulp](http://gulpjs.com/). If you have them installed, then simply execute the following commands in the terminal to install and configure WAAX. Make sure to replace `$YOUR_DIRECTORY` with your installation directory.
+- **Fast** - Built around native Web Audio API nodes.
+- **Less code**
+    - Web Audio API helpers and utilities
+    - Parameter control and plug-in builder
+    - Transport and time management (i.e. sequencer)
+- **Modular and extensible**
+    - [WAPL](https://ccrma.stanford.edu/~hongchan/posts/creating-waax-plugin/) (Web Audio PLug-in): Plug-in for Web Audio API ecosystem
+    - [MUI](http://hoch.github.io/WAAX/mui/) (Musical User Interface): GUI for music apps
+- **Robust workflow** - Preconfigured with Bower and Gulp
+
+
+## Prerequisites
+
+The complete WAAX development setup requires the following software. Make sure they are installed with appropriate scope and permission.
+
+- [Git](http://git-scm.com/) - [Installation](http://git-scm.com/downloads)
+- [Node.js](http://nodejs.org/) - [Installation](http://nodejs.org/)
+- [Bower](http://bower.io/) - [Installation](http://bower.io/#install-bower)
+- [Gulp](http://gulpjs.com/) - [Installation](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md)
+
+
+## Installation
+
+If you have them installed, then simply execute the following commands in the terminal to install WAAX. Replace `$YOUR_DIRECTORY` with your installation directory.
 
 ~~~bash
 git clone https://github.com/hoch/WAAX $YOUR_DIRECTORY
 cd $YOUR_DIRECTORY
-make
+npm install
+bower install
 ~~~
 
 
 ## Quick Start with Gulp
 
+WAAX is pre-configured for the optimum development workflow. Type `gulp` in the terminal and then your web browser will open the project landing page automatically.
+
 ~~~bash
 gulp                    # cleans, builds and starts dev server
-
 gulp clean              # cleans dist, build path
 gulp serve              # starts dev server 127.0.0.1:3000 and opens Canary
 gulp scripts:core       # minifies and concats WAAX core JS files to build
 gulp scripts:plugins    # minifies plug-in JS files to build/plug-ins
-gulp scripts:ktrl       # minifies ktrl library
 gulp build              # all above
 ~~~
 
 
-# Basic Usage
+## What's Next?
 
-To use WAAX in a web page, simply load the `waax.js` in an HTML document. Note that MUI elements packages require Polymer library, so it has to be included before its usage. The following code snippets require `build/` and `mui/` directories to be at the right place.
-
-~~~html
-<!-- load WAAX, MUI, Timebase and plug-ins -->
-<script src="build/waax.js"></script>
-<script src="build/plug_ins/wxs1.js"></script>
-<script src="build/plug_ins/converb.js"></script>
-<script src="build/plug_ins/stereodelay.js"></script>
-<!-- load MUI elements -->
-<import src="mui/mui.html"></script>
-~~~
-
-For Web MIDI support, the following components should be included as well:
-
-~~~html
-<!-- optional: for MIDI support -->
-<script src="build/ktrl.js"></script>
-~~~
-
-Note that MIDI support depends on [Web MIDI API](http://www.w3.org/TR/webmidi/), which is still behind the flag at the moment even in Chrome and Chrome Canary. __Ktrl__ is a part of WAAX framework for Web MIDI and more info is available [here](https://github.com/hoch/Ktrl).
+- "Still not sure what it does."
+    + Visit project page and have a look on examples.
+- "Want to see more details."
+    + Visit documentation/API reference page.
+- "Are there any videos?"
+    + Watch some recorded talks.
 
 
-## Playing Sound
+## Change Log
 
-By its design, WAAX accommodates various use cases with different levels. As shown below, it can be as simple as possible.
+- 1.0.0-alpha2
+    + Updated dependencies with latest version: Gulp, Polymer
+    + MUI elements updated for new version of Polymer
+    + Timebase cleaned/refactored.
+    + Updated README.
 
-~~~javascript
-// Creating a WXS-1 synth and a stereo delay instance.
-var synth = WX.WXS1(),
-    delay = WX.StereoDelay();
-// Plug-in patching: Synth => Delay => Master
-synth.to(delay).to(WX.Master);
-// Plays C4 with 100 velocity for 1 second.
-synth.noteOn(60, 100);
-synth.noteOff(WX.now + 1.0);
-~~~
+- 1.0.0-alpha
+    + First alpha version before stable release.
+    + Dropped deprecated components from repository.
+    + New plug-in builder introduced.
 
-Also it can be as complex as a complete music application. For more examples, check out [MUI showcases](http://hoch.github.io/WAAX/mui/) and [Plug-In Workshop](http://hoch.github.io/WAAX/examples/workshop/).
-
-
-## Creating UI with MUI elements
-
-MUI(Musical User Interface) package offers essential UI elements for rapid prototyping of instrument design or processing algorithm. By design, MUI supports seamless parameter binding and easy GUI building. A live demo can be found [here](http://hoch.github.io/WAAX/examples/hellowaax/).
-
-First, MUI elements, which are custom HTML elements, should be declared.
-
-~~~html
-<!-- MUI knob element -->
-<mui-knob id="knob-freq"></mui-knob>
-~~~
-
-Secondly, create any plug-in and connect the GUI to a parameter.
-
-~~~javascript
-// Creates an oscillator plug-in.
-var osc = WX.SimpleOsc();
-// Patching: Osc => Master
-osc.to(WX.Master);
-// Starts audio.
-osc.noteOn(60, 100);
-// Links the knob and a parameter: link(target_plugin, parameter_name)
-MUI.$('knob-freq').link(osc, 'oscFreq');
-~~~
-
-
-## Further Reading
-
-- [Thought behind: Rebirth of WAAX](https://ccrma.stanford.edu/~hongchan/posts/thoughts-behind-rebirth-of-waax/) : Concepts, design choices and the future road map.
-- [Creating WAAX Plug-in](https://ccrma.stanford.edu/~hongchan/posts/creating-waax-plugin/) : A step-by-step tutorial on how to create a plug-in for WAAX.
+- r17 (dev)
+    + Last version of dev/experimental release.
 
 
 ## License and Contact

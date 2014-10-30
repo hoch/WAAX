@@ -818,7 +818,7 @@
   WX.PlugIn.register = function (PlugInClass) {
     var info = PlugInClass.prototype.info;
     // hard check version info
-    if (WX.getVersion() > info.api_version) {
+    if (WX.getVersion() < info.api_version) {
       // FATAL: PlugInClass is incompatible with WX Core.
       WX.Log.error(PlugInClass.name, ': FATAL. incompatible WAAX version.');
     }

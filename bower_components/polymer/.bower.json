@@ -14,6 +14,6 @@
     "commit": "90270bc3b8f1537b849ca1b1c0283a7c0691c0f7"
   },
   "_source": "git://github.com/Polymer/polymer.git",
-  "_target": "^0.4.0",
+  "_target": "~0.4.2",
   "_originalSource": "Polymer/polymer"
 }

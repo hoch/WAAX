@@ -1,7 +1,73 @@
+2.0.0 / 2014-10-21
+==================
+
+ * remove: support for node 0.6.x, 0.4.x
+ * fix: landing reporter with non ansi characters (#211)
+ * fix: html reporter - preserve query params when navigating to suites/tests (#1358)
+ * fix: json stream reporter add error message to failed test
+ * fix: fixes for visionmedia -> mochajs
+ * fix: use stdio, fixes node deprecation warnings (#1391)
+
+1.21.5 / 2014-10-11
+==================
+
+ * fix: build for NodeJS v0.6.x
+ * fix: do not attempt to highlight syntax when non-HTML reporter is used
+ * update: escape-string-regexp to 1.0.2.
+ * fix: botched indentation in canonicalize()
+ * fix: .gitignore: ignore .patch and .diff files
+ * fix: changed 'Catched' to 'Caught' in uncaught exception error handler messages
+ * add: `pending` field for json reporter
+ * fix: Runner.prototype.uncaught: don't double-end runnables that already have a state.
+ * fix: --recursive, broken by f0facd2e
+ * update: replaces escapeRegexp with the escape-string-regexp package.
+ * update: commander to 2.3.0.
+ * update: diff to 1.0.8.
+ * fix: ability to disable syntax highlighting (#1329)
+ * fix: added empty object to errorJSON() call to catch when no error is present
+ * fix: never time out after calling enableTimeouts(false)
+ * fix: timeout(0) will work at suite level (#1300)
+ * Fix for --watch+only() issue (#888 )
+ * fix: respect err.showDiff, add Base reporter test (#810)
+
+1.22.1-3 / 2014-07-27
+==================
+
+  * fix: disabling timeouts with this.timeout(0) (#1301)
+
+1.22.1-3 / 2014-07-27
+==================
+
+  * fix: local uis and reporters (#1288)
+  * fix: building 1.21.0's changes in the browser (#1284)
+
+1.21.0 / 2014-07-23
+==================
+
+  * add: --no-timeouts option (#1262, #1268)
+  * add: --*- deprecation node flags (#1217)
+  * add: --watch-extensions argument (#1247)
+  * change: spec reporter is default (#1228)
+  * fix: diff output showing incorrect +/- (#1182)
+  * fix: diffs of circular structures (#1179)
+  * fix: re-render the progress bar when progress has changed only (#1151)
+  * fix support for environments with global and window (#1159)
+  * fix: reverting to previously defined onerror handler (#1178)
+  * fix: stringify non error objects passed to done() (#1270)
+  * fix: using local ui, reporters (#1267)
+  * fix: cleaning es6 arrows (#1176)
+  * fix: don't include attrs in failure tag for xunit (#1244)
+  * fix: fail tests that return a promise if promise is rejected w/o a reason (#1224)
+  * fix: showing failed tests in doc reporter (#1117)
+  * fix: dot reporter dots being off (#1204)
+  * fix: catch empty throws (#1219)
+  * fix: honoring timeout for sync operations (#1242)
+  * update: growl to 1.8.0
+
 1.20.1 / 2014-06-03
 ==================
 
-  * update: should dependency to ~4.0.0 (#1231)
+  * update: should dev dependency to ~4.0.0 (#1231)
 
 1.20.0 / 2014-05-28
 ==================

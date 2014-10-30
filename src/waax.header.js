@@ -15,7 +15,7 @@ window.WX = {};
   'use strict';
 
   // System info
-  var _API_VERSION = '1.0.0-alpha';
+  var _API_VERSION = '1.0.0-alpha2';
 
   /**
    * Returns WAAX API version number. (semantic version)
