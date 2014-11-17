@@ -2,7 +2,6 @@
  * WAAX 1.0.0-alpha2
  *
  * gulp                 # cleans, builds and starts dev server
- *
  * gulp clean           # cleans dist, build path
  * gulp serve           # starts dev server 127.0.0.1:3000 and opens Canary
  * gulp scripts:core    # minifies and concats WAAX core JS files to build
