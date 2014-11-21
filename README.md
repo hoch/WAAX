@@ -2,7 +2,7 @@
 
 Web Music Framework (1.0.0-alpha2)
 
-> WAAX requires Web Audio API and Web Components. Run [the test suite](http://hoch.github.io/WAAX/test/) to check the browser compatibility.
+> WAAX requires Web Audio API and Web Components!
 
 <!-- travis build image -->
 
@@ -19,8 +19,8 @@ __WAAX__ offers a comprehensive framework for web-based music application. Its g
     - Succint parameter control
     - Transport and event management (i.e. sequencer)
 - **Modular and extensible**
-    - [WAPL](https://ccrma.stanford.edu/~hongchan/posts/creating-waax-plugin/) (Web Audio PLug-in): Plug-in for Web Audio API ecosystem
-    - [MUI](http://hoch.github.io/WAAX/mui/) (Musical User Interface): GUI for music apps
+    - WAPL (Web Audio PLug-in): Plug-in for Web Audio API ecosystem
+    - MUI (Musical User Interface): GUI for music apps
 - **Robust workflow** - Preconfigured with Bower and Gulp
 
 
@@ -51,19 +51,22 @@ bower install
 WAAX is pre-configured for the optimum development workflow. Type `gulp` in the terminal and then your web browser (Chrome by default) will open the project landing page automatically.
 
 ~~~bash
-gulp                    # cleans, builds and starts dev server
+gulp                    # build everything and serve at 127.0.0.1:3000
+
 gulp clean              # cleans dist, build path
+gulp core               # minifies and concats core JS files to build/
+gulp plugins            # minifies plug-in JS files to build/plug_ins
+gulp mui                # copies MUI elements files to build/
 gulp serve              # starts dev server 127.0.0.1:3000 and opens Chrome
-gulp scripts:core       # minifies and concats core JS files to build/
-gulp scripts:plugins    # minifies plug-in JS files to build/plug_ins
-gulp build              # all the above
+gulp build              # build and minify core, plug-ins
 ~~~
 
 
+<!--
 ## What's Next?
 
 Go to the [project landing page](http://hoch.github.io/WAAX) and see what WAAX can do.
-
+-->
 
 ## Change Log
 
@@ -71,7 +74,8 @@ Go to the [project landing page](http://hoch.github.io/WAAX) and see what WAAX c
     + Updated dependencies with latest version: Gulp, Polymer
     + MUI elements updated for new version of Polymer
     + Timebase cleaned/refactored.
-    + Updated README and the project landing page.
+    + Updated README and the temporary landing page is removed.
+    + MUI elements and test files are now compatible with FireFox/Safari.
 
 - 1.0.0-alpha
     + First alpha version before stable release.
@@ -79,7 +83,7 @@ Go to the [project landing page](http://hoch.github.io/WAAX) and see what WAAX c
     + New plug-in builder introduced.
 
 - r17 (dev)
-    + Last version of dev/experimental release.
+    + Last version of dev/experimental revision.
 
 
 ## License and Contact
