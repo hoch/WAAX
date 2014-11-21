@@ -131,7 +131,7 @@ window.WX = {};
       case undefined:
         time = (time < now) ? now : time;
         this.setValueAtTime(value, time);
-        // when node is not connected, automation will not work
+        // TO FIX: when node is not connected, automation will not work
         // this hack handles the error
         if (time <= now && value !== this.value) {
           this.value = value;

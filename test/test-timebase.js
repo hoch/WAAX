@@ -391,12 +391,12 @@ describe('Timebase: Transport', function() {
       setTimeout(function () {
         expect(TX.isRunning()).to.equal(true);
         // when BPM=120, 500ms is 1 beat, that is 480 tick.
-        expect(TX.getNow()).to.be.within(465, 495);
+        expect(TX.getNow()).to.be.within(465, 505);
         setTimeout(function () {
           TX.pause();
           expect(TX.isRunning()).to.equal(false);
           // when BPM=120, 1000ms is 2 beats, that is 960 tick.
-          expect(TX.getNow()).to.be.within(945, 975);
+          expect(TX.getNow()).to.be.within(945, 990);
           TX.rewind();
           expect(TX.getNow()).to.be.equal(0.0);
           done();

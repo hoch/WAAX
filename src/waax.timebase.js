@@ -19,7 +19,7 @@
   // internal: unique ID for notes/events (4 bytes uid generator)
   // see: http://stackoverflow.com/a/8809472/4155261
   function generate_uid4(){
-    var t = performance.now();
+    var t = Date.now();
     var id = 'xxxx'.replace(/[x]/g, function(c) {
       var r = (t + Math.random() * 16) % 16 | 0;
       t = Math.floor(t / 16);
