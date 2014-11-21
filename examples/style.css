@@ -1,0 +1,88 @@
+body {
+  font-family: "Roboto Condensed";
+  color: #37474F;
+}
+
+h1 {
+  font-size: 2.4rem;
+  margin: 2rem 0 1rem 0;
+}
+
+h2 {
+  font-size: 2.0rem;
+  margin: 1.8rem 0 0 0;
+}
+
+.wx-container {
+  width: 800px;
+  margin: 40px 20px;
+}
+
+.wx-header {
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #607D8B;
+}
+
+.wx-title {
+  font-size: 1.2rem;
+  font-weight: 400;
+  letter-spacing: 0.25rem;
+}
+
+.wx-info {
+  color:#B0BEC5;
+  font-size: 0.75rem;
+  font-weight: 300;
+}
+
+.wx-menu {
+  font-size: 1.0rem;
+  font-weight: 300;
+  display: inline-block;
+  float: right;
+  line-height: 30px;
+}
+
+.wx-menu a:hover {
+  color: #0277BD;
+}
+
+.wx-menu a {
+  color: #03A9F4;
+  text-decoration: none;
+}
+
+.wx-toc dl {
+  margin-left: 0.75rem;
+}
+
+.wx-toc dt {
+  font-size: 1.4rem;
+  font-weight: 300;
+  margin-bottom: 0.125rem;
+}
+
+.wx-toc dd {
+  color: #546E7A;
+  font-family: "Roboto";
+  font-size: 0.925rem;
+  margin: 0 0 1.2rem 0;
+}
+
+.wx-toc a,
+.wx-toc a:visited,
+.wx-toc a:active {
+  color: #03A9F4;
+  text-decoration: none;
+}
+
+.wx-toc a:hover {
+  color: #0277BD;
+  text-decoration: underline;
+}
+
+
+h2 {
+  margin: 2.5rem 0 0.5rem 0;
+  padding: 0;
+}

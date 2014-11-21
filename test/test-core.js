@@ -326,7 +326,7 @@ describe('Core: Audio System', function() {
   });
   describe('loadClip', function () {
     it('should return a audio buffer after xhr loading success.', function (done) {
-      var clip = { name: 'ziggy', url: '../snd/hochkit/fx-001.wav' };
+      var clip = { name: 'ziggy', url: '../sound/hochkit/fx-001.wav' };
       var progress = false, complete = false;
       WX.loadClip(clip,
         function (clip) {

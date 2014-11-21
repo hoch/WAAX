@@ -57,7 +57,7 @@
       // envelope: ads
       this._carGain.gain.set(0.0, time, 0);
       this._carGain.gain.set(scale * bal, time + att, 1);
-      this._carGain.gain.set(p.sustain * scale * bal, [time + att, dec], 3);
+      this._carGain.gain.set(sus * scale * bal, [time + att, dec], 3);
       // 2: start generation
       this._mod2.start(time);
       this._car2.start(time);
@@ -69,7 +69,7 @@
       // envelope: ads
       this._carGain2.gain.set(0.0, time, 0);
       this._carGain2.gain.set(scale * (1 - bal), time + att, 1);
-      this._carGain2.gain.set(p.sustain * scale * (1 - bal), [time + att, dec], 3);
+      this._carGain2.gain.set(sus * scale * (1 - bal), [time + att, dec], 3);
       // get minDur
       this.minDur = time + att + dec;
     },

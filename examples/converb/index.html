@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>ConVerb | WAAX Examples</title>
+  <script src="../../build/waax.js"></script>
+  <script src="../../build/plug_ins/converb.js"></script>
+  <script src="../../build/plug_ins/impulse.js"></script>
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../../build/mui/mui.html">
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body unresolved>
+  <div class="wx-container">
+    <div class="wx-header">
+      <span class="wx-title">WAAX</span>
+      <span class="wx-info" id="wx-version"></span>
+      <span class="wx-menu">
+        <a href="..">Examples</a>
+      </span>
+    </div>
+
+    <h1>ConVerb</h1>
+    <mui-rack label="Reverb" id="r-converb">
+      <mui-select label="Preset" id="preset"></mui-select>
+    </mui-rack>
+
+  </div>
+  <script>
+
+    MUI.start(function () {
+
+      var irData = [
+        {
+          key: 'Big Empty Church',
+          value: '../../sound/ir/960-BigEmptyChurch.mp3'
+        },
+        {
+          key: 'Reverse Gate',
+          value: '../../sound/ir/H3000-ReverseGate.mp3'
+        },
+        {
+          key: 'Brite Stage',
+          value: '../../sound/ir/960-BriteStage.mp3'
+        },
+        {
+          key: 'Elec SNR Plate',
+          value: '../../sound/ir/SPX990-ElecSNRPlate.mp3'
+        },
+        {
+          key: 'Large Bright Room',
+          value: '../../sound/ir/960-LargeBrightRoom.mp3'
+        },
+        {
+          key: 'Reflections',
+          value: '../../sound/ir/SPX990-Reflections.mp3'
+        },
+        {
+          key: 'Large Plate',
+          value: '../../sound/ir/960-LargePlate.mp3'
+        },
+        {
+          key: 'Acoustic Ambience',
+          value: '../../sound/ir/UAD140-AcousticAmbience.mp3'
+        },
+        {
+          key: 'Metal Verb',
+          value: '../../sound/ir/H3000-MetalVerb.mp3'
+        },
+        {
+          key: 'Master Plate',
+          value: '../../sound/ir/UAD140-MasterPlate.mp3'
+        }
+      ];
+
+      var impulse = WX.Impulse({ freq: 0.5 }),
+          converb = WX.ConVerb({ mix: 0.45 });
+      impulse.to(converb).to(WX.Master);
+
+      // TODO: fix this...
+      var irClips = [], counter = irData.length;
+      for (var i = 0; i < irData.length; i++) {
+        var clip = {
+          name: irData[i].key,
+          url: irData[i].value,
+        };
+        irData[i].value = i;
+        WX.loadClip(clip, function () {
+          if (--counter == 0) {
+            converb.setClip(irClips[0]);
+          }
+        });
+        irClips.push(clip);
+      }
+
+      MUI.buildControls(converb, 'r-converb');
+      MUI.$('preset').setModel(irData);
+      MUI.$('preset').setValue(irData[0].value);
+      MUI.$('preset').onItemSelected = function (value) {
+        converb.setClip(irClips[value]);
+      }
+
+    });
+
+  </script>
+  <script src="../examples.js"></script>
+</body>
+
+</html>

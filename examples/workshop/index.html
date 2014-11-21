@@ -2,54 +2,55 @@
 <html>
 
 <head>
-  <title>MUI | Web Audio API eXtension</title>
+  <title>Plug-in Workshop | WAAX Examples</title>
+  <!-- CSS for examples -->
+  <link rel="stylesheet" href="../style.css">
+  <!-- MUI -->
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../../build/mui/mui.html">
+  <!-- WAAX -->
   <script src="../../build/waax.js"></script>
+  <!-- plug-ins -->
   <script src="../../build/plug_ins/wxs1.js"></script>
-  <script src="../../build/plug_ins/fmkey7.js"></script>
+  <script src="../../build/plug_ins/fmk1.js"></script>
   <script src="../../build/plug_ins/simpleosc.js"></script>
   <script src="../../build/plug_ins/noise.js"></script>
   <script src="../../build/plug_ins/impulse.js"></script>
   <script src="../../build/plug_ins/cmp1.js"></script>
   <script src="../../build/plug_ins/stereodelay.js"></script>
   <script src="../../build/plug_ins/converb.js"></script>
-  <link rel="import" href="../../mui/mui.html">
-  <link rel="import" href="../../mui/mui-style.html">
 </head>
 
 <body unresolved>
 
-  <div data-alert class="alert-box warning">
-    <strong>NOTE</strong>: WAAX and MUI require <strong>Chrome</strong> because they are built on top of <strong>Web Audio API, Web MIDI API and Web Components</strong>. Check <a target="_blank" href="http://caniuse.com">CanIUse.com</a> for the browser support.
-    <a href="#" class="close">&times;</a>
+  <div class="wx-container">
+    <div class="wx-header">
+      <span class="wx-title">WAAX</span>
+      <span class="wx-info" id="wx-version"></span>
+      <span class="wx-menu">
+        <a href="..">Examples</a>
+      </span>
+    </div>
+
+    <h1>Plug-in Workshop</h1>
+
+    <mui-select label="Generator" id="select-gen"></mui-select>
+    <mui-rack id="params-gen" title="Generator" opened="true">
+    </mui-rack>
+
+    <mui-select label="Processor" id="select-pro"></mui-select>
+    <mui-rack id="params-pro" title="Processor" opened="true">
+    </mui-rack>
+
+    <mui-rack label="Keyboard" opened="false">
+      <mui-vkey id="vkey"></mui-vkey>
+    </mui-rack>
+
+    <mui-rack label="spectrum">
+      <mui-spectrum id="spec"></mui-spectrum>
+    </mui-rack>
   </div>
 
-  <header>
-    <div class="row">
-      <div class="small-10 small-centered columns">
-        <ul class="breadcrumbs">
-          <li><a href="../..">WAAX Home</a></li>
-        </ul>
-        <h3>Plug-In Workshop</h3>
-      </div>
-    </div>
-  </header>
-
-  <article>
-    <div class="row">
-      <div class="small-10 small-centered columns">
-
-        <mui-select label="Generator" id="select-gen"></mui-select>
-        <mui-rack id="params-gen" title="Generator" opened="true">
-        </mui-rack>
-        <mui-select label="Processor" id="select-pro"></mui-select>
-        <mui-rack id="params-pro" title="Processor" opened="true">
-        </mui-rack>
-        <mui-rack label="Keyboard" opened="true">
-          <mui-vkey id="vkey"></mui-vkey>
-        </mui-rack>
-      </div>
-    </div>
-  </article>
 
   <script>
     MUI.start(function () {
@@ -71,7 +72,8 @@
       // Get DOM handles with MUI.$ selector
       var genSelector = MUI.$('select-gen'),
           proSelector = MUI.$('select-pro'),
-          vkeySelector = MUI.$('vkey');
+          vkeySelector = MUI.$('vkey'),
+          specSelector = MUI.$('spec');
 
       // Set data model and event handler
       genSelector.setModel(genModel);
@@ -84,7 +86,7 @@
       // loading WXClip for convolution reverb
       var reverbClip = {
         name: '960 Large Plate',
-        url: '../../sound/ir/960-LargePlate.wav'
+        url: '../../sound/ir/960-LargePlate.mp3'
       };
       WX.loadClip(reverbClip, function (clip) {
         WX.Log.info('clip loaded.');
@@ -111,6 +113,7 @@
         currGen = WX[genSelector.value]();
         currPro = WX[proSelector.value]();
         currGen.to(currPro).to(WX.Master);
+        currPro.to(specSelector);
 
         // connecting keyboard input
         if (currGen.onData) {
@@ -133,5 +136,10 @@
     });
   </script>
 
+  <script>
+    var wxver = document.querySelector('#wx-version');
+    wxver.textContent = WX.getVersion();
+  </script>
 </body>
+
 </html>

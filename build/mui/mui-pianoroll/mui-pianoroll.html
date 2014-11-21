@@ -38,7 +38,7 @@
     _ctx: null,
     _ctxos: null,
 
-    _notemap: null,
+    _noteclip: null,
     _selectedNotesId: [],
     _newNote: null,
     _newNoteId: null,
@@ -97,7 +97,7 @@
       return {
         x: Math.ceil(note.start * this._pxTick) - this._cx + this._kbd.w,
         y: Math.floor((130 - note.pitch) * this._pxPitch) - this._cy,
-        w: Math.floor(note.dur * this._pxTick),
+        w: Math.floor(note.duration * this._pxTick),
         h: this._pxPitch
       };
     },
@@ -120,20 +120,22 @@
 
     // this will return action mode
     _selectNoteAtPos: function (posMIDI) {
-      // get note id
-      var id = this._notemap.findNoteIdAtPosition(posMIDI.pitch, posMIDI.tick);
-      // add note id to the selection
-      if (id) {
-        if (this._selectedNotesId.indexOf(id) < 0) {
-          this._selectedNotesId.push(id);
+      if (this._noteclip) {
+        // get note id
+        var id = this._noteclip.findNoteIdAtPosition(posMIDI.pitch, posMIDI.tick);
+        // add note id to the selection
+        if (id) {
+          if (this._selectedNotesId.indexOf(id) < 0) {
+            this._selectedNotesId.push(id);
+          }
+          // check if position query was at the end of note (-45 ticks)
+          var note = this._noteclip.get(id);
+          var end = note.getEnd();
+          if (end - 45 <= posMIDI.tick && posMIDI.tick <= end) {
+            return 'RESIZE';
+          }
+          return 'MOVE';
         }
-        // check if position query was at the end of note (-45 ticks)
-        var note = this._notemap.get(id);
-        var end = note.getEnd();
-        if (end - 45 <= posMIDI.tick && posMIDI.tick <= end) {
-          return 'RESIZE';
-        }
-        return 'MOVE';
       }
       return null;
     },
@@ -158,13 +160,15 @@
         startTick = end.tick;
         endTick = start.tick;
       }
-      var notesId = this._notemap.findNotesIdInArea(
-        minPitch, maxPitch, startTick, endTick
-      );
-      if (notesId) {
-        for (var i = 0; i < notesId.length; i++) {
-          if (this._selectedNotesId.indexOf(notesId[i]) < 0) {
-            this._selectedNotesId.push(notesId[i]);
+      if (this._noteclip) {
+        var notesId = this._noteclip.findNotesIdInArea(
+          minPitch, maxPitch, startTick, endTick
+        );
+        if (notesId) {
+          for (var i = 0; i < notesId.length; i++) {
+            if (this._selectedNotesId.indexOf(notesId[i]) < 0) {
+              this._selectedNotesId.push(notesId[i]);
+            }
           }
         }
       }
@@ -174,7 +178,7 @@
       var changes = {};
       for (var i = 0; i < this._selectedNotesId.length; i++) {
         var id = this._selectedNotesId[i];
-        var note = this._notemap.get(id);
+        var note = this._noteclip.get(id);
         note.translatePitch(deltaMIDI.pitch);
         note.translateStart(deltaMIDI.tick);
         changes[id] = note;
@@ -188,8 +192,8 @@
       var changes = {};
       for (var i = 0; i < this._selectedNotesId.length; i++) {
         var id = this._selectedNotesId[i],
-            note = this._notemap.get(id);
-        note.translateDur(deltaMIDI.tick);
+            note = this._noteclip.get(id);
+        note.changeDuration(deltaMIDI.tick);
         changes[id] = note;
       }
       if (this._cloudModel) {
@@ -205,14 +209,16 @@
       var start = ~~(posMIDI.tick / 120) * 120;
       start += (posMIDI.tick % 120) > 60 ? 120 : 0;
       this._newNote = WX.Note(posMIDI.pitch, 100, start, 120);
-      this._newNoteId = this._notemap.push(this._newNote);
+      if (this._noteclip) {
+        this._newNoteId = this._noteclip.push(this._newNote);
+      }
     },
 
     _updateNewNote: function (posMIDI) {
-      var dur = posMIDI.tick - this._newNote.start;
-      dur = ~~(dur / 120) * 120;
-      dur += (dur % 120) > 60 ? 120 : 0;
-      this._newNote.dur = dur;
+      var duration = posMIDI.tick - this._newNote.start;
+      duration = ~~(duration / 120) * 120;
+      duration += (duration % 120) > 60 ? 120 : 0;
+      this._newNote.duration = duration;
     },
 
     _endNewNote: function (posMIDI) {
@@ -229,7 +235,7 @@
       var changes = {};
       for (var i = 0; i < this._selectedNotesId.length; i++) {
         var id = this._selectedNotesId[i];
-        this._notemap.delete(id);
+        this._noteclip.delete(id);
         changes[id] = null;
       }
       if (this._cloudModel) {
@@ -269,7 +275,7 @@
       this._imageMap.onload = function () {
         callback();
       }.bind(this);
-      this._imageMap.src = '//hoch.github.io/WAAX/mui/mui-pianoroll/imagemap.png';
+      this._imageMap.src = '../../build/mui/mui-pianoroll/imagemap.png';
     },
 
     _buildImageMap: function () {
@@ -395,8 +401,8 @@
 
     _drawNotes: function () {
       this._ctx.lineWidth = 1.0;
-      if (this._notemap) {
-        this._notemap.iterate(function (id, note) {
+      if (this._noteclip) {
+        this._noteclip.iterate(function (id, note) {
             if (note) {
               // transfrom viewport
               var pos = this._MIDI2Grid(note);
@@ -610,8 +616,8 @@
       this._scrollByDelta(0, this._kbdMaxH * -0.4);
     },
 
-    setNoteMap: function (notemap) {
-      this._notemap = notemap;
+    setNoteClip: function (noteclip) {
+      this._noteclip = noteclip;
       this.update();
     },
 
@@ -628,16 +634,16 @@
       // console.log('realtimechange', index, noteArr);
       if (noteArr) {
         var note = WX.Note(noteArr[0], noteArr[1], noteArr[2], noteArr[3]);
-        this._notemap.set(id, note);
+        this._noteclip.set(id, note);
       } else {
-        this._notemap.delete(id);
+        this._noteclip.delete(id);
       }
       this._needsRedraw = true;
     },
 
     loadNote: function (id, noteArr) {
       var note = WX.Note(noteArr[0], noteArr[1], noteArr[2], noteArr[3]);
-      this._notemap.set(id, note);
+      this._noteclip.set(id, note);
       this._needsRedraw = true;
     }
 

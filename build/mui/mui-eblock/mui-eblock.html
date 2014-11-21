@@ -1,4 +1,11 @@
-<polymer-element name="mui-eblock" attributes="type label" noscript>
+<!--
+  `mui-eblock`
+  @version 1.0.0-alpha2
+  @description MUI envelope block abstraction.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<polymer-element name="mui-eblock" attributes="type label">
   <template>
     <style>
     :host {
@@ -46,7 +53,7 @@
   </template>
   <!-- logic -->
   <script>
-    Polymer('mui-eblock', {
+    Polymer({
 
       label: 'mui-eblock',
       values: null,

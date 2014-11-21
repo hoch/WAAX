@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>CMP1 | WAAX Examples</title>
+  <script src="../../build/waax.js"></script>
+  <script src="../../build/plug_ins/sp1.js"></script>
+  <script src="../../build/plug_ins/cmp1.js"></script>
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../../build/mui/mui.html">
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body unresolved>
+  <div class="wx-container">
+    <div class="wx-header">
+      <span class="wx-title">WAAX</span>
+      <span class="wx-info" id="wx-version"></span>
+      <span class="wx-menu">
+        <a href="..">Examples</a>
+      </span>
+    </div>
+
+    <h1>CMP1</h1>
+    <mui-rack id="rack"></mui-rack>
+
+  </div>
+  <script>
+
+    MUI.start(function () {
+
+      var sp1 = WX.SP1({ ampSustain: 1.0 });
+      var cmp1 = WX.CMP1({
+        output: 0.8, threshold: -50, ratio: 10, knee: 50,
+        attack: 0.02, release: 0.25, makeup: 6.28
+      });
+      sp1.to(cmp1).to(WX.Master);
+
+      sp1.onReady = function () {
+        sp1.noteOn(60, 100);
+      };
+      sp1.loadClip({
+        name: 'drums',
+        url: '../../../sound/loops/drums.mp3'
+      });
+
+      MUI.buildControls(cmp1, 'rack');
+
+    });
+
+  </script>
+  <script src="../examples.js"></script>
+</body>
+
+</html>

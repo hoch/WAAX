@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Fader | WAAX Examples</title>
+  <script src="../../build/waax.js"></script>
+  <script src="../../build/plug_ins/simpleosc.js"></script>
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../../build/mui/mui.html">
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body unresolved>
+  <div class="wx-container">
+    <div class="wx-header">
+      <span class="wx-title">WAAX</span>
+      <span class="wx-info" id="wx-version"></span>
+      <span class="wx-menu">
+        <a href="..">Examples</a>
+      </span>
+    </div>
+
+    <h1>Fader</h1>
+    <mui-rack label="Fader" id="r-fader"></mui-rack>
+
+  </div>
+
+  <script>
+
+    MUI.start(function () {
+
+      var osc = WX.SimpleOsc();
+      osc.to(WX.Master);
+      osc.noteOn(60, 32);
+      MUI.buildControls(WX.Master, 'r-fader');
+
+    });
+
+  </script>
+  <script src="../examples.js"></script>
+</body>
+
+</html>

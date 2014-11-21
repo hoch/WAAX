@@ -2,117 +2,89 @@
 <html>
 
 <head>
-  <title>MUI | WAAX</title>
+  <title>MUI | WAAX Examples</title>
+  <!-- CSS for examples -->
+  <link rel="stylesheet" href="../style.css">
+  <!-- MUI -->
   <script src="../../bower_components/platform/platform.js"></script>
-  <link rel="import" href="deps.html">
+  <link rel="import" href="../../build/mui/mui.html">
+  <!-- WAAX -->
+  <script src="../../build/waax.js"></script>
+  <script src="../../build/plug_ins/simpleosc.js"></script>
 </head>
 
 <body unresolved>
+  <div class="wx-container">
+    <div class="wx-header">
+      <span class="wx-title">WAAX</span>
+      <span class="wx-info" id="wx-version"></span>
+      <span class="wx-menu">
+        <a href="..">Examples</a>
+      </span>
+    </div>
 
-  <div data-alert class="alert-box warning">
-    <strong>NOTE</strong>: WAAX and MUI require <strong>Chrome</strong> because they are built on top of <strong>Web Audio API, Web MIDI API and Web Components</strong>. Check <a target="_blank" href="http://caniuse.com">CanIUse.com</a> for the browser support.
-    <a href="#" class="close">&times;</a>
+    <h1>MUI Elements</h1>
+
+    <h2>mui-button</h2>
+    <mui-button icon="av:play-arrow" type="toggle"></mui-button>
+    <mui-button icon="av:stop"></mui-button>
+
+    <h2>mui-knob</h2>
+    <mui-knob label="knob 1" value="0.3"></mui-knob>
+    <mui-knob label="knob 2" value="0.7"></mui-knob>
+
+    <h2>mui-knobh</h2>
+    <mui-knobh label="BPM" min="20" max="200" value="120"></mui-knobh>
+    <mui-knobh label="Qunatize" min="0" max="100" value="0"></mui-knobh>
+
+    <h2>mui-select</h2>
+    <mui-select id="waveform" label="items"></mui-select>
+
+    <h2>mui-eblock</h2>
+    <mui-eblock></mui-eblock>
+
+    <h2>mui-rack | mui-group</h2>
+    <mui-rack label="rack">
+      <mui-group label="group 1">
+        <mui-knob label="knob 1" value="0.1"></mui-knob>
+        <mui-knob label="knob 2" value="0.2"></mui-knob>
+      </mui-group>
+      <mui-group label="group 2">
+        <mui-knob label="knob 3" value="0.3"></mui-knob>
+        <mui-knob label="knob 4" value="0.4"></mui-knob>
+      </mui-group>
+    </mui-rack>
+
+    <h2>mui-vkey</h2>
+    <mui-rack label="keybaord">
+      <mui-vkey id="vkey"></mui-vkey>
+    </mui-rack>
+
+    <h2>mui-spectrum</h2>
+    <mui-rack label="spectrum">
+      <mui-spectrum id="spec"></mui-spectrum>
+    </mui-rack>
+
+    <h2>mui-pianoroll</h2>
+    <mui-rack label="workspace">
+      <mui-pianoroll id="proll"></mui-pianoroll>
+    </mui-rack>
+
   </div>
-
-  <header>
-    <div class="row">
-      <div class="small-10 small-centered columns">
-        <ul class="breadcrumbs">
-          <li><a href="..">WAAX Home</a></li>
-        </ul>
-        <h3>MUI Elements</h3>
-      </div>
-    </div>
-  </header>
-
-  <article>
-    <div class="row">
-      <div class="small-10 small-centered columns">
-
-        <mui-rack label="WXS-1" opened="true">
-          <mui-group label="OSC1">
-            <mui-select id="select-osc1type"></mui-select>
-            <mui-knob id="knob-osc1octave"></mui-knob>
-            <mui-knob id="knob-osc1gain"></mui-knob>
-          </mui-group>
-          <mui-group label="OSC2">
-            <mui-select id="select-osc2type"></mui-select>
-            <mui-knob id="knob-osc2detune"></mui-knob>
-            <mui-knob id="knob-osc2gain"></mui-knob>
-          </mui-group>
-          <mui-group label="Master">
-            <mui-knob id="knob-output"></mui-knob>
-          </mui-group>
-          <mui-group label="Filter">
-            <mui-knob id="knob-cutoff"></mui-knob>
-            <mui-knob id="knob-reso"></mui-knob>
-            <mui-knob id="knob-filterMod"></mui-knob>
-          </mui-group>
-          <mui-group label="Filter Envelope">
-            <mui-knob id="knob-filterA"></mui-knob>
-            <mui-knob id="knob-filterD"></mui-knob>
-            <mui-knob id="knob-filterS"></mui-knob>
-            <mui-knob id="knob-filterR"></mui-knob>
-          </mui-group>
-          <mui-group label="Amp Envelope">
-            <mui-knob id="knob-ampA"></mui-knob>
-            <mui-knob id="knob-ampD"></mui-knob>
-            <mui-knob id="knob-ampS"></mui-knob>
-            <mui-knob id="knob-ampR"></mui-knob>
-          </mui-group>
-        </mui-rack>
-
-        <mui-rack label="Keyboard" opened="true">
-          <mui-vkey id="vkey"></mui-vkey>
-        </mui-rack>
-
-        <mui-rack label="Control" opened="true">
-          <mui-group label="Transport">
-            <mui-button icon="av:skip-previous"></mui-button>
-            <mui-button icon="av:stop"></mui-button>
-            <mui-button icon="av:pause"></mui-button>
-            <mui-button icon="av:play-arrow" type="toggle"></mui-button>
-            <mui-button icon="av:loop" type="toggle"></mui-button>
-          </mui-group>
-          <mui-group label="Collaboration">
-            <mui-button icon="work"></mui-button>
-            <mui-button icon="social:person-add"></mui-button>
-            <mui-button icon="social:share"></mui-button>
-          </mui-group>
-          <mui-group label="Tempo">
-            <mui-knobh id="knob-tempo" label="BPM" min="20" max="200" value="120"></mui-knobh>
-            <mui-knobh id="knob-quant" label="Qunatize" min="0" max="100" value="0"></mui-knobh>
-            <mui-knobh id="knob-swing" label="Swing" min="0" max="100" value="0"></mui-knobh>
-          </mui-group>
-        </mui-rack>
-
-      </div>
-    </div>
-  </article>
-
   <script>
     MUI.start(function () {
-      var wxs1 = WX.WXS1();
-      wxs1.to(WX.Master);
-      MUI.$('select-osc1type').link(wxs1, 'osc1type');
-      MUI.$('knob-osc1octave').link(wxs1, 'osc1octave');
-      MUI.$('knob-osc1gain').link(wxs1, 'osc1gain');
-      MUI.$('select-osc2type').link(wxs1, 'osc2type');
-      MUI.$('knob-osc2detune').link(wxs1, 'osc2detune');
-      MUI.$('knob-osc2gain').link(wxs1, 'osc2gain');
-      MUI.$('knob-output').link(wxs1, 'output');
-      MUI.$('knob-cutoff').link(wxs1, 'cutoff');
-      MUI.$('knob-reso').link(wxs1, 'reso');
-      MUI.$('knob-filterMod').link(wxs1, 'filterMod');
-      MUI.$('knob-filterA').link(wxs1, 'filterAttack');
-      MUI.$('knob-filterD').link(wxs1, 'filterDecay');
-      MUI.$('knob-filterS').link(wxs1, 'filterSustain');
-      MUI.$('knob-filterR').link(wxs1, 'filterRelease');
-      MUI.$('knob-ampA').link(wxs1, 'ampAttack');
-      MUI.$('knob-ampD').link(wxs1, 'ampDecay');
-      MUI.$('knob-ampS').link(wxs1, 'ampSustain');
-      MUI.$('knob-ampR').link(wxs1, 'ampRelease');
-      MUI.$('vkey').addTarget(wxs1);
+      // for mui-select to work
+      MUI.$('waveform').setModel(WX.WAVEFORMS);
+
+      // for mui-vkey, mui-spectrum to work
+      var osc = WX.SimpleOsc({ oscType: 'sawtooth',  lfoDepth: 200 });
+      var spec = MUI.$('spec');
+      osc.to(spec);
+      MUI.$('vkey').addTarget(osc);
+
+      // for mui-pianoroll to work
+      var noteclip = WX.NoteClip();
+      MUI.$('proll').setNoteClip(noteclip);
     });
   </script>
 </body>

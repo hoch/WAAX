@@ -3,56 +3,46 @@
 
 <head>
   <title>Hello WAAX! | WAAX Examples</title>
-  <!-- MUI -->
-  <script src="../../bower_components/platform/platform.js"></script>
-  <link rel="import" href="../../build/mui/mui.html">
-  <!-- WAAX -->
   <script src="../../build/waax.js"></script>
   <script src="../../build/plug_ins/simpleosc.js"></script>
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../../build/mui/mui.html">
+  <link rel="stylesheet" href="../style.css">
 </head>
 
 <body unresolved>
+  <div class="wx-container">
+    <div class="wx-header">
+      <span class="wx-title">WAAX</span>
+      <span class="wx-info" id="wx-version"></span>
+      <span class="wx-menu">
+        <a href="..">Examples</a>
+      </span>
+    </div>
+    <div>
 
-  <a href="../..">WAAX Home</a>
+    <!-- example HTML code -->
+    <h1>Hello WAAX!</h1>
+    <mui-knob id="k-freq"></mui-knob>
+    <mui-knob id="k-output"></mui-knob>
 
-  <h3>Hello WAAX!</h3>
-
-  <!-- GUI -->
-  <mui-rack label="Rack">
-    <mui-group label="Test">
-      <mui-button icon="av:pause"></mui-button>
-      <mui-knob id="k-freq"></mui-knob>
-      <mui-knobh id="k-gain"></mui-knobh>
-      <mui-select label="Waveform" id="s-waveform"></mui-select>
-    </mui-group>
-    <mui-spectrum id="k-spec"></mui-spectrum>
-  </mui-rack>
-  <mui-vkey id="k-key"></mui-vkey>
-
-
-  <!-- Logic -->
+    </div>
+  </div>
   <script>
+
+    // example JS code
     MUI.start(function () {
+
       var osc = WX.SimpleOsc();
       osc.to(WX.Master);
-      osc.noteOn(60, 100);
-
+      osc.noteOn(60, 64);
       MUI.$('k-freq').link(osc, 'oscFreq');
-      MUI.$('k-gain').link(osc, 'output');
-      MUI.$('s-waveform').setModel(WX.WAVEFORMS);
-      MUI.$('s-waveform').link(osc, 'oscType')
+      MUI.$('k-output').link(osc, 'output');
 
-      osc.to(MUI.$('k-spec'));
-      MUI.$('k-key').addTarget(osc);
-
-      // MUI.link([
-      //   { source: 'k-freq', target: 'osc#oscFreq' },
-      //   { source: 'k-gain', target: 'osc#output' },
-      //   { source: 's-waveform', target: 'osc#oscType' },
-      // ]);
     });
-  </script>
 
+  </script>
+  <script src="../examples.js"></script>
 </body>
 
 </html>

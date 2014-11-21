@@ -22,7 +22,7 @@
     this._src = WX.Source();
     this._srcGain = WX.Gain();
     this._src.to(this._srcGain).to(this.parent._filter);
-
+    this._src.loop = true;
     this._src.buffer = this.parent.clip.buffer;
     // this._src.onended = function () {
     //   // DO SOMETHING
@@ -66,7 +66,6 @@
         } else {
           this._srcGain.gain.set(0.0, [time, rel], 3);
         }
-
       }
     }
 
@@ -279,6 +278,8 @@
       WX.Log.info('Clip loaded:', clip.name);
     },
 
+    onReady: null,
+
     isReady: function () {
       return this.ready;
     },
@@ -286,6 +287,9 @@
     setClip: function (clip) {
       this.clip = clip;
       this.ready = true;
+      if (this.onReady) {
+        this.onReady();
+      }
     },
 
     loadClip: function (clip) {
