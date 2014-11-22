@@ -73,9 +73,12 @@ Go to the [project landing page](http://hoch.github.io/WAAX) and see what WAAX c
 - 1.0.0-alpha2
     + Updated dependencies with latest version: Gulp, Polymer
     + MUI elements updated for new version of Polymer
-    + Timebase cleaned/refactored.
+    + Timebase code has been cleaned/refactored.
     + Updated README and the temporary landing page is removed.
     + MUI elements and test files are now compatible with FireFox/Safari.
+    + Audio assets are converted to MP3.
+    - `WXS1` and `FMK1` plug-ins produce distorted sound in FireFox.
+    - Safari does not load the example with `StereoDelay` plug-in.
 
 - 1.0.0-alpha
     + First alpha version before stable release.
