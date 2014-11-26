@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>StereoDelay | WAAX Examples</title>
+  <script src="../../build/waax.js"></script>
+  <script src="../../build/plug_ins/impulse.js"></script>
+  <script src="../../build/plug_ins/stereodelay.js"></script>
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../../build/mui/mui.html">
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body unresolved>
+  <div class="wx-container">
+    <div class="wx-header">
+      <span class="wx-title">WAAX</span>
+      <span class="wx-info" id="wx-version"></span>
+      <span class="wx-menu">
+        <a href="..">Examples</a>
+      </span>
+    </div>
+
+      <h1>StereoDelay</h1>
+      <mui-rack id="rack"></mui-rack>
+
+    </div>
+  <script>
+
+    MUI.start(function () {
+
+      var impuse = WX.Impulse(),
+          delay = WX.StereoDelay();
+      impuse.to(delay).to(WX.Master);
+
+      MUI.buildControls(delay, 'rack');
+
+    });
+
+  </script>
+  <script src="../examples.js"></script>
+</body>
+
+</html>

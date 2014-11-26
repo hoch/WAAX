@@ -1,0 +1,102 @@
+<!--
+  `mui-rack`
+  @version 1.0.0-alpha2
+  @description MUI rack abstraction. A bigger and collapsible container for MUI
+    elements.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../mui-button/mui-button.html">
+
+<polymer-element name="mui-rack" attributes="label opened disabled">
+<template>
+  <style>
+    :host {
+      display: block;
+    }
+    .container {
+      padding: 8px;
+      margin: 8px 0;
+      border-radius: 2px;
+      box-shadow: 0 0 3px #898989;
+      background-color: #fff;
+      /*overflow: hidden;*/
+    }
+    .header {
+      font-family:'Roboto', sans-serif;
+      height: 24px;
+      line-height: 24px;
+      color: #b0bec5;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      /* background-color: #ddd; */
+      /* color: #31353D; */
+    }
+    .header .button {
+      float: right;
+      margin: 0;
+      padding: 0;
+      color: #03a9f4;
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+      box-shadow: none;
+    }
+    .header .button:hover {
+      box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.12);
+    }
+    .content {
+      margin-top: 4px;
+    }
+    :host(.disabled) {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  </style>
+  <div class="container">
+    <div class="header">
+      <mui-button id="eButton" class="button" icon="expand-more" on-click="{{toggle}}"></mui-button>
+      {{ label }}
+    </div>
+    <div class="content" id="eContent">
+      <content></content>
+    </div>
+  </div>
+</template>
+<script>
+  Polymer({
+
+    label: 'RACK',
+    target: null,
+    button: null,
+    opened: true,
+    disabled: false,
+
+    update: function () {
+      if (this.opened) {
+        this.target.style.display = 'block';
+        this.button.icon = 'expand-less';
+      } else {
+        this.target.style.display = 'none';
+        this.button.icon = 'expand-more';
+      }
+    },
+
+    ready: function() {
+      this.target = this.$.eContent;
+      this.button = this.$.eButton;
+      this.update();
+    },
+
+    toggle: function() {
+      this.opened = !this.opened;
+      this.update();
+    },
+
+    disabledChanged: function() {
+      this.classList.toggle('disabled', this.disabled);
+    }
+
+  });
+</script>
+</polymer-element>

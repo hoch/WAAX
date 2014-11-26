@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Hello WAAX! | WAAX Examples</title>
+  <script src="../../build/waax.js"></script>
+  <script src="../../build/plug_ins/simpleosc.js"></script>
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../../build/mui/mui.html">
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body unresolved>
+  <div class="wx-container">
+    <div class="wx-header">
+      <span class="wx-title">WAAX</span>
+      <span class="wx-info" id="wx-version"></span>
+      <span class="wx-menu">
+        <a href="..">Examples</a>
+      </span>
+    </div>
+    <div>
+
+    <!-- example HTML code -->
+    <h1>Hello WAAX!</h1>
+    <mui-knob id="k-freq"></mui-knob>
+    <mui-knob id="k-output"></mui-knob>
+
+    </div>
+  </div>
+  <script>
+
+    // example JS code
+    MUI.start(function () {
+
+      var osc = WX.SimpleOsc();
+      osc.to(WX.Master);
+      osc.noteOn(60, 64);
+      MUI.$('k-freq').link(osc, 'oscFreq');
+      MUI.$('k-output').link(osc, 'output');
+
+    });
+
+  </script>
+  <script src="../examples.js"></script>
+</body>
+
+</html>

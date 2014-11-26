@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>MUI | WAAX Examples</title>
+  <script src="../../build/waax.js"></script>
+  <script src="../../build/plug_ins/simpleosc.js"></script>
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../../build/mui/mui.html">
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body unresolved>
+  <div class="wx-container">
+    <div class="wx-header">
+      <span class="wx-title">WAAX</span>
+      <span class="wx-info" id="wx-version"></span>
+      <span class="wx-menu">
+        <a href="..">Examples</a>
+      </span>
+    </div>
+
+    <h1>MUI Elements</h1>
+
+    <h2>mui-button</h2>
+    <mui-button icon="av:play-arrow" type="toggle"></mui-button>
+    <mui-button icon="av:stop"></mui-button>
+
+    <h2>mui-knob</h2>
+    <mui-knob label="knob 1" value="0.3"></mui-knob>
+    <mui-knob label="knob 2" value="0.7"></mui-knob>
+
+    <h2>mui-knobh</h2>
+    <mui-knobh label="BPM" min="20" max="200" value="120"></mui-knobh>
+    <mui-knobh label="Qunatize" min="0" max="100" value="0"></mui-knobh>
+
+    <h2>mui-select</h2>
+    <mui-select id="waveform" label="items"></mui-select>
+
+    <h2>mui-eblock</h2>
+    <mui-eblock></mui-eblock>
+
+    <h2>mui-rack | mui-group</h2>
+    <mui-rack label="rack">
+      <mui-group label="group 1">
+        <mui-knob label="knob 1" value="0.1"></mui-knob>
+        <mui-knob label="knob 2" value="0.2"></mui-knob>
+      </mui-group>
+      <mui-group label="group 2">
+        <mui-knob label="knob 3" value="0.3"></mui-knob>
+        <mui-knob label="knob 4" value="0.4"></mui-knob>
+      </mui-group>
+    </mui-rack>
+
+    <h2>mui-vkey</h2>
+    <mui-rack label="keybaord">
+      <mui-vkey id="vkey"></mui-vkey>
+    </mui-rack>
+
+    <h2>mui-spectrum</h2>
+    <mui-rack label="spectrum">
+      <mui-spectrum id="spec"></mui-spectrum>
+    </mui-rack>
+
+    <h2>mui-pianoroll</h2>
+    <mui-rack label="workspace">
+      <mui-pianoroll id="proll"></mui-pianoroll>
+    </mui-rack>
+
+  </div>
+  <script>
+    MUI.start(function () {
+      // for mui-select to work
+      MUI.$('waveform').setModel(WX.WAVEFORMS);
+
+      // for mui-vkey, mui-spectrum to work
+      var osc = WX.SimpleOsc({ oscType: 'sawtooth',  lfoDepth: 200 });
+      var spec = MUI.$('spec');
+      osc.to(spec);
+      MUI.$('vkey').addTarget(osc);
+
+      // for mui-pianoroll to work
+      var noteclip = WX.NoteClip();
+      MUI.$('proll').setNoteClip(noteclip);
+    });
+  </script>
+  <script src="../examples.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,171 @@
+<!--
+  `mui-button`
+  @version 1.0.0-alpha2
+  @description MUI button abstraction. Using icons from core-element package.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/core-icon/core-icon.html">
+<link rel="import" href="../../../bower_components/core-icons/core-icons.html">
+<link rel="import" href="../../../bower_components/core-icons/av-icons.html">
+<link rel="import" href="../../../bower_components/core-icons/communication-icons.html">
+<link rel="import" href="../../../bower_components/core-icons/hardware-icons.html">
+<link rel="import" href="../../../bower_components/core-icons/social-icons.html">
+
+<polymer-element name="mui-button" attributes="src icon active type"
+  on-click="{{buttonClicked}}">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        vertical-align: middle;
+        width: 48px;
+        height: 48px;
+        background-image: none;
+        border-radius: 2px;
+        padding: 12px 12px;
+        margin: 6px 4px;
+        font-size: 0.7rem;
+        cursor: pointer;
+        color: #546e7a;
+        box-shadow: 0 0 0 1px #b0bec5;
+      }
+      :host([disabled]) {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+      /*:host(.outline) {
+        box-shadow: 0 0 0 1px ;
+      }*/
+      :host(:hover:not([disabled])) {
+        box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1), 0 0 1px 1px rgba(0, 0, 0, 0.2);
+      }
+      :host(.selected:not([disabled])) {
+        color: #03a9f4;
+        /*background-color: #039be5;*/
+        background-color: rgba(0, 0, 0, 0.15);
+        box-shadow: inset 0 1px 0 0 rgba(0, 0, 0, 0.24), 0 0 0 1px rgba(0, 0, 0, 0.28);
+      }
+      :host(:active:not([disabled]), .selected:active:not([disabled])) {
+        background-color: rgba(0, 0, 0, 0.1);
+        box-shadow: inset 0 1px 0 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.24);
+      }
+      core-icon {
+        pointer-events: none;
+      }
+      .title {
+        color: #607d8b;
+        font-family: 'Roboto Condensed', sans-serif;
+        line-height: 1rem;
+        text-align: center;
+        overflow: hidden;
+        margin: 15px -4px;
+      }
+      .title(.selected) {
+        color: #fff;
+      }
+    </style>
+
+    <div>
+      <core-icon src="{{ src }}" icon="{{ icon }}"></core-icon>
+      <div class="title">
+        {{ label }}
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      /**
+       * The URL of an image for the icon.  Should not use `icon` property
+       * if you are using this property.
+       *
+       * @attribute src
+       * @type string
+       * @default ''
+       */
+      src: '',
+
+      /**
+       * If true, border is placed around the button to indicate it's
+       * active state.
+       *
+       * @attribute active
+       * @type boolean
+       * @default false
+       */
+      active: false,
+
+      /**
+       * Specifies the icon name or index in the set of icons available in
+       * the icon set.  Should not use `src` property if you are using this
+       * property.
+       *
+       * @attribute icon
+       * @type string
+       * @default ''
+       */
+      icon: '',
+
+      // moment or toggle
+      type: 'moment',
+
+      // MUI
+      lable: 'unlabeled',
+      value: false,
+      targetParam: null,
+
+      activeChanged: function() {
+        this.classList.toggle('selected', this.active);
+      },
+
+      // if this is toggle mode, change active when clicked
+      // button => model
+      buttonClicked: function () {
+        if (this.type === 'toggle') {
+          this.active = !this.active;
+        }
+        this.value = this.active;
+        if (this.targetParam) {
+          // do not call the handler directly.
+          // invoke 'xxxxxParam.set' method instead
+          this.targetParam.set(this.value);
+        }
+      },
+
+      // model => button
+      update: function () {
+        this.active = this.value;
+      },
+
+      loadTargetParamData: function () {
+        if (this.targetParam) {
+          this.label = this.targetParam.name;
+          this.value = this.targetParam.value;
+          this.update();
+        }
+      },
+
+      link: function (plugin, param) {
+        // get target parameter object
+        this.targetParam = plugin.params[param];
+        // load plugin param data
+        this.loadTargetParamData();
+        // setup path observer to the param
+        var ob = new PathObserver(plugin.params[param], 'value');
+        ob.open(function (newValue, oldValue) {
+          this.value = newValue;
+          this.update();
+        }.bind(this));
+      },
+
+    });
+
+  </script>
+
+</polymer-element>

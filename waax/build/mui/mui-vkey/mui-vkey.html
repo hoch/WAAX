@@ -1,0 +1,416 @@
+<!--
+  `mui-vkey`
+  @version 1.0.0-alpha2
+  @description MUI virtual keybaord. Responds to key and mouse input.
+-->
+
+<link rel="import" href="../mui-button/mui-button.html">
+<polymer-element name="mui-vkey" attributes="label captureKeyboard">
+
+<template>
+
+  <style>
+    :host {
+      display: block;
+      overflow: hidden;
+    }
+    .mui-vkey-container {
+    }
+    .mui-vkey-header {
+      margin: 0 0 6px 0;
+    }
+    .mui-vkey-header .button {
+      padding: 2px 2px;
+      width: 28px;
+      height: 28px;
+      box-shadow: none;
+      box-shadow: 0 0 0 1px #cfd8dc;
+      margin: 1px;
+    }
+    /*.header .button:hover {
+      box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.1);
+    }*/
+    .c-display {
+      display: inline-block;
+      vertical-align: middle;
+      text-align: center;
+      font-family:'Roboto Condensed', sans-serif;
+      font-size: 0.7rem;
+      height: 25px;
+      line-height: 25px;
+      padding-top: 3px;
+      border-radius: 1px;
+      color: #00796b;
+      background-color: #b2dfdb;
+      box-shadow: inset 0 1px 1px 1px rgba(0, 0, 0, 0.2), 0px 0px 1px 0px rgba(0, 0, 0, 0.24);
+    }
+    .mui-vkey-octave {
+      width: 48px;
+    }
+    .mui-vkey-message {
+      float: right;
+      width: 100px;
+      margin: 1px;
+    }
+    .c-vkey {
+      display: block;
+      cursor: move;
+      background-color: #cfd8dc;
+      border-radius: 1px;
+    }
+    .c-wheel {
+      stroke: #78909c;
+      stroke-width: 1px;
+      fill: #fff;
+    }
+    .c-wheel-pos {
+      fill: #039be5;
+    }
+    .c-white-key {
+      fill: #fff;
+    }
+    .c-black-key {
+      fill: #607d8b;
+    }
+    .active {
+      fill: #039be5;
+    }
+  </style>
+
+  <div class="mui-vkey-container">
+    <div class="mui-vkey-header">
+      <div id="eMsgPanel" class="c-display mui-vkey-message">HELLO</div>
+      <mui-button class="mui-vkey-header button" icon="hardware:keyboard" type="toggle" on-click="{{ toggleKeyboardInput }}" active="true"></mui-button>
+      <mui-button class="mui-vkey-header button" icon="chevron-left" on-click="{{ octaveDown }}"></mui-button>
+      <div class="c-display mui-vkey-octave">{{ _octaveStr }} oct.</div>
+      <mui-button class="mui-vkey-header button" icon="chevron-right" on-click="{{ octaveUp }}"></mui-button>
+    </div>
+    <svg id="eTouchable" class="c-vkey" height="100" version="1.1" xmlns="http://www.w3.org/2000/svg">
+      <rect class="c-wheel" x="6" y="6" width="32" height="88" rx="2" ry="2"></rect>
+      <rect class="c-wheel" x="44" y="6" width="32" height="88" rx="2" ry="2"></rect>
+      <rect id="ePitWhlPos" class="c-wheel-pos" x="7" y="50" width="30" height="2"></rect>
+      <rect id="eModWhlPos" class="c-wheel-pos" x="45" y="88" width="30" height="2"></rect>
+    </svg>
+  </div>
+
+</template>
+
+<script>
+  Polymer({
+
+    // public parameter
+    label: 'mui-vkey',
+    octave: 0,
+    captureKeyboard: true,
+
+    // internal parameter
+    _octaveOffset: 24,
+    _octaveStr: '0',
+    _numKeys: 61, // 61keys, 5 octaves
+
+    // key rendering parameters
+    _svgWidth: 787,
+    _offset: 80,
+    _keyUpperY: 6,
+    _keyLowerY: 52,
+    _keyWidth: 18,
+    _keyHeight: 42,
+    _keyPaddingX: 1,
+    _keyRadius: 1.5,
+
+    // primary svg DOM object
+    _svg: null,
+    // internal key data strcuture
+    _keys: [],
+    // previous pitch (for mouse)
+    _prevPitch: null,
+
+    // keyCodeMap: zsxdcvgbhnjm q2w3er5t6y7u i
+    _keyCodes: [
+      90, 83, 88, 68, 67, 86, 71, 66, 72, 78, 74, 77,
+      81, 50, 87, 51, 69, 82, 53, 84, 54, 89, 55, 85, 73
+    ],
+
+    // target plug-ins
+    _targets: [],
+
+
+    /**
+     * Internal methods
+     */
+
+    // helper: 2d area detection
+    _checkKeyArea: function (data) {
+      if (data) {
+        for (var i = 0; i < this._keys.length; i++) {
+          var key = this._keys[i];
+          // check y first
+          if (key.y1 <= data.y && data.y <= key.y2) {
+            // then check x
+            if (key.x1 <= data.x && data.x <= key.x2) {
+              return i;
+            }
+          }
+        }
+      }
+      return null;
+    },
+
+    // helper: check p/mod wheel area
+    _checkWheelArea: function (data) {
+      if (data) {
+        // check pwheel
+        if (6 <= data.x && data.x <= 38) {
+          if (6 <= data.y && data.y <= 94) {
+            console.log('pwheel touched', (data.y - 6) / 88);
+          }
+        }
+        // check modwheel
+        if (44 <= data.x && data.x <= 76) {
+          if (6 <= data.y && data.y <= 94) {
+            console.log('modwheel touched', (data.y - 6) / 88);
+          }
+        }
+      }
+    },
+
+    // helper: key render methods
+    _renderKey: function (key) {
+      var rect = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+      rect.setAttribute('x', key.x1);
+      rect.setAttribute('y', key.y1);
+      rect.setAttribute('rx', this._keyRadius);
+      rect.setAttribute('ry', this._keyRadius);
+      rect.setAttribute('width', this._keyWidth);
+      rect.setAttribute('height', this._keyHeight);
+      rect.setAttribute('class', key.white ? 'c-white-key' : 'c-black-key');
+      this._svg.appendChild(rect);
+      return rect;
+    },
+
+    // building keyboard
+    _buildKeys: function () {
+      var i = 0, count = 0;
+      while (count < this._numKeys) {
+        var pclass = i % 14;
+        i++;
+        if (pclass === 5 || pclass === 13) continue;
+        var white = (pclass % 2 === 0),
+            x1 = this._offset + i * ((this._keyWidth + this._keyPaddingX) / 2),
+            y1 = white ? this._keyLowerY : this._keyUpperY,
+            x2 = x1 + this._keyWidth,
+            y2 = y1 + this._keyHeight;
+        var key = {
+          white: white, state: false,
+          x1: x1, y1: y1, x2: x2, y2: y2
+        };
+        key.rect = this._renderKey(key);
+        this._keys[count] = key;
+        count++;
+      }
+    },
+
+    // highlight key
+    // TODO: this needs to be optimized (just change color, not style)
+    _highlight: function (pitch) {
+      if (pitch !== null) {
+        var key = this._keys[pitch];
+        if (key) {
+          key.rect.setAttribute('class', key.rect.getAttribute('class') + ' active');
+        }
+      }
+      if (this._prevPitch !== null) {
+        key = this._keys[this._prevPitch];
+        if (key) {
+          key.rect.setAttribute('class', key.rect.getAttribute('class').slice(0, 11));
+        }
+      }
+    },
+
+    //
+    _displayMessage: function (msg) {
+      this.$.eMsgPanel.textContent = msg;
+    },
+
+    // action: { on, off, pitchwheel, modwheel }
+    // data: on[pitch, velo] off[pitch,velo] pitchwheel[value], modwheel[value]
+    _dispatch: function (sender, action, data) {
+      // dispatch 'action' and 'data' to all connected destination
+      for (var i = 0; i < this._targets.length; i++) {
+        var plugin = this._targets[i].onData(action, data);
+      }
+    },
+
+
+    /**
+     * dispatch helpers
+     */
+
+    _start: function (pitch, velocity) {
+      if (pitch !== null) {
+        var xpitch = pitch + this._octaveOffset + this.octave * 12;
+        this._dispatch(this.label, 'noteon', { pitch: xpitch, velocity: velocity });
+        this._displayMessage('NOTE ON ' + xpitch);
+        this._highlight(pitch);
+        this._prevPitch = pitch;
+      }
+    },
+
+    _glide: function (pitch) {
+      if (pitch !== null && this._prevPitch !== pitch) {
+        var xpitch = pitch + this._octaveOffset + this.octave * 12;
+        this._dispatch(this.label, 'glide', { pitch: xpitch });
+        this._displayMessage('GLIDE ' + xpitch);
+        this._highlight(pitch);
+        this._prevPitch = pitch;
+      }
+    },
+
+    _stop: function (pitch) {
+      var xpitch = pitch + this._octaveOffset + this.octave * 12;
+      this._dispatch(this.label, 'noteoff', { pitch: xpitch, velocity: 0 });
+      this._displayMessage('NOTE OFF');
+      this._highlight(null);
+      this._prevPitch = null;
+    },
+
+    _setPitchWheel: function (value) {
+      this._dispatch(this.label, 'pitchwheel', { value: value });
+      this._displayMessage('PWHEEL ' + value.toFixed(2));
+      this.$.ePitWhlPos.setAttribute('y', 7 + (84 - value * 84));
+    },
+
+    _setModWheel: function (value) {
+      this._dispatch(this.label, 'modwheel', { value: value });
+      this._displayMessage('MWHEEL ' + value.toFixed(2));
+      this.$.eModWhlPos.setAttribute('y', 7 + (84 - value * 84));
+    },
+
+    /**
+     * Key Event Hanlders
+     */
+
+    _listenKeyDown: function (event) {
+      if (!this.captureKeyboard) return;
+      var pitch = this._keyCodes.indexOf(event.keyCode);
+      if (pitch > -1) {
+        if (this._keys[pitch].state) return;
+        this._keys[pitch].state = true;
+        this._start(pitch + this._octaveOffset + this.octave * 12, 100);
+      }
+    },
+
+    _listenKeyUp: function (event) {
+      if (!this.captureKeyboard) return;
+      var pitch = this._keyCodes.indexOf(event.keyCode);
+      if (pitch > -1) {
+        if (this._keys[pitch].state) {
+          this._keys[pitch].state = false;
+          this._stop(pitch + this._octaveOffset + this.octave * 12);
+        }
+      }
+    },
+
+    // return action, data1, data2
+    // TODO: this needs to be redesigned...
+    _mouseCallback: function (sender, action, data) {
+      if (data) {
+        // check pwheel
+        if (6 <= data.x && data.x <= 38) {
+          if (6 <= data.y && data.y <= 94) {
+            this._setPitchWheel(1.0 - (data.y - 6) / 88);
+          }
+        }
+        // check modwheel
+        else if (44 <= data.x && data.x <= 76) {
+          if (6 <= data.y && data.y <= 94) {
+            this._setModWheel(1.0 - (data.y - 6) / 88);
+          }
+        }
+        // check keys
+        else if (this._offset <= data.x && data.x <= this._svgWidth) {
+          for (var i = 0; i < this._keys.length; i++) {
+            var key = this._keys[i];
+            // check y first
+            if (key.y1 <= data.y && data.y <= key.y2) {
+              // then check x
+              if (key.x1 <= data.x && data.x <= key.x2) {
+                switch (action) {
+                  case 'clicked':
+                    this._start(i, 100);
+                    break;
+                  case 'dragged':
+                    this._glide(i);
+                    break;
+                  case 'released':
+                    this._stop(i);
+                    break;
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+
+    /**
+     * Polymer-system methods
+     */
+
+    ready: function() {
+      // set svg box size
+      this._svg = this.$.eTouchable;
+      this._svg.setAttribute('width', '100%');
+      // build keys
+      this._buildKeys();
+
+      // hook mouse event listener
+      var mouseResponder = MUI.MouseResponder(
+        this.label,
+        this._svg,
+        this._mouseCallback.bind(this)
+      );
+
+      // key listeners
+      window.addEventListener('keydown', this._listenKeyDown.bind(this), false);
+      window.addEventListener('keyup', this._listenKeyUp.bind(this), false);
+    },
+
+    /**
+     * DOM UI handlers
+     */
+
+    toggleKeyboardInput: function () {
+      this.captureKeyboard = !this.captureKeyboard;
+    },
+
+    octaveUp: function () {
+      this.octave++;
+      this._octaveStr = (this.octave > 0 ? '+' : '') + this.octave.toString();
+    },
+
+    octaveDown: function () {
+      this.octave--;
+      this._octaveStr = (this.octave > 0 ? '+' : '') + this.octave.toString();
+    },
+
+    /**
+     * Exports
+     */
+
+    addTarget: function (target) {
+      this._targets.push(target);
+    },
+
+    removeTarget: function (target) {
+      var idx = this._targets.indexOf(target);
+      if (idx > -1) {
+        this._targets.splice(idx, 1);
+      }
+    },
+
+  });
+</script>
+
+</polymer-element>

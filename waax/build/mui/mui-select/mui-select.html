@@ -1,0 +1,235 @@
+<polymer-element name="mui-select" attributes="label key value">
+
+  <template>
+    <style>
+      :host {
+          display: inline-block;
+          width: 160px;
+          height: 40px;
+          margin: 6px 4px;
+          vertical-align: top;
+          -webkit-user-select: none;
+      }
+      input:focus {
+        outline: none;
+      }
+      .c-select-view {
+        display: block;
+        width: 156px;
+        height: 24px;
+        line-height: 24px;
+        border-radius: 2px;
+        margin-top: 3px;
+        color: #37474f;
+        background-color: #fff;
+        box-shadow: 0 0 0 1px #cfd8dc;
+        cursor: pointer;
+      }
+      .c-select-view:active {
+        background-color: rgba(0, 0, 0, 0.05);
+        box-shadow: inset 0 1px 0 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.24);
+      }
+      .c-select-value {
+        width: 119px;
+        height: 24px;
+        padding: 0 4px;
+        line-height: 24px;
+        font-size: 0.8rem;
+        font-family:'Roboto', sans-serif;
+        text-align: left;
+        color: #546e7a;
+      }
+      .c-select-button {
+        float: right;
+        width: 20px;
+        height: 24px;
+        text-align: center;
+        color: #78909c;
+        border-left: 1px solid #cfd8dc;
+      }
+      .c-select-label {
+        display: block;
+        width: 64px;
+        height: 16px;
+        line-height: 16px;
+        font-family:'Roboto Condensed', sans-serif;
+        color: #607d8b;
+        font-size: 11px;
+        font-weight: 400;
+        text-align: left;
+      }
+      .c-select-dropdown {
+        display: none;
+        position: absolute;
+        font-family:'Roboto', sans-serif;
+        padding: 0;
+        background-color: #fff;
+        border-radius: 0 0 3px 3px;
+        border: 1px solid #78909c;
+        vertical-align: top;
+        z-index: 1000;
+      }
+      .c-select-dropdown ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      li.c-select-dropdown-item {
+        height: 20px;
+        line-height: 20px;
+        font-size: 12px;
+        padding: 2px 5px;
+        text-align: left;
+        width: 124px;
+      }
+      li.c-select-dropdown-item:hover {
+        color: #fff;
+        background-color: #039be5;
+      }
+    </style>
+
+    <div class="c-select-label">{{ label }}</div>
+    <div id="eTouchable" class="c-select-view">
+      <div class="c-select-button" on-click="{{menuClicked}}">&blacktriangledown;</div>
+      <div class="c-select-value" on-click="{{menuClicked}}">{{ key }}</div>
+      <div id="eDropdown" class="c-select-dropdown">
+        <ul>
+          <template id="eItems" class="c-select-dropdown" repeat>
+            <li class="c-select-dropdown-item" on-click="{{itemClicked}}" id="{{ value }}">{{ key }}</li>
+          </template>
+        </ul>
+      </div>
+    </div>
+
+  </template>
+  <!-- logic -->
+  <script>
+    Polymer({
+
+      // published
+      label: 'unlabeled',
+      key: 'not ready yet',
+      value: null,
+
+      // private
+      _menuShown: false,
+      _modelLoaded: false,
+
+      // binding
+      targetParam: null,
+      cloudMap: null,
+      cloudParam: null,
+
+      // external event handler
+      onItemSelected: null,
+
+      render: function () {
+        this.$.eDropdown.style.display = (this._menuShown) ? 'block' : 'none';
+      },
+
+      // model => knob
+      update: function () {
+        this.key = WX.findKeyByValue(this.$.eItems.model, this.value);
+        this.render();
+      },
+
+      // post: knob => model
+      post: function () {
+        this.value = WX.findValueByKey(this.$.eItems.model, this.key);
+        // update target param
+        if (this.targetParam) {
+          // do not call the handler directly.
+          // invoke 'xxxxxParam.set' method
+          this.targetParam.set(this.value);
+        }
+        // GDrive support
+        if (this.cloudMap) {
+          this.cloudMap._callbackMUI(this.cloudParam, this.value);
+        }
+        // external event handler
+        if (this.onItemSelected) {
+          this.onItemSelected(this.value);
+        }
+        this.render();
+      },
+
+      menuClicked: function (event, detail, sender) {
+        if (this._modelLoaded) {
+          event.stopPropagation();
+          this._menuShown = !this._menuShown;
+          this.render();
+        }
+      },
+
+      itemClicked: function (event, detail, sender) {
+        event.stopPropagation();
+        this.key = sender.textContent;
+        this.value = sender.id;
+        this._menuShown = false;
+        this.post();
+        // TODO: detect outside click and close the menu
+      },
+
+      attributeChanged: function (attrName, oldVal, newVal) {
+        this.update();
+      },
+
+      ready: function () {
+      },
+
+      setModel: function (collection) {
+        this.$.eItems.model = collection;
+        this.key = 'Select...';
+        this._modelLoaded = true;
+      },
+
+      setValue: function (value) {
+        var key = WX.findKeyByValue(this.$.eItems.model, value)
+        if (key) {
+          this.value = value;
+          this.key = key;
+        }
+        this.update();
+      },
+
+      loadTargetParamData: function () {
+        this.setModel(this.targetParam.getModel());
+        this.value = this.targetParam.default;
+        this.label = this.targetParam.name;
+        this.update();
+      },
+
+      link: function (plugin, param, cloudMap) {
+        // setting reference to plugin (ui => pluginparam)
+        this.targetParam = plugin.params[param];
+        // load target param data
+        this.loadTargetParamData();
+        // establish observer
+        var ob = new PathObserver(plugin.params[param], 'value');
+        ob.open(function (newValue, oldValue) {
+          if (this.value === newValue) return;
+          this.value = newValue;
+          this.update();
+        }.bind(this));
+
+        // OPTIONAL: add param to cloud map data
+        if (cloudMap) {
+          this.cloudMap = cloudMap;
+          this.cloudParam = param;
+          // this.cloudMap.registerParam(param, this.value);
+          // setup path observer to cloud map param
+          var obsCloudMap = new PathObserver(cloudMap.localCache, param);
+          obsCloudMap.open(function (newValue, oldValue) {
+            if (this.value === newValue) return;
+            this.value = newValue;
+            this.update();
+            // TEMP: need to update target parameter in plugin too.
+            if (this.targetParam) {
+              this.targetParam.set(this.value, WX.now + 0.05, 1);
+            }
+          }.bind(this));
+        }
+      }
+    });
+  </script>
+</polymer-element>

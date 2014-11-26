@@ -1,0 +1,313 @@
+<!--
+  `mui-knob`
+  @version 1.0.0-alpha2
+  @description MUI knob abstraction.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<polymer-element name="mui-knob" attributes="value min max label">
+  <template>
+    <style>
+    @-webkit-keyframes flash {
+      from { opacity: 0.5; }
+      to { opacity: 0; }
+    }
+    :host {
+      display: inline-block;
+      vertical-align: middle;
+      margin: 6px 2px;
+      width: 48px;
+      height: 80px;
+      -webkit-user-select: none;
+    }
+    input:focus {
+      outline: none;
+    }
+    .c-knob-label {
+      display: block;
+      color: #607d8b;
+      font-family:'Roboto Condensed', sans-serif;
+      font-size: 0.7rem;
+      height: 16px;
+      line-height: 16px;
+      text-align: center;
+    }
+    .c-knob-flat {
+      display: block;
+      cursor: move;
+    }
+    .c-knob-value {
+      display: block;
+      font-family:'Roboto', sans-serif;
+      font-size: 0.725rem;
+      height: 16px;
+      width: 48px;
+      line-height: 16px;
+      text-align: center;
+      color: #37474f;
+      background-color: #cfd8dc;
+      border-radius: 3px;
+      margin-top: 3px;
+      padding: 0;
+      border: none;
+    }
+    .c-knob-value-select {
+      color: #fff;
+      background-color: #546e7a;
+      box-shadow: inset 0 0 5px #263238;
+    }
+    .c-knob-flat-outer {
+      /*fill: #353D42;*/
+      /*fill: #7E8AA2;*/
+      /*fill: #374140;*/
+      /*fill: #31353D;*/
+      stroke: #cfd8dc;
+      stroke-width: 0.75px;
+      fill: none;
+    }
+    .c-knob-flat-inner {
+      /*fill: #505455;*/
+      /*fill: #EEE;*/
+      /*fill: #D9CB9E;*/
+      /*fill: #445878;*/
+      fill: #b0bec5;
+    }
+    .c-overlay {
+      fill: #e91e63;
+      opacity: 0;
+    }
+    .c-overlay-flash {
+      fill: #e91e63;
+      -webkit-animation-name: flash;
+      -webkit-animation-duration: 0.15s;
+      /*fill: #EEE;*/
+      /*fill: #D9CB9E;*/
+      /*fill: #445878;*/
+      /*fill: #b0bec5;*/
+    }
+    .c-knob-flat-gauge {
+      /*stroke: #0CB4F5;*/
+      /*stroke: #FF9800;*/
+      /*stroke: #DC3522;*/
+      stroke: #039be5;
+      stroke-width: 4px;
+      fill: none;
+    }
+    </style>
+    <div class="c-knob-label">{{label}}</div>
+    <svg id="eTouchable" class="c-knob-flat" width="48" height="48" version="1.1" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="23.5" cy="23.5" r="23" class="c-knob-flat-outer" />
+      <path id="eKnob" class="c-knob-flat-gauge" />
+      <circle cx="23.5" cy="23.5" r="16" class="c-knob-flat-inner" />
+      <rect id="eOverlay" x="0" y="0" width="48" height="48" rx="4" ry="4" class="c-overlay" />
+    </svg>
+    <input id="eValueDisplay" type="text" class="c-knob-value">
+  </template>
+  <!-- logic -->
+  <script>
+    Polymer({
+
+      // published
+      label: 'unlabeled',
+      value: 0.0,
+      min: 0.0,
+      max: 1.0,
+
+      // binding
+      targetParam: null,
+      cloudMap: null,
+      cloudParam: null,
+
+      // private
+      _normValue: 0.0,
+      _offset: Math.PI * 0.75,
+      _arcPath: null,
+      _arcCenter: 23.5,
+      _arcRadius: 19,
+
+      // counter
+      _counter: 0,
+
+      // render UI data
+      render: function () {
+        var target = this._normValue * Math.PI * 1.5 ;
+        this._arcPath.x = this._arcCenter + this._arcRadius * Math.cos(this._offset + target);
+        this._arcPath.y = this._arcCenter + this._arcRadius * Math.sin(this._offset + target);
+        this._arcPath.largeArcFlag = (target < Math.PI) ? false : true;
+        this.$.eValueDisplay.value = this.value.toFixed(2);
+      },
+
+      flash: function () {
+        this.$.eOverlay.classList.switch(
+          'c-overlay',
+          'c-overlay-flash'
+        );
+        console.log(this.$.eOverlay.classList);
+        setTimeout(function () {
+          this.$.eOverlay.classList.switch(
+            'c-overlay-flash',
+            'c-overlay'
+          );
+        }.bind(this), 150);
+      },
+
+      // update: model => knob
+      update: function () {
+        this.value = Math.max(Math.min(this.value, this.max), this.min);
+        this._normValue = (this.value - this.min) / (this.max - this.min);
+        this.render();
+      },
+
+      // post: knob => model
+      post: function () {
+        // update target param
+        if (this.targetParam) {
+          // do not call the handler directly.
+          // invoke 'xxxxxParam.set' method instead
+          this.targetParam.set(this.value, WX.now + 0.05, 1);
+        }
+        if (this.cloudMap) {
+          this.cloudMap._callbackMUI(this.cloudParam, this.value);
+        }
+        this.render();
+      },
+
+      attributeChanged: function (attrName, oldVal, newVal) {
+        this.update();
+      },
+
+      // created = entry point
+      ready: function () {
+
+        // initialize
+        this.value = parseFloat(this.value);
+        this.min = parseFloat(this.min);
+        this.max = parseFloat(this.max);
+        this.value = Math.max(Math.min(this.value, this.max), this.min);
+        this._normValue = (this.value - this.min) / (this.max - this.min);
+
+        // create arc path
+        var target = this._normValue * Math.PI * 1.5;
+        var x1 = this._arcCenter + this._arcRadius * Math.cos(this._offset);
+        var y1 = this._arcCenter + this._arcRadius * Math.sin(this._offset);
+        var x2 = this._arcCenter + this._arcRadius * Math.cos(target + this._offset);
+        var y2 = this._arcCenter + this._arcRadius * Math.sin(target + this._offset);
+        var flag = (target < Math.PI) ? 0 : 1;
+        var d = 'M ' + x1 + ' ' + y1 + ' A ' + this._arcRadius + ' ' + this._arcRadius;
+        d += ' 0 ' + flag + ' 1 ' + x2 + ' ' + y2 + ' ';
+        this.$.eKnob.setAttribute('d', d);
+        this.$.eValueDisplay.value = this.value.toFixed(2);
+        this._arcPath = this.$.eKnob.pathSegList.getItem(1);
+
+        // mouse responder
+        var prevData = {};
+        var mouseResponder = MUI.MouseResponder(
+          this.label,
+          this.$.eTouchable,
+          function (sender, action, data) {
+            switch (action) {
+              case 'clicked':
+                prevData = data;
+                document.body.style.cursor = 'move';
+                break;
+              case 'dragged':
+                var delta = ((data.x - prevData.x) || -(data.y - prevData.y)) * ((data.shiftKey) ? 0.001 : 0.01);
+                prevData = data;
+                // norm => val => post
+                this._normValue += delta;
+                this._normValue = Math.min(Math.max(this._normValue, 0.0), 1.0);
+                this.value = this._normValue * (this.max - this.min) + this.min;
+                this.post();
+                break;
+              case 'released':
+                document.body.style.cursor = 'default';
+                this.post();
+                break;
+            }
+          }.bind(this)
+        );
+
+        // keyboard input responder
+        var d = this.$.eValueDisplay;
+        var keyResponder = MUI.KeyResponder(
+          this.label,
+          d,
+          function (sender, action, data) {
+            switch (action) {
+              case 'clicked':
+                d.className += ' c-knob-value-select';
+                d.select();
+                break;
+              case 'keypressed':
+                if (data === 13) {
+                  var v = parseFloat(d.value);
+                  // sanity check
+                  if (!isNaN(v)) {
+                    // val => norm => post
+                    this.value = Math.min(Math.max(v, this.min), this.max);
+                    this._normValue = (this.value - this.min) / (this.max - this.min);
+                    this.post();
+                  }
+                  d.blur();
+                }
+                break;
+              case 'finished':
+                d.className = 'c-knob-value';
+                break;
+            }
+          }.bind(this)
+        );
+
+        // ready & go
+        this.update();
+      },
+
+      loadTargetParamData: function () {
+        if (this.targetParam) {
+          this.label = this.targetParam.name;
+          this.min = this.targetParam.min;
+          this.max = this.targetParam.max;
+          this.value = this.targetParam.value;
+          this.update();
+        }
+      },
+
+      // link to plugin, param and cloudMap
+      link: function (plugin, param, cloudMap) {
+
+        // get target parameter object
+        this.targetParam = plugin.params[param];
+        // load plugin param data
+        this.loadTargetParamData();
+        // setup path observer to plugin param
+        var obsPlugin = new PathObserver(plugin.params[param], 'value');
+        obsPlugin.open(function (newValue, oldValue) {
+          if (this.value === newValue) return;
+          this.value = newValue;
+          this.update();
+        }.bind(this));
+
+        // OPTIONAL: add param to cloud map data
+        if (cloudMap) {
+          this.cloudMap = cloudMap;
+          this.cloudParam = param;
+          // this.cloudMap.registerParam(param, this.value);
+          // setup path observer to cloud map param
+          var obsCloudMap = new PathObserver(cloudMap.localCache, param);
+          obsCloudMap.open(function (newValue, oldValue) {
+            if (this.value === newValue) return;
+            this.value = newValue;
+            this.update();
+            this.flash();
+            // TEMP: need to update target parameter in plugin too.
+            if (this.targetParam) {
+              this.targetParam.set(this.value, WX.now + 0.05, 1);
+            }
+          }.bind(this));
+        }
+
+      }
+
+    });
+  </script>
+</polymer-element>

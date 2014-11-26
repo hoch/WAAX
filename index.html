@@ -1,325 +1,203 @@
-<!DOCTYPE html>
-<!--[if IE 9]><html class="lt-ie10" lang="en" ><![endif]-->
-<html class="no-js">
+<!doctype html>
+<html>
 
 <head>
-  <title>WAAX: Web Audio API eXtension</title>
-
+  <title>WAAX - Web Music Framework</title>
+  <meta name="keywords" content="Web Audio API, Web MIDI API, JavaScript, collaboration, creativity, sound synthesis, computer music, music productionm, Chrome, FireFox, Safari">
+  <meta name="description" content="Computer Music meets the Web. Experimental music software and collaborative creativity.">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="bower_components/foundation/css/normalize.css">
-  <link rel="stylesheet" href="bower_components/foundation/css/foundation.css">
-  <script src="bower_components/foundation/js/vendor/modernizr.js"></script>
-  <link href='http://fonts.googleapis.com/css?family=Roboto:300,700,400' rel='stylesheet' type='text/css'>
-  <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:300,700,400' rel='stylesheet' type='text/css'>
-
-  <style>
-    html body {
-      background-color: #eceff1;
-    }
-    h1, h2, h3, h4, h5, h6, body
-    {
-      font-family: 'Roboto', sans-serif;
-      color: #37474f;
-    }
-    .top-bar-section ul li > a
-    {
-      font-family: 'Roboto', sans-serif;
-      font-size: 0.9rem;
-    }
-    .top-bar,
-    .top-bar-section ul li,
-    .top-bar-section li:not(.has-form) a:not(.button)
-    {
-      font-size: 1rem;
-      font-weight: 300;
-      color: #e0f2f1;
-      background-color: #009688;
-    }
-    .top-bar-section li:not(.has-form) a:not(.button):hover,
-    .top-bar-section .dropdown li:not(.has-form):hover > a:not(.button),
-    .top-bar-section ul li:hover:not(.has-form) > a
-    {
-      color: #fff;
-      background-color: #00897b;
-    }
-    .top-bar-section .dropdown li:not(.has-form) a:not(.button)
-    {
-      background-color: #009688;
-    }
-
-    .alert-box.warning {
-      text-align: center;
-      font-weight: 300;
-      font-size: 0.9rem;
-      margin-bottom: 4rem;
-    }
-    .container {
-      width: 100%;
-    }
-    h1 {
-      font-family: 'Roboto Condensed', sans-serif;
-      font-weight: 700;
-      font-size: 4.4rem;
-      letter-spacing: 0.6rem;
-      margin: 0 1rem;
-      color: #37474f;
-    }
-    h2 {
-      font-family: 'Roboto Condensed', sans-serif;
-      font-size: 2.4rem;
-      margin: 2.4rem 0 1.8rem 0;
-      color: #37474f;
-    }
-    h3 {
-      font-family: 'Roboto Condensed', sans-serif;
-      font-weight: 300;
-      font-size: 1.8rem;
-      margin-top: 0.6rem;
-      padding-top: 0;
-      color: #546e7a;
-    }
-    h4 {
-      font-size: 1rem;
-      font-weight: 700;
-    }
-    h1 small {
-      font-size: 1.0rem;
-      font-weight: 400;
-      letter-spacing: 0.05rem;
-    }
-    p {
-      font-size: 0.95rem;
-    }
-    nav.top-bar {
-      margin-bottom: 2rem;
-      box-shadow: 3px 1px 3px 0 rgba(0, 0, 0, 0.23);
-    }
-    .panel {
-      border: none;
-      background: #fff;
-      box-shadow: 0 1px 2px 2px rgba(96, 125, 139, 0.23);
-    }
-    .panel.code {
-      border: none;
-      background: #fff;
-      box-shadow: none;
-    }
-    pre {
-      font-size: 0.925rem;
-      line-height: 1.25rem;
-    }
-    .panel h3 {
-      font-weight: 300;
-      font-size: 1.6rem;
-      margin-bottom: 1.2rem;
-      color: #546e7a;
-    }
-    .panel p {
-      color: #455a64;
-      font-family: 'Roboto', sans-serif;
-      font-weight: 300;
-      font-size: 0.925rem;
-      line-height: 1.6rem
-    }
-    ul.feature-highlights li {
-      font-size: 1.05rem;
-      line-height: 2rem;
-    }
-    hr {
-      border-color: #cfd8dc;
-    }
-    p.copyright {
-      font-weight: 300;
-      font-size: 0.85rem;
-    }
-  </style>
-
+  <!-- WAAX -->
+  <script src="waax/build/waax.js"></script>
+  <script src="waax/build/plug_ins/fmk1.js"></script>
+  <script src="waax/build/plug_ins/stereodelay.js"></script>
+  <script src="waax/bower_components/platform/platform.js"></script>
+  <link rel="import" href="waax/build/mui/mui.html">
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/wxdoc.min.css">
+  <link href='http://fonts.googleapis.com/css?family=Roboto:100,300,400,700|Roboto+Condensed:300,400,700' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:500' rel='stylesheet' type='text/css'>
 </head>
 
-<body>
+<body unresolved class="wx-landing-body">
+<div class="docs-wrap">
+<div class="inner-wrap">
 
-  <div data-alert class="alert-box warning">
-    <strong>NOTE</strong>: WAAX and MUI require <strong>Chrome</strong> because they are built on top of <strong>Web Audio API, Web MIDI API and Web Components</strong>. Check <a target="_blank" href="http://caniuse.com">CanIUse.com</a> for the browser support.
-    <a href="#" class="close">&times;</a>
+  <nav class="top-bar sticky" data-topbar="">
+    <section class="left">
+      <div class="wx-navbar-title">
+        <h1><a href="#">WAAX</a> <small>v1.0.0-alpha2</small></h1>
+      </div>
+    </section>
+    <section class="top-bar-section">
+      <ul class="right">
+        <li class="divider"></li>
+        <li><a href="get-started/">Get Started</a></li>
+        <li class="divider"></li>
+        <li><a href="waax/examples">Examples</a></li>
+        <li class="divider"></li>
+        <li><a href="https://github.com/hoch/WAAX/">GitHub</a></li>
+      </ul>
+    </section>
+  </nav>
+  <!-- CONTENTS HERE -->
+
+  <div class="row wx-landing-title">
+    <div class="small-10 small-centered columns">
+      <h1 class="text-center">WAAX</h1>
+      <h2 class="text-center">Web Music Framework</h2>
+    </div>
   </div>
 
-  <div class="container">
-
-  <header>
-
+  <div class="wx-landing-showroom">
     <div class="row">
-      <div class="large-12 columns">
-        <h1>WAAX<small>Web Music Framework</small></h1>
-        <nav class="top-bar" data-topbar role="navigation">
-          <section class="top-bar-section">
-            <ul class="left">
-              <li><a href="#getstarted">Get Started</a></li>
-              <li class="has-dropdown">
-                <a href="#">Examples</a>
-                <ul class="dropdown">
-                  <li><a href="examples/hellowaax/">Hello WAAX!</a></li>
-                  <li><a href="examples/workshop/">Plug-In Workshop</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Plug-ins</a></li>
-              <li><a href="mui/">MUI Elements</a></li>
-              <li class="has-dropdown">
-                <a href="#">Develop</a>
-                <ul class="dropdown">
-                  <li><a href="docs/reference/WX.html">API Reference</a></li>
-                  <li><a href="test/">Test Suite</a></li>
-                  <li><a href="https://github.com/hoch/WAAX">GitHub</a></li>
-                </ul>
-              </li>
-            </ul>
-          </section>
-        </nav>
+      <div class="small-10 small-centered columns">
+        <!-- <img class="text-center" src="http://placehold.it/800x470"> -->
+
+        <mui-rack id="fmk1"></mui-rack>
+        <mui-rack id="delay"></mui-rack>
+        <mui-rack label="keyboard">
+          <mui-vkey id="vkey"></mui-vkey>
+        </mui-rack>
+
       </div>
     </div>
-  </header>
-
-  <article>
-    <div class="row">
-      <div class="large-5 columns">
-        <h3>Feature Highlights</h3>
-        <ul class="feature-highlights">
-          <li>Modular and extensible architecture</li>
-          <li><a href="https://ccrma.stanford.edu/%7Ehongchan/posts/creating-waax-plugin/">Web Audio Plug-in</a> (WAPL) Interface</li>
-          <li><a href="mui/">Modular GUI elements</a> powered by Polymer</li>
-          <li>Sequencing: Timebase, Transport and NoteList</li>
-          <li><a href="https://github.com/hoch/Ktrl">Web MIDI API Integration</a> <em>(experimental)</em></li>
-          <li>Create, build and deploy: Bower and Gulp</li>
-        </ul>
-      </div>
-      <div class="large-7 columns">
-        <div class="panel">
-          <h3>What is WAAX?</h3>
-          <p><strong>WAAX</strong> (Web Audio API eXtension) is a comprehensive JavaScript framework that facilitates and supports the development of web music applications as well as various collaborative music creation scenarios.</p>
-          <p>At the moment, <strong>WAAX</strong> and <strong>MUI</strong> require Blink-based web browsers - <em>Chrome, Chrome Canary or Chromium</em> - because they are built on top of <strong>Web Audio API</strong>, <strong>Web Component</strong> and <strong>Web MIDI API</strong>.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="large-12 columns">
-        <h2 id="getstarted">Get Started</h2>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="large-4 columns">
-        <h4>Install.</h4>
-        <p>The complete WAAX development setup requires NPM, Bower and Gulp. If you have them installed, the installation is simple.</p>
-      </div>
-      <div class="large-8 columns">
-        <div class="panel code">
-          <pre>
-git clone https://github.com/hoch/WAAX $YOUR_DIRECTORY
-cd $YOUR_DIRECTORY
-make</pre>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="large-4 columns">
-        <h4>Load.</h4>
-        <p>To use WAAX in a web page, simply load the <code>waax.js</code> in an HTML document. You can also add WAAX plug-ins that you want to play with.</p>
-      </div>
-      <div class="large-8 columns">
-        <div class="panel code">
-          <pre>
-&lt;!-- load WAAX, MUI, Timebase and plug-ins --&gt;
-&lt;script src=&quot;build/waax.js&quot;&gt;&lt;/script&gt;
-&lt;script src=&quot;build/plug_ins/wxs1.js&quot;&gt;&lt;/script&gt;
-&lt;script src=&quot;build/plug_ins/stereodelay.js&quot;&gt;&lt;/script&gt;</pre>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="row">
-      <div class="large-4 columns">
-        <h4>Play.</h4>
-        <p>Once you load the core library and plug-ins. Using them is straight-forward and does not ask you to have audio hacking experience. Just create instances and path them to make sounds. NOTE: Adjust your audio volume before you do this step!</p>
-      </div>
-      <div class="large-8 columns">
-        <div class="panel code">
-          <pre>
-// Creating a WXS-1 synth and a stereo delay instance.
-var synth = WX.WXS1(),
-    delay = WX.StereoDelay();
-// Plug-in patching: Synth =&gt; Delay =&gt; Master
-synth.to(delay).to(WX.Master);
-// Plays C4 with 100 velocity for 1 second.
-synth.noteOn(60, 100);
-synth.noteOff(WX.now + 1.0);</pre>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="large-4 columns">
-        <h4>Iterate. Fast.</h4>
-        <p>Then start rolling wit Gulp! WAAX offers basic Gulp commands so you can iterate and deploy rapidly.</p>
-      </div>
-      <div class="large-8 columns">
-        <div class="panel code">
-          <pre>
-gulp build           # generates distribution package
-gulp deploy          # builds and deploys to gh-pages
-gulp                 # cleans, builds and starts dev server</pre>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="large-12 columns">
-        <h2>Talks</h2>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="large-6 columns">
-        <h4>WAAX @ Sound of Denmark <small>2013, Nov</small></h4>
-        <iframe width="470" height="315" src="//www.youtube.com/embed/f4oDUwEoOzc" frameborder="0" allowfullscreen></iframe>
-      </div>
-      <div class="large-6 columns">
-        <h4>CCRMA Colloquium <small>2013, May</small></h4>
-        <iframe width="470" height="315" src="//www.youtube.com/embed/mcl7HPbWXlE#t=40m12s" frameborder="0" allowfullscreen></iframe>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="large-12 columns">
-        <hr>
-        <p class="copyright text-center">MIT License. Copyright (c) 2011-2014 <a href="http://www.hoch.io">Hongchan Choi</a></p>
-      </div>
-    </div>
-  </article>
-
   </div>
 
-  <!-- scripts -->
-  <script src="bower_components/foundation/js/vendor/jquery.js"></script>
-  <script src="bower_components/foundation/js/foundation.min.js"></script>
-  <script src="build/waax.js"></script>
+  <div class="wx-landing-codesnippet">
+    <div class="row">
+      <div class="small-10 small-centered columns">
+        <div class="row">
+          <div class="medium-6 columns">
+            <div class="wx-codebox">
+              <pre>
+<code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-title">mui-rack</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">“fmk1”</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">mui-rack</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">mui-rack</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">“delay”</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">mui-rack</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">mui-rack</span> <span class="hljs-attribute">label</span>=<span class="hljs-value">“keyboard”</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">mui-vkey</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">“vkey”</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">mui-vkey</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">mui-rack</span>&gt;</span></code>
+</pre>
+              <span class="wx-codebox-type">HTML</span>
+            </div>
+          </div>
+          <div class="medium-6 columns">
+            <div class="wx-codebox">
+              <pre>
+<code class="javascript hljs"><span class="hljs-keyword">var</span> fmk1 = WX.FMK1();
+<span class="hljs-keyword">var</span> delay = WX.StereoDelay();
+fmk1.to(delay).to(WX.Master);
+MUI.buildControls(fmk1, <span class="hljs-string">‘fmk1’</span>);
+MUI.buildControls(delay, <span class="hljs-string">‘delay’</span>);
+MUI.$(<span class="hljs-string">‘vkey’</span>).addTarget(fmk1);
+</code></pre>
+              <span class="wx-codebox-type">JS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <script>
-    $(document).foundation();
-    var domWAAXVersion = document.querySelector('#waax-ver');
-    domWAAXVersion.textContent = WX.getVersion();
-  </script>
+  <div class="wx-insertstrip">
+    <div class="row">
+      <div class="small-10 small-centered columns wx-headline">
+        <p>"<strong>WAAX</strong>, <em>Web Audio API eXtension</em>, is <br> a JavaScript framework  for web-based music application <br> built on top of <strong>Web Audio API</strong> and <strong>Web Components</strong>."</p>
+        <a href="get-started/" class="button radius">Get Started</a>
+        <a href="waax/examples" class="button radius">Examples</a>
+        <a href="reference/1.0.0-alpha2" class="button radius">API Reference</a>
+      </div>
+    </div>
+  </div>
 
-  <!-- ga analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-    ga('create', 'UA-7423687-10', 'auto');
-    ga('send', 'pageview');
-  </script>
+  <div class="wx-highlights">
+    <div class="row">
+      <div class="small-10 small-centered columns">
+        <div class="row">
+          <div class="medium-6 columns">
+            <h2>Modular, Extensible and Robust.</h2>
+            <p>WAAX is comprised of 4 parts: Core, Plug-ins, MUI elements and Workflow. The flexibility serves various use cases such as prototyping, classroom setting, live coding or full-featured application design.</p>
+          </div>
+          <div class="medium-6 columns">
+            <h2>Create, Connect and Tweak.</h2>
+            <p>Synthesizer, sampler, chorus or equalizer - you can chain them to create your own sound. Furthermore, it is straight-forward to design your own plug-in based on WAPL(Web Audio PLugin) format.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-10 small-centered columns">
+        <div class="row">
+          <div class="medium-6 columns">
+            <h2>Musical UI for Web.</h2>
+            <p>With the power of Web Components, WAAX offers MUI, a set of musically-specialized GUI elements. You can create a knob with a single line of HTML code. Also MUI is smart enough to generate UI automatically.</p>
+          </div>
+          <div class="medium-6 columns">
+            <h2>Iterate and Experiment. Fast.</h2>
+            <p>WAAX values iteration and experiment. The pre-configured setup simplifies and optimizes the development process significantly. Bootstrap, iterate, build and deploy with few keystrokes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="wx-bottom">
+    <div class="row">
+      <div class="small-10 small-centered columns">
+        <div class="wx-copyright">
+          <p>Copyright (c) 2012-2014 Hongchan Choi. All rights reserved.</p>
+          <dl class="sub-nav">
+            <dd><a href="#">About</a></dd>
+            <dd><a href="#">License</a></dd>
+            <dd><a href="#">Web Audio API</a></dd>
+            <dd><a href="#">Web MIDI API</a></dd>
+            <dd><a href="#">Acknowledegement</a></dd>
+            <dd><a href="#">Contributing</a></dd>
+            <dd><a href="#">Blog</a></dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WAAX script -->
+<script>
+  MUI.start(function () {
+
+    var fmk1 = WX.FMK1({ output: 0.5 });
+    var delay = WX.StereoDelay({
+      mix: 0.25,
+      delayTimeLeft: 0.5,
+      delayTimeRight: 0.75,
+      feedbackLeft: 0.2,
+      feedbackRight: 0.4,
+      crosstalk: 0.25
+    });
+    fmk1.to(delay).to(WX.Master);
+
+    MUI.buildControls(fmk1, 'fmk1');
+    MUI.buildControls(delay, 'delay');
+    MUI.$('vkey').addTarget(fmk1);
+
+  });
+</script>
+<script src="../script/wxdoc.min.js"></script>
+
+<!-- google analytics
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'YOUR-GA-ID-HERE', 'GA-LABEL');
+  ga('send', 'pageview');
+</script>
+-->
+
+<!-- AddThis
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=YOUR-ADDTHIS-PUB-ID-HERE"></script>
+-->
+
 </body>
 </html>

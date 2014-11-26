@@ -1,0 +1,65 @@
+<!doctype html><html><head><title>Connection and Parameter | WAAX</title><meta name="keywords" content="Web Audio API, Web MIDI API, JavaScript, collaboration, creativity, sound synthesis, computer music, music productionm, Chrome, FireFox, Safari"><meta name="description" content="Computer Music meets the Web. Experimental music software and collaborative creativity."><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="../css/wxdoc.min.css"><link href='http://fonts.googleapis.com/css?family=Roboto:100,300,400,700|Roboto+Condensed:300,400,700' rel='stylesheet' type='text/css'><link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:500' rel='stylesheet' type='text/css'></head><body unresolved class="wx-docpage-body"><div class="docs-wrap"><div class="inner-wrap"><nav class="top-bar sticky" data-topbar=""><section class="left"><div class="wx-navbar-title"><h1><a href="../">WAAX</a> <small>v1.0.0-alpha2</small></h1></div></section><section class="top-bar-section"><ul class="right"><li class="divider"></li><li><a href="../get-started">Get Started</a></li><li class="divider"></li><li><a href="../waax/examples">Examples</a></li><li class="divider"></li><li><a href="https://github.com/hoch/WAAX/">GitHub</a></li></ul></section></nav><div class="wx-content"><div class="wx-sidebar"><ul class="side-nav"><li class="heading">Documentation</li><li><a href="../get-started">Get Started</a></li><li><a href="../connection-and-parameter">Connection and Parameter</a></li><li><a href="../creating-waax-plugin">Creating WAAX Plug-in</a></li><!-- <li><a href="">Designing MUI Element</a></li> --><!-- <li><a href="">Sequencer and Transport</a></li> --><li class="heading">Tutorial</li><li><a href="../example-hellowaax">Hello WAAX!</a></li><li class="heading">API Reference</li><li><a href="../reference/1.0.0-alpha2/WX.html">1.0.0-alpha2</a></li><li class="heading">Resources</li><li><a href="https://github.com/hoch/WAAX/issues">GitHub Issue Tracker</a></li><li><a href="">Talks</a></li></ul></div><!-- content start --><div class="wx-view"><h1 id="connection-and-parameter">Connection and Parameter</h1>
+<p>Perhaps the most important thing in the world of audio programming is connecting components and the precise control of parameter. This documentation describes how WAAX utilities can make the audio programming easy.</p>
+<p>If you are not familiar with basic features in Web Audio API, this <a href="http://www.html5rocks.com/en/tutorials/webaudio/intro/">HTML5ROCKS</a> article can help you.</p>
+<h2 id="creating-web-audio-api-nodes">Creating Web Audio API Nodes</h2>
+<p>For the starter, WAAX offers shorthands for node creators in Web Audio API. Here&#39;s the list:</p>
+<pre><code class="lang-js">WX.Gain              <span class="hljs-tag">&lt;<span class="hljs-title">=</span>&gt;</span>      AudioContext.createGain
+WX.OSC               <span class="hljs-tag">&lt;<span class="hljs-title">=</span>&gt;</span>      AudioContext.createOscillator
+WX.Delay             <span class="hljs-tag">&lt;<span class="hljs-title">=</span>&gt;</span>      AudioContext.createDelay
+WX.Filter            <span class="hljs-tag">&lt;<span class="hljs-title">=</span>&gt;</span>      AudioContext.createBiquadFilter
+WX.Comp              <span class="hljs-tag">&lt;<span class="hljs-title">=</span>&gt;</span>      AudioContext.createDynamicsCompressor
+WX.Convolver         <span class="hljs-tag">&lt;<span class="hljs-title">=</span>&gt;</span>      AudioContext.createConvolver
+WX.WaveShaper        <span class="hljs-tag">&lt;<span class="hljs-title">=</span>&gt;</span>      AudioContext.createWaveShaper
+WX.Source            <span class="hljs-tag">&lt;<span class="hljs-title">=</span>&gt;</span>      AudioContext.createBufferSource
+WX.Analyzer          <span class="hljs-tag">&lt;<span class="hljs-title">=</span>&gt;</span>      AudioContext.createAnalyser
+WX.Panner            <span class="hljs-tag">&lt;<span class="hljs-title">=</span>&gt;</span>      AudioContext.createPanner
+WX.PeriodicWave      <span class="hljs-tag">&lt;<span class="hljs-title">=</span>&gt;</span>      AudioContext.createPeriodicWave
+WX.Splitter          <span class="hljs-tag">&lt;<span class="hljs-title">=</span>&gt;</span>      AudioContext.createChannelSplitter
+WX.Merger            <span class="hljs-tag">&lt;<span class="hljs-title">=</span>&gt;</span>      AudioContext.createChannelMerger
+WX.Buffer            <span class="hljs-tag">&lt;<span class="hljs-title">=</span>&gt;</span>      AudioContext.createBuffer
+</code></pre>
+<h2 id="making-connections">Making Connections</h2>
+<p>WAAX adds few methods to <code>AudioNode</code> and <code>AudioParam</code> in Web Audio API. Note that <code>AudioNode</code> is an atomic unit in Web Audio API such as oscillator, gain, filter. <code>AudioParam</code> is an object in <code>AudioNode</code> for user-controllable (and modulatable) parameter.</p>
+<p>Here we create 1 oscillator node and 3 gain nodes.</p>
+<pre><code class="lang-js"><span class="hljs-keyword">var</span> osc = WX.OSC();
+<span class="hljs-keyword">var</span> gain1 = WX.Gain();
+<span class="hljs-keyword">var</span> gain2 = WX.Gain();
+<span class="hljs-keyword">var</span> gain3 = WX.Gain();
+</code></pre>
+<p>For making connections from the oscillator to each gain node, we use <code>.connect()</code> method.</p>
+<pre><code class="lang-js">osc.connect(gain1);
+osc.connect(gain2);
+osc.connect(gain3);
+</code></pre>
+<p>This can be shortened with <code>.to()</code> method. This type of connection is often called &#39;fan-out.&#39;</p>
+<pre><code class="lang-js">osc.to(gain1, gain2, gain3);
+</code></pre>
+<p>If you rather want to have a &#39;chain&#39; than &#39;fan-out&#39;, you can also use <code>.to()</code> method to chain multiple nodes.</p>
+<pre><code class="lang-js">osc.to(gain1).to(gain2).to(gain3);
+</code></pre>
+<p>To cut a connection, use <code>.cut()</code> method. Note that selective disconnection is currently not supported in Web Audio API but it will be implemented in the near future as <a href="https://github.com/WebAudio/web-audio-api/issues/6">the spec change suggests</a>.</p>
+<pre><code class="lang-js">osc.cut();
+</code></pre>
+<h2 id="parameter-control">Parameter Control</h2>
+<p>The parameter control in Web Audio API is fairly complex compared to the other audio programming platform. This is primarily due to the sample-accurate scheduling mechanism. Technically, the place where you run your command is different with the place where things actually happen. It is a typical asynchronous scenario and not ideal situation for audio programming.</p>
+<p>The bottom line is: to control parameter precisely we need to schedule it ahead. For that purpose, we have <code>AudioParam</code> object in Web Audio API. It allows us to do sample-accurate automation by scheduling events ahead. Here are default <code>AudioParam</code> methods.</p>
+<pre><code class="lang-js">AudioParam.setValueAtTime (value, startTime)
+AudioParam.linearRampToValueAtTime (value, endTime)
+AudioParam.exponentialRampToValueAtTime (value, endTime)
+AudioParam.setTargetAtTime (target, startTime, timeConstant)
+AudioParam.cancelScheduledValues (startTime)
+</code></pre>
+<p>WAAX unifies first 4 methods into a single one.</p>
+<pre><code class="lang-js">AudioParam.<span class="hljs-built_in">set</span>(val, time, rampType)
+</code></pre>
+<p><code>rampType</code> can be <em>step</em>(0), <em>linear</em>(1), <em>expo</em>(2), or <em>target</em>(3). When the <code>rampType</code> is &#39;target&#39;, the second argument will be an array of two time values. The following example create a pitch modulation from 440Hz to 880Hz, and then back to 440 in 1 second.</p>
+<pre><code class="lang-js"><span class="hljs-keyword">var</span> osc = WX.OSC();
+osc.frequency
+    .set(<span class="hljs-number">440</span>, <span class="hljs-number">0.0</span>, <span class="hljs-string">'step'</span>)
+    .set(<span class="hljs-number">880</span>, <span class="hljs-number">0.25</span>, <span class="hljs-number">1</span>)
+    .set(<span class="hljs-number">440</span>, [<span class="hljs-number">0.25</span>, <span class="hljs-number">0.75</span>], <span class="hljs-number">3</span>);
+</code></pre>
+<p>To cancel the scheduled value, simply call <code>.cancel()</code> method.</p>
+<pre><code class="lang-js">osc.frequency.cancel();
+</code></pre>
+</div><!-- footer --></div></div></div><div class="wx-bottom"><div class="wx-view"><div class="wx-copyright"><p>Copyright (c) 2012-2014 Hongchan Choi. All rights reserved.</p><dl class="sub-nav"><dd><a href="#">About</a></dd><dd><a href="#">License</a></dd><dd><a href="#">Web Audio API</a></dd><dd><a href="#">Web MIDI API</a></dd><dd><a href="#">Acknowledegement</a></dd><dd><a href="#">Contributing</a></dd><dd><a href="#">Blog</a></dd></dl></div></div></div><!-- scripts --><script src="../script/wxdoc.min.js"></script><!-- google analytics<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'YOUR-GA-ID-HERE', 'GA-LABEL');ga('send', 'pageview');</script>--><!-- AddThis<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=YOUR-ADDTHIS-PUB-ID-HERE"></script>--></body></html>

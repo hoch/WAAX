@@ -1,0 +1,41 @@
+<!doctype html><html><head><title>Example: Hello WAAX! | WAAX</title><meta name="keywords" content="Web Audio API, Web MIDI API, JavaScript, collaboration, creativity, sound synthesis, computer music, music productionm, Chrome, FireFox, Safari"><meta name="description" content="Computer Music meets the Web. Experimental music software and collaborative creativity."><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="../css/wxdoc.min.css"><link href='http://fonts.googleapis.com/css?family=Roboto:100,300,400,700|Roboto+Condensed:300,400,700' rel='stylesheet' type='text/css'><link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:500' rel='stylesheet' type='text/css'></head><body unresolved class="wx-docpage-body"><div class="docs-wrap"><div class="inner-wrap"><nav class="top-bar sticky" data-topbar=""><section class="left"><div class="wx-navbar-title"><h1><a href="../">WAAX</a> <small>v1.0.0-alpha2</small></h1></div></section><section class="top-bar-section"><ul class="right"><li class="divider"></li><li><a href="../get-started">Get Started</a></li><li class="divider"></li><li><a href="../waax/examples">Examples</a></li><li class="divider"></li><li><a href="https://github.com/hoch/WAAX/">GitHub</a></li></ul></section></nav><div class="wx-content"><div class="wx-sidebar"><ul class="side-nav"><li class="heading">Documentation</li><li><a href="../get-started">Get Started</a></li><li><a href="../connection-and-parameter">Connection and Parameter</a></li><li><a href="../creating-waax-plugin">Creating WAAX Plug-in</a></li><!-- <li><a href="">Designing MUI Element</a></li> --><!-- <li><a href="">Sequencer and Transport</a></li> --><li class="heading">Tutorial</li><li><a href="../example-hellowaax">Hello WAAX!</a></li><li class="heading">API Reference</li><li><a href="../reference/1.0.0-alpha2/WX.html">1.0.0-alpha2</a></li><li class="heading">Resources</li><li><a href="https://github.com/hoch/WAAX/issues">GitHub Issue Tracker</a></li><li><a href="">Talks</a></li></ul></div><!-- content start --><div class="wx-view"><h1 id="example-hello-waax-">Example: Hello WAAX!</h1>
+<p>To get familiar with WAAX, let us start with the simplest example. It emonstrates a boilerplate, how to instantiate plug-ins, make connections and use GUI elements along with them.</p>
+<p>First, boot up the developement server in the terminal.</p>
+<pre><code class="lang-bash">$ gulp
+</code></pre>
+<p>Then open up <code>examples/hellowaax/index.html</code> in your favorite text editor. You can find the following 3 chunks of code that actually to get WAAX working.</p>
+<h2 id="loading-waax-libraries">Loading WAAX libraries</h2>
+<p> The first part is in the header. You must load <code>waax.js</code> before any plug-in or MUI element. <code>platform.js</code> is Polymer library file which is required only if you use MUI element. You can load various WAAX plug-ins for your purpose, but we will only use <code>SimpleOsc</code> plug-in in this example.</p>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"../../build/waax.js"</span>&gt;</span><span class="javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"../../build/plug_ins/simpleosc.js"</span>&gt;</span><span class="javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"../../bower_components/platform/platform.js"</span>&gt;</span><span class="javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">link</span> <span class="hljs-attribute">rel</span>=<span class="hljs-value">"import"</span> <span class="hljs-attribute">href</span>=<span class="hljs-value">"../../build/mui/mui.html"</span>&gt;</span>
+</code></pre>
+<h2 id="creating-mui-elements">Creating MUI elements</h2>
+<p>With all the libraries loaded, you can start create MUI elements, which are custom HTML elements for musical GUI, just like any other HTML element. Make sure to assign unique ID to each element so we can use them in JS code later.</p>
+<pre><code class="lang-html"><span class="hljs-comment">&lt;!-- MUI elements --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">mui-knob</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"k-freq"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">mui-knob</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">mui-knob</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"k-output"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">mui-knob</span>&gt;</span>
+</code></pre>
+<h2 id="writing-js-code">Writing JS code</h2>
+<p>Finally, write JS code at the bottom of the document. Create an instance of SimpleOsc plug-in and connect to <code>WX.Master</code>, that is the master output of WAAX system. Then start generating audio by <code>noteOn()</code> method. <code>60</code> means MIDI pitch and <code>100</code> for MIDI velocity.</p>
+<pre><code class="lang-html"><span class="hljs-comment">&lt;!-- WAAX JS Code --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">script</span>&gt;</span><span class="javascript">
+  MUI.start(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+    <span class="hljs-keyword">var</span> osc = WX.SimpleOsc();
+    osc.to(WX.Master);
+    osc.noteOn(<span class="hljs-number">60</span>, <span class="hljs-number">100</span>);
+    MUI.$(<span class="hljs-string">'k-freq'</span>).link(osc, <span class="hljs-string">'oscFreq'</span>);
+    MUI.$(<span class="hljs-string">'k-output'</span>).link(osc, <span class="hljs-string">'output'</span>);
+  });
+</span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+</code></pre>
+<p>The last two lines of code show how to connect MUI elements with WAAX plug-in parameters. <code>MUI.$(&#39;element_id&#39;)</code> will give you the reference of MUI element so you can connect to a parameter of a plug-in by <code>.link(plug_in, parameter_name)</code> method.</p>
+<p>See the demo <a href="">here</a>.</p>
+<h2 id="what-s-next-">What&#39;s Next?</h2>
+<ul>
+<li><a href="../waax/examples">Examples</a><!-- - [WAAX API Reference (not ready)]() --></li>
+<li><a href="">Creating WAAX plug-in</a><!-- - [designing MUI element]() -->
+</li>
+</ul>
+</div><!-- footer --></div></div></div><div class="wx-bottom"><div class="wx-view"><div class="wx-copyright"><p>Copyright (c) 2012-2014 Hongchan Choi. All rights reserved.</p><dl class="sub-nav"><dd><a href="#">About</a></dd><dd><a href="#">License</a></dd><dd><a href="#">Web Audio API</a></dd><dd><a href="#">Web MIDI API</a></dd><dd><a href="#">Acknowledegement</a></dd><dd><a href="#">Contributing</a></dd><dd><a href="#">Blog</a></dd></dl></div></div></div><!-- scripts --><script src="../script/wxdoc.min.js"></script><!-- google analytics<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'YOUR-GA-ID-HERE', 'GA-LABEL');ga('send', 'pageview');</script>--><!-- AddThis<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=YOUR-ADDTHIS-PUB-ID-HERE"></script>--></body></html>

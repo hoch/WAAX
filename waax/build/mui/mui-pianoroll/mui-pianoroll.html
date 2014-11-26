@@ -1,0 +1,653 @@
+<polymer-element name="mui-pianoroll">
+
+<template>
+
+  <style>
+    :host {
+      /*width: 100%;*/
+      display: block;
+      overflow: hidden;
+      margin-bottom: 5px;
+      height: 300px;
+    }
+    .mui-pianoroll-container {
+      /*width: 100%;*/
+      position: relative;
+      display: block;
+      vertical-align: top;
+      overflow: hidden;
+    }
+    .mui-pianoroll-toolbar {
+      display: block;
+      height: 28px;
+      background-color: #eee;
+    }
+  </style>
+
+  <div id="eContainer" class="mui-pianoroll-container">
+    <div id="eToolbar" class="mui-pianoroll-toolbar"></div>
+    <canvas id="eOnScreenCanvas"></canvas>
+  </div>
+
+</template>
+
+<script>
+  Polymer('mui-pianoroll', {
+
+    // primary and offscreen context
+    _ctx: null,
+    _ctxos: null,
+
+    _noteclip: null,
+    _selectedNotesId: [],
+    _newNote: null,
+    _newNoteId: null,
+
+    // key responder: internal key data strcuture
+    _keys: [],
+
+    // current viewpoint's virtual coord
+    _cx: 0,
+    _cy: 0,
+
+    // area
+    _minH: 400,
+    _vp: { x: 0, y: 0, w: null, h: null },
+    _ruler: { x: 40, y: 0, w: null, h: 23 },
+    _kbd: { x: 0, y: 23, w: 40, h: null },
+    _grid: { x: 40, y: 23, w: null, h: null },
+
+    // pitchRange (keyboard): C-1 (0) ~ G9 (127)
+    // kbd unit texture height * numOctave + offset
+    _kbdMaxH: 96 * 10 + 64,
+
+    // tiles
+    _tile: {
+      ruler: { x: 40, y: 0, w: 320, h: 23 },
+      kbd: { x: 0, y: 23, w: 40, h: 96},
+      grid: { x: 40, y: 23, w: 320, h: 96 }
+      // lane: { x: 40, y: 119, w: 320, h: 74 }
+    },
+
+    // tick per pixel, pitch per pixel (tick_per_beat = 480)
+    _tickPx: (480 * 4) / 320,
+    _pitchPx: 12 / 96,
+    _pxTick: 320 / (480 * 4),
+    _pxPitch: 96 / 12,
+
+    // dirty flag
+    _needsRedraw: true,
+
+    // action handler variables, marquee area
+    _actionMode: 'IDLE',
+    _marqueeStart: { x: 0, y: 0 },
+    _marqueeEnd: { w: 0, h: 0 },
+
+    // cloud realtime model ref
+    _cloudModel: null,
+
+    // transport object reference
+    _transport: null,
+
+    //
+    // utilities
+    //
+
+    _MIDI2Grid: function (note) {
+      return {
+        x: Math.ceil(note.start * this._pxTick) - this._cx + this._kbd.w,
+        y: Math.floor((130 - note.pitch) * this._pxPitch) - this._cy,
+        w: Math.floor(note.duration * this._pxTick),
+        h: this._pxPitch
+      };
+    },
+
+    _grid2MIDI: function (data) {
+      var nx = this._cx + data.x - this._kbd.w,
+          ny = this._cy + data.y - this._ruler.h;
+      return {
+        pitch: 127 - Math.floor(ny * this._pitchPx),
+        tick: Math.round(nx * this._tickPx)
+      };
+    },
+
+    _grid2MIDIDelta: function (dx, dy) {
+      return {
+        pitch: dy * this._pitchPx,
+        tick: Math.round(dx * this._tickPx)
+      };
+    },
+
+    // this will return action mode
+    _selectNoteAtPos: function (posMIDI) {
+      if (this._noteclip) {
+        // get note id
+        var id = this._noteclip.findNoteIdAtPosition(posMIDI.pitch, posMIDI.tick);
+        // add note id to the selection
+        if (id) {
+          if (this._selectedNotesId.indexOf(id) < 0) {
+            this._selectedNotesId.push(id);
+          }
+          // check if position query was at the end of note (-45 ticks)
+          var note = this._noteclip.get(id);
+          var end = note.getEnd();
+          if (end - 45 <= posMIDI.tick && posMIDI.tick <= end) {
+            return 'RESIZE';
+          }
+          return 'MOVE';
+        }
+      }
+      return null;
+    },
+
+    _selectNotesInMarquee: function () {
+      // get note id bucket
+      var start = this._grid2MIDI(this._marqueeStart),
+          end = this._grid2MIDI(this._marqueeEnd);
+      var minPitch, maxPitch, startTick, endTick;
+      // TODO: arrange min, max accordingly
+      if (start.pitch <= end.pitch) {
+        minPitch = start.pitch;
+        maxPitch = end.pitch;
+      } else {
+        minPitch = end.pitch;
+        maxPitch = start.pitch;
+      }
+      if (start.tick <= end.tick) {
+        startTick = start.tick;
+        endTick = end.tick;
+      } else {
+        startTick = end.tick;
+        endTick = start.tick;
+      }
+      if (this._noteclip) {
+        var notesId = this._noteclip.findNotesIdInArea(
+          minPitch, maxPitch, startTick, endTick
+        );
+        if (notesId) {
+          for (var i = 0; i < notesId.length; i++) {
+            if (this._selectedNotesId.indexOf(notesId[i]) < 0) {
+              this._selectedNotesId.push(notesId[i]);
+            }
+          }
+        }
+      }
+    },
+
+    _moveSelectedNotes: function (deltaMIDI) {
+      var changes = {};
+      for (var i = 0; i < this._selectedNotesId.length; i++) {
+        var id = this._selectedNotesId[i];
+        var note = this._noteclip.get(id);
+        note.translatePitch(deltaMIDI.pitch);
+        note.translateStart(deltaMIDI.tick);
+        changes[id] = note;
+      }
+      if (this._cloudModel) {
+        this._cloudModel._callbackMUI(changes);
+      }
+    },
+
+    _changeNoteLength: function (deltaMIDI) {
+      var changes = {};
+      for (var i = 0; i < this._selectedNotesId.length; i++) {
+        var id = this._selectedNotesId[i],
+            note = this._noteclip.get(id);
+        note.changeDuration(deltaMIDI.tick);
+        changes[id] = note;
+      }
+      if (this._cloudModel) {
+        this._cloudModel._callbackMUI(changes);
+      }
+    },
+
+    _clearNoteSelection: function () {
+      this._selectedNotesId.length = 0;
+    },
+
+    _startNewNote: function (posMIDI) {
+      var start = ~~(posMIDI.tick / 120) * 120;
+      start += (posMIDI.tick % 120) > 60 ? 120 : 0;
+      this._newNote = WX.Note(posMIDI.pitch, 100, start, 120);
+      if (this._noteclip) {
+        this._newNoteId = this._noteclip.push(this._newNote);
+      }
+    },
+
+    _updateNewNote: function (posMIDI) {
+      var duration = posMIDI.tick - this._newNote.start;
+      duration = ~~(duration / 120) * 120;
+      duration += (duration % 120) > 60 ? 120 : 0;
+      this._newNote.duration = duration;
+    },
+
+    _endNewNote: function (posMIDI) {
+      this._updateNewNote(posMIDI);
+      var changes = {};
+      if (this._cloudModel) {
+        changes[this._newNoteId] = this._newNote;
+        this._cloudModel._callbackMUI(changes);
+      }
+      this._newNote = null;
+    },
+
+    _deleteSelectedNotes: function () {
+      var changes = {};
+      for (var i = 0; i < this._selectedNotesId.length; i++) {
+        var id = this._selectedNotesId[i];
+        this._noteclip.delete(id);
+        changes[id] = null;
+      }
+      if (this._cloudModel) {
+        this._cloudModel._callbackMUI(changes);
+      }
+    },
+
+    //
+    // Drawing related
+    //
+
+    _clearCanvas: function () {
+      this._ctx.fillStyle = '#222';
+      this._ctx.fillRect(0, 0, this._kInnerWidth, this._kInnerHeight);
+    },
+
+    _resize: function () {
+      // get current host size
+      this._kInnerWidth = this.clientWidth;
+      this._kInnerHeight =
+        this.clientHeight < this._minH ? this._minH : this.clientHeight;
+      // adjust canvas size
+      this._ctx.canvas.style.width = '100%';
+      this._ctx.canvas.width = this._kInnerWidth;
+      this._ctx.canvas.height = this._kInnerHeight;
+      // adjust key coordinates
+      this._vp.w = this._kInnerWidth;
+      this._vp.h = this._kInnerHeight;
+      this._grid.w = this._kInnerWidth - this._kbd.w;
+      this._grid.h = this._kInnerHeight - this._ruler.h;
+      this._kbd.h = this._grid.h;
+      this._ruler.w = this._grid.w;
+    },
+
+    _loadImageMap: function (callback) {
+      this._imageMap = new Image();
+      this._imageMap.onload = function () {
+        callback();
+      }.bind(this);
+      this._imageMap.src = '../../build/mui/mui-pianoroll/imagemap.png';
+    },
+
+    _buildImageMap: function () {
+      // for smooth moving, pre-render possible workspace background tiles
+      // onto offscreen canvas
+
+      // get rows and cols for tiles with buffer area
+      var numCols = Math.round(this._grid.w / this._tile.grid.w) + 2,
+          numRows = Math.round(this._grid.h / this._tile.grid.h) + 2;
+      var r, c;
+
+      // resize offscreen canvas
+      this._ctxos.canvas.width =
+        this._tile.kbd.w + numCols * this._tile.grid.w;
+      this._ctxos.canvas.height =
+        this._tile.ruler.h + numRows * this._tile.grid.h;
+
+      // draw ruler
+      for (c = 0; c < numCols; c++) {
+        this._ctxos.drawImage(this._imageMap,
+          this._tile.ruler.x, this._tile.ruler.y,
+          this._tile.ruler.w, this._tile.ruler.h,
+          this._tile.ruler.x + c * this._tile.ruler.w, this._tile.ruler.y,
+          this._tile.ruler.w, this._tile.ruler.h
+        );
+        // lane: currently disabled
+        // this._ctxos.drawImage(this._imageMap,
+        //   this._tile.lane.x, this._tile.lane.y,
+        //   this._tile.lane.w, this._tile.lane.h,
+        //   this._tile.lane.x + c * this._tile.lane.w,
+        //   this._vp.h - this._tile.lane.h,
+        //   this._tile.lane.w, this._tile.lane.h
+        // );
+      };
+      // draw kbd
+      for (r = 0; r < numRows; r++) {
+        this._ctxos.drawImage(this._imageMap,
+          this._tile.kbd.x, this._tile.kbd.y,
+          this._tile.kbd.w, this._tile.kbd.h,
+          this._tile.kbd.x, this._tile.ruler.h + r * this._tile.kbd.h,
+          this._tile.kbd.w, this._tile.kbd.h
+        );
+      }
+      // draw grid
+      for (r = 0; r < numRows; r++) {
+        for (c = 0; c < numCols; c++) {
+          this._ctxos.drawImage(this._imageMap,
+            this._tile.grid.x, this._tile.grid.y,
+            this._tile.grid.w, this._tile.grid.h,
+            this._tile.kbd.w + c * this._tile.grid.w,
+            this._tile.ruler.h + r * this._tile.grid.h,
+            this._tile.grid.w, this._tile.grid.h
+          );
+        }
+      }
+    },
+
+    _drawDebug: function () {
+      this._ctx.drawImage(this._ctxos.canvas, 0, 0);
+    },
+
+    _drawForeground: function () {
+      // ruler
+      this._ctx.drawImage(this._ctxos.canvas,
+        // src
+        this._ruler.x + (this._cx % this._tile.ruler.w),
+        this._ruler.y,
+        this._ruler.w,
+        this._ruler.h,
+        // dst
+        this._ruler.x,
+        this._ruler.y,
+        this._ruler.w,
+        this._ruler.h
+      );
+      // playhead
+      if (this._vp.x <= this._playheadPos &&
+        this._playheadPos < this._vp.x + this._vp.w) {
+        this._ctx.beginPath();
+        this._ctx.moveTo(this._playheadPos, this._vp.y);
+        this._ctx.lineTo(this._playheadPos, this._vp.h);
+        this._ctx.strokeStyle = '#fff';
+        this._ctx.stroke();
+      }
+      // keyboard (32 is for G8, 127 offset)
+      this._ctx.drawImage(this._ctxos.canvas,
+        this._kbd.x,
+        this._kbd.y + 32 + (this._cy % this._tile.kbd.h),
+        this._kbd.w,
+        this._kbd.h,
+        this._kbd.x,
+        this._kbd.y,
+        this._kbd.w,
+        this._kbd.h
+      );
+      // draw marquee
+      if (this._actionMode === 'MARQUEE') {
+        this._ctx.strokeStyle = '#fff';
+        this._ctx.strokeRect(
+          this._marqueeStart.x, this._marqueeStart.y,
+          this._marqueeEnd.x - this._marqueeStart.x,
+          this._marqueeEnd.y - this._marqueeStart.y
+        );
+      }
+      // corner
+      this._ctx.fillStyle = '#222';
+      this._ctx.fillRect(0, 0, this._ruler.x, this._kbd.y);
+    },
+
+    _drawBackground: function () {
+      // grid
+      this._ctx.drawImage(this._ctxos.canvas,
+        this._grid.x + (this._cx % this._tile.grid.w),
+        this._grid.y + (this._cy % this._tile.grid.h),
+        this._grid.w,
+        this._grid.h,
+        this._grid.x,
+        this._grid.y,
+        this._grid.w,
+        this._grid.h
+      );
+    },
+
+    _drawNotes: function () {
+      this._ctx.lineWidth = 1.0;
+      if (this._noteclip) {
+        this._noteclip.iterate(function (id, note) {
+            if (note) {
+              // transfrom viewport
+              var pos = this._MIDI2Grid(note);
+              // filter out invisible notes
+              if (this._grid.x + this._grid.w < pos.x) return;
+              if (pos.x + pos.w < this._grid.x) return;
+              if (this._grid.y + this._grid.h < pos.y) return;
+              if (pos.y + pos.h < this._grid.y) return;
+              // draw note
+              if (this._selectedNotesId.indexOf(id) == -1) {
+                this._ctx.strokeStyle = '#000';
+                this._ctx.fillStyle = '#C66';
+              } else {
+                this._ctx.strokeStyle = '#fff';
+                this._ctx.fillStyle = '#D99';
+              }
+              this._ctx.strokeRect(pos.x, pos.y, pos.w, pos.h);
+              this._ctx.fillRect(pos.x, pos.y, pos.w, pos.h);
+              // console.log('drawn', note); // to debug
+            }
+          }.bind(this)
+        );
+      }
+    },
+
+    _scrollByDelta: function (dx, dy) {
+      this._cx -= dx;
+      this._cy -= dy;
+      // boundary checking
+      this._cx = (this._cx < 0) ? 0 : this._cx;
+      this._cy = (this._cy < 0) ? 0 : this._cy;
+      if (this._cy > this._kbdMaxH - this._grid.h) {
+        this._cy = this._kbdMaxH - this._grid.h;
+      }
+    },
+
+    setPlayhead: function (tick) {
+      var pos = Math.ceil(tick * this._pxTick) - this._cx + this._kbd.w;
+      if (pos !== this._playheadPos) {
+        this._playheadPos = pos;
+        this._needsRedraw = true;
+      }
+    },
+
+    reportPlayheadPos: function (tick) {
+      this._transport.setNow(tick);
+    },
+
+    _draw: function () {
+      this._clearCanvas();
+      this._drawBackground();
+      this._drawNotes();
+      this._drawForeground();
+    },
+
+    update: function () {
+      if (this._needsRedraw) {
+        this._draw();
+        this._needsRedraw = false;
+      }
+      requestAnimationFrame(this.update.bind(this));
+    },
+
+    _listenKeyDown: function (event) {
+      if (this._keys[event.keyCode]) return;
+      this._keys[event.keyCode] = true;
+      // console.log(event.keyCode);
+      switch (event.keyCode) {
+        case 46: // delete key
+          event.preventDefault();
+          this._deleteSelectedNotes();
+      }
+      this._needsRedraw = true;
+    },
+
+    _listenKeyUp: function (event) {
+      if (!this._keys[event.keyCode]) return;
+      this._keys[event.keyCode] = false;
+    },
+
+    _handleAction: function (sender, action, data) {
+
+    },
+
+    ready: function () {
+
+      // create offscreen canvas
+      var offscreen = document.createElement('canvas');
+
+      // create 2d context
+      this._ctx = this.$.eOnScreenCanvas.getContext('2d');
+      this._ctxos = offscreen.getContext('2d');
+
+      // load+build image map and callback when done
+      this._loadImageMap(function () {
+        // resize element height to minimum and clear out
+        this._resize();
+        this._buildImageMap();
+        // this._drawDebug();
+        this._needsRedraw = true;
+        this.update();
+      }.bind(this));
+
+      // UI specific vars
+      var prevData, uy;
+
+      // mouse responder
+      var mouseResponder = MUI.MouseResponder(
+        this.label,
+        this.$.eOnScreenCanvas,
+        function (sender, action, data) {
+          var posMIDI = this._grid2MIDI(data);
+          switch (action) {
+            case 'clicked':
+              if (MUI.isPointInArea(data, this._ruler)) {
+                // report current position to transport
+                this.reportPlayheadPos(posMIDI.tick);
+              } else if (MUI.isPointInArea(data, this._kbd)) {
+                // preview sound
+                console.log(posMIDI.pitch)
+              } else if (MUI.isPointInArea(data, this._grid)){
+                // if a note clicked
+                if (posMIDI) {
+                  // TODO: shiftkey when selection is not empty
+                  if (!data.shiftKey) {
+                    this._clearNoteSelection();
+                  }
+                  // note end clicked = select, resize
+                  // note clicked = select, move
+                  // note not clicked = null
+                  var actionMode = this._selectNoteAtPos(posMIDI);
+                  if (actionMode) {
+                    this._actionMode = actionMode;
+                    uy = 0;
+                  } else {
+                    // altkey = create a note
+                    if (data.altKey) {
+                      document.body.style.cursor = 'crosshair';
+                      this._startNewNote(posMIDI);
+                      this._actionMode = 'CREATE';
+                    }
+                    // metakey = scroll
+                    else if (data.metaKey) {
+                      document.body.style.cursor = 'all-scroll';
+                      this._actionMode = 'SCROLL';
+                    }
+                    // otherwise, start marquee
+                    else {
+                      this._actionMode = 'MARQUEE';
+                      this._marqueeStart.x = this._marqueeEnd.x = data.x;
+                      this._marqueeStart.y = this._marqueeEnd.y = data.y;
+                    }
+                  }
+                }
+              }
+              this._needsRedraw = true;
+              break;
+            case 'dragged':
+              switch (this._actionMode) {
+                case 'MOVE':
+                  var dx = data.x - prevData.x,
+                      dy = 0;
+                  uy -= data.y - prevData.y;
+                  // quantizing ux by px per pitch
+                  if (uy > this._pxPitch || uy < -this._pxPitch) {
+                    dy = Math.round(uy / this._pxPitch);
+                    uy = uy / this._pxPitch - dy;
+                  }
+                  // translate back to screen coord
+                  dy *= this._pxPitch;
+                  // move notes
+                  this._moveSelectedNotes(this._grid2MIDIDelta(dx, dy));
+                  break;
+                case 'RESIZE':
+                  var dx = data.x - prevData.x;
+                  this._changeNoteLength(this._grid2MIDIDelta(dx, dy));
+                  break;
+                case 'CREATE':
+                  this._updateNewNote(posMIDI);
+                  break;
+                case 'SCROLL':
+                  this._scrollByDelta(data.x - prevData.x, data.y - prevData.y);
+                  break;
+                case 'MARQUEE':
+                  this._marqueeEnd.x += data.x - prevData.x;
+                  this._marqueeEnd.y += data.y - prevData.y;
+                  this._selectNotesInMarquee();
+                  break;
+              }
+              this._needsRedraw = true;
+              break;
+            case 'released':
+              document.body.style.cursor = 'default';
+              if (this._newNote) {
+                this._endNewNote(posMIDI);
+              }
+              this._actionMode = 'IDLE';
+              this._needsRedraw = true;
+              break;
+          }
+          prevData = data;
+          // console.log(this._actionMode);
+        }.bind(this)
+      );
+
+      // keyboard responder
+      window.addEventListener('keydown', this._listenKeyDown.bind(this), false);
+      window.addEventListener('keyup', this._listenKeyUp.bind(this), false);
+
+      // initiali location
+      this._scrollByDelta(0, this._kbdMaxH * -0.4);
+    },
+
+    setNoteClip: function (noteclip) {
+      this._noteclip = noteclip;
+      this.update();
+    },
+
+    //
+    // realtime sync features
+    //
+
+    link: function (rtModel) {
+      this._cloudModel = rtModel;
+      rtModel.view = this;
+    },
+
+    onRealtimeChange: function (id, noteArr) {
+      // console.log('realtimechange', index, noteArr);
+      if (noteArr) {
+        var note = WX.Note(noteArr[0], noteArr[1], noteArr[2], noteArr[3]);
+        this._noteclip.set(id, note);
+      } else {
+        this._noteclip.delete(id);
+      }
+      this._needsRedraw = true;
+    },
+
+    loadNote: function (id, noteArr) {
+      var note = WX.Note(noteArr[0], noteArr[1], noteArr[2], noteArr[3]);
+      this._noteclip.set(id, note);
+      this._needsRedraw = true;
+    }
+
+  });
+</script>
+
+</polymer-element>

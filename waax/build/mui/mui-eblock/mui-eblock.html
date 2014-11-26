@@ -1,0 +1,155 @@
+<!--
+  `mui-eblock`
+  @version 1.0.0-alpha2
+  @description MUI envelope block abstraction.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<polymer-element name="mui-eblock" attributes="type label">
+  <template>
+    <style>
+    :host {
+      display: inline-block;
+      vertical-align: middle;
+      margin: 2px 2px;
+      width: 86px;
+      height: 70px;
+      -webkit-user-select: none;
+    }
+    .c-frame {
+      fill: #607d8b;
+      stroke: #37474f;
+      stroke-width: 2.5;
+    }
+    .c-frame-selected {
+      fill: #039be5;
+      stroke: #0277bd;
+      stroke-width: 2.5;
+    }
+    .c-line {
+      fill: rgba(255, 255, 255, 0.25);
+      stroke: #eceff1;
+      stroke-width: 1.25;
+    }
+    .c-overlay {
+      fill: #fff;
+      opacity: 0;
+    }
+    .c-overlay-flash {
+      fill: #fff;
+      -webkit-animation-name: flash;
+      -webkit-animation-duration: 0.25s;
+    }
+    @-webkit-keyframes flash {
+      from  { opacity: 0.75; }
+      to    { opacity: 0; }
+    }
+    </style>
+    <svg id="eTouchable" class="c-svg" width="86" height="70" version="1.1" xmlns="http://www.w3.org/2000/svg">
+      <rect id="eFrame" width="86" height="70" class="c-frame" />
+      <polyline id="eLine" class="c-line" />
+      <rect id="eOverlay" width="86" height="70" class="c-overlay" />
+    </svg>
+  </template>
+  <!-- logic -->
+  <script>
+    Polymer({
+
+      label: 'mui-eblock',
+      values: null,
+      type: 0, // 0:linear env, 1: 1 step, 2:2steps, 3:3steps, 4:4steps
+
+      // internal
+      _width: 86,
+      _height: 70,
+
+      // render UI data
+      render: function () {
+        var points = '';
+        for (var i = 0; i < this.values.length; i++) {
+          points += (this.values[i][0] * this._width) + ',';
+          points += ((1.0 - this.values[i][1]) * this._height) + ' ';
+        }
+        this.$.eLine.setAttributeNS(null, 'points', points);
+      },
+
+      // update: model => knob
+      update: function () {
+        this.render();
+      },
+
+      // post: knob => model
+      post: function (dx, dy) {
+        dx = (dx || 0);
+        dy = (dy || 0);
+        this.values[1][0] += dx / this._width;
+        this.values[1][1] -= dy / this._height;
+        this.values[1][0] = WX.clamp(this.values[1][0], 0.0, 1.0);
+        this.values[1][1] = WX.clamp(this.values[1][1], 0.0, 1.0);
+        this.render();
+      },
+
+      flash: function () {
+        this.$.eOverlay.classList.switch('c-overlay', 'c-overlay-flash');
+        setTimeout(function () {
+          this.$.eOverlay.classList.switch('c-overlay-flash', 'c-overlay');
+        }.bind(this), 250)
+      },
+
+      highlight: function (bool) {
+        if (bool) {
+          this.$.eFrame.classList.switch('c-frame', 'c-frame-selected');
+        } else {
+          this.$.eFrame.classList.switch('c-frame-selected', 'c-frame');
+        }
+      },
+
+      created: function () {
+        // data values: normalized pair of (time, value)
+        this.values = [[0.0, 0.0], [0.15, 0.2], [1.0, 0.0]];
+      },
+
+      ready: function () {
+
+        // mouse responder
+        var prevData = {};
+        var mouseResponder = MUI.MouseResponder(
+          this.label,
+          this.$.eTouchable,
+          function (sender, action, data) {
+            switch (action) {
+              case 'clicked':
+                document.body.style.cursor = 'move';
+                this.highlight(true);
+                prevData = data;
+                break;
+              case 'dragged':
+                switch (this.type) {
+                  case 0:
+                    var dx = data.x - prevData.x,
+                        dy = data.y - prevData.y;
+                    this.post(dx, dy);
+                    break;
+                }
+                this.post();
+                prevData = data;
+                break;
+              case 'released':
+                document.body.style.cursor = 'default';
+                this.post();
+                break;
+            }
+          }.bind(this)
+        );
+
+        // ready & go
+        this.update();
+      },
+
+      getValues: function () {
+        return this.values.slice(0);
+      }
+
+    });
+  </script>
+</polymer-element>

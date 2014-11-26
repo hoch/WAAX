@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>FMK1 | WAAX Examples</title>
+  <script src="../../build/waax.js"></script>
+  <script src="../../build/plug_ins/fmk1.js"></script>
+  <script src="../../build/plug_ins/stereodelay.js"></script>
+  <script src="../../build/plug_ins/converb.js"></script>
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../../build/mui/mui.html">
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body unresolved>
+  <div class="wx-container">
+    <div class="wx-header">
+      <span class="wx-title">WAAX</span>
+      <span class="wx-info" id="wx-version"></span>
+      <span class="wx-menu">
+        <a href="..">Examples</a>
+      </span>
+    </div>
+
+    <h1>FMK1</h1>
+    <mui-rack id="r-params"></mui-rack>
+    <mui-rack label="Effects" opened="false">
+      <mui-group id="g-delay"></mui-group>
+      <mui-group id="g-verb"></mui-group>
+    </mui-rack>
+    <mui-rack label="keyboard">
+      <mui-vkey id="vkey"></mui-vkey>
+    </mui-rack>
+
+  </div>
+
+  <script>
+    MUI.start(function () {
+
+      var fmk1 = WX.FMK1({ output: 0.5 }),
+          delay = WX.StereoDelay({
+            mix: 1.0,
+            delayTimeLeft: 0.5,
+            delayTimeRight: 0.75,
+            feedbackLeft: 0.2,
+            feedbackRight: 0.4,
+            crosstalk: 0.25
+          }),
+          converb = WX.ConVerb({
+            mix: 1.0,
+            output: 0.5
+          });
+
+      converb.loadClip({
+        name: 'hall',
+        url: '../../../sound/ir/960-LargePlate.wav'
+      });
+
+      fmk1.to(WX.Master);
+      fmk1.to(delay).to(converb).to(WX.Master);
+
+      MUI.buildControls(fmk1, 'r-params');
+      MUI.buildControls(delay, 'g-delay');
+      MUI.buildControls(converb, 'g-verb');
+
+      MUI.$('vkey').addTarget(fmk1);
+
+    });
+  </script>
+  <script src="../examples.js"></script>
+</body>
+
+</html>

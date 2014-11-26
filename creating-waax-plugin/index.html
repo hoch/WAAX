@@ -1,0 +1,128 @@
+<!doctype html><html><head><title>Creating WAAX plug-in | WAAX</title><meta name="keywords" content="Web Audio API, Web MIDI API, JavaScript, collaboration, creativity, sound synthesis, computer music, music productionm, Chrome, FireFox, Safari"><meta name="description" content="Computer Music meets the Web. Experimental music software and collaborative creativity."><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="../css/wxdoc.min.css"><link href='http://fonts.googleapis.com/css?family=Roboto:100,300,400,700|Roboto+Condensed:300,400,700' rel='stylesheet' type='text/css'><link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:500' rel='stylesheet' type='text/css'></head><body unresolved class="wx-docpage-body"><div class="docs-wrap"><div class="inner-wrap"><nav class="top-bar sticky" data-topbar=""><section class="left"><div class="wx-navbar-title"><h1><a href="../">WAAX</a> <small>v1.0.0-alpha2</small></h1></div></section><section class="top-bar-section"><ul class="right"><li class="divider"></li><li><a href="../get-started">Get Started</a></li><li class="divider"></li><li><a href="../waax/examples">Examples</a></li><li class="divider"></li><li><a href="https://github.com/hoch/WAAX/">GitHub</a></li></ul></section></nav><div class="wx-content"><div class="wx-sidebar"><ul class="side-nav"><li class="heading">Documentation</li><li><a href="../get-started">Get Started</a></li><li><a href="../connection-and-parameter">Connection and Parameter</a></li><li><a href="../creating-waax-plugin">Creating WAAX Plug-in</a></li><!-- <li><a href="">Designing MUI Element</a></li> --><!-- <li><a href="">Sequencer and Transport</a></li> --><li class="heading">Tutorial</li><li><a href="../example-hellowaax">Hello WAAX!</a></li><li class="heading">API Reference</li><li><a href="../reference/1.0.0-alpha2/WX.html">1.0.0-alpha2</a></li><li class="heading">Resources</li><li><a href="https://github.com/hoch/WAAX/issues">GitHub Issue Tracker</a></li><li><a href="">Talks</a></li></ul></div><!-- content start --><div class="wx-view"><h1 id="creating-waax-plug-in">Creating WAAX Plug-in</h1>
+<p>If you are not familiar with the concept of plug-in in music production, I recommend you to read these resources first.</p>
+<ul>
+<li><a href="http://en.wikipedia.org/wiki/Audio_plugin">Audio Plug-in, Wikipedia</a> </li>
+<li><a href="http://music.tutsplus.com/tutorials/beginners-introduction-to-composing-on-the-computer-software--audio-19607">Introductory Article, TutsPlus.com</a></li>
+<li><a href="http://tweakheadz.com/plugins-for-audio/">Plug-ins for Audio, Tweakheadz.com</a></li>
+</ul>
+<h2 id="generator-processor-and-analyzer">Generator, Processor and Analyzer</h2>
+<p>WAAX currently defines 3 types of plug-in: <strong>Generator</strong>, <strong>Process</strong> and <strong>Analyzer</strong>. They have different configuration in terms of the internal audio routing. Note that the encapsulation is made possible by a predefined set of gain nodes. The following diagrams show how internal nodes are connected.</p>
+<p><img src="../assets/waax-plugin-0.png" alt="WAAX Plug-in Types"></p>
+<p>The examples of each plug-in type are:</p>
+<ul>
+<li>Generator: a synthesizer or sampler.</li>
+<li>Processor: an effect unit such as compressor, delay, distortion or reverb.</li>
+<li>Analyzer: a special unit for visualization, metering and event generation.</li>
+</ul>
+<p>Blackboxes above are to be filled in by a developer. All other stuffs - preset/parameter management, two-way binding, standardized input/output and more - will be managed by WAAX.</p>
+<h2 id="parameter-and-handler">Parameter and Handler</h2>
+<p>Before writing a plug-in, it is useful to understand how the parameter handler works. A WAAX plug-in has its own parameter layer and it is designed to abstract <code>AudioParam</code> object. </p>
+<p>When you define a parameter in a plug-in, you are required to write a handler for the parameter. Once it is set up, changing the parameter value automatically triggers the corresponding handler to perform scaling and mapping. Note that WAAX parameter can support &#39;one-to-many&#39; mapping scheme.</p>
+<p><img src="../assets/waax-plugin-1.png" alt="Parameter and Handler"></p>
+<p>With this mechanism, you can have an abstract preset (a collection of WAAX parameters) which can be mapped into multiple AudioParam instances in a flexible fashion.</p>
+<p>The handler is a quite powerful tool especially when you want to use <strong>MUI elements</strong> (i.e. knobs, sliders and etc.) for parameter control. You can get two-way binding between a parameter and a GUI element with a single line of code. (See the article on <a href="">MUI</a> for detail.)</p>
+<h2 id="building-waax-plug-in">Building WAAX Plug-in</h2>
+<p>This section shows the anatomy of plug-in building procedure. Before jumping right into the code example, here is the summary of each step:</p>
+<ol>
+<li>Create IIFE encapsulation and define a class</li>
+<li>Write the class constructor<ul>
+<li>Define plug-in type</li>
+<li>Do your stuff: node creation/patching and etc.</li>
+<li>Define WAAX Parameters</li>
+<li>Initialize Preset</li>
+</ul>
+</li>
+<li>Write the class prototype<ul>
+<li>Write plug-in info</li>
+<li>Write plug-in default preset</li>
+<li>Write handler methods for WAAX parameters defined above</li>
+</ul>
+</li>
+<li>Wrapping up<ul>
+<li>Extend the prototype with predefined plug-in types</li>
+<li>Register the plug-in under WX namespace.</li>
+</ul>
+</li>
+</ol>
+<p>It might be too much to digest at a glance, but it is nothing more than defining a JavaScript class.</p>
+<h3 id="1-iife-encapsulation-and-class-definition">1. IIFE Encapsulation and Class Definition</h3>
+<pre><code class="lang-js"><span class="hljs-list">(<span class="hljs-title">function</span> <span class="hljs-list">(<span class="hljs-title">WX</span>)</span> {
+
+  // Plug-in constructor <span class="hljs-list">(<span class="hljs-title">Step</span> <span class="hljs-number">2</span>)</span>
+  function MyPlugin<span class="hljs-list">(<span class="hljs-title">preset</span>)</span> {}
+
+  // Prototype <span class="hljs-list">(<span class="hljs-title">Step</span> <span class="hljs-number">3</span>)</span>
+  MyPlugin.prototype = {}<span class="hljs-comment">;</span>
+
+  // Define plug-in type <span class="hljs-list">(<span class="hljs-title">Step</span> <span class="hljs-number">4</span>)</span>
+  WX.Plugin.extendPrototype<span class="hljs-list">(<span class="hljs-title">MyPlugin</span>, 'Processor')</span><span class="hljs-comment">;</span>
+
+  // Register plug-in into WX namespace <span class="hljs-list">(<span class="hljs-title">Step</span> <span class="hljs-number">4</span>)</span>
+  WX.Plugin.register<span class="hljs-list">(<span class="hljs-title">MyPlugin</span>)</span><span class="hljs-comment">;</span>
+
+})</span><span class="hljs-list">(<span class="hljs-title">WX</span>)</span><span class="hljs-comment">;</span>
+</code></pre>
+<p>The above snippet is a fundamental scaffolding of WAAX plug-in. For the safe encapsulation, Using <a href="http://en.wikipedia.org/wiki/Immediately-invoked_function_expression">IIFE</a> is strongly recommended. Other than that, it is a plain JavaScript class definition. For the next step, the constructor needs to be filled in.</p>
+<h3 id="2-plug-in-constructor">2. Plug-in Constructor</h3>
+<pre><code class="lang-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">MyPlugin</span><span class="hljs-params">(preset)</span> {</span>
+
+  <span class="hljs-comment">// 1. define plug-in type</span>
+  WX.Plugin.defineType(<span class="hljs-keyword">this</span>, <span class="hljs-string">'Processor'</span>);
+
+  <span class="hljs-comment">// 2. create and patch native nodes</span>
+  <span class="hljs-keyword">this</span>._input.to(<span class="hljs-keyword">this</span>._output);
+
+  <span class="hljs-comment">// 3. define WAAX parameters</span>
+  WX.defineParams(<span class="hljs-keyword">this</span>, { 
+    sweet: {
+      type: <span class="hljs-string">'Boolean'</span>, <span class="hljs-keyword">default</span>: <span class="hljs-literal">false</span>
+    },
+  });
+
+  <span class="hljs-comment">// 4. initialize preset</span>
+  WX.Plugin.initPreset(<span class="hljs-keyword">this</span>, preset);
+}
+</code></pre>
+<p>Among the steps shown above, 1, 3 and 4 are mandatory for the plug-in to run properly. The most important thing is the step 1 because it creates the internal routing so you can input or output sound. In the current version (1.0.0), you can choose one plug-in type from <em>Generator, Processor and Analyzer</em>.</p>
+<p>Step 3 is to define WAAX parameters and note that you need to define the corresponding handler in the prototype.</p>
+<h3 id="3-plug-in-prototype">3. Plug-in Prototype</h3>
+<pre><code class="lang-js">MyPlugin.prototype = {
+
+  <span class="hljs-comment">// 1: plug-in info</span>
+  info: {
+    name: <span class="hljs-string">'MyPlugin'</span>,
+    api_version: <span class="hljs-string">'1.0.0-alpha2'</span>,
+    plugin_version: <span class="hljs-string">'1.0.0'</span>,
+    author: <span class="hljs-string">'Hongchan Choi'</span>,
+    type: <span class="hljs-string">'Processor'</span>,
+    description: <span class="hljs-string">'Dummy Plug-in'</span>
+  },
+
+  <span class="hljs-comment">// 2: default preset</span>
+  defaultPreset: {
+    sweet: <span class="hljs-literal">false</span>
+  },
+
+  <span class="hljs-comment">// 3: define handlers</span>
+  $sweet: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value, time, xtype)</span> {</span>
+    <span class="hljs-comment">// do something when parameter 'sweet' changed</span>
+  }
+};
+</code></pre>
+<p>A plug-in prototype is consist of <strong>plug-in information</strong>, <strong>default preset</strong> and <strong>handlers</strong>: filling the info and default preset should be straightforward. Writing handlers is not difficult if you have a solid idea on how to scale and map parameters.</p>
+<p>The detail on parameter definition and writing handler is covered in <a href="">this article</a>.</p>
+<h3 id="4-wrapping-up">4. Wrapping Up</h3>
+<pre><code class="lang-js">WX.Plugin.extendPrototype(MyPlugin, <span class="hljs-string">'Processor'</span>);
+WX.Plugin.register(MyPlugin);
+</code></pre>
+<p>Just copy and paste two lines above and replace the constructor name and the plug-in type accordingly.</p>
+<h2 id="how-to-use-plug-in">How to Use Plug-in</h2>
+<p>Load your plug-in script file after WAAX core library. Then you can use it under WX namespace.</p>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"waax.js"</span>&gt;</span><span class="javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"MyPlugin.js"</span>&gt;</span><span class="javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">script</span>&gt;</span><span class="javascript">
+  <span class="hljs-keyword">var</span> myplugin = WX.MyPlugin({ sweet: <span class="hljs-number">1.0</span> });
+  myplugin.to(WX.Master);
+</span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+</code></pre>
+</div><!-- footer --></div></div></div><div class="wx-bottom"><div class="wx-view"><div class="wx-copyright"><p>Copyright (c) 2012-2014 Hongchan Choi. All rights reserved.</p><dl class="sub-nav"><dd><a href="#">About</a></dd><dd><a href="#">License</a></dd><dd><a href="#">Web Audio API</a></dd><dd><a href="#">Web MIDI API</a></dd><dd><a href="#">Acknowledegement</a></dd><dd><a href="#">Contributing</a></dd><dd><a href="#">Blog</a></dd></dl></div></div></div><!-- scripts --><script src="../script/wxdoc.min.js"></script><!-- google analytics<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'YOUR-GA-ID-HERE', 'GA-LABEL');ga('send', 'pageview');</script>--><!-- AddThis<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=YOUR-ADDTHIS-PUB-ID-HERE"></script>--></body></html>

@@ -1,0 +1,47 @@
+<!--
+  `mui-group`
+  @version 1.0.0-alpha2
+  @description MUI group element. A container for multiple elements.
+-->
+
+<polymer-element name="mui-group" attributes="label">
+<template>
+  <style>
+    :host {
+      display: inline-block;
+    }
+    .mui-group-container {
+      position: relative;
+      display: inline-block;
+      margin: 0 6px 10px 0;
+      padding: 0;
+      vertical-align: top;
+    }
+    .mui-group-header {
+      font-family: 'Roboto Condensed', sans-serif;
+      color: #90a4ae;
+      font-size: 0.7rem;
+      line-height: 0.8rem;
+      padding-bottom: 2px;
+      text-align: center;
+      border-bottom: 1px solid #cfd8dc;
+      /* text-transform: uppercase; */
+    }
+  </style>
+  <div class="mui-group-container">
+    <div class="mui-group-header">
+      <span class="label">{{ label }}</span>
+    </div>
+    <div class="mui-group-content">
+      <content></content>
+    </div>
+  </div>
+</template>
+<script>
+  Polymer({
+
+    label: 'Unlabeled'
+
+  });
+</script>
+</polymer-element>

@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Plug-in Workshop | WAAX Examples</title>
+  <!-- CSS for examples -->
+  <link rel="stylesheet" href="../style.css">
+  <!-- MUI -->
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../../build/mui/mui.html">
+  <!-- WAAX -->
+  <script src="../../build/waax.js"></script>
+  <!-- plug-ins -->
+  <script src="../../build/plug_ins/wxs1.js"></script>
+  <script src="../../build/plug_ins/fmk1.js"></script>
+  <script src="../../build/plug_ins/simpleosc.js"></script>
+  <script src="../../build/plug_ins/noise.js"></script>
+  <script src="../../build/plug_ins/impulse.js"></script>
+  <script src="../../build/plug_ins/cmp1.js"></script>
+  <script src="../../build/plug_ins/stereodelay.js"></script>
+  <script src="../../build/plug_ins/converb.js"></script>
+</head>
+
+<body unresolved>
+
+  <div class="wx-container">
+    <div class="wx-header">
+      <span class="wx-title">WAAX</span>
+      <span class="wx-info" id="wx-version"></span>
+      <span class="wx-menu">
+        <a href="..">Examples</a>
+      </span>
+    </div>
+
+    <h1>Plug-in Workshop</h1>
+
+    <mui-select label="Generator" id="select-gen"></mui-select>
+    <mui-rack id="params-gen" title="Generator" opened="true">
+    </mui-rack>
+
+    <mui-select label="Processor" id="select-pro"></mui-select>
+    <mui-rack id="params-pro" title="Processor" opened="true">
+    </mui-rack>
+
+    <mui-rack label="Keyboard" opened="false">
+      <mui-vkey id="vkey"></mui-vkey>
+    </mui-rack>
+
+    <mui-rack label="spectrum">
+      <mui-spectrum id="spec"></mui-spectrum>
+    </mui-rack>
+  </div>
+
+
+  <script>
+    MUI.start(function () {
+
+      // Get registered WX plug-ins: Generator and Processor
+      var gens = WX.PlugIn.getRegistered('Generator'),
+          pros = WX.PlugIn.getRegistered('Processor');
+
+      // Create data model for mui-select
+      var genModel = [],
+          proModel = [];
+      for (var i = 0; i < gens.length; i++) {
+        genModel.push({ key: gens[i], value: gens[i] });
+      }
+      for (i = 0; i < pros.length; i++) {
+        proModel.push({ key: pros[i], value: pros[i] });
+      }
+
+      // Get DOM handles with MUI.$ selector
+      var genSelector = MUI.$('select-gen'),
+          proSelector = MUI.$('select-pro'),
+          vkeySelector = MUI.$('vkey'),
+          specSelector = MUI.$('spec');
+
+      // Set data model and event handler
+      genSelector.setModel(genModel);
+      genSelector.setValue(gens[0]);
+      genSelector.onItemSelected = onPatch;
+      proSelector.setModel(proModel);
+      proSelector.setValue(pros[1]);
+      proSelector.onItemSelected = onPatch;
+
+      // loading WXClip for convolution reverb
+      var reverbClip = {
+        name: '960 Large Plate',
+        url: '../../sound/ir/960-LargePlate.mp3'
+      };
+      WX.loadClip(reverbClip, function (clip) {
+        WX.Log.info('clip loaded.');
+      });
+
+      // Current generator and processor references
+      var currGen, currPro;
+
+      // Event handler: onPatch
+      function onPatch() {
+
+        // clear up
+        if (currGen) {
+          currGen.cut();
+          vkeySelector.removeTarget(currGen);
+        }
+        if (currPro) {
+          currPro.cut();
+        }
+        MUI.removeChildren('params-gen');
+        MUI.removeChildren('params-pro');
+
+        // recreation
+        currGen = WX[genSelector.value]();
+        currPro = WX[proSelector.value]();
+        currGen.to(currPro).to(WX.Master);
+        currPro.to(specSelector);
+
+        // connecting keyboard input
+        if (currGen.onData) {
+          vkeySelector.addTarget(currGen);
+        }
+
+        // parse and build GUI elements
+        MUI.buildControls(currGen, 'params-gen');
+        MUI.buildControls(currPro, 'params-pro');
+
+        if (proSelector.value === 'ConVerb') {
+          currPro.setClip(reverbClip);
+        }
+
+      }
+
+      // Initial patching
+      onPatch();
+
+    });
+  </script>
+
+  <script>
+    var wxver = document.querySelector('#wx-version');
+    wxver.textContent = WX.getVersion();
+  </script>
+</body>
+
+</html>

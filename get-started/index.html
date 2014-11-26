@@ -1,0 +1,34 @@
+<!doctype html><html><head><title>Get Started | WAAX</title><meta name="keywords" content="Web Audio API, Web MIDI API, JavaScript, collaboration, creativity, sound synthesis, computer music, music productionm, Chrome, FireFox, Safari"><meta name="description" content="Computer Music meets the Web. Experimental music software and collaborative creativity."><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="../css/wxdoc.min.css"><link href='http://fonts.googleapis.com/css?family=Roboto:100,300,400,700|Roboto+Condensed:300,400,700' rel='stylesheet' type='text/css'><link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:500' rel='stylesheet' type='text/css'></head><body unresolved class="wx-docpage-body"><div class="docs-wrap"><div class="inner-wrap"><nav class="top-bar sticky" data-topbar=""><section class="left"><div class="wx-navbar-title"><h1><a href="../">WAAX</a> <small>v1.0.0-alpha2</small></h1></div></section><section class="top-bar-section"><ul class="right"><li class="divider"></li><li><a href="../get-started">Get Started</a></li><li class="divider"></li><li><a href="../waax/examples">Examples</a></li><li class="divider"></li><li><a href="https://github.com/hoch/WAAX/">GitHub</a></li></ul></section></nav><div class="wx-content"><div class="wx-sidebar"><ul class="side-nav"><li class="heading">Documentation</li><li><a href="../get-started">Get Started</a></li><li><a href="../connection-and-parameter">Connection and Parameter</a></li><li><a href="../creating-waax-plugin">Creating WAAX Plug-in</a></li><!-- <li><a href="">Designing MUI Element</a></li> --><!-- <li><a href="">Sequencer and Transport</a></li> --><li class="heading">Tutorial</li><li><a href="../example-hellowaax">Hello WAAX!</a></li><li class="heading">API Reference</li><li><a href="../reference/1.0.0-alpha2/WX.html">1.0.0-alpha2</a></li><li class="heading">Resources</li><li><a href="https://github.com/hoch/WAAX/issues">GitHub Issue Tracker</a></li><li><a href="">Talks</a></li></ul></div><!-- content start --><div class="wx-view"><h1 id="get-started">Get Started</h1>
+<h2 id="before-installation">Before Installation</h2>
+<p>The complete WAAX development setup requires the following software. Make sure they are installed with appropriate scope and permission.</p>
+<ul>
+<li><a href="http://git-scm.com/">Git</a> - <a href="http://git-scm.com/downloads">Installation</a></li>
+<li><a href="http://nodejs.org/">Node.js</a> - <a href="http://nodejs.org/">Installation</a></li>
+<li><a href="http://bower.io/">Bower</a> - <a href="http://bower.io/#install-bower">Installation</a></li>
+<li><a href="http://gulpjs.com/">Gulp</a> - <a href="https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md">Installation</a></li>
+</ul>
+<h2 id="installation">Installation</h2>
+<p>If you have all the above installed, then simply execute the following commands in the terminal to install WAAX. Replace <code>$YOUR_DIRECTORY</code> with your installation directory.</p>
+<pre><code class="lang-bash">git clone https://github.com/hoch/WAAX <span class="hljs-variable">$YOUR_DIRECTORY</span>
+<span class="hljs-built_in">cd</span> <span class="hljs-variable">$YOUR_DIRECTORY</span>
+npm install
+bower install
+</code></pre>
+<h2 id="quick-start-with-gulp">Quick Start with Gulp</h2>
+<p>WAAX is pre-configured for the optimum development workflow. Type <code>gulp</code> in the terminal and then your web browser (Chrome by default) will open the project landing page automatically.</p>
+<pre><code class="lang-bash">gulp                    <span class="hljs-comment"># build everything and serve at 127.0.0.1:3000</span>
+
+gulp clean              <span class="hljs-comment"># cleans dist, build path</span>
+gulp core               <span class="hljs-comment"># minifies and concats core JS files to build/</span>
+gulp plugins            <span class="hljs-comment"># minifies plug-in JS files to build/plug_ins</span>
+gulp mui                <span class="hljs-comment"># copies MUI elements files to build/</span>
+gulp serve              <span class="hljs-comment"># starts dev server 127.0.0.1:3000 and opens Chrome</span>
+gulp build              <span class="hljs-comment"># build and minify core, plug-ins</span>
+</code></pre>
+<h2 id="what-s-next-">What&#39;s Next?</h2>
+<ul>
+<li>Start with a basic example: <a href="../example-hellowaax">Example - Hello WAAX!</a></li>
+<li>How to build and tweak: <a href="../connection-and-parameter">Connection and Parameter</a></li>
+<li>Look around <a href="../waax/examples">live demos</a></li>
+</ul>
+</div><!-- footer --></div></div></div><div class="wx-bottom"><div class="wx-view"><div class="wx-copyright"><p>Copyright (c) 2012-2014 Hongchan Choi. All rights reserved.</p><dl class="sub-nav"><dd><a href="#">About</a></dd><dd><a href="#">License</a></dd><dd><a href="#">Web Audio API</a></dd><dd><a href="#">Web MIDI API</a></dd><dd><a href="#">Acknowledegement</a></dd><dd><a href="#">Contributing</a></dd><dd><a href="#">Blog</a></dd></dl></div></div></div><!-- scripts --><script src="../script/wxdoc.min.js"></script><!-- google analytics<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'YOUR-GA-ID-HERE', 'GA-LABEL');ga('send', 'pageview');</script>--><!-- AddThis<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=YOUR-ADDTHIS-PUB-ID-HERE"></script>--></body></html>

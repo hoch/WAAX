@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>CMP1 | WAAX Examples</title>
+  <script src="../../build/waax.js"></script>
+  <script src="../../build/plug_ins/noise.js"></script>
+  <script src="../../bower_components/platform/platform.js"></script>
+  <link rel="import" href="../../build/mui/mui.html">
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body unresolved>
+  <div class="wx-container">
+    <div class="wx-header">
+      <span class="wx-title">WAAX</span>
+      <span class="wx-info" id="wx-version"></span>
+      <span class="wx-menu">
+        <a href="..">Examples</a>
+      </span>
+    </div>
+
+    <h1>Noise</h1>
+    <mui-rack label="Noise" id="rack"></mui-rack>
+    <mui-rack label="Spectrum">
+      <mui-spectrum id="spec"></mui-spectrum>
+    </mui-rack>
+
+  </div>
+  <script>
+
+    MUI.start(function () {
+
+      var noise = WX.Noise({ output: 0.25 });
+      noise.to(WX.Master);
+
+      MUI.buildControls(noise, 'rack');
+      noise.to(MUI.$('spec'));
+
+    });
+
+  </script>
+  <script src="../examples.js"></script>
+</body>
+
+</html>
