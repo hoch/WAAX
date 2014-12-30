@@ -1,3 +1,4 @@
+// Gulp dependencies
 var gulp        = require('gulp'),
     plugins     = require('gulp-load-plugins')(),
     browserSync = require('browser-sync'),
@@ -7,12 +8,14 @@ var gulp        = require('gulp'),
 var reload      = browserSync.reload;
 
 
+// Clean: Empty the build directory before a complete build.
 gulp.task('clean', del.bind(null, [
   'build/**/*',
   '!build'
 ]));
 
 
+// Core: Build waax.js into build/ path.
 gulp.task('core', function () {
   return gulp.src([
     'src/waax.header.js',
@@ -30,6 +33,7 @@ gulp.task('core', function () {
 });
 
 
+// Plugins: Build plug-in JS files into build/plug_ins/ path.
 gulp.task('plugins', function () {
   return gulp.src([
     'src/plug_ins/**/*.js',
@@ -42,6 +46,7 @@ gulp.task('plugins', function () {
 });
 
 
+// MUI: Build MUI elements into build/mui/ path.
 gulp.task('mui', function () {
   return gulp.src([
     'src/mui/**/*',
@@ -52,6 +57,7 @@ gulp.task('mui', function () {
 })
 
 
+// Serve: Start a dev server at 127.0.0.1:3000.
 gulp.task('serve', function () {
   browserSync({
     notify: false,
@@ -70,11 +76,13 @@ gulp.task('serve', function () {
 });
 
 
+// Build: Clean and build everything in build/ path.
 gulp.task('build', function (cb) {
   runSequence('clean', ['core', 'plugins', 'mui'], cb);
 });
 
 
+// Default: Build and serve.
 gulp.task('default', function (cb) {
   runSequence('build', 'serve', cb);
 });

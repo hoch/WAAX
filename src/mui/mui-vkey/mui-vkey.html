@@ -1,6 +1,6 @@
 <!--
   `mui-vkey`
-  @version 1.0.0-alpha2
+  @version 1.0.0-alpha3
   @description MUI virtual keybaord. Responds to key and mouse input.
 -->
 
@@ -211,23 +211,30 @@
     },
 
     // highlight key
-    // TODO: this needs to be optimized (just change color, not style)
-    _highlight: function (pitch) {
-      if (pitch !== null) {
-        var key = this._keys[pitch];
-        if (key) {
+    // TO FIX: this needs to be optimized (just change color, not style)
+    _highlight: function (pitch, highlight) {
+      var key = this._keys[pitch];
+      if (key) {
+        if (highlight) {
           key.rect.setAttribute('class', key.rect.getAttribute('class') + ' active');
-        }
-      }
-      if (this._prevPitch !== null) {
-        key = this._keys[this._prevPitch];
-        if (key) {
+        } else {
           key.rect.setAttribute('class', key.rect.getAttribute('class').slice(0, 11));
         }
       }
+      // if (pitch !== null) {
+      //   var key = this._keys[pitch];
+      //   if (key) {
+      //     key.rect.setAttribute('class', key.rect.getAttribute('class') + ' active');
+      //   }
+      // }
+      // if (this._prevPitch !== null) {
+      //   key = this._keys[this._prevPitch];
+      //   if (key) {
+      //     key.rect.setAttribute('class', key.rect.getAttribute('class').slice(0, 11));
+      //   }
+      // }
     },
 
-    //
     _displayMessage: function (msg) {
       this.$.eMsgPanel.textContent = msg;
     },
@@ -246,32 +253,30 @@
      * dispatch helpers
      */
 
-    _start: function (pitch, velocity) {
+    _keyOn: function (pitch, velocity) {
       if (pitch !== null) {
         var xpitch = pitch + this._octaveOffset + this.octave * 12;
         this._dispatch(this.label, 'noteon', { pitch: xpitch, velocity: velocity });
         this._displayMessage('NOTE ON ' + xpitch);
-        this._highlight(pitch);
-        this._prevPitch = pitch;
+        this._highlight(pitch, true);
       }
     },
 
-    _glide: function (pitch) {
-      if (pitch !== null && this._prevPitch !== pitch) {
-        var xpitch = pitch + this._octaveOffset + this.octave * 12;
-        this._dispatch(this.label, 'glide', { pitch: xpitch });
-        this._displayMessage('GLIDE ' + xpitch);
-        this._highlight(pitch);
-        this._prevPitch = pitch;
-      }
-    },
+    // _glide: function (pitch) {
+    //   if (pitch !== null && this._prevPitch !== pitch) {
+    //     var xpitch = pitch + this._octaveOffset + this.octave * 12;
+    //     this._dispatch(this.label, 'glide', { pitch: xpitch });
+    //     this._displayMessage('GLIDE ' + xpitch);
+    //     this._highlight(pitch);
+    //     this._prevPitch = pitch;
+    //   }
+    // },
 
-    _stop: function (pitch) {
+    _keyOff: function (pitch) {
       var xpitch = pitch + this._octaveOffset + this.octave * 12;
       this._dispatch(this.label, 'noteoff', { pitch: xpitch, velocity: 0 });
       this._displayMessage('NOTE OFF');
-      this._highlight(null);
-      this._prevPitch = null;
+      this._highlight(pitch, false);
     },
 
     _setPitchWheel: function (value) {
@@ -296,7 +301,7 @@
       if (pitch > -1) {
         if (this._keys[pitch].state) return;
         this._keys[pitch].state = true;
-        this._start(pitch + this._octaveOffset + this.octave * 12, 100);
+        this._keyOn(pitch + this._octaveOffset + this.octave * 12, 100);
       }
     },
 
@@ -306,53 +311,97 @@
       if (pitch > -1) {
         if (this._keys[pitch].state) {
           this._keys[pitch].state = false;
-          this._stop(pitch + this._octaveOffset + this.octave * 12);
+          this._keyOff(pitch + this._octaveOffset + this.octave * 12);
         }
       }
     },
 
     // return action, data1, data2
-    // TODO: this needs to be redesigned...
+    // TO FIX: redesign interaction...
     _mouseCallback: function (sender, action, data) {
       if (data) {
-        // check pwheel
-        if (6 <= data.x && data.x <= 38) {
-          if (6 <= data.y && data.y <= 94) {
-            this._setPitchWheel(1.0 - (data.y - 6) / 88);
-          }
-        }
-        // check modwheel
-        else if (44 <= data.x && data.x <= 76) {
-          if (6 <= data.y && data.y <= 94) {
-            this._setModWheel(1.0 - (data.y - 6) / 88);
-          }
-        }
-        // check keys
-        else if (this._offset <= data.x && data.x <= this._svgWidth) {
-          for (var i = 0; i < this._keys.length; i++) {
-            var key = this._keys[i];
-            // check y first
-            if (key.y1 <= data.y && data.y <= key.y2) {
-              // then check x
-              if (key.x1 <= data.x && data.x <= key.x2) {
-                switch (action) {
-                  case 'clicked':
-                    this._start(i, 100);
-                    break;
-                  case 'dragged':
-                    this._glide(i);
-                    break;
-                  case 'released':
-                    this._stop(i);
-                    break;
+        if (6 <= data.y && data.y <= 94) {
+          switch (action) {
+            case 'clicked':
+              if (6 <= data.x && data.x <= 38) { // check pwheel
+                this._setPitchWheel(1.0 - (data.y - 6) / 88);
+              } else if (44 <= data.x && data.x <= 76) { // check modwheel
+                this._setModWheel(1.0 - (data.y - 6) / 88);
+              } else if (this._offset <= data.x && data.x <= this._svgWidth) { // check keys
+                for (var i = 0; i < this._keys.length; i++) {
+                  var key = this._keys[i];
+                  // check y first
+                  if (key.y1 <= data.y && data.y <= key.y2) {
+                    // then check x
+                    if (key.x1 <= data.x && data.x <= key.x2) {
+                      this._keyOn(i, 100);
+                      this._prevPitch = i;
+                    }
+                  }
                 }
               }
-            }
+              break;
+
+            case 'dragged':
+              if (6 <= data.x && data.x <= 38) { // check pwheel
+                this._setPitchWheel(1.0 - (data.y - 6) / 88);
+              } else if (44 <= data.x && data.x <= 76) { // check modwheel
+                this._setModWheel(1.0 - (data.y - 6) / 88);
+              } else if (this._offset <= data.x && data.x <= this._svgWidth) { // check keys
+                var validKeyFound = false;
+                for (var i = 0; i < this._keys.length; i++) {
+                  var key = this._keys[i];
+                  // check y first
+                  if (key.y1 <= data.y && data.y <= key.y2) {
+                    // then check x
+                    if (key.x1 <= data.x && data.x <= key.x2) {
+                      // check for transition and then trigger
+                      if (this._prevPitch !== i) {
+                        this._keyOff(this._prevPitch);
+                        this._keyOn(i, 100);
+                        this._prevPitch = i;
+                      }
+                      // found a key. break the loop.
+                      validKeyFound = true;
+                      break;
+                    }
+                  }
+                }
+                // pointer is at invalid area. release previous pitch.
+                if (!validKeyFound) {
+                  if (this._prevPitch) {
+                    this._keyOff(this._prevPitch);
+                    this._prevPitch = null;
+                  }
+                }
+              }
+              break;
+
+            case 'released':
+              if (this._offset <= data.x && data.x <= this._svgWidth) { // check keys
+                for (var i = 0; i < this._keys.length; i++) {
+                  var key = this._keys[i];
+                  // check y first
+                  if (key.y1 <= data.y && data.y <= key.y2) {
+                    // then check x
+                    if (key.x1 <= data.x && data.x <= key.x2) {
+                      this._keyOff(i);
+                      this._prevPitch = null;
+                    }
+                  }
+                }
+              }
+              break;
+          }
+        } else {
+          // invalid area, release previous pitch
+          if (this._prevPitch) {
+            this._keyOff(this._prevPitch);
+            this._prevPitch = null;
           }
         }
       }
     },
-
 
     /**
      * Polymer-system methods

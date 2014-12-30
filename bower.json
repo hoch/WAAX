@@ -1,6 +1,6 @@
 {
   "name": "WAAX",
-  "version": "1.0.0-alpha2",
+  "version": "1.0.0-alpha3",
   "homepage": "https://github.com/hoch/WAAX",
   "license": "MIT",
   "ignore": [
@@ -11,9 +11,9 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#~0.4.2",
-    "core-icon": "Polymer/core-icon#~0.4.2",
-    "chai": "~1.9.2",
-    "mocha": "~2.0.1"
+    "polymer": "Polymer/polymer#~0.5.1",
+    "core-icon": "Polymer/core-icon#~0.5.2",
+    "chai": "~1.10.0",
+    "mocha": "~2.1.0"
   }
 }

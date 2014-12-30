@@ -1,14 +1,15 @@
-## WAAX (Web Audio API eXtension)
+## WAAX
 
-Web Music Framework (1.0.0-alpha2)
+Web Audio API eXtension (1.0.0-alpha2)
 
-> WAAX requires Web Audio API and Web Components!
+> WAAX requires Web Audio API and Web Components.
 
 <!-- travis build image -->
 
+
 ## Introduction
 
-__WAAX__ offers a comprehensive framework for web-based music application. Its goal is to facilitate and support the development of web-based music application.
+__WAAX__ offers a comprehensive framework for web-based music application. Its goal is to facilitate and support the development of web-based music software.
 
 
 ## Feature Highlights
@@ -36,11 +37,11 @@ The complete WAAX development setup requires the following software. Make sure t
 
 ## Installation
 
-If you have all the above installed, then simply execute the following commands in the terminal to install WAAX. Replace `$YOUR_DIRECTORY` with your installation directory.
+If you have all the above installed, execute the following commands in the terminal to install WAAX.
 
 ~~~bash
-git clone https://github.com/hoch/WAAX $YOUR_DIRECTORY
-cd $YOUR_DIRECTORY
+git clone https://github.com/hoch/WAAX waax
+cd waax
 npm install
 bower install
 ~~~
@@ -70,15 +71,18 @@ Go to the [project landing page](http://hoch.github.io/WAAX) and see what WAAX c
 
 ## Change Log
 
+- 1.0.0-alpha3
+    + Updated dependencies with latest version: Polymer, Gulp-related utilities.
+
 - 1.0.0-alpha2
-    + Updated dependencies with latest version: Gulp, Polymer
-    + MUI elements updated for new version of Polymer
+    + Updated dependencies with latest version: Gulp, Polymer.
+    + MUI elements updated for new version of Polymer.
     + Timebase code has been cleaned/refactored.
     + Updated README and the temporary landing page is removed.
     + MUI elements and test files are now compatible with FireFox/Safari.
     + Audio assets are converted to MP3.
-    - `WXS1` and `FMK1` plug-ins produce distorted sound in FireFox.
-    - Safari does not load the example with `StereoDelay` plug-in.
+    - [bug] `WXS1` and `FMK1` plug-ins produce distorted sound in FireFox.
+    - [bug] Safari does not load the example with `StereoDelay` plug-in.
 
 - 1.0.0-alpha
     + First alpha version before stable release.
@@ -91,4 +95,4 @@ Go to the [project landing page](http://hoch.github.io/WAAX) and see what WAAX c
 
 ## License and Contact
 
-MIT License. Copyright (c) 2011-2014 [Hongchan Choi](http://www.hoch.io)
+MIT License. Copyright 2011-2014 [Hongchan Choi](http://www.hoch.io)

@@ -127,7 +127,6 @@
 
     /**
      * Initializes or resets note clip.
-     * @return {[type]}
      */
     _init: function () {
       this.notes = {};
@@ -211,7 +210,7 @@
     /**
      * Returns note from clip with id.
      * @param  {String} id Note ID.
-     * @return {[type]}
+     * @return {Object}
      */
     get: function (id) {
       if (this.hasId(id)) {
