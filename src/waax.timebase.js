@@ -1,6 +1,5 @@
 /**
  * @fileOverview Note, NoteClip data structure and Transport system.
- * @version 1.0.0-alpha2
  * @author Hongchan Choi (hoch)
  * @license MIT
  */

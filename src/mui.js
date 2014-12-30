@@ -1,14 +1,7 @@
 /**
  * @fileOverview MUI: Musical User Interface module (for Polymer integration)
- * @description This module includes some utilities for keyboard and mouse
- *   responders, because music-specific GUI elements require non-standard user
- *   interaction. The functionality might be integrated into Polymer custom
- *   element, but the code is currently used for bridging the gap between WAAX
- *   and Polymer.
- * @version 1.0.0-alpha2
+ * @version 1.0.0-alpha3
  */
-
-
 
 window.MUI = (function (WX) {
 

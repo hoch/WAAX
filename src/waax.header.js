@@ -1,6 +1,5 @@
 /**
  * @fileOverview WX Namespace and basic Web Audio API wrapper.
- * @version 1.0.0-alpha2
  * @author Hongchan Choi (hoch)
  * @license MIT
  */
@@ -15,7 +14,7 @@ window.WX = {};
   'use strict';
 
   // System info
-  var _API_VERSION = '1.0.0-alpha2';
+  var _API_VERSION = '1.0.0-alpha3';
 
   /**
    * Returns WAAX API version number. (semantic version)

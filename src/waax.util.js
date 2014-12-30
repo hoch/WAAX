@@ -1,6 +1,5 @@
 /**
  * @fileOverview Various utilities for WAAX
- * @version 1.0.0-alpha
  * @author Hongchan Choi (hoch)
  * @license MIT
  */

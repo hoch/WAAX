@@ -1,8 +1,8 @@
-## WAAX
+# WAAX
 
-Web Audio API eXtension (1.0.0-alpha2)
+Web Audio API eXtension (1.0.0-alpha3)
 
-> WAAX requires Web Audio API and Web Components.
+> NOTE: WAAX requires Web Audio API and Web Components.
 
 <!-- travis build image -->
 
@@ -73,6 +73,8 @@ Go to the [project landing page](http://hoch.github.io/WAAX) and see what WAAX c
 
 - 1.0.0-alpha3
     + Updated dependencies with latest version: Polymer, Gulp-related utilities.
+    + mui-vkey polyphonic release issue solved.
+    + New project landing page is online.
 
 - 1.0.0-alpha2
     + Updated dependencies with latest version: Gulp, Polymer.
