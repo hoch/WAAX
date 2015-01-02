@@ -23,7 +23,6 @@ gulp.task('core', function () {
     'src/waax.core.js',
     'src/waax.timebase.js',
     'src/mui.js',
-    'src/timebase.js',
     'src/plug_ins/Fader/fader.js'
   ])
     .pipe(plugins.uglify({ mangle: false }))
