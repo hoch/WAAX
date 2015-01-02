@@ -1,8 +1,7 @@
-/**
- * @fileOverview Note, NoteClip data structure and Transport system.
- * @author Hongchan Choi (hoch)
- * @license MIT
- */
+// Copyright 2011-2014 Hongchan Choi. All rights reserved.
+// Use of this source code is governed by MIT license that can be found in the
+// LICENSE file.
+
 (function (WX) {
 
   'use strict';
@@ -315,9 +314,9 @@
   };
 
 
-  /**
-   * Router class should be here.
-   */
+  //
+  // Router class should be here.
+  //
 
 
   // NOTES:
@@ -672,6 +671,7 @@
 
   /**
    * Converts MBST(measure, beat, sixteenth, tick) format to tick.
+   * @memberOf WX
    * @param  {Object} mtime Musical time in MBST format.
    * @param  {Object} mtime.measure Measure.
    * @param  {Object} mtime.beat Beat.
@@ -688,6 +688,7 @@
 
   /**
    * Converts tick to MBST(measure, beat, sixteenth, tick) format.
+   * @memberOf WX
    * @param  {NUmber} tick Tick.
    * @return {Object} mtime Musical time in MBST format.
    * @return {Object} mtime.measure Measure.
@@ -706,6 +707,7 @@
 
   /**
    * Creates a Note instance.
+   * @memberOf WX
    * @param  {Number} pitch MIDI pitch (0~127)
    * @param  {Number} velocity MIDI velocity (0~127)
    * @param  {Number} start Note start time in tick.
@@ -718,6 +720,7 @@
 
   /**
    * Create a NoteClip instance.
+   * @memberOf WX
    * @return {WX.NoteClip}
    */
   WX.NoteClip = function () {

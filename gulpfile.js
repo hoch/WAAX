@@ -18,7 +18,8 @@ gulp.task('clean', del.bind(null, [
 // Core: Build waax.js into build/ path.
 gulp.task('core', function () {
   return gulp.src([
-    'src/waax.header.js',
+    'src/waax.js',
+    'src/waax.extension.js',
     'src/waax.util.js',
     'src/waax.core.js',
     'src/waax.timebase.js',

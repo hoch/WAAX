@@ -1,10 +1,10 @@
-/**
- * @fileOverview WAAX core. Parameter and plug-in abstraction.
- * @author Hongchan Choi (hoch)
- * @license MIT
- */
+// Copyright 2011-2014 Hongchan Choi. All rights reserved.
+// Use of this source code is governed by MIT license that can be found in the
+// LICENSE file.
 
 (function (WX) {
+
+  'use strict';
 
   //
   // WX-specific data structure
@@ -53,7 +53,6 @@
    *   velocityModulatio: true  // use velocity moduation
    * };
    */
-
 
   //
   // Parameter Abstractions
@@ -837,6 +836,11 @@
     var plugins = null;
     if (PLUGIN_TYPES.indexOf(type) > -1) {
       switch (type) {
+        case undefined:
+          plugins = registered.Generator.slice(0);
+          plugins = plugins.concat(registered.Processor.slice(0));
+          plugins = plugins.concat(registered.Analyzer.slice(0));
+          break;
         case 'Generator':
           plugins = registered.Generator.slice(0);
           break;
@@ -851,9 +855,7 @@
     return plugins;
   };
 
-  /**
-   * All system go.
-   */
+  // WAAX is ready to serve!
   WX.Log.info('WAAX', WX.getVersion(), '(' + WX.srate + 'Hz)');
 
 })(WX);
