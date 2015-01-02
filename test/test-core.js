@@ -8,7 +8,7 @@ var expect = chai.expect,
 describe('Core: Utilities - object, music math and more.', function() {
   describe('getVersion()', function () {
     it('should return API version number.', function () {
-      expect(WX.getVersion()).to.equal('1.0.0-alpha2');
+      expect(WX.getVersion()).to.equal('1.0.0-alpha3');
     });
   });
   describe('Log.info(arg)', function () {
@@ -498,12 +498,11 @@ describe('Plug-in: Fader', function () {
     expect(fader.info.name).to.equal('Fader');
     // TO FIX: revise .set method for all 3 browsers. Chrome and Safari work
     // same way, so fix this for the FireFox.
-    // setTimeout(function () {
-    //   fader._output.gain.cancel(0);
-    //   expect(fader._output.gain.value).to.equal(0.5011872053146362);
-    //   osc.stop(0);
-    //   done();
-    // }, 100);
-    done();
+    setTimeout(function () {
+      fader._output.gain.cancel(0);
+      expect(fader._output.gain.value).to.equal(0.5011872053146362);
+      osc.stop(0);
+      done();
+    }, 100);
   });
 });

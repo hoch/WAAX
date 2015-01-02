@@ -58,7 +58,7 @@ WX.Log.error = function () {
  * @see {@link http://semver.org/}
  */
 WX.getVersion = function () {
-  return _VERSION;
+  return this._VERSION;
 };
 
 // Object manipulation and music math.
