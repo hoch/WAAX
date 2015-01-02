@@ -1,87 +1,55 @@
-<!DOCTYPE html>
+<!doctype html>
+<html>
 
-<html lang="en">
 <head>
-	<meta charset="utf-8">
-	<title>WAAX API Reference Source: waax.timebase.js</title>
-
-	<!--[if lt IE 9]>
-	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
-
-	
-	<link type="text/css" rel="stylesheet" href="styles/site.journal.css">
-	
+  <meta name="generator" content="JSDoc 3.3.0-dev">
+  <meta charset="utf-8">
+  <title>Source: waax.timebase.js</title>
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Karla:400,400i,700,700i" type="text/css">
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Noto+Serif:400,400i,700,700i" type="text/css">
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Inconsolata:500" type="text/css">
+  <link href="css/baseline.css" rel="stylesheet">
 </head>
 
-<body>
-<div class="container-fluid">
-	<div class="navbar navbar-fixed-top ">
-		<div class="navbar-inner">
-			<a class="brand" href="index.html">WAAX API Reference</a>
-			<ul class="nav">
-				
-				<li class="dropdown">
-					<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b
-						class="caret"></b></a>
+<body onload="prettyPrint()">
+  <nav id="jsdoc-navbar" role="navigation" class="jsdoc-navbar">
+    <div id="jsdoc-navbar-container">
+      <div id="jsdoc-navbar-content">
+        <a href="index.html" class="jsdoc-navbar-package-name">Home</a>
+      </div>
+    </div>
+  </nav>
+  <div id="jsdoc-body-container">
+    <div id="jsdoc-content">
+      <div id="jsdoc-content-container">
+        <div id="jsdoc-banner" role="banner">
+        </div>
+        <div id="jsdoc-main" role="main">
+          <header class="page-header">
+            <h1>Source: waax.timebase.js</h1>
+          </header>
+          <article>
+            <pre class="prettyprint linenums"><code>// Copyright 2011-2014 Hongchan Choi. All rights reserved.
+// Use of this source code is governed by MIT license that can be found in the
+// LICENSE file.
 
-					<ul class="dropdown-menu ">
-						
-						<li>
-							<a href="AudioNode.html">AudioNode</a>
-						</li>
-						
-						<li>
-							<a href="AudioParam.html">AudioParam</a>
-						</li>
-						
-						<li>
-							<a href="WX.html">WX</a>
-						</li>
-						
-						<li>
-							<a href="WX.Log.html">Log</a>
-						</li>
-						
-						<li>
-							<a href="WX.PlugIn.html">PlugIn</a>
-						</li>
-						
-
-					</ul>
-				</li>
-				
-			</ul>
-		</div>
-	</div>
-
-	<div class="row-fluid">
-
-		
-			<div class="span12">
-				
-				<div id="main">
-					
-
-
-		<h1 class="page-title">Source: waax.timebase.js</h1>
-    
-    <section>
-        <article>
-            <pre class="sunlight-highlight-javascript linenums">/**
- * @fileOverview Note, NoteClip data structure and Transport system.
- * @author Hongchan Choi (hoch)
- * @license MIT
+/**
+ * @typedef MBST
+ * @description Measure, beat, sixteenth, tick aka musical timebase.
+ * @type {Object}
+ * @property {Number} measure Measure.
+ * @property {Number} beat Beat.
+ * @property {Number} sixteenth Sixteenth.
+ * @property {Number} tick Tick.
  */
+
 (function (WX) {
 
-  'use strict';
+  &#x27;use strict&#x27;;
 
-  // NOTES: Terms on timebase.
-  // MBT - measure, beat, sixteenth, tick aka musical timebase
-  // Tick - atomic unit for musical timebase
-  // Second - unit for linear timebase
+  // MBT - measure, beat, sixteenth, tick aka musical timebase.
+  // Tick - atomic unit for musical timebase.
+  // Second - unit for linear timebase.
   var _TICKS_PER_BEAT = 480,
       _TICKS_PER_MEASURE = _TICKS_PER_BEAT * 4,
       _TICKS_PER_SIXTEENTH = _TICKS_PER_BEAT * 0.25;
@@ -90,18 +58,17 @@
   // see: http://stackoverflow.com/a/8809472/4155261
   function generate_uid4(){
     var t = Date.now();
-    var id = 'xxxx'.replace(/[x]/g, function(c) {
+    var id = &#x27;xxxx&#x27;.replace(/[x]/g, function(c) {
       var r = (t + Math.random() * 16) % 16 | 0;
       t = Math.floor(t / 16);
-      return (c == 'x' ? r : (r &amp; 0x7 | 0x8)).toString(16);
+      return (c == &#x27;x&#x27; ? r : (r &amp;amp; 0x7 | 0x8)).toString(16);
     });
     return id;
   }
 
   /**
    * Note abstraction. Instantiated by {@link WX.Note}.
-   * @memberOf WX
-   * @private
+   * @name Note
    * @class
    * @param {Number} pitch MIDI pitch.
    * @param {Number} velocity MIDI velocity.
@@ -119,6 +86,7 @@
 
     /**
      * Changes note duration by delta.
+     * @memberOf Note
      * @param  {Number} delta Duration.
      */
     changeDuration: function (delta) {
@@ -128,6 +96,7 @@
 
     /**
      * Returns the note end time in tick.
+     * @memberOf Note
      * @return {Number}
      */
     getEnd: function () {
@@ -136,6 +105,7 @@
 
     /**
      * Sets note properties from a note.
+     * @memberOf Note
      * @param {Note} note
      */
     setNote: function (note) {
@@ -146,6 +116,7 @@
 
     /**
      * Moves note pitch by delta.
+     * @memberOf Note
      * @param  {Number} delta Pitch displacement.
      */
     translatePitch: function (delta) {
@@ -155,6 +126,7 @@
 
     /**
      * Moves note pitch by delta.
+     * @memberOf Note
      * @param  {Number} delta Pitch displacement.
      */
     translateStart: function (delta) {
@@ -164,15 +136,17 @@
 
     /**
      * Returns current properties in a string.
+     * @memberOf Note
      * @return {String}
      */
     toString: function () {
-      return this.pitch + ',' + this.velocity + ',' +
-        this.start + ',' + this.duration;
+      return this.pitch + &#x27;,&#x27; + this.velocity + &#x27;,&#x27; +
+        this.start + &#x27;,&#x27; + this.duration;
     },
 
     /**
      * Returns start time for numeric operation.
+     * @memberOf Note
      * @return {Number}
      */
     valueOf: function () {
@@ -185,8 +159,7 @@
   /**
    * NoteClip abstraction. A collection of Note objects. Instantiated by
    *   {@link WX.NoteClip}.
-   * @memberOf WX
-   * @private
+   * @name NoteClip
    * @class
    */
   function NoteClip() {
@@ -195,9 +168,7 @@
 
   NoteClip.prototype = {
 
-    /**
-     * Initializes or resets note clip.
-     */
+    // Initializes or resets note clip.
     _init: function () {
       this.notes = {};
       this.start = 0;
@@ -207,6 +178,7 @@
 
     /**
      * Deletes and returns a note from clip. Returns null when not found.
+     * @memberOf NoteClip
      * @param  {String} id Note ID.
      * @return {Note | null}
      */
@@ -222,6 +194,7 @@
 
     /**
      * Flush out noteclip content.
+     * @memberOf NoteClip
      */
     empty: function () {
       this.notes = {};
@@ -235,6 +208,7 @@
      *   simply catches the first note detected in the iteration. There is no
      *   perfect solution over this problem, so I chose to make it robust
      *   instead.
+     * @memberOf NoteClip
      * @param  {Number} pitch MIDI pitch
      * @param  {Number} tick Position in tick.
      * @return {String | null}
@@ -242,8 +216,8 @@
     findNoteIdAtPosition: function (pitch, tick) {
       for (var id in this.notes) {
         var note = this.notes[id];
-        if (note &amp;&amp; note.pitch === pitch) {
-          if (note.start &lt;= tick &amp;&amp; tick &lt;= note.getEnd()) {
+        if (note &amp;amp;&amp;amp; note.pitch === pitch) {
+          if (note.start &amp;lt;= tick &amp;amp;&amp;amp; tick &amp;lt;= note.getEnd()) {
             return id;
           }
         }
@@ -256,6 +230,7 @@
      *   of notes. Returns null when nothing in target area.
      *   Note that this method only care for start time of note. If a note
      *   starts before than the area, it will not be included in the selection.
+     * @memberOf NoteClip
      * @param  {Number} minPitch Lower bound pitch.
      * @param  {Number} maxPitch Upper bound pitch.
      * @param  {Number} startTick Start time in tick.
@@ -267,18 +242,19 @@
       for (var id in this.notes) {
         var note = this.notes[id];
         if (note) {
-          if (minPitch &lt;= note.pitch &amp;&amp; note.pitch &lt;= maxPitch) {
-            if (startTick &lt;= note.start &amp;&amp; note.start &lt;= endTick) {
+          if (minPitch &amp;lt;= note.pitch &amp;amp;&amp;amp; note.pitch &amp;lt;= maxPitch) {
+            if (startTick &amp;lt;= note.start &amp;amp;&amp;amp; note.start &amp;lt;= endTick) {
               bucket.push(id);
             }
           }
         }
       }
-      return (bucket.length > 0) ? bucket : null;
+      return (bucket.length &gt; 0) ? bucket : null;
     },
 
     /**
      * Returns note from clip with id.
+     * @memberOf NoteClip
      * @param  {String} id Note ID.
      * @return {Object}
      */
@@ -291,6 +267,7 @@
 
     /**
      * Retunrs an array with all the ID of notes.
+     * @memberOf NoteClip
      * @return {Array}
      */
     getAllId: function () {
@@ -299,6 +276,7 @@
 
     /**
      * Returns clip size.
+     * @memberOf NoteClip
      * @return {Number}
      */
     getSize: function () {
@@ -307,6 +285,7 @@
 
     /**
      * Probes clip with note id.
+     * @memberOf NoteClip
      * @param  {String} id Note id.
      * @return {Boolean} True if clip contains the note.
      */
@@ -316,6 +295,7 @@
 
     /**
      * Iterates all the notes with callback function.
+     * @memberOf NoteClip
      * @param  {callback_noteclip_iterate} callback Process for iteration.
      */
     iterate: function (callback) {
@@ -326,16 +306,17 @@
     },
 
     /**
-     * Callback for note clip interation. Called by {@link WX.NoteClip.iterate}.
+     * Callback for note clip interation. Called by {@link NoteClip.iterate}.
      * @callback callback_noteclip_iterate
      * @param {String} id Note ID.
      * @param {Note} Note object.
      * @param {Number} index Iteration index.
-     * @see {@link WX.NoteClip.iterate}
+     * @see {@link NoteClip.iterate}
      */
 
     /**
      * Pushes a new note into clip. Returns ID of the new note.
+     * @memberOf NoteClip
      * @param  {Note} note
      * @return {String} Note ID.
      */
@@ -353,6 +334,7 @@
      * Set a note with a specific ID. If the same ID found, update properties
      *   of the note. Otherwise, create a new note with a specified ID. Usually
      *   this method is used in the collaborative context.
+     * @memberOf NoteClip
      * @param {String} id Note ID.
      * @param {Note} note Note object.
      */
@@ -367,6 +349,7 @@
     /**
      * Returns an array of notes within a timespan. Returns null when not found.
      *   Note that this method actually returns Note objects, not IDs.
+     * @memberOf NoteClip
      * @param  {Number} start Start time in tick.
      * @param  {Number} end End time in tick.
      * @return {Array | null}
@@ -376,19 +359,19 @@
       for (var id in this.notes) {
         var note = this.notes[id];
         if (note) {
-          if (start &lt;= note.start &amp;&amp; note.start &lt;= end) {
+          if (start &amp;lt;= note.start &amp;amp;&amp;amp; note.start &amp;lt;= end) {
             bucket.push(note);
           }
         }
       }
-      return (bucket.length > 0) ? bucket : null;
+      return (bucket.length &gt; 0) ? bucket : null;
     }
   };
 
 
-  /**
-   * Router class should be here.
-   */
+  //
+  // Router class should be here.
+  //
 
 
   // NOTES:
@@ -400,8 +383,7 @@
 
   /**
    * Transport abstraction. Singleton and instantiated by default.
-   * @memberOf WX
-   * @private
+   * @name Transport
    * @class
    * @param {Number} BPM Beat per minute.
    */
@@ -433,8 +415,8 @@
         }
         // push notes into playbackQueue
         if (notes) {
-          for (var i = 0; i &lt; notes.length; i++) {
-            if (this._playbackQueue.indexOf(notes[i]) &lt; 0) {
+          for (var i = 0; i &amp;lt; notes.length; i++) {
+            if (this._playbackQueue.indexOf(notes[i]) &amp;lt; 0) {
               this._playbackQueue.push(notes[i]);
             }
           }
@@ -442,18 +424,18 @@
         this._needsScan = false;
       }
       // send queued notes to target plug-ins
-      if (this._playbackQueue.length > 0) {
-        for (var i = 0; i &lt; this._playbackQueue.length; i++) {
+      if (this._playbackQueue.length &gt; 0) {
+        for (var i = 0; i &amp;lt; this._playbackQueue.length; i++) {
           var note = this._playbackQueue[i],
               start = this._absOrigin + this.tick2sec(note.start),
               end = start + this.tick2sec(note.dur);
           // schedule notes by onData method
-          // this.targets[0].onData('noteon', {
+          // this.targets[0].onData(&#x27;noteon&#x27;, {
           //   pitch: note.pitch,
           //   velocity: note.velocity,
           //   time: start
           // });
-          // this.targets[0].onData('noteoff', {
+          // this.targets[0].onData(&#x27;noteoff&#x27;, {
           //   pitch: note.pitch,
           //   velocity: 0,
           //   time :end
@@ -465,8 +447,8 @@
     // Move the scan range of scan forward by runner.
     _advanceScanRange: function () {
       // Advances the scan range to the next block, if the scan end point is
-      // close enough (&lt; 16.7ms) to playhead.
-      if (this._scanEnd - this._now &lt; 0.0167) {
+      // close enough (&amp;lt; 16.7ms) to playhead.
+      if (this._scanEnd - this._now &amp;lt; 0.0167) {
         this._scanStart = this._scanEnd;
         this._scanEnd = this._scanStart + this._lookAhead;
         this._needsScan = true;
@@ -504,15 +486,15 @@
         this._flushPlaybackQueue();
         // check loop flag
         if (this._LOOP) {
-          if (this._loopEnd - (this._now + this._lookAhead) &lt; 0) {
+          if (this._loopEnd - (this._now + this._lookAhead) &amp;lt; 0) {
             this._setPlayheadPosition(this._loopStart - (this._loopEnd - this._now));
           }
         }
 
         // TODO
-        // Transport should have a router (note clips > in-out > plug-in)
+        // Transport should have a router (note clips &gt; in-out &gt; plug-in)
         // 0. iterate through the router entries
-        // 1. note clip entry in router -> get target plug-in
+        // 1. note clip entry in router -&gt; get target plug-in
         // 2. scan note clips
         // 3. send data to plug-in
         //
@@ -520,14 +502,14 @@
         // schedule metronome as well
 
         // TODO: pulse metronome
-        // if (this.USE_METRONOME &amp;&amp; this.metronome) {
+        // if (this.USE_METRONOME &amp;amp;&amp;amp; this.metronome) {
         //   // if nextPulse is in lookahead range, schedule it
         //   this.metronome.play(this.now, this.lookahead);
         // }
 
         // ORIGINAL CODE:
         // var tick = mtime2tick(this.nextClick);
-        // if (this.getLinearTime(tick) &lt; this.ltime_now + this.lookahead) {
+        // if (this.getLinearTime(tick) &amp;lt; this.ltime_now + this.lookahead) {
         //   var accent = (this.nextClick.beat % 4 === 0) ? true : false;
         //   this.metronome.play(this.getAbsoluteTime(tick), accent);
         //   this.nextClick.beat += 1;
@@ -539,7 +521,7 @@
 
     // initializing transport with BPM
     _init: function (BPM) {
-      // origin in absolute time and 'now' reference
+      // origin in absolute time and &#x27;now&#x27; reference
       this._BPM = BPM;
       this._lastBPM = BPM;
 
@@ -548,7 +530,7 @@
       this._TIS = 0.0;
 
       // origin by audio context time
-      // it is '0' position of playhead in linear time
+      // it is &#x27;0&#x27; position of playhead in linear time
       this._absOrigin = 0.0;
       this._absLastNow = 0.0;
 
@@ -591,11 +573,12 @@
     // So, this number is good enough to cover general music making.
     //
     // Having separated notation like { measure, beat, sixteenth, tick } is
-    // not really necessary. It is easy to translate both way when it's needed.
+    // not really necessary. It is easy to translate both way when it&#x27;s needed.
     // (i.e. displaying timing data on UI.)
 
     /**
      * Converts tick to second based on transport tempo.
+     * @memberOf Transport
      * @param  {Number} tick Tick (atomic musical time unit)
      * @return {Number}
      */
@@ -605,6 +588,7 @@
 
     /**
      * Converts second to tick based on transport tempo.
+     * @memberOf Transport
      * @param  {Number} sec Second
      * @return {Number}
      */
@@ -614,6 +598,7 @@
 
     /**
      * Starts playback.
+     * @memberOf Transport
      */
     start: function () {
       // Arrange time references.
@@ -628,6 +613,7 @@
 
     /**
      * Pauses current playback.
+     * @memberOf Transport
      */
     pause: function () {
       this._RUNNING = false;
@@ -636,6 +622,7 @@
 
     /**
      * Sets playhead position by tick.
+     * @memberOf Transport
      * @param {Number} tick Playhead position in ticks.
      */
     setNow: function (tick) {
@@ -645,6 +632,7 @@
 
     /**
      * Returns playhead position by tick.
+     * @memberOf Transport
      * @return {Number}
      */
     getNow: function () {
@@ -653,6 +641,7 @@
 
     /**
      * Rewinds playhead to the beginning.
+     * @memberOf Transport
      */
     rewind: function () {
       this._setPlayheadPosition(0.0);
@@ -660,6 +649,7 @@
 
     /**
      * Sets loop start position by tick.
+     * @memberOf Transport
      * @param {Number} tick Loop start in tick.
      */
     setLoopStart: function (tick) {
@@ -668,6 +658,7 @@
 
     /**
      * Sets loop end position by tick.
+     * @memberOf Transport
      * @param {Number} tick Loop end in tick.
      */
     setLoopEnd: function (tick) {
@@ -676,6 +667,7 @@
 
     /**
      * Returns loop start by tick.
+     * @memberOf Transport
      * @return {Number}
      */
     getLoopStart: function () {
@@ -684,6 +676,7 @@
 
     /**
      * Returns loop end by tick.
+     * @memberOf Transport
      * @return {Number}
      */
     getLoopEnd: function () {
@@ -692,6 +685,7 @@
 
     /**
      * Toggles or sets loop status.
+     * @memberOf Transport
      * @param  {Boolean|undefined} bool Loop state. If undefined, it toggles the current state.
      */
     toggleLoop: function (bool) {
@@ -701,13 +695,14 @@
         if (WX.isBoolean(bool)) {
           this._LOOP = bool;
         } else {
-          WX.Log.error('Invalid parameter. Use boolean value.');
+          WX.Log.error(&#x27;Invalid parameter. Use boolean value.&#x27;);
         }
       }
     },
 
     /**
      * Sets transport BPM.
+     * @memberOf Transport
      * @param {Number} BPM Beat per minute.
      */
     setBPM: function (BPM) {
@@ -729,12 +724,18 @@
 
     /**
      * Returns current BPM.
+     * @memberOf Transport
      * @return {Number}
      */
     getBPM: function () {
       return this._BPM;
     },
 
+    /**
+     * Returns current running status of transport.
+     * @memberOf Transport
+     * @return {Boolean}
+     */
     isRunning: function () {
       return this._RUNNING;
     }
@@ -743,12 +744,9 @@
 
   /**
    * Converts MBST(measure, beat, sixteenth, tick) format to tick.
-   * @param  {Object} mtime Musical time in MBST format.
-   * @param  {Object} mtime.measure Measure.
-   * @param  {Object} mtime.beat Beat.
-   * @param  {Object} mtime.sixteenth Sixteenth.
-   * @param  {Object} mtime.tick Tick.
-   * @return {Number}
+   * @memberOf WX
+   * @param  {MBST} Musical time in MBST format.
+   * @return {Number} Musical time in tick.
    */
   WX.mbst2tick = function (mtime) {
     return (mtime.measure || 0) * _TICKS_PER_MEASURE +
@@ -759,12 +757,9 @@
 
   /**
    * Converts tick to MBST(measure, beat, sixteenth, tick) format.
-   * @param  {NUmber} tick Tick.
-   * @return {Object} mtime Musical time in MBST format.
-   * @return {Object} mtime.measure Measure.
-   * @return {Object} mtime.beat Beat.
-   * @return {Object} mtime.sixteenth Sixteenth.
-   * @return {Object} mtime.tick Tick.
+   * @memberOf WX
+   * @param  {Number} tick Tick.
+   * @return {MBST} Musical time in MBST format.
    */
   WX.tick2mbst = function (tick) {
     return {
@@ -777,11 +772,12 @@
 
   /**
    * Creates a Note instance.
+   * @memberOf WX
    * @param  {Number} pitch MIDI pitch (0~127)
    * @param  {Number} velocity MIDI velocity (0~127)
    * @param  {Number} start Note start time in tick.
    * @param  {Number} duration Note durtion in tick.
-   * @return {WX.Note}
+   * @return {Note}
    */
   WX.Note = function (pitch, velocity, start, duration) {
     return new Note(pitch, velocity, start, duration);
@@ -789,7 +785,8 @@
 
   /**
    * Create a NoteClip instance.
-   * @return {WX.NoteClip}
+   * @memberOf WX
+   * @return {NoteClip}
    */
   WX.NoteClip = function () {
     return new NoteClip();
@@ -797,69 +794,30 @@
 
   /**
    * Singleton instance of Transporter.
-   * @type {WX.Transport}
+   * @type {Transport}
    */
   WX.Transport = new Transport(120);
 
-})(WX);</pre>
-        </article>
-    </section>
-
-
-
-
-
-				</div>
-
-				<div class="clearfix"></div>
-				<footer>
-					
-					
-		<span class="copyright">
-		2011-2014 Copyright Hongchan Choi.
-		</span>
-					<br />
-					
-		<span class="jsdoc-message">
-		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a>
-		on Mon Dec 29 2014 16:42:25 GMT-0800 (PST) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
-		</span>
-				</footer>
-			</div>
-
-			
-			<br clear="both">
-		</div>
-
-	</div>
-	<script src="scripts/sunlight.js"></script>
-	<script src="scripts/sunlight.javascript.js"></script>
-	<script src="scripts/sunlight-plugin.doclinks.js"></script>
-	<script src="scripts/sunlight-plugin.linenumbers.js"></script>
-	<script src="scripts/sunlight-plugin.menu.js"></script>
-	<script src="scripts/jquery.min.js"></script>
-	<script src="scripts/jquery.scrollTo.js"></script>
-	<script src="scripts/jquery.localScroll.js"></script>
-	<script src="scripts/bootstrap-dropdown.js"></script>
-	<script src="scripts/toc.js"></script>
-
-
-	<script>  Sunlight.highlightAll({lineNumbers:true,  showMenu: true, enableDoclinks :true}); </script>
-
-	<script>
-		$( function () {
-			$( "#toc" ).toc( {
-				selectors   : "h1,h2,h3,h4",
-				showAndHide : false,
-				scrollTo    : 60
-			} );
-			$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
-			$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-
-		} );
-	</script>
-
-	
-
+})(WX);</code></pre>
+          </article>
+        </div>
+      </div>
+      <nav id="jsdoc-toc-nav" role="navigation"></nav>
+    </div>
+  </div>
+  <footer id="jsdoc-footer" class="jsdoc-footer">
+    <div id="jsdoc-footer-container">
+      <p>
+        Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc</a> 3.3.0-dev on January 2, 2015.
+      </p>
+    </div>
+  </footer>
+  <script src="scripts/jquery.min.js"></script>
+  <script src="scripts/jquery.cookie.js"></script>
+  <script src="scripts/tree.jquery.js"></script>
+  <script src="scripts/prettify.js"></script>
+  <script src="scripts/jsdoc-toc.js"></script>
+  <script src="scripts/linenumber.js"></script>
 </body>
+
 </html>

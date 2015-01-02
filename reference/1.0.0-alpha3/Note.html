@@ -1,0 +1,331 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta name="generator" content="JSDoc 3.3.0-dev">
+  <meta charset="utf-8">
+  <title>Class: Note</title>
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Karla:400,400i,700,700i" type="text/css">
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Noto+Serif:400,400i,700,700i" type="text/css">
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Inconsolata:500" type="text/css">
+  <link href="css/baseline.css" rel="stylesheet">
+</head>
+
+<body onload="prettyPrint()">
+  <nav id="jsdoc-navbar" role="navigation" class="jsdoc-navbar">
+    <div id="jsdoc-navbar-container">
+      <div id="jsdoc-navbar-content">
+        <a href="index.html" class="jsdoc-navbar-package-name">Home</a>
+      </div>
+    </div>
+  </nav>
+  <div id="jsdoc-body-container">
+    <div id="jsdoc-content">
+      <div id="jsdoc-content-container">
+        <div id="jsdoc-main" role="main">
+          <header class="page-header">
+            <h1><div class="symbol-detail-labels"><span class="label label-kind">class</span></div><small></small><span class="symbol-name">Note</span></h1>
+            <p class="source-link">Source: <a href="waax.timebase.js.html#source-line-38">waax.<wbr>timebase.<wbr>js:38</a>
+            </p>
+            <dl class="dl-compact">
+            </dl>
+          </header>
+          <section id="summary">
+            <div class="summary-callout">
+              <h2 class="summary-callout-heading">Methods</h2>
+              <div class="summary-content">
+                <div class="summary-column">
+                  <dl class="dl-summary-callout">
+                    <dt><a href="Note.html#.changeDuration">changeDuration(delta)</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="Note.html#.getEnd">getEnd()</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="Note.html#.setNote">setNote(note)</a></dt>
+                    <dd>
+                    </dd>
+                  </dl>
+                </div>
+                <div class="summary-column">
+                  <dl class="dl-summary-callout">
+                    <dt><a href="Note.html#.toString">toString()</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="Note.html#.translatePitch">translatePitch(delta)</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="Note.html#.translateStart">translateStart(delta)</a></dt>
+                    <dd>
+                    </dd>
+                  </dl>
+                </div>
+                <div class="summary-column">
+                  <dl class="dl-summary-callout">
+                    <dt><a href="Note.html#.valueOf">valueOf()</a></dt>
+                    <dd>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section>
+            <h2 id="Note">new&nbsp;<span class="symbol-name">Note</span><span class="signature"><span class="signature-params">(pitch, velocity, start, duration)</span></span></h2>
+            <p>Note abstraction. Instantiated by <a href="WX.html#.Note">WX.Note</a>.</p>
+            <section>
+              <h3>Parameters</h3>
+              <table class="jsdoc-details-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Optional</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <p>pitch</p>
+                    </td>
+                    <td>
+                      <p>Number</p>
+                    </td>
+                    <td>
+                      <p>&nbsp;</p>
+                    </td>
+                    <td>
+                      <p>MIDI pitch.</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>velocity</p>
+                    </td>
+                    <td>
+                      <p>Number</p>
+                    </td>
+                    <td>
+                      <p>&nbsp;</p>
+                    </td>
+                    <td>
+                      <p>MIDI velocity.</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>start</p>
+                    </td>
+                    <td>
+                      <p>Number</p>
+                    </td>
+                    <td>
+                      <p>&nbsp;</p>
+                    </td>
+                    <td>
+                      <p>Start time in tick.</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>duration</p>
+                    </td>
+                    <td>
+                      <p>Number</p>
+                    </td>
+                    <td>
+                      <p>&nbsp;</p>
+                    </td>
+                    <td>
+                      <p>Note durtion in tick.</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+            <dl class="dl-compact">
+            </dl>
+          </section>
+          <section>
+            <h2>Methods</h2>
+            <section>
+              <h3 id=".changeDuration"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">changeDuration</span><span class="signature"><span class="signature-params">(delta)</span></span></h3>
+              <p>Changes note duration by delta.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>delta</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Duration.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id=".getEnd"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">getEnd</span><span class="signature"><span class="signature-params">()</span>&nbsp;&rarr; <span class="signature-returns"> Number</span></span></h3>
+              <p>Returns the note end time in tick.</p>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>Number</code>&nbsp;</p>
+                </dd>
+              </dl>
+              <h3 id=".setNote"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">setNote</span><span class="signature"><span class="signature-params">(note)</span></span></h3>
+              <p>Sets note properties from a note.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>note</p>
+                      </td>
+                      <td>
+                        <p><a href="Note.html">Note</a>
+                        </p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id=".toString"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">toString</span><span class="signature"><span class="signature-params">()</span>&nbsp;&rarr; <span class="signature-returns"> String</span></span></h3>
+              <p>Returns current properties in a string.</p>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>String</code>&nbsp;</p>
+                </dd>
+              </dl>
+              <h3 id=".translatePitch"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">translatePitch</span><span class="signature"><span class="signature-params">(delta)</span></span></h3>
+              <p>Moves note pitch by delta.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>delta</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Pitch displacement.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id=".translateStart"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">translateStart</span><span class="signature"><span class="signature-params">(delta)</span></span></h3>
+              <p>Moves note pitch by delta.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>delta</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Pitch displacement.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id=".valueOf"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">valueOf</span><span class="signature"><span class="signature-params">()</span>&nbsp;&rarr; <span class="signature-returns"> Number</span></span></h3>
+              <p>Returns start time for numeric operation.</p>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>Number</code>&nbsp;</p>
+                </dd>
+              </dl>
+            </section>
+          </section>
+        </div>
+      </div>
+      <nav id="jsdoc-toc-nav" role="navigation"></nav>
+    </div>
+  </div>
+  <footer id="jsdoc-footer" class="jsdoc-footer">
+    <div id="jsdoc-footer-container">
+      <p>
+        Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc</a> 3.3.0-dev on January 2, 2015.
+      </p>
+    </div>
+  </footer>
+  <script src="scripts/jquery.min.js"></script>
+  <script src="scripts/jquery.cookie.js"></script>
+  <script src="scripts/tree.jquery.js"></script>
+  <script src="scripts/prettify.js"></script>
+  <script src="scripts/jsdoc-toc.js"></script>
+  <script src="scripts/linenumber.js"></script>
+</body>
+
+</html>

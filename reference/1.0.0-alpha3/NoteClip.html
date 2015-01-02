@@ -1,0 +1,554 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta name="generator" content="JSDoc 3.3.0-dev">
+  <meta charset="utf-8">
+  <title>Class: NoteClip</title>
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Karla:400,400i,700,700i" type="text/css">
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Noto+Serif:400,400i,700,700i" type="text/css">
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Inconsolata:500" type="text/css">
+  <link href="css/baseline.css" rel="stylesheet">
+</head>
+
+<body onload="prettyPrint()">
+  <nav id="jsdoc-navbar" role="navigation" class="jsdoc-navbar">
+    <div id="jsdoc-navbar-container">
+      <div id="jsdoc-navbar-content">
+        <a href="index.html" class="jsdoc-navbar-package-name">Home</a>
+      </div>
+    </div>
+  </nav>
+  <div id="jsdoc-body-container">
+    <div id="jsdoc-content">
+      <div id="jsdoc-content-container">
+        <div id="jsdoc-main" role="main">
+          <header class="page-header">
+            <h1><div class="symbol-detail-labels"><span class="label label-kind">class</span></div><small></small><span class="symbol-name">NoteClip</span></h1>
+            <p class="source-link">Source: <a href="waax.timebase.js.html#source-line-128">waax.<wbr>timebase.<wbr>js:128</a>
+            </p>
+            <dl class="dl-compact">
+            </dl>
+          </header>
+          <section id="summary">
+            <div class="summary-callout">
+              <h2 class="summary-callout-heading">Methods</h2>
+              <div class="summary-content">
+                <div class="summary-column">
+                  <dl class="dl-summary-callout">
+                    <dt><a href="NoteClip.html#.delete">delete(id)</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="NoteClip.html#.empty">empty()</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="NoteClip.html#.findNoteIdAtPosition">findNoteIdAtPosition(pitch, tick)</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="NoteClip.html#.findNotesIdInArea">findNotesIdInArea(minPitch, maxPitch, startTick, endTick)</a></dt>
+                    <dd>
+                    </dd>
+                  </dl>
+                </div>
+                <div class="summary-column">
+                  <dl class="dl-summary-callout">
+                    <dt><a href="NoteClip.html#.get">get(id)</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="NoteClip.html#.getAllId">getAllId()</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="NoteClip.html#.getSize">getSize()</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="NoteClip.html#.hasId">hasId(id)</a></dt>
+                    <dd>
+                    </dd>
+                  </dl>
+                </div>
+                <div class="summary-column">
+                  <dl class="dl-summary-callout">
+                    <dt><a href="NoteClip.html#.iterate">iterate(callback)</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="NoteClip.html#.push">push(note)</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="NoteClip.html#.scanNotesInTimeSpan">scanNotesInTimeSpan(start, end)</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="NoteClip.html#.set">set(id, note)</a></dt>
+                    <dd>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section>
+            <h2 id="NoteClip">new&nbsp;<span class="symbol-name">NoteClip</span><span class="signature"><span class="signature-params">()</span></span></h2>
+            <p>NoteClip abstraction. A collection of Note objects. Instantiated by
+              <a href="WX.html#.NoteClip">WX.NoteClip</a>.</p>
+            <dl class="dl-compact">
+            </dl>
+          </section>
+          <section>
+            <h2>Methods</h2>
+            <section>
+              <h3 id=".delete"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">delete</span><span class="signature"><span class="signature-params">(id)</span>&nbsp;&rarr; <span class="signature-returns"> (<a href="Note.html">Note</a> or null)</span></span></h3>
+              <p>Deletes and returns a note from clip. Returns null when not found.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>id</p>
+                      </td>
+                      <td>
+                        <p>String</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Note ID.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>(<a href="Note.html">Note</a> or null)</code>&nbsp;</p>
+                </dd>
+              </dl>
+              <h3 id=".empty"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">empty</span><span class="signature"><span class="signature-params">()</span></span></h3>
+              <p>Flush out noteclip content.</p>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id=".findNoteIdAtPosition"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">findNoteIdAtPosition</span><span class="signature"><span class="signature-params">(pitch, tick)</span>&nbsp;&rarr; <span class="signature-returns"> (String or null)</span></span></h3>
+              <p>Find a note that contains a point specified by pitch and tick. Then returns note ID. Returns null when not found. Note that this impl might produce an undesirable result since it simply catches the first note detected in the iteration. There
+                is no perfect solution over this problem, so I chose to make it robust instead.
+              </p>
+              <section>
+                <h4>Parameters</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>pitch</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>MIDI pitch</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>tick</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Position in tick.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>(String or null)</code>&nbsp;</p>
+                </dd>
+              </dl>
+              <h3 id=".findNotesIdInArea"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">findNotesIdInArea</span><span class="signature"><span class="signature-params">(minPitch, maxPitch, startTick, endTick)</span>&nbsp;&rarr; <span class="signature-returns"> (Array or null)</span></span></h3>
+              <p>Find notes in a area specified by pitch and tick. Then returns an array of notes. Returns null when nothing in target area. Note that this method only care for start time of note. If a note starts before than the area, it will not be included
+                in the selection.</p>
+              <section>
+                <h4>Parameters</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>minPitch</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Lower bound pitch.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>maxPitch</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Upper bound pitch.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>startTick</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Start time in tick.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>endTick</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>End time in tick.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>(Array or null)</code>&nbsp;</p>
+                </dd>
+              </dl>
+              <h3 id=".get"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">get</span><span class="signature"><span class="signature-params">(id)</span>&nbsp;&rarr; <span class="signature-returns"> Object</span></span></h3>
+              <p>Returns note from clip with id.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>id</p>
+                      </td>
+                      <td>
+                        <p>String</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Note ID.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>Object</code>&nbsp;</p>
+                </dd>
+              </dl>
+              <h3 id=".getAllId"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">getAllId</span><span class="signature"><span class="signature-params">()</span>&nbsp;&rarr; <span class="signature-returns"> Array</span></span></h3>
+              <p>Retunrs an array with all the ID of notes.</p>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>Array</code>&nbsp;</p>
+                </dd>
+              </dl>
+              <h3 id=".getSize"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">getSize</span><span class="signature"><span class="signature-params">()</span>&nbsp;&rarr; <span class="signature-returns"> Number</span></span></h3>
+              <p>Returns clip size.</p>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>Number</code>&nbsp;</p>
+                </dd>
+              </dl>
+              <h3 id=".hasId"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">hasId</span><span class="signature"><span class="signature-params">(id)</span>&nbsp;&rarr; <span class="signature-returns"> Boolean</span></span></h3>
+              <p>Probes clip with note id.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>id</p>
+                      </td>
+                      <td>
+                        <p>String</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Note id.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>Boolean</code>&nbsp;True if clip contains the note.</p>
+                </dd>
+              </dl>
+              <h3 id=".iterate"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">iterate</span><span class="signature"><span class="signature-params">(callback)</span></span></h3>
+              <p>Iterates all the notes with callback function.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>callback</p>
+                      </td>
+                      <td>
+                        <p><a href="global.html#callback_noteclip_iterate">callback_noteclip_iterate</a>
+                        </p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Process for iteration.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id=".push"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">push</span><span class="signature"><span class="signature-params">(note)</span>&nbsp;&rarr; <span class="signature-returns"> String</span></span></h3>
+              <p>Pushes a new note into clip. Returns ID of the new note.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>note</p>
+                      </td>
+                      <td>
+                        <p><a href="Note.html">Note</a>
+                        </p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>String</code>&nbsp;Note ID.</p>
+                </dd>
+              </dl>
+              <h3 id=".scanNotesInTimeSpan"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">scanNotesInTimeSpan</span><span class="signature"><span class="signature-params">(start, end)</span>&nbsp;&rarr; <span class="signature-returns"> (Array or null)</span></span></h3>
+              <p>Returns an array of notes within a timespan. Returns null when not found. Note that this method actually returns Note objects, not IDs.</p>
+              <section>
+                <h4>Parameters</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>start</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Start time in tick.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>end</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>End time in tick.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>(Array or null)</code>&nbsp;</p>
+                </dd>
+              </dl>
+              <h3 id=".set"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">set</span><span class="signature"><span class="signature-params">(id, note)</span></span></h3>
+              <p>Set a note with a specific ID. If the same ID found, update properties of the note. Otherwise, create a new note with a specified ID. Usually this method is used in the collaborative context.</p>
+              <section>
+                <h4>Parameters</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>id</p>
+                      </td>
+                      <td>
+                        <p>String</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Note ID.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>note</p>
+                      </td>
+                      <td>
+                        <p><a href="Note.html">Note</a>
+                        </p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Note object.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+              </dl>
+            </section>
+          </section>
+        </div>
+      </div>
+      <nav id="jsdoc-toc-nav" role="navigation"></nav>
+    </div>
+  </div>
+  <footer id="jsdoc-footer" class="jsdoc-footer">
+    <div id="jsdoc-footer-container">
+      <p>
+        Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc</a> 3.3.0-dev on January 2, 2015.
+      </p>
+    </div>
+  </footer>
+  <script src="scripts/jquery.min.js"></script>
+  <script src="scripts/jquery.cookie.js"></script>
+  <script src="scripts/tree.jquery.js"></script>
+  <script src="scripts/prettify.js"></script>
+  <script src="scripts/jsdoc-toc.js"></script>
+  <script src="scripts/linenumber.js"></script>
+</body>
+
+</html>

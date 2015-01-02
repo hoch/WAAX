@@ -1,0 +1,448 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta name="generator" content="JSDoc 3.3.0-dev">
+  <meta charset="utf-8">
+  <title>Class: Transport</title>
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Karla:400,400i,700,700i" type="text/css">
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Noto+Serif:400,400i,700,700i" type="text/css">
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Inconsolata:500" type="text/css">
+  <link href="css/baseline.css" rel="stylesheet">
+</head>
+
+<body onload="prettyPrint()">
+  <nav id="jsdoc-navbar" role="navigation" class="jsdoc-navbar">
+    <div id="jsdoc-navbar-container">
+      <div id="jsdoc-navbar-content">
+        <a href="index.html" class="jsdoc-navbar-package-name">Home</a>
+      </div>
+    </div>
+  </nav>
+  <div id="jsdoc-body-container">
+    <div id="jsdoc-content">
+      <div id="jsdoc-content-container">
+        <div id="jsdoc-main" role="main">
+          <header class="page-header">
+            <h1><div class="symbol-detail-labels"><span class="label label-kind">class</span></div><small></small><span class="symbol-name">Transport</span></h1>
+            <p class="source-link">Source: <a href="waax.timebase.js.html#source-line-353">waax.<wbr>timebase.<wbr>js:353</a>
+            </p>
+            <dl class="dl-compact">
+            </dl>
+          </header>
+          <section id="summary">
+            <div class="summary-callout">
+              <h2 class="summary-callout-heading">Methods</h2>
+              <div class="summary-content">
+                <div class="summary-column">
+                  <dl class="dl-summary-callout">
+                    <dt><a href="Transport.html#.getBPM">getBPM()</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="Transport.html#.getLoopEnd">getLoopEnd()</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="Transport.html#.getLoopStart">getLoopStart()</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="Transport.html#.getNow">getNow()</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="Transport.html#.isRunning">isRunning()</a></dt>
+                    <dd>
+                    </dd>
+                  </dl>
+                </div>
+                <div class="summary-column">
+                  <dl class="dl-summary-callout">
+                    <dt><a href="Transport.html#.pause">pause()</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="Transport.html#.rewind">rewind()</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="Transport.html#.sec2tick">sec2tick(sec)</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="Transport.html#.setBPM">setBPM(BPM)</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="Transport.html#.setLoopEnd">setLoopEnd(tick)</a></dt>
+                    <dd>
+                    </dd>
+                  </dl>
+                </div>
+                <div class="summary-column">
+                  <dl class="dl-summary-callout">
+                    <dt><a href="Transport.html#.setLoopStart">setLoopStart(tick)</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="Transport.html#.setNow">setNow(tick)</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="Transport.html#.start">start()</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="Transport.html#.tick2sec">tick2sec(tick)</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="Transport.html#.toggleLoop">toggleLoop(bool)</a></dt>
+                    <dd>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section>
+            <h2 id="Transport">new&nbsp;<span class="symbol-name">Transport</span><span class="signature"><span class="signature-params">(BPM)</span></span></h2>
+            <p>Transport abstraction. Singleton and instantiated by default.</p>
+            <section>
+              <h3>Parameter</h3>
+              <table class="jsdoc-details-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Optional</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <p>BPM</p>
+                    </td>
+                    <td>
+                      <p>Number</p>
+                    </td>
+                    <td>
+                      <p>&nbsp;</p>
+                    </td>
+                    <td>
+                      <p>Beat per minute.</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+            <dl class="dl-compact">
+            </dl>
+          </section>
+          <section>
+            <h2>Methods</h2>
+            <section>
+              <h3 id=".getBPM"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">getBPM</span><span class="signature"><span class="signature-params">()</span>&nbsp;&rarr; <span class="signature-returns"> Number</span></span></h3>
+              <p>Returns current BPM.</p>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>Number</code>&nbsp;</p>
+                </dd>
+              </dl>
+              <h3 id=".getLoopEnd"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">getLoopEnd</span><span class="signature"><span class="signature-params">()</span>&nbsp;&rarr; <span class="signature-returns"> Number</span></span></h3>
+              <p>Returns loop end by tick.</p>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>Number</code>&nbsp;</p>
+                </dd>
+              </dl>
+              <h3 id=".getLoopStart"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">getLoopStart</span><span class="signature"><span class="signature-params">()</span>&nbsp;&rarr; <span class="signature-returns"> Number</span></span></h3>
+              <p>Returns loop start by tick.</p>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>Number</code>&nbsp;</p>
+                </dd>
+              </dl>
+              <h3 id=".getNow"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">getNow</span><span class="signature"><span class="signature-params">()</span>&nbsp;&rarr; <span class="signature-returns"> Number</span></span></h3>
+              <p>Returns playhead position by tick.</p>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>Number</code>&nbsp;</p>
+                </dd>
+              </dl>
+              <h3 id=".isRunning"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">isRunning</span><span class="signature"><span class="signature-params">()</span>&nbsp;&rarr; <span class="signature-returns"> Boolean</span></span></h3>
+              <p>Returns current running status of transport.</p>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>Boolean</code>&nbsp;</p>
+                </dd>
+              </dl>
+              <h3 id=".pause"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">pause</span><span class="signature"><span class="signature-params">()</span></span></h3>
+              <p>Pauses current playback.</p>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id=".rewind"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">rewind</span><span class="signature"><span class="signature-params">()</span></span></h3>
+              <p>Rewinds playhead to the beginning.</p>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id=".sec2tick"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">sec2tick</span><span class="signature"><span class="signature-params">(sec)</span>&nbsp;&rarr; <span class="signature-returns"> Number</span></span></h3>
+              <p>Converts second to tick based on transport tempo.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>sec</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Second</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>Number</code>&nbsp;</p>
+                </dd>
+              </dl>
+              <h3 id=".setBPM"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">setBPM</span><span class="signature"><span class="signature-params">(BPM)</span></span></h3>
+              <p>Sets transport BPM.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>BPM</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Beat per minute.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id=".setLoopEnd"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">setLoopEnd</span><span class="signature"><span class="signature-params">(tick)</span></span></h3>
+              <p>Sets loop end position by tick.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>tick</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Loop end in tick.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id=".setLoopStart"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">setLoopStart</span><span class="signature"><span class="signature-params">(tick)</span></span></h3>
+              <p>Sets loop start position by tick.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>tick</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Loop start in tick.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id=".setNow"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">setNow</span><span class="signature"><span class="signature-params">(tick)</span></span></h3>
+              <p>Sets playhead position by tick.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>tick</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Playhead position in ticks.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id=".start"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">start</span><span class="signature"><span class="signature-params">()</span></span></h3>
+              <p>Starts playback.</p>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id=".tick2sec"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">tick2sec</span><span class="signature"><span class="signature-params">(tick)</span>&nbsp;&rarr; <span class="signature-returns"> Number</span></span></h3>
+              <p>Converts tick to second based on transport tempo.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>tick</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Tick (atomic musical time unit)</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>Number</code>&nbsp;</p>
+                </dd>
+              </dl>
+              <h3 id=".toggleLoop"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">toggleLoop</span><span class="signature"><span class="signature-params">(bool)</span></span></h3>
+              <p>Toggles or sets loop status.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>bool</p>
+                      </td>
+                      <td>
+                        <p>(Boolean or undefined)</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Loop state. If undefined, it toggles the current state.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+              </dl>
+            </section>
+          </section>
+        </div>
+      </div>
+      <nav id="jsdoc-toc-nav" role="navigation"></nav>
+    </div>
+  </div>
+  <footer id="jsdoc-footer" class="jsdoc-footer">
+    <div id="jsdoc-footer-container">
+      <p>
+        Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc</a> 3.3.0-dev on January 2, 2015.
+      </p>
+    </div>
+  </footer>
+  <script src="scripts/jquery.min.js"></script>
+  <script src="scripts/jquery.cookie.js"></script>
+  <script src="scripts/tree.jquery.js"></script>
+  <script src="scripts/prettify.js"></script>
+  <script src="scripts/jsdoc-toc.js"></script>
+  <script src="scripts/linenumber.js"></script>
+</body>
+
+</html>

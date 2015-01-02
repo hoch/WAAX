@@ -4,7 +4,7 @@
 <head>
   <meta name="generator" content="JSDoc 3.3.0-dev">
   <meta charset="utf-8">
-  <title>Namespace: PlugIn</title>
+  <title>Class: PlugInAbstract</title>
   <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Karla:400,400i,700,700i" type="text/css">
   <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Noto+Serif:400,400i,700,700i" type="text/css">
   <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Inconsolata:500" type="text/css">
@@ -24,11 +24,9 @@
       <div id="jsdoc-content-container">
         <div id="jsdoc-main" role="main">
           <header class="page-header">
-            <h1><div class="symbol-detail-labels"><span class="label label-kind">namespace</span>&nbsp;<span class="label label-static">static</span></div><small><a href="WX.html">WX</a>.<wbr></small><span class="symbol-name">PlugIn</span></h1>
-            <p class="source-link">Source: <a href="waax.core.js.html#source-line-690">waax.<wbr>core.<wbr>js:690</a>
+            <h1><div class="symbol-detail-labels"><span class="label label-kind">class</span></div><small></small><span class="symbol-name">PlugInAbstract</span></h1>
+            <p class="source-link">Source: <a href="waax.core.js.html#source-line-361">waax.<wbr>core.<wbr>js:361</a>
             </p>
-            <div class="symbol-description">
-            </div>
             <dl class="dl-compact">
             </dl>
           </header>
@@ -38,27 +36,30 @@
               <div class="summary-content">
                 <div class="summary-column">
                   <dl class="dl-summary-callout">
-                    <dt><a href="WX.PlugIn.html#.defineType">defineType(plugin, type)</a></dt>
+                    <dt><a href="PlugInAbstract.html#.cut">cut()</a></dt>
                     <dd>
                     </dd>
-                    <dt><a href="WX.PlugIn.html#.extendPrototype">extendPrototype(plugin, type)</a></dt>
-                    <dd>
-                    </dd>
-                  </dl>
-                </div>
-                <div class="summary-column">
-                  <dl class="dl-summary-callout">
-                    <dt><a href="WX.PlugIn.html#.getRegistered">getRegistered(type)</a></dt>
-                    <dd>
-                    </dd>
-                    <dt><a href="WX.PlugIn.html#.initPreset">initPreset(plugin, preset)</a></dt>
+                    <dt><a href="PlugInAbstract.html#.get">get(param)</a></dt>
                     <dd>
                     </dd>
                   </dl>
                 </div>
                 <div class="summary-column">
                   <dl class="dl-summary-callout">
-                    <dt><a href="WX.PlugIn.html#.register">register(PlugInClass)</a></dt>
+                    <dt><a href="PlugInAbstract.html#.getPreset">getPreset()</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="PlugInAbstract.html#.set">set(param, arg)</a></dt>
+                    <dd>
+                    </dd>
+                  </dl>
+                </div>
+                <div class="summary-column">
+                  <dl class="dl-summary-callout">
+                    <dt><a href="PlugInAbstract.html#.setPreset">setPreset(preset)</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="PlugInAbstract.html#.to">to(target)</a></dt>
                     <dd>
                     </dd>
                   </dl>
@@ -67,111 +68,20 @@
             </div>
           </section>
           <section>
+            <h2 id="PlugInAbstract">new&nbsp;<span class="symbol-name">PlugInAbstract</span><span class="signature"><span class="signature-params">()</span></span></h2>
+            <p>Plug-In base class.</p>
+            <dl class="dl-compact">
+            </dl>
+          </section>
+          <section>
             <h2>Methods</h2>
             <section>
-              <h3 id=".defineType"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">defineType</span><span class="signature"><span class="signature-params">(plugin, type)</span></span></h3>
-              <p>Defines type of a plug-in. Required in plug-in definition.</p>
-              <section>
-                <h4>Parameters</h4>
-                <table class="jsdoc-details-table">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Type</th>
-                      <th>Optional</th>
-                      <th>Description</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <p>plugin</p>
-                      </td>
-                      <td>
-                        <p><a href="global.html#WAPL">WAPL</a>
-                        </p>
-                      </td>
-                      <td>
-                        <p>&nbsp;</p>
-                      </td>
-                      <td>
-                        <p>Target plug-in.</p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <p>type</p>
-                      </td>
-                      <td>
-                        <p>String</p>
-                      </td>
-                      <td>
-                        <p>&nbsp;</p>
-                      </td>
-                      <td>
-                        <p>Plug-in type. <code>['Generator', 'Processor',
-  'Analyzer']</code>
-                        </p>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </section>
+              <h3 id=".cut"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">cut</span><span class="signature"><span class="signature-params">()</span></span></h3>
+              <p>Disconnects all outgoing connections fomr plug-in.</p>
               <dl class="dl-compact">
               </dl>
-              <h3 id=".extendPrototype"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">extendPrototype</span><span class="signature"><span class="signature-params">(plugin, type)</span></span></h3>
-              <p>Extends plug-in prototype according to the type. Required in plug-in definition.
-              </p>
-              <section>
-                <h4>Parameters</h4>
-                <table class="jsdoc-details-table">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Type</th>
-                      <th>Optional</th>
-                      <th>Description</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <p>plugin</p>
-                      </td>
-                      <td>
-                        <p><a href="global.html#WAPL">WAPL</a>
-                        </p>
-                      </td>
-                      <td>
-                        <p>&nbsp;</p>
-                      </td>
-                      <td>
-                        <p>Target plug-in.</p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <p>type</p>
-                      </td>
-                      <td>
-                        <p>String</p>
-                      </td>
-                      <td>
-                        <p>&nbsp;</p>
-                      </td>
-                      <td>
-                        <p>Plug-in type. <code>['Generator', 'Processor',
-  'Analyzer']</code>
-                        </p>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </section>
-              <dl class="dl-compact">
-              </dl>
-              <h3 id=".getRegistered"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">getRegistered</span><span class="signature"><span class="signature-params">(type)</span>&nbsp;&rarr; <span class="signature-returns"> Array</span></span></h3>
-              <p>Returns a list of regsitered plug-ins of a certain type.</p>
+              <h3 id=".get"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">get</span><span class="signature"><span class="signature-params">(param)</span>&nbsp;&rarr; <span class="signature-returns"> any type</span></span></h3>
+              <p>Gets a paramter value.</p>
               <section>
                 <h4>Parameter</h4>
                 <table class="jsdoc-details-table">
@@ -186,7 +96,7 @@
                   <tbody>
                     <tr>
                       <td>
-                        <p>type</p>
+                        <p>param</p>
                       </td>
                       <td>
                         <p>String</p>
@@ -195,7 +105,7 @@
                         <p>&nbsp;</p>
                       </td>
                       <td>
-                        <p>Plug-in Type.</p>
+                        <p>Parameter name.</p>
                       </td>
                     </tr>
                   </tbody>
@@ -204,11 +114,31 @@
               <dl class="dl-compact">
                 <dt>Returns</dt>
                 <dd>
-                  <p><code>Array</code>&nbsp;A list of plug-ins.</p>
+                  <p><code>any type</code>&nbsp;Paramter value. Returns null when a paramter not found.</p>
                 </dd>
               </dl>
-              <h3 id=".initPreset"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">initPreset</span><span class="signature"><span class="signature-params">(plugin, preset)</span></span></h3>
-              <p>Initializes plug-in preset. Merges default preset with user-defined preset. Required in plug-in definition.</p>
+              <h3 id=".getPreset"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">getPreset</span><span class="signature"><span class="signature-params">()</span>&nbsp;&rarr; <span class="signature-returns"> Object</span></span></h3>
+              <p>Gets a current plug-in paramters as a collection. Note that the collection is created on the fly. It is a clone of current parameter values.
+              </p>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>Object</code>&nbsp;Preset.</p>
+                </dd>
+              </dl>
+              <h3 id=".set"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">set</span><span class="signature"><span class="signature-params">(param, arg)</span>&nbsp;&rarr; <span class="signature-returns"> <a href="global.html#WAPL">WAPL</a></span></span></h3>
+              <p>Sets a plug-in parameter. Supports dynamic parameter assignment.</p>
+              <section>
+                <h4>
+            Example
+        </h4>
+                <div>
+                  <pre class="prettyprint"><code>// setting parameter with an array
+myeffect.set(&#x27;gain&#x27;, [[0.0], [1.0, 0.01, 1], [0.0, 0.5, 2]]);
+// setting parameter with a value (immediate change)
+myeffect.set(&#x27;gain&#x27;, 0.0);</code></pre>
+                </div>
+              </section>
               <section>
                 <h4>Parameters</h4>
                 <table class="jsdoc-details-table">
@@ -223,19 +153,55 @@
                   <tbody>
                     <tr>
                       <td>
-                        <p>plugin</p>
+                        <p>param</p>
                       </td>
                       <td>
-                        <p><a href="global.html#WAPL">WAPL</a>
-                        </p>
+                        <p>String</p>
                       </td>
                       <td>
                         <p>&nbsp;</p>
                       </td>
                       <td>
-                        <p>Target plug-in.</p>
+                        <p>Parameter name.</p>
                       </td>
                     </tr>
+                    <tr>
+                      <td>
+                        <p>arg</p>
+                      </td>
+                      <td>
+                        <p>(Array or Number)</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>An array of data points or a single value.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code><a href="global.html#WAPL">WAPL</a></code>&nbsp;Self-reference for method chaining.</p>
+                </dd>
+              </dl>
+              <h3 id=".setPreset"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">setPreset</span><span class="signature"><span class="signature-params">(preset)</span></span></h3>
+              <p>Sets plug-in preset, which is a collection of parameters. Note that setting a preset changes all the associated parameters immediatley.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
                     <tr>
                       <td>
                         <p>preset</p>
@@ -247,7 +213,7 @@
                         <p>&nbsp;</p>
                       </td>
                       <td>
-                        <p>Preset.</p>
+                        <p>A collection of paramters.</p>
                       </td>
                     </tr>
                   </tbody>
@@ -255,8 +221,8 @@
               </section>
               <dl class="dl-compact">
               </dl>
-              <h3 id=".register"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">register</span><span class="signature"><span class="signature-params">(PlugInClass)</span></span></h3>
-              <p>Registers the plug-in prototype to WX namespace. Required in plug-in definition.
+              <h3 id=".to"><div class="symbol-detail-labels"><span class="label label-static">static</span></div><span class="symbol-name">to</span><span class="signature"><span class="signature-params">(target)</span>&nbsp;&rarr; <span class="signature-returns"> (<a href="global.html#WAPL">WAPL</a> or <a href="AudioNode.html">AudioNode</a>)</span></span></h3>
+              <p>Connects a plug-in output to the other plug-in's input or a WA node. Note that this does not support multiple outgoing connection. (fanning-out)
               </p>
               <section>
                 <h4>Parameter</h4>
@@ -272,23 +238,26 @@
                   <tbody>
                     <tr>
                       <td>
-                        <p>PlugInClass</p>
+                        <p>target</p>
                       </td>
                       <td>
-                        <p>function()</p>
+                        <p>(<a href="global.html#WAPL">WAPL</a> or <a href="AudioNode.html">AudioNode</a>)</p>
                       </td>
                       <td>
                         <p>&nbsp;</p>
                       </td>
                       <td>
-                        <p>Class reference (function name) of plug-in.
-                        </p>
+                        <p>WAPL(Web Audio Plug-In) compatible plug-in or WA node.</p>
                       </td>
                     </tr>
                   </tbody>
                 </table>
               </section>
               <dl class="dl-compact">
+                <dt>Returns</dt>
+                <dd>
+                  <p><code>(<a href="global.html#WAPL">WAPL</a> or <a href="AudioNode.html">AudioNode</a>)</code>&nbsp;</p>
+                </dd>
               </dl>
             </section>
           </section>

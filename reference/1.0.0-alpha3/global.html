@@ -1,0 +1,611 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta name="generator" content="JSDoc 3.3.0-dev">
+  <meta charset="utf-8">
+  <title>Global: Globals</title>
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Karla:400,400i,700,700i" type="text/css">
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Noto+Serif:400,400i,700,700i" type="text/css">
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Inconsolata:500" type="text/css">
+  <link href="css/baseline.css" rel="stylesheet">
+</head>
+
+<body onload="prettyPrint()">
+  <nav id="jsdoc-navbar" role="navigation" class="jsdoc-navbar">
+    <div id="jsdoc-navbar-container">
+      <div id="jsdoc-navbar-content">
+        <a href="index.html" class="jsdoc-navbar-package-name">Home</a>
+      </div>
+    </div>
+  </nav>
+  <div id="jsdoc-body-container">
+    <div id="jsdoc-content">
+      <div id="jsdoc-content-container">
+        <div id="jsdoc-main" role="main">
+          <h1>Globals</h1>
+          <section id="summary">
+            <div class="summary-callout">
+              <h2 class="summary-callout-heading">Abstract types</h2>
+              <div class="summary-content">
+                <div class="summary-column">
+                  <dl class="dl-summary-callout">
+                    <dt><a href="global.html#callback_loadclip_oncomplete">callback_loadclip_oncomplete(clip)</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="global.html#callback_loadclip_onprogress">callback_loadclip_onprogress(event, clip)</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="global.html#callback_noteclip_iterate">callback_noteclip_iterate(id, Note, index)</a></dt>
+                    <dd>
+                    </dd>
+                  </dl>
+                </div>
+                <div class="summary-column">
+                  <dl class="dl-summary-callout">
+                    <dt><a href="global.html#MBST">MBST</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="global.html#WAPL">WAPL</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="global.html#WXClip">WXClip</a></dt>
+                    <dd>
+                    </dd>
+                  </dl>
+                </div>
+                <div class="summary-column">
+                  <dl class="dl-summary-callout">
+                    <dt><a href="global.html#WXModel">WXModel</a></dt>
+                    <dd>
+                    </dd>
+                    <dt><a href="global.html#WXSampleZone">WXSampleZone</a></dt>
+                    <dd>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section>
+            <h2>Abstract types</h2>
+            <section>
+              <h3 id="callback_loadclip_oncomplete"><span class="symbol-name">callback_loadclip_oncomplete</span><span class="signature"><span class="signature-params">(clip)</span></span></h3>
+              <p>Callback for clip loading completion. Called by <a href="WX.html#.loadClip">WX.loadClip</a>.</p>
+              <section>
+                <h4>Parameter</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>clip</p>
+                      </td>
+                      <td>
+                        <p>Object</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>WAAX clip</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+                <dt>See also</dt>
+                <dd></dd>
+              </dl>
+              <h3 id="callback_loadclip_onprogress"><span class="symbol-name">callback_loadclip_onprogress</span><span class="signature"><span class="signature-params">(event, clip)</span></span></h3>
+              <p>Callback for clip loading progress report. called by <a href="WX.html#.loadClip">WX.loadClip</a>.</p>
+              <section>
+                <h4>Parameters</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>event</p>
+                      </td>
+                      <td>
+                        <p>Object</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>XHR progress event object</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>clip</p>
+                      </td>
+                      <td>
+                        <p>Object</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>WAAX clip</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+                <dt>See also</dt>
+                <dd></dd>
+                <dd></dd>
+              </dl>
+              <h3 id="callback_noteclip_iterate"><span class="symbol-name">callback_noteclip_iterate</span><span class="signature"><span class="signature-params">(id, Note, index)</span></span></h3>
+              <p>Callback for note clip interation. Called by <a href="NoteClip.html#.iterate">NoteClip.iterate</a>.</p>
+              <section>
+                <h4>Parameters</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>id</p>
+                      </td>
+                      <td>
+                        <p>String</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Note ID.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>Note</p>
+                      </td>
+                      <td>
+                        <p><a href="Note.html">Note</a>
+                        </p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>object.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>index</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Iteration index.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+                <dt>See also</dt>
+                <dd></dd>
+              </dl>
+              <h3 id="MBST"><span class="symbol-name">MBST</span><small class="property-type">
+                &nbsp;Object</small></h3>
+              <p>Measure, beat, sixteenth, tick aka musical timebase.</p>
+              <section>
+                <h4>Properties</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>measure</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Measure.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>beat</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Beat.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>sixteenth</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Sixteenth.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>tick</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Tick.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id="WAPL"><span class="symbol-name">WAPL</span><small class="property-type">
+                &nbsp;Object</small></h3>
+              <p>Web Audio API Plug-in Object.</p>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id="WXClip"><span class="symbol-name">WXClip</span><small class="property-type">
+                &nbsp;Object</small></h3>
+              <p>WAAX abstraction of sample and meta data.</p>
+              <section>
+                <h4>
+            Example
+        </h4>
+                <div>
+                  <pre class="prettyprint"><code>var clip = {
+  name: &#x27;Cool Sample&#x27;,
+  url: &#x27;http://mystaticdata.com/samples/coolsample.wav&#x27;,
+  buffer: null
+};</code></pre>
+                </div>
+              </section>
+              <section>
+                <h4>Properties</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>name</p>
+                      </td>
+                      <td>
+                        <p>String</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>User-defined name of sample.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>url</p>
+                      </td>
+                      <td>
+                        <p>String</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>URL of audio file.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>buffer</p>
+                      </td>
+                      <td>
+                        <p>Object</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>A placeholder for ArrayBuffer object.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id="WXModel"><span class="symbol-name">WXModel</span><small class="property-type">
+                &nbsp;Array</small></h3>
+              <p>Contains a model for data binding.</p>
+              <section>
+                <h4>
+            Example
+        </h4>
+                <div>
+                  <pre class="prettyprint"><code>var model = [
+  { key:&#x27;Sine&#x27;, value:&#x27;sine&#x27; },
+  { key:&#x27;Sawtooth&#x27;, value:&#x27;sawtooth&#x27; }
+  ...
+];</code></pre>
+                </div>
+              </section>
+              <dl class="dl-compact">
+              </dl>
+              <h3 id="WXSampleZone"><span class="symbol-name">WXSampleZone</span><small class="property-type">
+                &nbsp;Object</small></h3>
+              <p>WAAX abstraction of sampler instrument data.</p>
+              <section>
+                <h4>
+            Example
+        </h4>
+                <div>
+                  <pre class="prettyprint"><code>var sampleZone = {
+  clip: WXClip
+  basePitch: 60            // samples original pitch
+  loop: true,
+  loopStart: 0.1,
+  loopEnd: 0.5,
+  pitchLow: 12,            // pitch low bound
+  pitchHigh: 96,           // pitch high bound
+  velocityLow: 12,         // velocity lower bound
+  velocityHigh: 127,       // velocity high bound
+  pitchModulation: true,   // use pitch modulation
+  velocityModulatio: true  // use velocity moduation
+};</code></pre>
+                </div>
+              </section>
+              <section>
+                <h4>Properties</h4>
+                <table class="jsdoc-details-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Optional</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>clip</p>
+                      </td>
+                      <td>
+                        <p><a href="global.html#WXClip">WXClip</a>
+                        </p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>WXClip object.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>basePitch</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Original sample pitch.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>loop</p>
+                      </td>
+                      <td>
+                        <p>Boolean</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Looping flag.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>loopStart</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Loop start point in seconds.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>loopEnd</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Loop end point in seconds.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>pitchLow</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Low pitch bound.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>pitchHigh</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>High pitch bound.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>velocityLow</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Low velocity bound.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>velocityHigh</p>
+                      </td>
+                      <td>
+                        <p>Number</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>High velocity bound.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>pitchModulation</p>
+                      </td>
+                      <td>
+                        <p>Boolean</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Switch for pitch sensitivity modulation.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>velocityModulatio</p>
+                      </td>
+                      <td>
+                        <p>Boolean</p>
+                      </td>
+                      <td>
+                        <p>&nbsp;</p>
+                      </td>
+                      <td>
+                        <p>Switch for velocity sensitivity modulation.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <dl class="dl-compact">
+              </dl>
+            </section>
+          </section>
+        </div>
+      </div>
+      <nav id="jsdoc-toc-nav" role="navigation"></nav>
+    </div>
+  </div>
+  <footer id="jsdoc-footer" class="jsdoc-footer">
+    <div id="jsdoc-footer-container">
+      <p>
+        Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc</a> 3.3.0-dev on January 2, 2015.
+      </p>
+    </div>
+  </footer>
+  <script src="scripts/jquery.min.js"></script>
+  <script src="scripts/jquery.cookie.js"></script>
+  <script src="scripts/tree.jquery.js"></script>
+  <script src="scripts/prettify.js"></script>
+  <script src="scripts/jsdoc-toc.js"></script>
+  <script src="scripts/linenumber.js"></script>
+</body>
+
+</html>
