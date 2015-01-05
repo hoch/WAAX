@@ -213,20 +213,25 @@ AudioParam.prototype.set = function (value, time, rampType) {
   switch (rampType) {
     case 0:
     case undefined:
-      if (time <= now) {
+      time = (time < now) ? now : time;
+      this.setValueAtTime(value, time);
+      // TO FIX: when node is not connected, automation will not work
+      // this hack handles the error
+      if (time <= now && value !== this.value) {
         this.value = value;
-      } else {
-        this.setValueAtTime(value, time);
       }
       break;
     case 1:
+      time = (time < now) ? now : time;
       this.linearRampToValueAtTime(value, time);
       break;
     case 2:
+      time = (time < now) ? now : time;
       value = value <= 0.0 ? 0.00001 : value;
       this.exponentialRampToValueAtTime(value, time);
       break;
     case 3:
+      time[0] = (time[0] < now) ? now : time[0];
       value = value <= 0.0 ? 0.00001 : value;
       this.setTargetAtTime(value, time[0], time[1]);
       break;

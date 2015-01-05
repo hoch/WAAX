@@ -241,7 +241,8 @@
       filterType: 'highshelf',
       filterFrequency: 7000,
       filterQ: 0.0,
-      filterGain: 8.0
+      filterGain: -3.0,
+      output: 0.3
     },
 
     // REQUIRED: handlers for each parameter

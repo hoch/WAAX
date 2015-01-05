@@ -32,13 +32,11 @@
 
     // example JS code
     MUI.start(function () {
-
       var osc = WX.SimpleOsc();
       osc.to(WX.Master);
       osc.noteOn(60, 64);
       MUI.$('k-freq').link(osc, 'oscFreq');
       MUI.$('k-output').link(osc, 'output');
-
     });
 
   </script>
