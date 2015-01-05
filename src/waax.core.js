@@ -7,54 +7,6 @@
   'use strict';
 
   //
-  // WX-specific data structure
-  //
-
-  /**
-   * Contains a model for data binding.
-   * @name WXModel
-   * @memberOf WX
-   * @example
-   * var model = [
-   *   { key:'Sine', value:'sine' },
-   *   { key:'Sawtooth', value:'sawtooth' }
-   *   ...
-   * ];
-   */
-
-  /**
-   * WAAX abstraction of audio sample data.
-   * @name WXClip
-   * @memberOf WX
-   * @example
-   * var clip = {
-   *   name: 'Cool Sample',
-   *   url: 'http://mystaticdata.com/samples/coolsample.wav',
-   *   buffer: null
-   * };
-   */
-
-  /**
-   * WAAX abstraction of sampler instrument data.
-   * @name WXZone
-   * @memberOf WX
-   * @example
-   * var zone = {
-   *   clip: WXClip
-   *   basePitch: 60            // samples original pitch
-   *   loop: true,
-   *   loopStart: 0.1,
-   *   loopEnd: 0.5,
-   *   pitchLow: 12,            // pitch low bound
-   *   pitchHigh: 96,           // pitch high bound
-   *   velocityLow: 12,         // velocity lower bound
-   *   velocityHigh: 127,       // velocity high bound
-   *   pitchModulation: true,   // use pitch modulation
-   *   velocityModulatio: true  // use velocity moduation
-   * };
-   */
-
-  //
   // Parameter Abstractions
   //
 
@@ -111,8 +63,7 @@
   /**
    * Generic parameter(numerical and ranged) abstraction. Usually called by
    *   {@link WX.defineParams} method.
-   * @memberOf WX
-   * @private
+   * @name GenericParam
    * @class
    * @param {Object} options Parameter configruation.
    * @param {String} options.name User-defined parameter name.
@@ -131,7 +82,7 @@
 
     /**
      * Initializes instance with options.
-     * @memberOf WX.GenericParam
+     * @memberOf GenericParam
      * @param  {Object} options Paramter configuration.
      */
     init: function (options) {
@@ -150,7 +101,7 @@
     /**
      * Sets parameter value with time and ramp type. Calls back
      *   a corresponding handler.
-     * @memberOf WX.GenericParam
+     * @memberOf GenericParam
      * @param {Number} value Parameter target value
      * @param {Number|Array} time time or array of [start time, time constant]
      * @param {Number} rampType WAAX ramp type
@@ -167,7 +118,7 @@
     /**
      * Returns the paramter value. Note that this is not a computed value
      *   of WA AudioParam instance.
-     * @memberOf WX.GenericParam
+     * @memberOf GenericParam
      * @return {Number} Latest paramter value.
      */
     get: function () {
@@ -179,8 +130,7 @@
   /**
    * Itemized parameter abstraction. Usually called by {@link WX.defineParams}
    *   method.
-   * @memberOf WX
-   * @private
+   * @name ItemizedParam
    * @class
    * @param {Object} options Parameter configruation.
    * @param {String} options.name User-defined parameter name.
@@ -197,7 +147,7 @@
 
     /**
      * Initializes instance with options.
-     * @memberOf WX.ItemizedParam
+     * @memberOf ItemizedParam
      * @param  {Object} options Paramter configuration.
      */
     init: function (options) {
@@ -223,7 +173,7 @@
     /**
      * Sets parameter value with time and ramp type. Calls back
      *   a corresponding handler.
-     * @memberOf WX.ItemizedParam
+     * @memberOf ItemizedParam
      * @param {Number} value Parameter target value
      * @param {Number|Array} time time or array of
      *   <code>[start time, time constant]</code>
@@ -242,7 +192,7 @@
     /**
      * Returns the paramter value. Note that this is not a computed value
      *   of WA AudioParam instance.
-     * @memberOf WX.ItemizedParam
+     * @memberOf ItemizedParam
      * @return {Number} Latest paramter value.
      */
     get: function () {
@@ -251,7 +201,7 @@
 
     /**
      * Returns the reference of items (WAAX model).
-     * @memberOf WX.ItemizedParam
+     * @memberOf ItemizedParam
      * @return {Array} WAAX model associated with the parameter.
      */
     getModel: function () {
@@ -263,8 +213,7 @@
   /**
    * Boolean parameter abstraction. Usually called by {@link WX.defineParams}
    *   method.
-   * @memberOf WX
-   * @private
+   * @name BooleanParam
    * @class
    * @param {Object} options Parameter configruation.
    * @param {String} options.name User-defined parameter name.
@@ -280,7 +229,7 @@
 
     /**
      * Initializes instance with options.
-     * @memberOf WX.BooleanParam
+     * @memberOf BooleanParam
      * @param {Object} options Paramter configuration.
      */
     init: function (options) {
@@ -298,7 +247,7 @@
     /**
      * Sets parameter value with time and ramp type. Calls back
      *   a corresponding handler.
-     * @memberOf WX.BooleanParam
+     * @memberOf BooleanParam
      * @param {Number} value Parameter target value
      * @param {Number|Array} time time or array of
      *   <code>[start time, time constant]</code>
@@ -316,7 +265,7 @@
     /**
      * Returns the paramter value. Note that this is not a computed value
      *   of WA AudioParam instance.
-     * @memberOf WX.BooleanParam
+     * @memberOf BooleanParam
      * @return {Number} Latest paramter value.
      */
     get: function () {
@@ -330,11 +279,8 @@
    * @memberOf WX
    * @param {Object} plugin WAAX Plug-in
    * @param {Object} paramOptions A collection of parameter option objects
-   *   . See {@link WX.GenericParam}, {@link WX.ItemizedParam} and
-   *   {@link WX.BooleanParam} for available parameter options.
-   * @see  {@link WX.GenericParam}
-   * @see  {@link WX.ItemizedParam}
-   * @see  {@link WX.BooleanParam}
+   *   . See {@link GenericParam}, {@link ItemizedParam} and
+   *   {@link BooleanParam} for available parameter options.
    * @example
    * WX.defineParams(this, {
    *   oscFreq: {
@@ -414,9 +360,8 @@
 
   /**
    * Plug-In base class.
-   * @memberOf WX
+   * @name PlugInAbstract
    * @class
-   * @private
    */
   function PlugInAbstract () {
     this.params = {};
@@ -428,21 +373,22 @@
      * Connects a plug-in output to the other plug-in's input or a WA node.
      *   Note that this does not support multiple outgoing connection.
      *   (fanning-out)
-     * @memberOf WX.PlugInAbstract
-     * @param {WAPL|AudioNode} plugin WAPL(Web Audio Plug-In)
+     * @memberOf PlugInAbstract
+     * @param {WAPL|AudioNode} target WAPL(Web Audio Plug-In)
      *   compatible plug-in or WA node.
+     * @returns {WAPL|AudioNode}
      */
-    to: function (plugin) {
-      // if the target is plugin with inlet
-      if (plugin._inlet) {
-        this._outlet.to(plugin._inlet);
-        return plugin;
+    to: function (target) {
+      // when the target is a plug-in with inlet.
+      if (target._inlet) {
+        this._outlet.to(target._inlet);
+        return target;
       }
-      // or it might be a WA node
+      // or it might simply be a WA node.
       else {
         try {
-          this._outlet.to(plugin);
-          return plugin;
+          this._outlet.to(target);
+          return target;
         } catch (error) {
           WX.Log.error('Connection failed. Invalid patching.');
         }
@@ -451,7 +397,7 @@
 
     /**
      * Disconnects all outgoing connections fomr plug-in.
-     * @memberOf WX.PlugInAbstract
+     * @memberOf PlugInAbstract
      */
     cut: function () {
       this._outlet.cut();
@@ -459,7 +405,7 @@
 
     /**
      * Sets a plug-in parameter. Supports dynamic parameter assignment.
-     * @memberOf WX.PlugInAbstract
+     * @memberOf PlugInAbstract
      * @param {String} param Parameter name.
      * @param {Array|Number} arg An array of data points or a single value.
      * @return {WAPL} Self-reference for method chaining.
@@ -488,7 +434,7 @@
 
     /**
      * Gets a paramter value.
-     * @memberOf WX.PlugInAbstract
+     * @memberOf PlugInAbstract
      * @param {String} param Parameter name.
      * @return {*} Paramter value. Returns null when a paramter not found.
      */
@@ -503,7 +449,7 @@
     /**
      * Sets plug-in preset, which is a collection of parameters. Note that
      *   setting a preset changes all the associated parameters immediatley.
-     * @memberOf WX.PlugInAbstract
+     * @memberOf PlugInAbstract
      * @param {Object} preset A collection of paramters.
      */
     setPreset: function (preset) {
@@ -516,7 +462,7 @@
      * Gets a current plug-in paramters as a collection. Note that the
      *   collection is created on the fly. It is a clone of current parameter
      *   values.
-     * @memberOf WX.PlugInAbstract
+     * @memberOf PlugInAbstract
      * @return {Object} Preset.
      */
     getPreset: function () {
@@ -532,10 +478,9 @@
 
   /**
    * Generator plug-in class. No audio inlet.
-   * @memberOf WX
+   * @name Generator
    * @class
-   * @private
-   * @extends WX.PlugInAbstract
+   * @extends PlugInAbstract
    * @param {Object} params
    * @param {Number} params.output Plug-in output gain.
    */
@@ -570,7 +515,8 @@
 
     /**
      * Parameter handler for <code>params.output</code>
-     * @memberOf WX.Generator
+     * @memberOf Generator
+     * @private
      */
     $output: function (value, time, rampType) {
       this._output.gain.set(value, time, rampType);
@@ -584,9 +530,8 @@
 
   /**
    * Processor plug-in class. Features both inlet and outlet.
-   * @memberOf WX
+   * @name Processor
    * @class
-   * @private
    * @extends PlugInAbstract
    * @param {Object} params
    * @param {Generic} params.input Input gain.
@@ -648,7 +593,8 @@
 
     /**
      * Parameter handler for <code>params.input</code>
-     * @memberOf WX.Processor
+     * @memberOf Processor
+     * @private
      */
     $input: function (value, time, rampType) {
       this._input.gain.set(value, time, rampType);
@@ -656,7 +602,8 @@
 
     /**
      * Parameter handler for <code>params.output</code>
-     * @memberOf WX.Processor
+     * @memberOf Processor
+     * @private
      */
     $output: function (value, time, rampType) {
       this._output.gain.set(value, time, rampType);
@@ -664,7 +611,8 @@
 
     /**
      * Parameter handler for <code>params.bypass</code>
-     * @memberOf WX.Processor
+     * @memberOf Processor
+     * @private
      */
     $bypass: function(value, time, rampType) {
       time = (time || WX.now);
@@ -685,9 +633,8 @@
 
   /**
    * Analyzer plug-in class. Features both inlet, outlet and analyzer.
-   * @memberOf WX
+   * @name Analyzer
    * @class
-   * @private
    * @extends PlugInAbstract
    * @param {Object} params
    * @param {Generic} params.input Input gain.
@@ -723,7 +670,8 @@
 
     /**
      * Parameter handler for <code>params.input</code>
-     * @memberOf WX.Analyzer
+     * @private
+     * @memberOf Analyzer
      */
     $input: function (value, time, xtype) {
       this._input.gain.set(value, time, xtype);
@@ -859,3 +807,72 @@
   WX.Log.info('WAAX', WX.getVersion(), '(' + WX.srate + 'Hz)');
 
 })(WX);
+
+
+//
+// WX-specific type definitions
+//
+
+/**
+ * @typedef WAPL
+ * @description Web Audio API Plug-in Object.
+ * @type {Object}
+ */
+
+/**
+ * @typedef WXModel
+ * @description Contains a model for data binding.
+ * @type {Array}
+ * @example
+ * var model = [
+ *   { key:'Sine', value:'sine' },
+ *   { key:'Sawtooth', value:'sawtooth' }
+ *   ...
+ * ];
+ */
+
+/**
+ * @typedef WXClip
+ * @description WAAX abstraction of sample and meta data.
+ * @type {Object}
+ * @property {String} name User-defined name of sample.
+ * @property {String} url URL of audio file.
+ * @property {Object} buffer A placeholder for ArrayBuffer object.
+ * @example
+ * var clip = {
+ *   name: 'Cool Sample',
+ *   url: 'http://mystaticdata.com/samples/coolsample.wav',
+ *   buffer: null
+ * };
+ */
+
+/**
+ * @typedef WXSampleZone
+ * @description WAAX abstraction of sampler instrument data.
+ * @type {Object}
+ * @property {WXClip} clip WXClip object.
+ * @property {Number} basePitch Original sample pitch.
+ * @property {Boolean} loop Looping flag.
+ * @property {Number} loopStart Loop start point in seconds.
+ * @property {Number} loopEnd Loop end point in seconds.
+ * @property {Number} pitchLow Low pitch bound.
+ * @property {Number} pitchHigh High pitch bound.
+ * @property {Number} velocityLow Low velocity bound.
+ * @property {Number} velocityHigh High velocity bound.
+ * @property {Boolean} pitchModulation Switch for pitch sensitivity modulation.
+ * @property {Boolean} velocityModulatio Switch for velocity sensitivity modulation.
+ * @example
+ * var sampleZone = {
+ *   clip: WXClip
+ *   basePitch: 60            // samples original pitch
+ *   loop: true,
+ *   loopStart: 0.1,
+ *   loopEnd: 0.5,
+ *   pitchLow: 12,            // pitch low bound
+ *   pitchHigh: 96,           // pitch high bound
+ *   velocityLow: 12,         // velocity lower bound
+ *   velocityHigh: 127,       // velocity high bound
+ *   pitchModulation: true,   // use pitch modulation
+ *   velocityModulatio: true  // use velocity moduation
+ * };
+ */

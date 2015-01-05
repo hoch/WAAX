@@ -398,14 +398,14 @@ WX.loadClip = function (clip, oncomplete, onprogress) {
 
 /**
  * Callback for clip loading completion. Called by {@link WX.loadClip}.
- * @callback loadClip_oncomplete
+ * @callback callback_loadclip_oncomplete
  * @param {Object} clip WAAX clip
  * @see {@link WX.loadClip}
  */
 
 /**
  * Callback for clip loading progress report. called by {@link WX.loadClip}.
- * @callback loadClip_onprogress
+ * @callback callback_loadclip_onprogress
  * @param {Object} event XHR progress event object
  * @param {Object} clip WAAX clip
  * @see {@link WX.loadClip}

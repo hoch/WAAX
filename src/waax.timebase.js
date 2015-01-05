@@ -2,14 +2,23 @@
 // Use of this source code is governed by MIT license that can be found in the
 // LICENSE file.
 
+/**
+ * @typedef MBST
+ * @description Measure, beat, sixteenth, tick aka musical timebase.
+ * @type {Object}
+ * @property {Number} measure Measure.
+ * @property {Number} beat Beat.
+ * @property {Number} sixteenth Sixteenth.
+ * @property {Number} tick Tick.
+ */
+
 (function (WX) {
 
   'use strict';
 
-  // NOTES: Terms on timebase.
-  // MBT - measure, beat, sixteenth, tick aka musical timebase
-  // Tick - atomic unit for musical timebase
-  // Second - unit for linear timebase
+  // MBT - measure, beat, sixteenth, tick aka musical timebase.
+  // Tick - atomic unit for musical timebase.
+  // Second - unit for linear timebase.
   var _TICKS_PER_BEAT = 480,
       _TICKS_PER_MEASURE = _TICKS_PER_BEAT * 4,
       _TICKS_PER_SIXTEENTH = _TICKS_PER_BEAT * 0.25;
@@ -28,8 +37,7 @@
 
   /**
    * Note abstraction. Instantiated by {@link WX.Note}.
-   * @memberOf WX
-   * @private
+   * @name Note
    * @class
    * @param {Number} pitch MIDI pitch.
    * @param {Number} velocity MIDI velocity.
@@ -47,6 +55,7 @@
 
     /**
      * Changes note duration by delta.
+     * @memberOf Note
      * @param  {Number} delta Duration.
      */
     changeDuration: function (delta) {
@@ -56,6 +65,7 @@
 
     /**
      * Returns the note end time in tick.
+     * @memberOf Note
      * @return {Number}
      */
     getEnd: function () {
@@ -64,6 +74,7 @@
 
     /**
      * Sets note properties from a note.
+     * @memberOf Note
      * @param {Note} note
      */
     setNote: function (note) {
@@ -74,6 +85,7 @@
 
     /**
      * Moves note pitch by delta.
+     * @memberOf Note
      * @param  {Number} delta Pitch displacement.
      */
     translatePitch: function (delta) {
@@ -83,6 +95,7 @@
 
     /**
      * Moves note pitch by delta.
+     * @memberOf Note
      * @param  {Number} delta Pitch displacement.
      */
     translateStart: function (delta) {
@@ -92,6 +105,7 @@
 
     /**
      * Returns current properties in a string.
+     * @memberOf Note
      * @return {String}
      */
     toString: function () {
@@ -101,6 +115,7 @@
 
     /**
      * Returns start time for numeric operation.
+     * @memberOf Note
      * @return {Number}
      */
     valueOf: function () {
@@ -113,8 +128,7 @@
   /**
    * NoteClip abstraction. A collection of Note objects. Instantiated by
    *   {@link WX.NoteClip}.
-   * @memberOf WX
-   * @private
+   * @name NoteClip
    * @class
    */
   function NoteClip() {
@@ -123,9 +137,7 @@
 
   NoteClip.prototype = {
 
-    /**
-     * Initializes or resets note clip.
-     */
+    // Initializes or resets note clip.
     _init: function () {
       this.notes = {};
       this.start = 0;
@@ -135,6 +147,7 @@
 
     /**
      * Deletes and returns a note from clip. Returns null when not found.
+     * @memberOf NoteClip
      * @param  {String} id Note ID.
      * @return {Note | null}
      */
@@ -150,6 +163,7 @@
 
     /**
      * Flush out noteclip content.
+     * @memberOf NoteClip
      */
     empty: function () {
       this.notes = {};
@@ -163,6 +177,7 @@
      *   simply catches the first note detected in the iteration. There is no
      *   perfect solution over this problem, so I chose to make it robust
      *   instead.
+     * @memberOf NoteClip
      * @param  {Number} pitch MIDI pitch
      * @param  {Number} tick Position in tick.
      * @return {String | null}
@@ -184,6 +199,7 @@
      *   of notes. Returns null when nothing in target area.
      *   Note that this method only care for start time of note. If a note
      *   starts before than the area, it will not be included in the selection.
+     * @memberOf NoteClip
      * @param  {Number} minPitch Lower bound pitch.
      * @param  {Number} maxPitch Upper bound pitch.
      * @param  {Number} startTick Start time in tick.
@@ -207,6 +223,7 @@
 
     /**
      * Returns note from clip with id.
+     * @memberOf NoteClip
      * @param  {String} id Note ID.
      * @return {Object}
      */
@@ -219,6 +236,7 @@
 
     /**
      * Retunrs an array with all the ID of notes.
+     * @memberOf NoteClip
      * @return {Array}
      */
     getAllId: function () {
@@ -227,6 +245,7 @@
 
     /**
      * Returns clip size.
+     * @memberOf NoteClip
      * @return {Number}
      */
     getSize: function () {
@@ -235,6 +254,7 @@
 
     /**
      * Probes clip with note id.
+     * @memberOf NoteClip
      * @param  {String} id Note id.
      * @return {Boolean} True if clip contains the note.
      */
@@ -244,6 +264,7 @@
 
     /**
      * Iterates all the notes with callback function.
+     * @memberOf NoteClip
      * @param  {callback_noteclip_iterate} callback Process for iteration.
      */
     iterate: function (callback) {
@@ -254,16 +275,17 @@
     },
 
     /**
-     * Callback for note clip interation. Called by {@link WX.NoteClip.iterate}.
+     * Callback for note clip interation. Called by {@link NoteClip.iterate}.
      * @callback callback_noteclip_iterate
      * @param {String} id Note ID.
      * @param {Note} Note object.
      * @param {Number} index Iteration index.
-     * @see {@link WX.NoteClip.iterate}
+     * @see {@link NoteClip.iterate}
      */
 
     /**
      * Pushes a new note into clip. Returns ID of the new note.
+     * @memberOf NoteClip
      * @param  {Note} note
      * @return {String} Note ID.
      */
@@ -281,6 +303,7 @@
      * Set a note with a specific ID. If the same ID found, update properties
      *   of the note. Otherwise, create a new note with a specified ID. Usually
      *   this method is used in the collaborative context.
+     * @memberOf NoteClip
      * @param {String} id Note ID.
      * @param {Note} note Note object.
      */
@@ -295,6 +318,7 @@
     /**
      * Returns an array of notes within a timespan. Returns null when not found.
      *   Note that this method actually returns Note objects, not IDs.
+     * @memberOf NoteClip
      * @param  {Number} start Start time in tick.
      * @param  {Number} end End time in tick.
      * @return {Array | null}
@@ -328,8 +352,7 @@
 
   /**
    * Transport abstraction. Singleton and instantiated by default.
-   * @memberOf WX
-   * @private
+   * @name Transport
    * @class
    * @param {Number} BPM Beat per minute.
    */
@@ -524,6 +547,7 @@
 
     /**
      * Converts tick to second based on transport tempo.
+     * @memberOf Transport
      * @param  {Number} tick Tick (atomic musical time unit)
      * @return {Number}
      */
@@ -533,6 +557,7 @@
 
     /**
      * Converts second to tick based on transport tempo.
+     * @memberOf Transport
      * @param  {Number} sec Second
      * @return {Number}
      */
@@ -542,6 +567,7 @@
 
     /**
      * Starts playback.
+     * @memberOf Transport
      */
     start: function () {
       // Arrange time references.
@@ -556,6 +582,7 @@
 
     /**
      * Pauses current playback.
+     * @memberOf Transport
      */
     pause: function () {
       this._RUNNING = false;
@@ -564,6 +591,7 @@
 
     /**
      * Sets playhead position by tick.
+     * @memberOf Transport
      * @param {Number} tick Playhead position in ticks.
      */
     setNow: function (tick) {
@@ -573,6 +601,7 @@
 
     /**
      * Returns playhead position by tick.
+     * @memberOf Transport
      * @return {Number}
      */
     getNow: function () {
@@ -581,6 +610,7 @@
 
     /**
      * Rewinds playhead to the beginning.
+     * @memberOf Transport
      */
     rewind: function () {
       this._setPlayheadPosition(0.0);
@@ -588,6 +618,7 @@
 
     /**
      * Sets loop start position by tick.
+     * @memberOf Transport
      * @param {Number} tick Loop start in tick.
      */
     setLoopStart: function (tick) {
@@ -596,6 +627,7 @@
 
     /**
      * Sets loop end position by tick.
+     * @memberOf Transport
      * @param {Number} tick Loop end in tick.
      */
     setLoopEnd: function (tick) {
@@ -604,6 +636,7 @@
 
     /**
      * Returns loop start by tick.
+     * @memberOf Transport
      * @return {Number}
      */
     getLoopStart: function () {
@@ -612,6 +645,7 @@
 
     /**
      * Returns loop end by tick.
+     * @memberOf Transport
      * @return {Number}
      */
     getLoopEnd: function () {
@@ -620,6 +654,7 @@
 
     /**
      * Toggles or sets loop status.
+     * @memberOf Transport
      * @param  {Boolean|undefined} bool Loop state. If undefined, it toggles the current state.
      */
     toggleLoop: function (bool) {
@@ -636,6 +671,7 @@
 
     /**
      * Sets transport BPM.
+     * @memberOf Transport
      * @param {Number} BPM Beat per minute.
      */
     setBPM: function (BPM) {
@@ -657,12 +693,18 @@
 
     /**
      * Returns current BPM.
+     * @memberOf Transport
      * @return {Number}
      */
     getBPM: function () {
       return this._BPM;
     },
 
+    /**
+     * Returns current running status of transport.
+     * @memberOf Transport
+     * @return {Boolean}
+     */
     isRunning: function () {
       return this._RUNNING;
     }
@@ -672,12 +714,8 @@
   /**
    * Converts MBST(measure, beat, sixteenth, tick) format to tick.
    * @memberOf WX
-   * @param  {Object} mtime Musical time in MBST format.
-   * @param  {Object} mtime.measure Measure.
-   * @param  {Object} mtime.beat Beat.
-   * @param  {Object} mtime.sixteenth Sixteenth.
-   * @param  {Object} mtime.tick Tick.
-   * @return {Number}
+   * @param  {MBST} Musical time in MBST format.
+   * @return {Number} Musical time in tick.
    */
   WX.mbst2tick = function (mtime) {
     return (mtime.measure || 0) * _TICKS_PER_MEASURE +
@@ -689,12 +727,8 @@
   /**
    * Converts tick to MBST(measure, beat, sixteenth, tick) format.
    * @memberOf WX
-   * @param  {NUmber} tick Tick.
-   * @return {Object} mtime Musical time in MBST format.
-   * @return {Object} mtime.measure Measure.
-   * @return {Object} mtime.beat Beat.
-   * @return {Object} mtime.sixteenth Sixteenth.
-   * @return {Object} mtime.tick Tick.
+   * @param  {Number} tick Tick.
+   * @return {MBST} Musical time in MBST format.
    */
   WX.tick2mbst = function (tick) {
     return {
@@ -712,7 +746,7 @@
    * @param  {Number} velocity MIDI velocity (0~127)
    * @param  {Number} start Note start time in tick.
    * @param  {Number} duration Note durtion in tick.
-   * @return {WX.Note}
+   * @return {Note}
    */
   WX.Note = function (pitch, velocity, start, duration) {
     return new Note(pitch, velocity, start, duration);
@@ -721,7 +755,7 @@
   /**
    * Create a NoteClip instance.
    * @memberOf WX
-   * @return {WX.NoteClip}
+   * @return {NoteClip}
    */
   WX.NoteClip = function () {
     return new NoteClip();
@@ -729,7 +763,7 @@
 
   /**
    * Singleton instance of Transporter.
-   * @type {WX.Transport}
+   * @type {Transport}
    */
   WX.Transport = new Transport(120);
 
