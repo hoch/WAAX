@@ -53,28 +53,20 @@ WAAX is pre-configured for the optimum development workflow. Type `gulp` in the 
 
 ~~~bash
 gulp                    # build everything and serve at 127.0.0.1:3000
-
-gulp clean              # cleans dist, build path
-gulp core               # minifies and concats core JS files to build/
-gulp plugins            # minifies plug-in JS files to build/plug_ins
-gulp mui                # copies MUI elements files to build/
-gulp serve              # starts dev server 127.0.0.1:3000 and opens Chrome
-gulp build              # build and minify core, plug-ins
 ~~~
 
 
-<!--
 ## What's Next?
 
 Go to the [project landing page](http://hoch.github.io/WAAX) and see what WAAX can do.
--->
+
 
 ## Change Log
 
 - 1.0.0-alpha3
     + Updated dependencies with latest version: Polymer, Gulp-related utilities.
     + mui-vkey polyphonic release issue solved.
-    + New project landing page is online.
+    + New project landing page and API reference are online.
 
 - 1.0.0-alpha2
     + Updated dependencies with latest version: Gulp, Polymer.

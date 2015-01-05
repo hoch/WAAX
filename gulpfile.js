@@ -1,4 +1,15 @@
-// Gulp dependencies
+/**
+ * WAAX project gulp task file (1.0.0-alpha3)
+ *
+ * gulp                    # build everything and serve at 127.0.0.1:3000
+ * gulp clean              # cleans dist, build path
+ * gulp core               # minifies and concats core JS files to build/
+ * gulp plugins            # minifies plug-in JS files to build/plug_ins
+ * gulp mui                # copies MUI elements files to build/
+ * gulp serve              # starts dev server 127.0.0.1:3000 and opens Chrome
+ * gulp build              # build and minify core, plug-ins
+ */
+
 var gulp        = require('gulp'),
     plugins     = require('gulp-load-plugins')(),
     browserSync = require('browser-sync'),
