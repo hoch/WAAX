@@ -2,9 +2,10 @@
 <html>
 
 <head>
-  <title>Hello WAAX! | WAAX Examples</title>
+  <title>Chorus | WAAX Examples</title>
   <script src="../../build/waax.js"></script>
-  <script src="../../build/plug_ins/simpleosc.js"></script>
+  <script src="../../build/plug_ins/sp1.js"></script>
+  <script src="../../build/plug_ins/chorus.js"></script>
   <script src="../../bower_components/webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="../../build/mui/mui.html">
   <link rel="stylesheet" href="../style.css">
@@ -19,24 +20,29 @@
         <a href="..">Examples</a>
       </span>
     </div>
-    <div>
 
-    <!-- example HTML code -->
-    <h1>Hello WAAX!</h1>
-    <mui-knob id="k-freq"></mui-knob>
-    <mui-knob id="k-output"></mui-knob>
+    <h1>Chorus</h1>
+    <mui-rack id="rack"></mui-rack>
 
-    </div>
   </div>
   <script>
 
-    // example JS code
     MUI.start(function () {
-      var osc = WX.SimpleOsc();
-      osc.to(WX.Master);
-      osc.noteOn(60, 64);
-      MUI.$('k-freq').link(osc, 'oscFreq');
-      MUI.$('k-output').link(osc, 'output');
+
+      var sp1 = WX.SP1({ ampSustain: 1.0 });
+      var chorus = WX.Chorus();
+      sp1.to(chorus).to(WX.Master);
+
+      sp1.onReady = function () {
+        sp1.noteOn(60, 100);
+      };
+      sp1.loadClip({
+        name: 'guitar',
+        url: '../../../sound/guitar.wav'
+      });
+
+      MUI.buildControls(chorus, 'rack');
+
     });
 
   </script>

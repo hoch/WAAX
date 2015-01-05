@@ -20,7 +20,7 @@
 <p>When you define a parameter in a plug-in, you are required to write a handler for the parameter. Once it is set up, changing the parameter value automatically triggers the corresponding handler to perform scaling and mapping. Note that WAAX parameter can support &#39;one-to-many&#39; mapping scheme.</p>
 <p><img src="../assets/waax-plugin-1.png" alt="Parameter and Handler"></p>
 <p>With this mechanism, you can have an abstract preset (a collection of WAAX parameters) which can be mapped into multiple AudioParam instances in a flexible fashion.</p>
-<p>The handler is a quite powerful tool especially when you want to use <strong>MUI elements</strong> (i.e. knobs, sliders and etc.) for parameter control. You can get two-way binding between a parameter and a GUI element with a single line of code. (See the article on <a href="">MUI</a> for detail.)</p>
+<p>The handler is a quite powerful tool especially when you want to use <strong>MUI elements</strong> (i.e. knobs, sliders and etc.) for parameter control. You can get two-way binding between a parameter and a GUI element with a single line of code. <!--(See the article on [MUI]() for detail.)--></p>
 <h2 id="building-waax-plug-in">Building WAAX Plug-in</h2>
 <p>This section shows the anatomy of plug-in building procedure. Before jumping right into the code example, here is the summary of each step:</p>
 <ol>
@@ -110,7 +110,9 @@
 };
 </code></pre>
 <p>A plug-in prototype is consist of <strong>plug-in information</strong>, <strong>default preset</strong> and <strong>handlers</strong>: filling the info and default preset should be straightforward. Writing handlers is not difficult if you have a solid idea on how to scale and map parameters.</p>
-<p>The detail on parameter definition and writing handler is covered in <a href="">this article</a>.</p>
+<!--The detail on parameter definition and writing handler is covered in [this article]().-->
+
+
 <h3 id="4-wrapping-up">4. Wrapping Up</h3>
 <pre><code class="lang-js">WX.Plugin.extendPrototype(MyPlugin, <span class="hljs-string">'Processor'</span>);
 WX.Plugin.register(MyPlugin);
@@ -121,7 +123,8 @@ WX.Plugin.register(MyPlugin);
 <pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"waax.js"</span>&gt;</span><span class="javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"MyPlugin.js"</span>&gt;</span><span class="javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-title">script</span>&gt;</span><span class="javascript">
-  <span class="hljs-keyword">var</span> myplugin = WX.MyPlugin({ sweet: <span class="hljs-number">1.0</span> });
+  <span class="hljs-keyword">var</span> myplugin = WX.MyPlugin({ sweet: <span class="hljs-literal">true</span> });
+  myplugin.set(<span class="hljs-string">'sweet'</span>, <span class="hljs-literal">false</span>);
   myplugin.to(WX.Master);
 </span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
 </code></pre>
