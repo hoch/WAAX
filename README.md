@@ -31,7 +31,6 @@ The complete WAAX development setup requires the following software. Make sure t
 
 - [Git](http://git-scm.com/) - [Installation](http://git-scm.com/downloads)
 - [Node.js](http://nodejs.org/) - [Installation](http://nodejs.org/)
-- [Bower](http://bower.io/) - [Installation](http://bower.io/#install-bower)
 - [Gulp](http://gulpjs.com/) - [Installation](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md)
 
 
@@ -43,7 +42,6 @@ If you have all the above installed, execute the following commands in the termi
 git clone https://github.com/hoch/WAAX waax
 cd waax
 npm install
-bower install
 ~~~
 
 
@@ -68,6 +66,8 @@ Go to the [project landing page](http://hoch.github.io/WAAX) and see what WAAX c
     + mui-vkey polyphonic release issue solved.
     + WXS-1 monophonic legato behavior fixed.
     + New project landing page and API reference are online.
+    + Using MUI package is significantly simplified.
+    + License for sound resources is added.
 
 - 1.0.0-alpha2
     + Updated dependencies with latest version: Gulp, Polymer.
