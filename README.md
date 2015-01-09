@@ -66,6 +66,7 @@ Go to the [project landing page](http://hoch.github.io/WAAX) and see what WAAX c
 - 1.0.0-alpha3
     + Updated dependencies with latest version: Polymer, Gulp-related utilities.
     + mui-vkey polyphonic release issue solved.
+    + WXS-1 monophonic legato behavior fixed.
     + New project landing page and API reference are online.
 
 - 1.0.0-alpha2
