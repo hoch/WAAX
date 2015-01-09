@@ -34,7 +34,7 @@ The complete WAAX development setup requires the following software. Make sure t
 - [Gulp](http://gulpjs.com/) - [Installation](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md)
 
 
-## Installation
+## Installation and Quick Start
 
 If you have all the above installed, execute the following commands in the terminal to install WAAX.
 
@@ -42,16 +42,10 @@ If you have all the above installed, execute the following commands in the termi
 git clone https://github.com/hoch/WAAX waax
 cd waax
 npm install
-~~~
-
-
-## Quick Start with Gulp
-
-WAAX is pre-configured for the optimum development workflow. Type `gulp` in the terminal and then your web browser (Chrome by default) will open the project landing page automatically.
-
-~~~bash
 gulp                    # build everything and serve at 127.0.0.1:3000
 ~~~
+
+Note that WAAX is pre-configured for the optimum development workflow. Type `gulp` in the terminal and then your web browser (Chrome by default) will open the project index page automatically.
 
 
 ## What's Next?
@@ -67,6 +61,7 @@ Go to the [project landing page](http://hoch.github.io/WAAX) and see what WAAX c
     + WXS-1 monophonic legato behavior fixed.
     + New project landing page and API reference are online.
     + Using MUI package is significantly simplified.
+    + `bower_components` are now part of MUI package, not WAAX.
     + License for sound resources is added.
 
 - 1.0.0-alpha2
