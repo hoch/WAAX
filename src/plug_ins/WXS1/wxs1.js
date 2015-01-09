@@ -1,41 +1,59 @@
-/**
- * @wapl WXS1
- * @author Hongchan Choi (hoch, hongchan.choi@gmail.com)
- */
+// Copyright 2011-2014 Hongchan Choi. All rights reserved.
+// Use of this source code is governed by MIT license that can be found in the
+// LICENSE file.
+
 (function (WX) {
 
   'use strict';
 
-  /** REQUIRED: plug-in constructor **/
+  /**
+   * Implements monophonic subtractive synthsizer.
+   * @type {WAPL}
+   * @param {Object} preset Parameter preset.
+   * @param {Number} preset.osc1type Oscillator 1 waveform type.
+   * @param {Number} preset.osc1octave Oscillator 1 octave.
+   * @param {Number} preset.osc1gain Oscillator 1 gain.
+   * @param {Number} preset.osc2type Oscillator 2 waveform type.
+   * @param {Number} preset.osc2detune Oscillator 2 detune.
+   * @param {Number} preset.osc2gain Oscillator 2 gain.
+   * @param {Number} preset.glide Pitch glide time in seconds.
+   * @param {Number} preset.cutoff LPF cutoff frequency.
+   * @param {Number} preset.reso LPF resonance.
+   * @param {Number} preset.filterMod Filter modulation amount.
+   * @param {Number} preset.filterAttack Filter envelope attack.
+   * @param {Number} preset.filterDecay Filter envelope decay.
+   * @param {Number} preset.filterSustain Filter envelope sustain.
+   * @param {Number} preset.filterRelease Filter envelope release.
+   * @param {Number} preset.ampAttack Amplitude envelope attack.
+   * @param {Number} preset.ampDecay Amplitude envelope decay.
+   * @param {Number} preset.ampSustain Amplitude envelope sustain.
+   * @param {Number} preset.ampRelease Amplitude envelope release.
+   * @param {Number} preset.output Plug-in output gain.
+   */
   function WXS1(preset) {
 
-    // REQUIRED: adding necessary modules
     WX.PlugIn.defineType(this, 'Generator');
 
-    // 2 oscs
     this._osc1 = WX.OSC();
     this._osc2 = WX.OSC();
-    // 2 osc gains
     this._osc1gain = WX.Gain();
     this._osc2gain = WX.Gain();
-    // 1 lowpass (-12dB/oct)
     this._lowpass = WX.Filter();
-    // 1 amplifier
     this._amp = WX.Gain();
-    // patching
+
     this._osc1.to(this._osc1gain).to(this._lowpass);
     this._osc2.to(this._osc2gain).to(this._lowpass);
     this._lowpass.to(this._amp);
     this._amp.to(this._output);
-    // start generation
+
     this._osc1.start(0);
     this._osc2.start(0);
 
-    // close envelope
+    // close envelope by default
     this._amp.gain.value = 0.0;
 
-    // flag
-    this.BUSY = false;
+    // for monophonic behaviour
+    this._pitchTimeStamps = {};
 
     // parameter definition
     WX.defineParams(this, {
@@ -88,6 +106,15 @@
         min: 0.0,
         max: 1.0,
         unit: 'LinearGain'
+      },
+
+      glide: {
+        type: 'Generic',
+        name: 'Glide',
+        default: 0.02,
+        min: 0.006,
+        max: 1.0,
+        unit: 'Seconds'
       },
 
       cutoff: {
@@ -188,24 +215,20 @@
       }
     });
 
-    // REQUIRED: initializing instance with preset
     WX.PlugIn.initPreset(this, preset);
   }
 
-  /** REQUIRED: plug-in prototype **/
   WXS1.prototype = {
 
-    // REQUIRED: plug-in info
     info: {
       name: 'WXS1',
-      version: '0.0.2',
+      version: '0.0.3',
       api_version: '1.0.0-alpha',
       author: 'Hongchan Choi',
       type: 'Generator',
       description: '2 OSC Monophonic Subtractive Synth'
     },
 
-    // REQUIRED: plug-in default preset
     defaultPreset: {
       osc1type: 'square',
       osc1octave: -1,
@@ -213,6 +236,7 @@
       osc2type: 'square',
       osc2detune: 7.0,
       osc2gain: 0.6,
+      glide: 0.02,
       cutoff: 140,
       reso: 18.0,
       filterMod: 7,
@@ -226,9 +250,6 @@
       ampRelease: 0.06,
       output: 0.8
     },
-
-    // REQUIRED: if you have a parameter,
-    //           corresponding handler is required.
 
     $osc1type: function (value, time, rampType) {
       this._osc1.type = value;
@@ -262,7 +283,29 @@
       this._lowpass.Q.set(value, time, rampType);
     },
 
-    noteOn: function (pitch, velocity, time) {
+    // Returns a key index with the most recent pitch in the map. If all keys
+    // are off, returns null.
+    _getCurrentPitch: function () {
+      var latestPitch = null,
+          latestTimeStamp = 0;
+      for (var pitch in this._pitchTimeStamps) {
+        var timeStamp = this._pitchTimeStamps[pitch];
+        if (timeStamp > latestTimeStamp) {
+          latestTimeStamp = timeStamp;
+          latestPitch = pitch;
+        }
+      }
+      return latestPitch;
+    },
+
+    _changePitch: function (pitch, time) {
+      time = (time || WX.now) + this.params.glide.get();
+      var freq = WX.mtof(pitch);
+      this._osc1.frequency.set(freq, time, 1);
+      this._osc2.frequency.set(freq, time, 1);
+    },
+
+    _startEnvelope: function (time) {
       time = (time || WX.now);
       var p = this.params,
           aAtt = p.ampAttack.get(),
@@ -271,26 +314,15 @@
           fAtt = p.filterAttack.get(),
           fDec = p.filterDecay.get(),
           fSus = p.filterSustain.get();
-      // sets frequency
-      this._osc1.frequency.set(WX.mtof(pitch), time + 0.02, 1);
-      this._osc2.frequency.set(WX.mtof(pitch), time + 0.02, 1);
       // attack
       this._amp.gain.set(1.0, [time, aAtt], 3);
       this._lowpass.detune.set(fAmt, [time, fAtt], 3);
       // decay
       this._amp.gain.set(fSus, [time + aAtt, aDec], 3);
       this._lowpass.detune.set(fAmt * fSus, [time + fAtt, fDec], 3);
-      // for chaining
-      return this;
     },
 
-    glide: function (pitch, time) {
-      time = (time || WX.now) + 0.04;
-      this._osc1.frequency.set(WX.mtof(pitch), time, 1);
-      this._osc2.frequency.set(WX.mtof(pitch), time, 1);
-    },
-
-    noteOff: function (time) {
+    _releaseEnvelope: function (time) {
       time = (time || WX.now);
       var p = this.params;
       // cancel pre-programmed envelope data points
@@ -299,31 +331,38 @@
       // release
       this._amp.gain.set(0.0, [time, p.ampRelease.get()], 3);
       this._lowpass.detune.set(0.0, [time, p.filterRelease.get()], 3);
-      // for chaining
-      return this;
     },
 
-    // realtime input data responder
     onData: function (action, data) {
-      // console.log('wxs1', action, data);
       switch (action) {
         case 'noteon':
-          this.noteOn(data.pitch, data.velocity, data.time);
-          break;
-        case 'glide':
-          this.glide(data.pitch);
+          this._pitchTimeStamps[data.pitch] = data.time;
+          var pitch = this._getCurrentPitch();
+          // The first key will start envelopes.
+          if (Object.keys(this._pitchTimeStamps).length === 1) {
+            this._changePitch(pitch, data.time);
+            this._startEnvelope(data.time);
+          } else {
+            this._changePitch(pitch, data.time);
+          }
           break;
         case 'noteoff':
-          this.noteOff(data.time);
+          if (this._pitchTimeStamps.hasOwnProperty(data.pitch)) {
+            delete this._pitchTimeStamps[data.pitch];
+          }
+          var pitch = this._getCurrentPitch();
+          // There is no key pressed. Release envelope.
+          if (pitch === null) {
+            this._releaseEnvelope(data.time);
+          } else {
+            this._changePitch(pitch, data.time);
+          }
           break;
       }
     }
   };
 
-  // REQUIRED: extending plug-in prototype with modules
   WX.PlugIn.extendPrototype(WXS1, 'Generator');
-
-  // REQUIRED: registering plug-in into WX ecosystem
   WX.PlugIn.register(WXS1);
 
 })(WX);

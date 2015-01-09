@@ -256,25 +256,23 @@
     _keyOn: function (pitch, velocity) {
       if (pitch !== null) {
         var xpitch = pitch + this._octaveOffset + this.octave * 12;
-        this._dispatch(this.label, 'noteon', { pitch: xpitch, velocity: velocity });
+        this._dispatch(this.label, 'noteon', {
+          pitch: xpitch,
+          velocity: velocity,
+          time: WX.now
+        });
         this._displayMessage('NOTE ON ' + xpitch);
         this._highlight(pitch, true);
       }
     },
 
-    // _glide: function (pitch) {
-    //   if (pitch !== null && this._prevPitch !== pitch) {
-    //     var xpitch = pitch + this._octaveOffset + this.octave * 12;
-    //     this._dispatch(this.label, 'glide', { pitch: xpitch });
-    //     this._displayMessage('GLIDE ' + xpitch);
-    //     this._highlight(pitch);
-    //     this._prevPitch = pitch;
-    //   }
-    // },
-
     _keyOff: function (pitch) {
       var xpitch = pitch + this._octaveOffset + this.octave * 12;
-      this._dispatch(this.label, 'noteoff', { pitch: xpitch, velocity: 0 });
+      this._dispatch(this.label, 'noteoff', {
+        pitch: xpitch,
+        velocity: 0,
+        time: WX.now
+      });
       this._displayMessage('NOTE OFF');
       this._highlight(pitch, false);
     },
