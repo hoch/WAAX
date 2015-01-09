@@ -1,0 +1,14 @@
+{
+  "name": "MUI",
+  "version": "1.0.0-alpha3",
+  "homepage": "https://github.com/hoch/WAAX",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "bower_components"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#~0.5.1",
+    "core-icon": "Polymer/core-icon#~0.5.2"
+  }
+}

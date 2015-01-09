@@ -3,9 +3,8 @@
 
 <head>
 <title>SP1 | WAAX Examples</title>
-  <script src="../../build/waax.js"></script>
-  <script src="../../build/plug_ins/sp1.js"></script>
-  <script src="../../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../../build/waax.min.js"></script>
+  <script src="../../build/mui/bower_components/webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="../../build/mui/mui.html">
   <link rel="stylesheet" href="../style.css">
 </head>
@@ -31,12 +30,12 @@
 
     MUI.start(function () {
 
-      var sp1 = WX.SP1();
+      var sp1 = WX.SP1({ ampSustain: 1.0 });
       sp1.to(WX.Master);
 
       sp1.loadClip({
-        name: 'a drum loop',
-        url: '../../sound/loops/drums.mp3'
+        name: 'Guitar 120BPM CMaj',
+        url: '../../sound/loops/cgtr-120-cmaj.mp3'
       });
 
       MUI.buildControls(sp1, 'rack');

@@ -496,8 +496,8 @@ describe('Plug-in: Fader', function () {
     expect(preset.input).to.equal(0.25);
     expect(preset.dB).to.equal(-6.0);
     expect(fader.info.name).to.equal('Fader');
-    // TO FIX: revise .set method for all 3 browsers. Chrome and Safari work
-    // same way, so fix this for the FireFox.
+    // TO FIX (hoch): revise .set method for all 3 browsers. Chrome and Safari
+    // work same way, so fix this for the FireFox.
     setTimeout(function () {
       fader._output.gain.cancel(0);
       expect(fader._output.gain.value).to.equal(0.5011872053146362);

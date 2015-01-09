@@ -19,6 +19,18 @@ var gulp        = require('gulp'),
 var reload      = browserSync.reload;
 
 
+var WX_ALL = [
+  // core
+  'src/waax.js',
+  'src/waax.extension.js',
+  'src/waax.util.js',
+  'src/waax.core.js',
+  'src/waax.timebase.js',
+  // plug_ins
+  'src/plug_ins/**/*.js'
+];
+
+
 // Clean: Empty the build directory before a complete build.
 gulp.task('clean', del.bind(null, [
   'build/**/*',
@@ -28,40 +40,32 @@ gulp.task('clean', del.bind(null, [
 
 // Core: Build waax.js into build/ path.
 gulp.task('core', function () {
-  return gulp.src([
-    'src/waax.js',
-    'src/waax.extension.js',
-    'src/waax.util.js',
-    'src/waax.core.js',
-    'src/waax.timebase.js',
-    'src/mui.js',
-    'src/plug_ins/Fader/fader.js'
-  ])
+  return gulp.src(WX_ALL)
     .pipe(plugins.uglify({ mangle: false }))
-    .pipe(plugins.concat('waax.js'))
+    .pipe(plugins.concat('waax.min.js'))
     .pipe(gulp.dest('build'))
     .pipe(plugins.size({ title: 'core' }));
 });
 
 
 // Plugins: Build plug-in JS files into build/plug_ins/ path.
-gulp.task('plugins', function () {
-  return gulp.src([
-    'src/plug_ins/**/*.js',
-    '!src/plug_ins/Fader/fader.js'
-  ])
-    .pipe(plugins.uglify({ mangle: false }))
-    .pipe(plugins.flatten())
-    .pipe(gulp.dest('build/plug_ins'))
-    .pipe(plugins.size({ title: 'plugins' }));
-});
+// gulp.task('plugins', function () {
+//   return gulp.src([
+//     'src/plug_ins/**/*.js',
+//     '!src/plug_ins/Fader/fader.js'
+//   ])
+//     .pipe(plugins.uglify({ mangle: false }))
+//     .pipe(plugins.flatten())
+//     .pipe(gulp.dest('build/plug_ins'))
+//     .pipe(plugins.size({ title: 'plugins' }));
+// });
 
 
 // MUI: Build MUI elements into build/mui/ path.
 gulp.task('mui', function () {
   return gulp.src([
     'src/mui/**/*',
-    '!src/mui/**/index.html',
+    '!src/mui/bower.json'
   ])
     .pipe(gulp.dest('build/mui'))
     .pipe(plugins.size({ title: 'mui' }));
@@ -89,7 +93,7 @@ gulp.task('serve', function () {
 
 // Build: Clean and build everything in build/ path.
 gulp.task('build', function (cb) {
-  runSequence('clean', ['core', 'plugins', 'mui'], cb);
+  runSequence('clean', ['core', 'mui'], cb);
 });
 
 

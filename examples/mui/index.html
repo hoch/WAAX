@@ -3,9 +3,8 @@
 
 <head>
   <title>MUI | WAAX Examples</title>
-  <script src="../../build/waax.js"></script>
-  <script src="../../build/plug_ins/simpleosc.js"></script>
-  <script src="../../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../../build/waax.min.js"></script>
+  <script src="../../build/mui/bower_components/webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="../../build/mui/mui.html">
   <link rel="stylesheet" href="../style.css">
 </head>
@@ -23,8 +22,14 @@
     <h1>MUI Elements</h1>
 
     <h2>mui-button</h2>
+    <mui-button icon="av:skip-previous"></mui-button>
     <mui-button icon="av:play-arrow" type="toggle"></mui-button>
+    <mui-button icon="av:pause"></mui-button>
     <mui-button icon="av:stop"></mui-button>
+    <mui-button icon="av:loop" type="toggle"></mui-button>
+    <mui-button icon="work"></mui-button>
+    <mui-button icon="social:person-add"></mui-button>
+    <mui-button icon="social:share"></mui-button>
 
     <h2>mui-knob</h2>
     <mui-knob label="knob 1" value="0.3"></mui-knob>
@@ -81,7 +86,12 @@
 
       // for mui-pianoroll to work
       var noteclip = WX.NoteClip();
+      for (var i = 0; i < 24; i++) {
+        noteclip.push(WX.Note(48 + i, 100, 240 * i, 120));
+      }
+
       MUI.$('proll').setNoteClip(noteclip);
+
     });
   </script>
   <script src="../examples.js"></script>

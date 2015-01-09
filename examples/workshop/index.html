@@ -3,22 +3,10 @@
 
 <head>
   <title>Plug-in Workshop | WAAX Examples</title>
-  <!-- CSS for examples -->
-  <link rel="stylesheet" href="../style.css">
-  <!-- MUI -->
-  <script src="../../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../../build/waax.min.js"></script>
+  <script src="../../build/mui/bower_components/webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="../../build/mui/mui.html">
-  <!-- WAAX -->
-  <script src="../../build/waax.js"></script>
-  <!-- plug-ins -->
-  <script src="../../build/plug_ins/wxs1.js"></script>
-  <script src="../../build/plug_ins/fmk1.js"></script>
-  <script src="../../build/plug_ins/simpleosc.js"></script>
-  <script src="../../build/plug_ins/noise.js"></script>
-  <script src="../../build/plug_ins/impulse.js"></script>
-  <script src="../../build/plug_ins/cmp1.js"></script>
-  <script src="../../build/plug_ins/stereodelay.js"></script>
-  <script src="../../build/plug_ins/converb.js"></script>
+  <link rel="stylesheet" href="../style.css">
 </head>
 
 <body unresolved>
@@ -83,12 +71,20 @@
       proSelector.setValue(pros[1]);
       proSelector.onItemSelected = onPatch;
 
-      // loading WXClip for convolution reverb
+      // loading WXClip for convolution reverb and SP1
       var reverbClip = {
         name: '960 Large Plate',
         url: '../../sound/ir/960-LargePlate.mp3'
       };
+      var sp1Clip = {
+        name: 'Guitar 120BPM CMaj',
+        url: '../../sound/loops/cgtr-120-cmaj.mp3'
+      };
+
       WX.loadClip(reverbClip, function (clip) {
+        WX.Log.info('clip loaded.');
+      });
+      WX.loadClip(sp1Clip, function (clip) {
         WX.Log.info('clip loaded.');
       });
 
@@ -120,6 +116,10 @@
           vkeySelector.addTarget(currGen);
         }
 
+        if (genSelector.value === 'SP1') {
+          currGen.setClip(sp1Clip);
+        }
+
         // parse and build GUI elements
         MUI.buildControls(currGen, 'params-gen');
         MUI.buildControls(currPro, 'params-pro');
@@ -135,11 +135,7 @@
 
     });
   </script>
-
-  <script>
-    var wxver = document.querySelector('#wx-version');
-    wxver.textContent = WX.getVersion();
-  </script>
+  <script src="../examples.js"></script>
 </body>
 
 </html>
