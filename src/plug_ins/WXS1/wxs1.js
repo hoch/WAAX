@@ -232,10 +232,10 @@
     defaultPreset: {
       osc1type: 'square',
       osc1octave: -1,
-      osc1gain: 0.6,
+      osc1gain: 0.4,
       osc2type: 'square',
       osc2detune: 7.0,
-      osc2gain: 0.6,
+      osc2gain: 0.4,
       glide: 0.02,
       cutoff: 140,
       reso: 18.0,

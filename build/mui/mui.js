@@ -94,7 +94,6 @@ window.MUI = (function (WX) {
 
     onfocus: function () {
       this.container.addEventListener('mousedown', function (event) {
-        event.preventDefault();
         this.callback(this.senderId, 'clicked', null);
         this.container.addEventListener('keypress', this.onkeypress, false);
         this.container.addEventListener('blur', this.onblur, false);
@@ -102,12 +101,10 @@ window.MUI = (function (WX) {
     },
 
     keypressed: function (event) {
-      event.preventDefault();
       this.callback(this.senderId, 'keypressed', event.keyCode);
     },
 
     finished: function (event) {
-      event.preventDefault();
       this.callback(this.senderId, 'finished', null);
       this.container.removeEventListener('keypress', this.onkeypress, false);
       this.container.removeEventListener('blur', this.onblur, false);
