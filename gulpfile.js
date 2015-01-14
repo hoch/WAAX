@@ -79,8 +79,8 @@ gulp.task('serve', function () {
     server: {
       baseDir: './'
     },
-    // browser: 'google chrome'
-    browser: 'google chrome canary'
+    browser: 'google chrome'
+    // browser: 'google chrome canary'
   });
 
   gulp.watch(['src/*.js', '!src/ktrl.js'], ['core', reload]);

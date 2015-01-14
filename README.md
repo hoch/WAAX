@@ -36,13 +36,13 @@ The complete WAAX development setup requires the following software. Make sure t
 
 ## Installation and Quick Start
 
-If you have all the above installed, execute the following commands in the terminal to install WAAX.
+If you have all the above installed, execute the following commands in the terminal to install and launch WAAX.
 
 ~~~bash
 git clone https://github.com/hoch/WAAX waax
 cd waax
 npm install
-gulp                    # build everything and serve at 127.0.0.1:3000
+gulp
 ~~~
 
 Note that WAAX is pre-configured for the optimum development workflow. Type `gulp` in the terminal and then your web browser (Chrome by default) will open the project index page automatically.
