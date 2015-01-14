@@ -3,10 +3,8 @@
 
 <head>
   <title>Chorus | WAAX Examples</title>
-  <script src="../../build/waax.js"></script>
-  <script src="../../build/plug_ins/sp1.js"></script>
-  <script src="../../build/plug_ins/chorus.js"></script>
-  <script src="../../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../../build/waax.min.js"></script>
+  <script src="../../build/mui/bower_components/webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="../../build/mui/mui.html">
   <link rel="stylesheet" href="../style.css">
 </head>
@@ -38,7 +36,7 @@
       };
       sp1.loadClip({
         name: 'guitar',
-        url: '../../../sound/guitar.wav'
+        url: '../../sound/loops/cgtr-120-cmaj.mp3'
       });
 
       MUI.buildControls(chorus, 'rack');

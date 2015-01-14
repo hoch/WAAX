@@ -3,11 +3,8 @@
 
 <head>
   <title>FMK1 | WAAX Examples</title>
-  <script src="../../build/waax.js"></script>
-  <script src="../../build/plug_ins/fmk1.js"></script>
-  <script src="../../build/plug_ins/stereodelay.js"></script>
-  <script src="../../build/plug_ins/converb.js"></script>
-  <script src="../../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../../build/waax.min.js"></script>
+  <script src="../../build/mui/bower_components/webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="../../build/mui/mui.html">
   <link rel="stylesheet" href="../style.css">
 </head>
@@ -53,7 +50,7 @@
 
       converb.loadClip({
         name: 'hall',
-        url: '../../../sound/ir/960-LargePlate.mp3'
+        url: '../../sound/ir/960-LargePlate.mp3'
       });
 
       fmk1.to(WX.Master);

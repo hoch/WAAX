@@ -44,7 +44,7 @@
 </ul>
 </li>
 </ol>
-<p>It might be too much to digest at a glance, but it is nothing more than defining a JavaScript class.</p>
+<p>It might be too much to digest at a glance, but it is nothing more than defining a JavaScript class. As the simplest example, the complete source code of <code>SimpleOsc</code> plug-in can be found <a href="https://github.com/hoch/WAAX/blob/master/src/plug_ins/SimpleOsc/SimpleOsc.js">here</a>.</p>
 <h3 id="1-iife-encapsulation-and-class-definition">1. IIFE Encapsulation and Class Definition</h3>
 <pre><code class="lang-js"><span class="hljs-list">(<span class="hljs-keyword">function</span> <span class="hljs-list">(<span class="hljs-keyword">WX</span>)</span> {
 
@@ -120,7 +120,7 @@ WX.Plugin.register(MyPlugin);
 <p>Just copy and paste two lines above and replace the constructor name and the plug-in type accordingly.</p>
 <h2 id="how-to-use-plug-in">How to Use Plug-in</h2>
 <p>Load your plug-in script file after WAAX core library. Then you can use it under WX namespace.</p>
-<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"waax.js"</span>&gt;</span><span class="javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"waax.min.js"</span>&gt;</span><span class="javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"MyPlugin.js"</span>&gt;</span><span class="javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-title">script</span>&gt;</span><span class="javascript">
   <span class="hljs-keyword">var</span> myplugin = WX.MyPlugin({ sweet: <span class="hljs-literal">true</span> });

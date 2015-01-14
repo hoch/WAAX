@@ -3,9 +3,8 @@
 
 <head>
   <title>WXS1 | WAAX Examples</title>
-  <script src="../../build/waax.js"></script>
-  <script src="../../build/plug_ins/wxs1.js"></script>
-  <script src="../../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../../build/waax.min.js"></script>
+  <script src="../../build/mui/bower_components/webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="../../build/mui/mui.html">
   <link rel="stylesheet" href="../style.css">
 </head>
@@ -28,17 +27,12 @@
 
   </div>
   <script>
-
     MUI.start(function () {
-
       var synth = WX.WXS1();
       synth.to(WX.Master);
-
       MUI.buildControls(synth, 'rack');
       MUI.$('vkey').addTarget(synth);
-
     });
-
   </script>
   <script src="../examples.js"></script>
 </body>
