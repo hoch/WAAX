@@ -5,11 +5,12 @@
 </code></pre>
 <p>Then open up <code>examples/hellowaax/index.html</code> in your favorite text editor. You can find the following 3 chunks of code that actually to get WAAX working.</p>
 <h2 id="loading-waax-libraries">Loading WAAX libraries</h2>
-<p> The first part is in the header. Include <code>waax.min.js</code> first. <code>webcomponent.min.js</code> is a polyfill for Web Components to support browsers without the features. Then you can load MUI elements with HTMLImport. Note that You can load your custom WAAX plug-ins, but we will only use a stock plug-in, <code>SimpleOSC</code> in this example.</p>
+<p>The first part is the header. Include <code>waax.min.js</code> first. Then add <code>webcomponent.min.js</code>, which is a polyfill for Web Components to support browsers without the features. Lastly, you can load MUI elements with HTMLImport. Note that MUI requires WAAX to work, but WAAX core library does not rely MUI or Web Components.</p>
 <pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"build/waax.min.js"</span>&gt;</span><span class="javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"build/mui/bower_components/webcomponentsjs/webcomponents.min.js"</span>&gt;</span><span class="javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-title">link</span> <span class="hljs-attribute">rel</span>=<span class="hljs-value">"import"</span> <span class="hljs-attribute">href</span>=<span class="hljs-value">"build/mui/mui.html"</span>&gt;</span>
 </code></pre>
+<p>You can load your custom WAAX plug-ins, but we will only use a stock plug-in, <code>SimpleOSC</code> in this example.</p>
 <h2 id="creating-mui-elements">Creating MUI elements</h2>
 <p>With all the libraries loaded, you can start create MUI elements, which are custom HTML elements for musical GUI, just like any other HTML element. Make sure to assign unique ID to each element so we can use them in JS code later.</p>
 <pre><code class="lang-html"><span class="hljs-comment">&lt;!-- MUI elements --&gt;</span>
@@ -30,7 +31,7 @@
 </span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
 </code></pre>
 <p>The last two lines of code show how to connect MUI elements with WAAX plug-in parameters. <code>MUI.$(&#39;element_id&#39;)</code> will give you the reference of MUI element so you can connect to a parameter of a plug-in by <code>.link(plug_in, parameter_name)</code> method.</p>
-<p>See the demo <a href="http://hoch.github.io/WAAX/waax/examples/hellowaax/">here</a>.</p>
+<p>See the <a href="http://hoch.github.io/WAAX/waax/examples/hellowaax/">demo</a> and the <a href="https://github.com/hoch/WAAX/blob/master/examples/hellowaax/index.html">source code</a>.</p>
 <h2 id="what-s-next-">What&#39;s Next?</h2>
 <ul>
 <li><a href="../waax/examples">Examples</a></li>
