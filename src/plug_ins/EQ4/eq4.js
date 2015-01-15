@@ -133,20 +133,20 @@
 
       band1Active: {
         type: 'Boolean',
-        name: 'Band1 Active',
+        name: 'On 1',
         default: true
       },
 
       band1Type: {
         type: 'Itemized',
-        name: 'Band1 Type',
-        default: 'lowshelf'
+        name: 'Type 1',
+        default: 'lowshelf',
         model: WX.FILTER_TYPES
       },
 
       band1Freq: {
         type: 'Generic',
-        name: 'Band1 Freq',
+        name: 'Freq 1',
         default: 80,
         min: 10,
         max: WX.srate * 0.5,
@@ -155,7 +155,7 @@
 
       band1Q: {
         type: 'Generic',
-        name: 'Band1 Q',
+        name: 'Q 1',
         default: 0.0,
         min: 0.01,
         max: 1000
@@ -163,7 +163,7 @@
 
       band1Gain: {
         type: 'Generic',
-        name: 'Band1 Gain',
+        name: 'Gain 1',
         default: 0.0,
         min: -40,
         max: 40,
@@ -172,20 +172,20 @@
 
       band2Active: {
         type: 'Boolean',
-        name: 'Band2 Active',
+        name: 'On 2',
         default: true
       },
 
       band2Type: {
         type: 'Itemized',
-        name: 'Band2 Type',
-        default: 'peaking'
+        name: 'Type 2',
+        default: 'peaking',
         model: WX.FILTER_TYPES
       },
 
       band2Freq: {
         type: 'Generic',
-        name: 'Band2 Freq',
+        name: 'Freq 2',
         default: 500,
         min: 10,
         max: WX.srate * 0.5,
@@ -194,7 +194,7 @@
 
       band2Q: {
         type: 'Generic',
-        name: 'Band2 Q',
+        name: 'Q 2',
         default: 0.0,
         min: 0.01,
         max: 1000
@@ -202,7 +202,7 @@
 
       band2Gain: {
         type: 'Generic',
-        name: 'Band2 Gain',
+        name: 'Gain 2',
         default: 0.0,
         min: -40,
         max: 40,
@@ -211,20 +211,20 @@
 
       band3Active: {
         type: 'Boolean',
-        name: 'Band3 Active',
+        name: 'On 3',
         default: true
       },
 
       band3Type: {
         type: 'Itemized',
-        name: 'Band3 Type',
-        default: 'peaking'
+        name: 'Type 3',
+        default: 'peaking',
         model: WX.FILTER_TYPES
       },
 
       band3Freq: {
         type: 'Generic',
-        name: 'Band3 Freq',
+        name: 'Freq 3',
         default: 3500,
         min: 10,
         max: WX.srate * 0.5,
@@ -233,7 +233,7 @@
 
       band3Q: {
         type: 'Generic',
-        name: 'Band3 Q',
+        name: 'Q 3',
         default: 0.0,
         min: 0.01,
         max: 1000
@@ -241,7 +241,7 @@
 
       band3Gain: {
         type: 'Generic',
-        name: 'Band3 Gain',
+        name: 'Gain 3',
         default: 0.0,
         min: -40,
         max: 40,
@@ -250,20 +250,20 @@
 
       band4Active: {
         type: 'Boolean',
-        name: 'Band4 Active',
+        name: 'On 4',
         default: true
       },
 
       band4Type: {
         type: 'Itemized',
-        name: 'Band4 Type',
-        default: 'highshelf'
+        name: 'Type 4',
+        default: 'highshelf',
         model: WX.FILTER_TYPES
       },
 
       band4Freq: {
         type: 'Generic',
-        name: 'Band4 Freq',
+        name: 'Freq 4',
         default: 12000,
         min: 10,
         max: WX.srate * 0.5,
@@ -272,7 +272,7 @@
 
       band4Q: {
         type: 'Generic',
-        name: 'Band4 Q',
+        name: 'Q 4',
         default: 0.0,
         min: 0.01,
         max: 1000
@@ -280,7 +280,7 @@
 
       band4Gain: {
         type: 'Generic',
-        name: 'Band4 Gain',
+        name: 'Gain 4',
         default: 0.0,
         min: -40,
         max: 40,
@@ -331,7 +331,7 @@
     },
 
     $band1Type: function (value, time, rampType) {
-      this._band1.setType(value);
+      this._band1.setFilterType(value);
     },
 
     $band1Freq: function (value, time, rampType) {
@@ -351,7 +351,7 @@
     },
 
     $band2Type: function (value, time, rampType) {
-      this._band2.setType(value);
+      this._band2.setFilterType(value);
     },
 
     $band2Freq: function (value, time, rampType) {
@@ -371,7 +371,7 @@
     },
 
     $band3Type: function (value, time, rampType) {
-      this._band3.setType(value);
+      this._band3.setFilterType(value);
     },
 
     $band3Freq: function (value, time, rampType) {
@@ -391,7 +391,7 @@
     },
 
     $band4Type: function (value, time, rampType) {
-      this._band4.setType(value);
+      this._band4.setFilterType(value);
     },
 
     $band4Freq: function (value, time, rampType) {

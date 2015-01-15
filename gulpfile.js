@@ -69,7 +69,7 @@ gulp.task('mui', function () {
   ])
     .pipe(gulp.dest('build/mui'))
     .pipe(plugins.size({ title: 'mui' }));
-})
+});
 
 
 // Serve: Start a dev server at 127.0.0.1:3000.
@@ -84,7 +84,7 @@ gulp.task('serve', function () {
   });
 
   gulp.watch(['src/*.js', '!src/ktrl.js'], ['core', reload]);
-  gulp.watch(['src/plug_ins/**/*.js'], ['plugins', reload]);
+  gulp.watch(['src/plug_ins/**/*.js'], ['core', reload]);
   gulp.watch(['src/mui/**/*.html'], ['mui', reload]);
   gulp.watch(['examples/**/*'], reload);
   gulp.watch(['test/**/*.html', 'test/**/*.js'], reload);

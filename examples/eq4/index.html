@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>EQ4 | WAAX Examples</title>
+  <script src="../../build/waax.min.js"></script>
+  <script src="../../build/mui/bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <link rel="import" href="../../build/mui/mui.html">
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body unresolved>
+  <div class="wx-container">
+    <div class="wx-header">
+      <span class="wx-title">WAAX</span>
+      <span class="wx-info" id="wx-version"></span>
+      <span class="wx-menu">
+        <a href="..">Examples</a>
+      </span>
+    </div>
+
+    <h1>EQ4</h1>
+
+    <mui-rack label="EQ4" opened="true">
+      <mui-group label="Band 1">
+        <mui-button id="b-band1-active" type="toggle"></mui-button>
+        <mui-select id="s-band1-type" size="small"></mui-select>
+        <mui-knob id="k-band1-freq"></mui-knob>
+        <mui-knob id="k-band1-Q"></mui-knob>
+        <mui-knob id="k-band1-gain"></mui-knob>
+      </mui-group>
+      <mui-group label="Band 2">
+        <mui-button id="b-band2-active" type="toggle"></mui-button>
+        <mui-select id="s-band2-type" size="small"></mui-select>
+        <mui-knob id="k-band2-freq"></mui-knob>
+        <mui-knob id="k-band2-Q"></mui-knob>
+        <mui-knob id="k-band2-gain"></mui-knob>
+      </mui-group>
+      <mui-group label="Band 3">
+        <mui-button id="b-band3-active" type="toggle"></mui-button>
+        <mui-select id="s-band3-type" size="small"></mui-select>
+        <mui-knob id="k-band3-freq"></mui-knob>
+        <mui-knob id="k-band3-Q"></mui-knob>
+        <mui-knob id="k-band3-gain"></mui-knob>
+      </mui-group>
+      <mui-group label="Band 4">
+        <mui-button id="b-band4-active" type="toggle"></mui-button>
+        <mui-select id="s-band4-type" size="small"></mui-select>
+        <mui-knob id="k-band4-freq"></mui-knob>
+        <mui-knob id="k-band4-Q"></mui-knob>
+        <mui-knob id="k-band4-gain"></mui-knob>
+      </mui-group>
+    </mui-rack>
+
+  </div>
+  <script>
+
+    MUI.start(function () {
+
+      var sp1 = WX.SP1({ ampSustain: 1.0 });
+      var eq4 = WX.EQ4();
+      sp1.to(eq4).to(WX.Master);
+
+      sp1.onReady = function () {
+        sp1.noteOn(60, 100);
+      };
+      sp1.loadClip({
+        name: 'guitar',
+        url: '../../sound/loops/cgtr-120-cmaj.mp3'
+      });
+
+      // MUI.buildControls(eq4, 'rack');
+
+      MUI.$('b-band1-active').link(eq4, 'band1Active');
+      MUI.$('s-band1-type').link(eq4, 'band1Type');
+      MUI.$('k-band1-freq').link(eq4, 'band1Freq');
+      MUI.$('k-band1-Q').link(eq4, 'band1Q');
+      MUI.$('k-band1-gain').link(eq4, 'band1Gain');
+      MUI.$('b-band2-active').link(eq4, 'band2Active');
+      MUI.$('s-band2-type').link(eq4, 'band2Type');
+      MUI.$('k-band2-freq').link(eq4, 'band2Freq');
+      MUI.$('k-band2-Q').link(eq4, 'band2Q');
+      MUI.$('k-band2-gain').link(eq4, 'band2Gain');
+      MUI.$('b-band3-active').link(eq4, 'band3Active');
+      MUI.$('s-band3-type').link(eq4, 'band3Type');
+      MUI.$('k-band3-freq').link(eq4, 'band3Freq');
+      MUI.$('k-band3-Q').link(eq4, 'band3Q');
+      MUI.$('k-band3-gain').link(eq4, 'band3Gain');
+      MUI.$('b-band4-active').link(eq4, 'band4Active');
+      MUI.$('s-band4-type').link(eq4, 'band4Type');
+      MUI.$('k-band4-freq').link(eq4, 'band4Freq');
+      MUI.$('k-band4-Q').link(eq4, 'band4Q');
+      MUI.$('k-band4-gain').link(eq4, 'band4Gain');
+
+
+    });
+
+  </script>
+  <script src="../examples.js"></script>
+</body>
+
+</html>
