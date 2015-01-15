@@ -1,21 +1,21 @@
-<polymer-element name="mui-select" attributes="label key value">
+<polymer-element name="mui-select" attributes="label key value size">
 
   <template>
     <style>
       :host {
-          display: inline-block;
-          width: 160px;
-          height: 40px;
-          margin: 6px 4px;
-          vertical-align: top;
-          -webkit-user-select: none;
+        display: inline-block;
+        width: 160px;
+        height: 40px;
+        margin: 6px 4px;
+        vertical-align: top;
+        -webkit-user-select: none;
       }
       input:focus {
         outline: none;
       }
       .c-select-view {
         display: block;
-        width: 156px;
+        width: 95%;
         height: 24px;
         line-height: 24px;
         border-radius: 2px;
@@ -27,7 +27,8 @@
       }
       .c-select-view:active {
         background-color: rgba(0, 0, 0, 0.05);
-        box-shadow: inset 0 1px 0 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.24);
+        box-shadow: inset 0 1px 0 0 rgba(0, 0, 0, 0.2),
+          0 0 0 1px rgba(0, 0, 0, 0.24);
       }
       .c-select-value {
         width: 119px;
@@ -110,6 +111,7 @@
       label: 'unlabeled',
       key: 'not ready yet',
       value: null,
+      size: 'medium',
 
       // private
       _menuShown: false,
@@ -175,6 +177,14 @@
       },
 
       ready: function () {
+        switch (this.size) {
+          case 'small':
+            this.style.width = '120px';
+            break;
+          case 'large':
+            this.style.width = '240px';
+            break;
+        }
       },
 
       setModel: function (collection) {
@@ -184,7 +194,7 @@
       },
 
       setValue: function (value) {
-        var key = WX.findKeyByValue(this.$.eItems.model, value)
+        var key = WX.findKeyByValue(this.$.eItems.model, value);
         if (key) {
           this.value = value;
           this.key = key;
