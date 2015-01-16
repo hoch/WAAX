@@ -227,19 +227,19 @@
         );
 
         // keyboard input responder
-        var d = this.$.eValueDisplay;
+        var display = this.$.eValueDisplay;
         var keyResponder = MUI.KeyResponder(
           this.label,
-          d,
+          display,
           function (sender, action, data) {
             switch (action) {
               case 'clicked':
-                d.className += ' c-knob-value-select';
-                d.select();
+                display.className += ' c-knob-value-select';
+                display.select();
                 break;
               case 'keypressed':
                 if (data === 13) {
-                  var v = parseFloat(d.value);
+                  var v = parseFloat(display.value);
                   // sanity check
                   if (!isNaN(v)) {
                     // val => norm => post
@@ -247,11 +247,11 @@
                     this._normValue = (this.value - this.min) / (this.max - this.min);
                     this.post();
                   }
-                  d.blur();
+                  display.blur();
                 }
                 break;
               case 'finished':
-                d.className = 'c-knob-value';
+                display.className = 'c-knob-value';
                 break;
             }
           }.bind(this)
@@ -273,7 +273,6 @@
 
       // link to plugin, param and cloudMap
       link: function (plugin, param, cloudMap) {
-
         // get target parameter object
         this.targetParam = plugin.params[param];
         // load plugin param data
