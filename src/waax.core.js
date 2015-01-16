@@ -180,12 +180,14 @@
      * @param {Number} rampType WAAX ramp type
      */
     set: function (value, time, rampType) {
-      // check if value is valid
+      // check if value is valid 
       if (WX.findKeyByValue(this.model, value)) {
         this.value = value;
         if (this.$callback) {
           this.$callback.call(this._parent, this.value, time, rampType);
         }
+      } else {
+        WX.Log.warn('Invalid value.');
       }
     },
 

@@ -8,11 +8,19 @@
 
   // Pre-defined scales: ionian, lydian, aeolian, and mixolydian.
   var SCALES = [
-    { key: 'Ionian', value: [0, 7, 14, 21, 28, 35, 43, 48] },
-    { key: 'Lydian', value: [0, 6, 16, 21, 26, 35, 42, 48] },
-    { key: 'Mixolydian', value: [0, 5, 16, 23, 26, 33, 41, 48] },
-    { key: 'Aeolian', value: [0, 7, 15, 22, 26, 34, 39, 48] }
+    { key: 'Ionian', value: 'ionian' },
+    { key: 'Lydian', value: 'lydian' },
+    { key: 'Mixolydian', value: 'mixolydian' },
+    { key: 'Aeolian', value: 'aeolian' }
   ];
+
+  // Pitch class for scales.
+  var PITCHES = {
+    'ionian': [0, 7, 14, 21, 28, 35, 43, 48],
+    'lydian': [0, 6, 16, 21, 26, 35, 42, 48],
+    'mixolydian': [0, 5, 16, 23, 26, 33, 41, 48],
+    'aeolian': [0, 7, 15, 22, 26, 34, 39, 48]
+  };
 
   // Number of bands. A band is consist of cascaded two bandpass filters.
   var NUM_BANDS = 8;
@@ -40,8 +48,8 @@
       this._filters1[i] = WX.Filter();
       this._filters2[i] = WX.Filter();
       this._gains[i] = WX.Gain();
-      this._filters1[i].type = "bandpass";
-      this._filters2[i].type = "bandpass";
+      this._filters1[i].type = 'bandpass';
+      this._filters2[i].type = 'bandpass';
       this._input.to(this._filters1[i]);
       this._filters1[i].to(this._filters2[i]).to(this._gains[i]);
       this._gains[i].to(this._summing);
@@ -49,7 +57,7 @@
     this._summing.to(this._output);
 
     // Gain compensation. The resulting loudness of filterbank is fairly small.
-    this._summing.gain.value = 50.0;
+    this._summing.gain.value = 35.0;
 
     // Parameter definition
     WX.defineParams(this, {
@@ -57,21 +65,21 @@
       pitch: {
         type: 'Generic',
         name: 'Pitch',
-        default: 41,
+        default: 24,
         min: 12,
-        max: 127
+        max: 48
       },
 
       scale: {
         type: 'Itemized',
         name: 'Scale',
-        default: 'Lydian',
+        default: 'lydian',
         model: SCALES
       },
 
       slope: {
         type: 'Generic',
-        name: 'Slope',
+        name: 'Harmonics',
         default: 0.26,
         min: 0.1,
         max: 0.75
@@ -110,10 +118,10 @@
     },
 
     defaultPreset: {
-      pitch: 41,
-      scale: 'Lydian',
-      slope: 0.26,
-      width: 0.49,
+      pitch: 34,
+      scale: 'lydian',
+      slope: 0.65,
+      width: 0.15,
       detune: 0.0
     },
 
@@ -127,11 +135,12 @@
     },
 
     // Change detune of filters. (Note that this is in cents.)
-    $scale: function (key, time, rampType) {
-      var chord = SCALES[key].value;
+    $scale: function (value, time, rampType) {
+      time = (WX.now || time);
+      var pitches = PITCHES[value];
       for (var i = 1; i < NUM_BANDS; i++) {
-        this._filters1[i].detune.set(chord[i] * 100, time, rampType);
-        this._filters2[i].detune.set(chord[i] * 100, time, rampType);
+        this._filters1[i].detune.set(pitches[i] * 100, time, rampType);
+        this._filters2[i].detune.set(pitches[i] * 100, time, rampType);
       }
     },
 
@@ -152,9 +161,16 @@
       }
     },
 
+    // TO FIX: detune handler
     $detune: function (value, time, rampType) {
 
+    },
+
+    getScaleModel: function () {
+      return SCALES.slice(0);
     }
+
+    // TO FIX: noteon, noteoff. Interactive features.
 
   };
 

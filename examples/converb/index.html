@@ -85,9 +85,8 @@
         };
         irData[i].value = i;
         WX.loadClip(clip, function () {
-          if (--counter == 0) {
+          if (--counter === 0)
             converb.setClip(irClips[0]);
-          }
         });
         irClips.push(clip);
       }
@@ -97,7 +96,7 @@
       MUI.$('preset').setValue(irData[0].value);
       MUI.$('preset').onItemSelected = function (value) {
         converb.setClip(irClips[value]);
-      }
+      };
 
     });
 

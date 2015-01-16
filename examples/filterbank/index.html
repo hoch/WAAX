@@ -27,19 +27,30 @@
 
     MUI.start(function () {
 
-      var sp1 = WX.SP1({ ampSustain: 1.0 });
-      var fb = WX.FilterBank();
-      sp1.to(fb).to(WX.Master);
+      var noise = WX.Noise({ output: 0.25 });
+      var fbank = WX.FilterBank();
+      var cverb = WX.ConVerb({ mix: 0.85 });
+      noise.to(fbank).to(cverb).to(WX.Master);
 
-      sp1.onReady = function () {
-        sp1.noteOn(60, 100);
+      var clip = {
+        name: 'Big Empty Church',
+        url: '../../sound/ir/960-BigEmptyChurch.mp3'
       };
-      sp1.loadClip({
-        name: 'guitar',
-        url: '../../sound/loops/cgtr-120-cmaj.mp3'
+      WX.loadClip(clip, function () {
+        cverb.setClip(clip);
       });
 
-      MUI.buildControls(fb, 'rack');
+      MUI.buildControls(fbank, 'rack');
+
+      var scaleModel = fbank.getScaleModel();
+
+      function step() {
+        fbank.set('pitch', WX.random2(12, 36));
+        fbank.set('scale', scaleModel[WX.random2(0, 3)].value);
+        setTimeout(step, 3000);
+      }
+
+      step();
 
     });
 
