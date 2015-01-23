@@ -1,0 +1,117 @@
+/* ----- header ----- */
+@import url(http://fonts.googleapis.com/css?family=Roboto:400);
+@import url(http://fonts.googleapis.com/css?family=Megrim);
+
+/* ----- demo style base ----- */
+/*body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  background-color: #6B6B6B;
+  -webkit-user-select: none;
+}
+*/
+
+h1 {
+  font-family: 'Megrim';
+  color: #fff;
+  margin: 0 10px;
+}
+
+.c-body-wrapper {
+  margin: 20px auto;
+  padding: 0 10px;
+  width: 908px;
+}
+
+.c-grid-container {
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #969696;
+  box-shadow: inset 0 0 10px #4B4B4B, 1px 1px 2px #B4B4B4, -1px -1px 2px #333;
+}
+
+.c-grid {
+
+}
+
+.c-xport-panel {
+  background-color: #E0E0E0;
+  margin: 20px 0px;
+  border-radius: 2px;
+  box-shadow: 0 0 6px #2C2C2C, inset 0 0 2px #fff;
+}
+
+.c-xport-control {
+  display: inline-block;
+}
+
+
+
+.c-panel {
+  position: relative;
+  background-color: #E0E0E0;
+  margin: 20px 0;
+  padding: 32px 5px 5px 5px;
+  border-radius: 2px;
+  box-shadow: 0 0 6px #2C2C2C, inset 0 0 2px #fff;
+}
+
+.c-control-subsection {
+  position: relative;
+  display: inline-block;
+  border: 1px solid #C0C0C0;
+  margin: 5px;
+  border-radius: 5px;
+  height: 60px;
+}
+
+.c-subsection {
+  position: relative;
+  display: inline-block;
+  border: 1px solid #C0C0C0;
+  margin: 5px;
+  border-radius: 5px;
+  height: 60px;
+}
+
+.section-title {
+  position: absolute;
+  font-size: 10px;
+  top: 9px;
+  left: 10px;
+  background: #C5C5C5;
+  padding: 0 6px;
+  text-shadow: 1px 1px 1px #FFF;
+  width: 874px;
+  height: 15px;
+  line-height: 15px;
+}
+
+.subsection-title {
+  position: absolute;
+  font-size: 10px;
+  top: -7px;
+  left: 5px;
+  background: #e0e0e0;
+  padding: 0 6px;
+  color: #9B9B9B;
+  text-shadow: 1px 1px 1px #FFF;
+}
+
+/*
+.c-rewind {
+  background: url("glyphicons_170_step_backward.png") #FFF top 9px left 28px no-repeat;
+}
+
+.c-stop {
+  background: url("glyphicons_175_stop.png") #FFF top 11px left 28px no-repeat;
+}
+
+.c-play {
+  background: url("glyphicons_173_play.png") #FFF top 9px left 28px no-repeat;
+}
+
+.c-record {
+  background: url("glyphicons_169_record.png") #FCC top 8px left 25px no-repeat;
+}
+*/

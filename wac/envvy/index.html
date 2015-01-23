@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Envvy (R2)</title>
+  <meta charset="utf-8">
+  <link href='//fonts.googleapis.com/css?family=Michroma' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="src/envvy.css">
+  <script src="src/WAAX.min.js"></script>
+</head>
+
+<body>
+  <div id="container" class="container">
+    <div class="c-header">
+      <button id="btn-share" class="c-share"></button>
+      <button id="btn-help" class="c-help"></button>
+      <h3>Envvy</h3>
+      <span class="upper">R2</span>
+    </div>
+    <div id="track1" class="c-track"></div>
+    <div id="track2" class="c-track"></div>
+    <div id="track3" class="c-track"></div>
+    <div id="track4" class="c-track"></div>
+    <div id="track5" class="c-track"></div>
+    <div id="track6" class="c-track"></div>
+  </div>
+  <div id="help" class="c-help-popup">
+    <div class="pull-left">
+      <dt>d</dt>
+      <dd>duplicate step forward</dd>
+      <dt>s</dt>
+      <dd>duplicate step backward</dd>
+      <dt>c</dt>
+      <dd>copy step</dd>
+      <dt>v</dt>
+      <dd>paste step</dd>
+      <dt>x</dt>
+      <dd>clear step</dd>
+      <dt>shift + dragging</dt>
+      <dd>fine control</dd>
+    </div>
+    <div class="pull-right">
+      <dt>Space</dt>
+      <dd>toggle playback</dd>
+      <dt>1</dt>
+      <dd>rewind (to step 1)</dd>
+      <dt>r</dt>
+      <dd>randomize track</dd>
+      <dt>m</dt>
+      <dd>toggle morphing</dd>
+      <dt>w</dt>
+      <dd>toggle waveform visualization</dd>
+      <dt>alt + dragging</dt>
+      <dd>track control</dd>
+    </div>
+  </div>
+  <div id="share" class="c-share-popup">
+    <p>Pattern URL</p>
+    <span class="c-pattern-url" id="id-pattern-url"></span>
+  </div>
+  <div id="background" class="c-background">
+  </div>
+  <div id="footer" class="c-footer">
+    Made with <a href="http://www.w3.org/TR/webaudio/" target="_blank">Web Audio API</a> and <a href="https://github.com/hoch/WAAX" target="_blank">WAAX library</a> by <a href="https://ccrma.stanford.edu/~hongchan/" target="_blank">Hoch</a>.
+  </div>
+
+  <!-- scripts: helper -->
+  <script src="src/rawinflate.js"></script>
+  <script src="src/rawdeflate.js"></script>
+  <!-- scripts: envvy -->
+  <script src="src/Envvy.js"></script>
+  <script src="src/Step.js"></script>
+  <script src="src/Track.js"></script>
+  <script src="src/Sound.js"></script>
+  <script>
+    // setup
+    var tracks = [];
+    var labels = ["Pitch", "PitMod", "Noise", "Cutoff", "Q", "Amp"];
+    var nsteps = [8, 8, 8, 8, 8, 8];
+    var divs = document.getElementsByClassName("c-track");
+    for(var i = 0; i < divs.length; ++i) {
+      tracks[i] = new Track(labels[i], nsteps[i], divs[i]);
+    }
+    Envvy.tracks = tracks;
+
+    // look up the hashtag
+    if (window.location.hash) {
+      var hash = window.location.hash.substr(1);
+      var revision = hash.substr(0, 3);
+      if (revision == 'R1/') {
+        alert('That shared link format is no longer supported.');
+      } else if (revision == 'R2/') {
+        Envvy.import(hash.substr(3));
+      }
+    }
+
+    // copy pattern link to the clipboard
+    // function share() {
+    //   var p = Envvy.export();
+    //   var url = "https://ccrma.stanford.edu/~hongchan/envvy/#R2/" + p;
+    //   window.prompt("Copy to clipboard: Ctrl+C, Enter", url);
+    // }
+
+    // button share
+    var btn_share = document.getElementById("btn-share");
+    btn_share.onclick = toggleShare;
+    var btn_help = document.getElementById("btn-help");
+    btn_help.onclick = toggleHelp;
+
+    // get data from tracks
+    function getStepData() {
+      // get track data from current step
+      var p = Math.floor(tracks[0].getStepData().val * 12) + 48;
+      var pitch = WX.pitch2freq(p);
+      var pitchmod = tracks[1].getStepData();
+      var bal = tracks[2].getStepData();
+      var cutoffmod = tracks[3].getStepData();
+      var Qmod = tracks[4].getStepData();
+      var ampmod = tracks[5].getStepData();
+      var data = {
+        pitch: pitch,
+        pitchmval: pitchmod.val,
+        pitchmtime: pitchmod.time,
+        noisemval: bal.val,
+        noisemtime: bal.time,
+        cutoffmval: cutoffmod.val,
+        cutoffmtime: cutoffmod.time,
+        Q: 1,
+        Qmval: Qmod.val,
+        Qmtime: Qmod.time,
+        ampmval: ampmod.val,
+        ampmtime: ampmod.time
+      };
+      return data;
+    }
+
+    // transport
+    (function () {
+
+      var NUMSTEPS = 8;
+
+      // establish time
+      var BPM = 120,              // beat per minute
+          SPB = 60 / BPM,         // second per beat
+          LOOKAHEAD = 1 / 60;     // look ahead, 16.6667ms
+
+      var _nextStepId, _nextStepOnset, _lastStepId;
+
+      function establishTimeline() {
+        // calculating origin
+        // var unixOrigin = Date.now() / 1000,
+        var unixOrigin = (performance.timing.navigationStart / 1000.0);
+        unixOrigin += (performance.now() / 1000.0);
+        var wxOrigin = unixOrigin - WX.now,
+            now = wxOrigin + WX.now,
+            totalSteps = Math.floor(now / SPB);
+            currentStepOnset = totalSteps * SPB - wxOrigin;
+        _nextStepId = (totalSteps + 1) % NUMSTEPS;
+        _nextStepOnset = currentStepOnset + SPB;
+        tracks.forEach(function(e) {
+          e.current = _nextStepId;
+        });
+      }
+
+      function getNextStep() {
+        // if next event in in range, return step info (step++, stepOnset)
+        if (_nextStepOnset <= WX.now + LOOKAHEAD) {
+          _nextStepOnset += SPB;
+          _nextStepId = (_nextStepId + 1) % NUMSTEPS;
+          return {
+            id: _nextStepId,
+            onset: _nextStepOnset
+          };
+        }
+        // if next event is too far away
+        else {
+          return null;
+        }
+      }
+
+      function run() {
+        var nextStep = getNextStep();
+        if (nextStep && _lastStepId !== nextStep.id) {
+          // Envvy.Workspace.triggerStep(nextStep.id, nextStep.onset);
+
+          // OLD IMPLEMENTATION
+          stepstep(nextStep.onset, getStepData());
+          tracks.forEach(function(e) {
+            if (Envvy._isMorphing) {
+              e.morphData(0.05);
+            }
+            // flash
+            e.flash((onset - WX.now) * 1000);
+            // advance step pointer
+            e.step();
+          });
+
+          _lastStepId = nextStep.id;
+        }
+        requestAnimationFrame(run);
+      }
+
+      function init() {
+        if (WX.now > 2.0) {
+          establishTimeline();
+          run();
+        } else {
+          setTimeout(init, 1000);
+        }
+      }
+
+      init();
+
+    })();
+
+
+    // walker
+    // var BPM = 120,              // beat per minute
+    //     SPB = 60 / BPM;
+    // var morph = false;
+    // var checkUpDur = stepDur / 16.0 * 1000;
+    // var lookAhead = stepDur * 1.75;
+    // var unixOrigin = (performance.timing.navigationStart / 1000.0);
+    // unixOrigin += (performance.now() / 1000.0);
+    // var wxOrigin = unixOrigin - WX.now;
+    //     nownow = wxOrigin + WX.now;
+    // totalSteps = Math.floor(nownow / SPB);
+
+    // // var away = unixOrigin % (stepDur * 1000);
+    // var nextStep = totalSteps * SPB - wxOrigin;
+
+
+    // var BPM = 120,              // beat per minute
+    //     SPB = 60 / BPM,         // second per beat
+    //     LOOKAHEAD = 1 / 60;     // look ahead, 16.6667ms
+    // var unixOrigin = (performance.timing.navigationStart / 1000.0);
+    // unixOrigin += (performance.now() / 1000.0);
+    // var wxOrigin = unixOrigin - now,
+    //     now = wxOrigin + now,
+    //     totalSteps = Math.floor(now / SPB),
+    //     currentStepOnset = totalSteps * SPB - wxOrigin;
+
+    // function walk() {
+
+    //   var now = WX.now;
+
+    //   setTimeout(walk, checkUpDur);
+
+    //   if (nextStep < now + lookAhead) {
+
+    //     var t = (nextStep - now) * 1000;
+    //     if (t < 0) {
+    //       nextStep = now + stepDur;
+    //     }
+
+    //     if (Envvy._isPlaying) {
+    //       stepstep(nextStep, getStepData());
+    //       tracks.forEach(function(e) {
+    //         if (Envvy._isMorphing) {
+    //           e.morphData(0.05);
+    //         }
+    //         // flash
+    //         e.flash(t);
+    //         // advance step pointer
+    //         e.step();
+    //       });
+    //     }
+
+    //     nextStep += stepDur;
+    //   }
+    // }
+    // walk();
+
+
+
+    // visualization fetching from lpf
+    var targetDiv = document.getElementById("background");
+    var canvas = document.createElement("canvas");
+    canvas.width = window.innerWidth;
+    canvas.height = 500;
+    targetDiv.appendChild(canvas);
+    var context2D = canvas.getContext('2d');
+    context2D.strokeStyle = "rgba(255, 255, 255, 0.25)";
+    context2D.lineWidth = 3.0;
+    var waveform = new WX.Waveform({ context:context2D });
+    cmp.to(waveform);
+
+    var waveformViz = false;
+    function toggleWaveform() {
+      waveformViz = !waveformViz;
+      if (waveformViz) {
+        canvas.width = window.innerWidth;
+        context2D.strokeStyle = "rgba(255, 255, 255, 0.25)";
+        context2D.lineWidth = 3.0;
+      }
+      targetDiv.style.display = (waveformViz) ? "block" : "none";
+    }
+
+    var help_popup = false;
+    var helpDiv = document.getElementById("help");
+    function toggleHelp() {
+      help_popup = !help_popup;
+      if (help_popup) {
+        helpDiv.style.left = (window.innerWidth / 2.0 - 352) + "px";
+      }
+      helpDiv.style.display = (help_popup) ? "block" : "none";
+    }
+
+    var share_popup = false;
+    var shareDiv = document.getElementById("share"),
+        patternUrlSpan = document.getElementById("id-pattern-url");
+    function toggleShare() {
+      while (shareDiv.firstChild) {
+          shareDiv.removeChild(shareDiv.firstChild);
+      }
+      var p = Envvy.export();
+      var el = document.createElement('a');
+      el.href = "http://" + window.location.host + "/envvy/#R2/" + p;
+      el.textContent = "Right Click Here and Copy Link.";
+      shareDiv.appendChild(el);
+      share_popup = !share_popup;
+      if (share_popup) {
+        shareDiv.style.left = (window.innerWidth / 2.0 - 352) + "px";
+      }
+      shareDiv.style.display = (share_popup) ? "block" : "none";
+    }
+
+    function draw() {
+      requestAnimationFrame(draw);
+      waveform.draw();
+    }
+    draw();
+
+    // keyboard handling
+    document.addEventListener("keydown", function(e) {
+      e.preventDefault();
+      switch(e.keyCode) {
+        case 82:
+          Envvy.randomizeTrack();
+          break;
+        case 77:
+          Envvy.toggleMorphing();
+          break;
+        case 65:
+          Envvy.duplicateStep("left");
+          break;
+        case 68:
+          Envvy.duplicateStep("right");
+          break;
+        case 67:
+          Envvy.copyStep();
+          break;
+        case 86:
+          Envvy.pasteStep();
+          break;
+        case 88:
+          Envvy.clearStep();
+          break;
+        case 49:
+          Envvy.rewind();
+          break;
+        case 32:
+          Envvy.togglePlay();
+          break;
+        case 87:
+          toggleWaveform();
+          break;
+      }
+    }, false);
+  </script>
+</body>
+
+</html>

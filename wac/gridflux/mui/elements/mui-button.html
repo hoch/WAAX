@@ -1,0 +1,107 @@
+<polymer-element name="mui-button" attributes="mode icon value">
+  <!-- global style -->
+  <link rel="stylesheet" polymer-scope="global" href="global.css">
+  <template>
+    <!-- style -->
+    <style>
+    @host {
+      * {
+        display: inline-block;
+        margin: 8px 4px;
+        width: 48px;
+        height: 32px;
+        vertical-align: top;
+        -webkit-user-select: none;
+      }
+    }
+    input:focus {
+      outline: none;
+    }
+    .c-button-view {
+      background-image: -webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(0.17, rgb(219,215,219)),
+        color-stop(0.92, rgb(250,250,250))
+      );
+
+      width: 48px;
+      height: 32px;
+      line-height: 32px;
+      border-radius: 3px;
+      border: 1px outset #ccc;
+      color: #31353D;
+      /*background-color: #eee;*/
+      cursor: pointer;
+      text-align: center;
+    }
+    .c-button-view:active {
+      /*background-image: -webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(0.92, rgb(219,215,219)),
+        color-stop(0.17, rgb(250,250,250))
+      );*/
+      /*color: #92CDCF;*/
+      background-color: #CCC;
+      border: 1px inset #BBB;
+      box-shadow: inset 0 5px 5px #ccc;
+    }
+    .c-button-icon {
+      font-family: "muicon";
+      font-size: 16px;
+    }
+    .c-button-icon.on {
+      color: #92CDCF;
+      text-shadow: #92CDCF 0 0 10px;
+    }
+
+    </style>
+
+    <!-- markup -->
+    <div id="eTouchable" class="c-button-view" on-click="clicked">
+      <span id="eIcon" class="c-button-icon">{{icon}}</span>
+    </div>
+
+  </template>
+
+  <!-- logic -->
+  <script>
+  Polymer('mui-button', {
+
+    // published
+    icon: null,
+    mode: 'button',
+    value: false,
+
+    // attributeChanged: function (attrName, oldVal, newVal) {
+    //   this.update();
+    // },
+
+    valueChanged: function() {
+      // console.log(this.classList);
+      this.$.eIcon.classList.toggle('on', this.value);
+      // console.log(1);
+      // this.$.eIcon.className = "c-button-icon " + this.value;
+    },
+
+    // clicked: function () {
+    //   if (this.mode === 'toggle') {
+    //     this.value = !this.value;
+    //   }
+    // },
+
+    // update: function () {
+    //   this.$.eIcon.className = "c-button-icon " + this.state;
+    // },
+
+    link: function (path, propName) {
+      this.bind('value', path, propName);
+    }
+
+  });
+  </script>
+
+</polymer-element>

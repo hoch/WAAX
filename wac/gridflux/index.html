@@ -1,0 +1,164 @@
+<!doctype html>
+<html>
+
+<head>
+  <!-- GridFlux r7 -->
+  <title>GRIDFLUX</title>
+
+  <!-- polymer + mui core -->
+  <script src="mui/bower_components/platform/platform.js"></script>
+  <script src="mui/mui-core.js"></script>
+  <link rel="stylesheet" type="text/css" href="mui/mui-core.css">
+  
+  <!-- mui elements -->
+  <link rel="import" href="mui/mui-knob/mui-knob.html">
+  <link rel="import" href="mui/mui-knobh/mui-knobh.html">
+  <link rel="import" href="mui/mui-toggle/mui-toggle.html">
+  <link rel="import" href="mui/mui-button/mui-button.html">
+  <link rel="import" href="mui/mui-select/mui-select.html">
+  
+  <!-- waax r12 -->
+  <script src="waax-r12/WAAX.js"></script>
+  <script src="waax-r12/Fader.js"></script>
+  <script src="waax-r12/Comp.js"></script>
+  <script src="waax-r12/Chorus.js"></script>
+  <script src="waax-r12/Pingpong.js"></script>
+  <script src="waax-r12/Converb.js"></script>
+  <script src="waax-r12/Saturator.js"></script>
+  <script src="waax-r12/Cell.js"></script>
+  <script src="waax-r12/Ktrl.js"></script>
+
+  <!-- GridFlux bass style -->
+  <link href="css/base-r7.css" rel="stylesheet" type="text/css">
+</head>
+
+<body unresolved>
+
+  <div class="container">
+    <h1>GRIDFLUX</h1>
+    <div class="c-mui-panel">
+      <h1>SAMPLER</h1>
+      <div class="c-mui-section">
+        <h2>SAMPLE</h2>
+        <mui-toggle id="sample-active" label="ON"></mui-toggle>
+        <mui-select id="sample-select" label="Sample"></mui-select>
+        <mui-knob id="sample-tune" label="Tune" value="0" min="-1200" max="1200"></mui-knob>
+      </div>
+      <div class="c-mui-section">
+        <h2>ENVELOPE</h2>
+        <mui-toggle id="env-active" label="ON"></mui-toggle>
+        <mui-knob id="env-attack" label="Attack" value="0.0" min="0.0" max="1.0"></mui-knob>
+        <mui-knob id="env-hold" label="Hold" value="0.02" min="0.0" max="1.0"></mui-knob>
+        <mui-knob id="env-release" label="Release" value="0.02" min="0.0" max="2.0"></mui-knob>
+      </div>
+      <div class="c-mui-section">
+        <h2>2-BAND EQ</h2>
+        <mui-toggle id="eq-active" label="ON"></mui-toggle>
+        <mui-knob id="eq-lfreq" label="L Freq" value="250" min="60.0" max="1500.0"></mui-knob>
+        <mui-knob id="eq-lgain" label="L Gain" value="0.0" min="-24.0" max="24.0"></mui-knob>
+        <mui-knob id="eq-hfreq" label="H Freq" value="2500" min="1500.0" max="5000.0"></mui-knob>
+        <mui-knob id="eq-hgain" label="H Gain" value="0.0" min="-24.0" max="24.0"></mui-knob>
+      </div>
+      <div class="c-mui-section">
+        <h2>OUTPUT</h2>
+        <mui-knob id="output-send1" label="Send 1" value="0" min="0.0" max="1.0"></mui-knob>
+        <mui-knob id="output-send2" label="Send 2" value="0" min="0.0" max="1.0"></mui-knob>
+        <mui-knob id="output-send3" label="Send 3" value="0" min="0.0" max="1.0"></mui-knob>
+        <mui-knob id="output-pan" label="Pan" value="0.0" min="-1" max="1"></mui-knob>
+        <mui-knob id="output-volume" label="Volume" value="0.8" min="0.0" max="1.0"></mui-knob>
+      </div>
+    </div>
+
+    <div class="c-mui-panel">
+      <canvas id="i-ui-event"></canvas>
+      <div class="c-transport-bar">
+        <div class="c-transport-setting">
+          <mui-knobh id="xport-quantize" label="Quantize" value="0" min="0.0" max="1.0"></mui-knobh>
+          <mui-knobh id="xport-swing" label="Swing" value="0" min="0.0" max="1.0"></mui-knobh>
+          <mui-knobh id="xport-tempo" label="Tempo" value="120" min="20" max="240"></mui-knobh>
+        </div>
+        <div class="c-transport-button">
+          <mui-button id="xport-rewind" icon="&#x52;"></mui-button>
+          <mui-button id="xport-stop" icon="&#x53;"></mui-button>
+          <mui-button id="xport-play" icon="&#x50;" mode="toggle"></mui-button>
+          <mui-button id="xport-record" icon="&#x43;" mode="toggle"></mui-button>
+          <mui-button id="xport-metro" icon="&#x4d;" mode="toggle"></mui-button>
+        </div>
+        <div class="c-transport-file">
+          <mui-select id="bundle-list" label="Bundles" style="margin-top:0px !important;"></mui-select>
+          <mui-button id="bundle-save" icon="&#x55;"></mui-button>
+          <mui-button id="bundle-load" icon="&#x44;"></mui-button>
+        </div>
+      </div>
+    </div>
+
+    <div class="c-mui-panel">
+      <h1>MASTER</h1>
+      <div class="c-mui-section">
+        <h2>CHORUS - SEND 1</h2>
+        <mui-knob id="chorus-rate" label="Rate" value="0" min="0.02" max="2.0"></mui-knob>
+        <mui-knob id="chorus-intensity" label="Intensity" value="0.0" min="0.0" max="0.99"></mui-knob>
+      </div>
+      <div class="c-mui-section">
+        <h2>DELAY - SEND 2</h2>
+        <mui-knob id="delay-time" label="Delay Time" value="0" min="0.02" max="2.0"></mui-knob>
+        <mui-knob id="delay-feedback" label="Feedback" value="0.0" min="0.0" max="0.99"></mui-knob>
+      </div>
+      <div class="c-mui-section">
+        <h2>REVERB - SEND 3</h2>
+        <mui-select id="reverb-preset" label="Preset"></mui-select>
+        <mui-knob id="reverb-mix" label="Mix" value="0.0"></mui-knob>
+      </div>
+      <div class="c-mui-section">
+        <h2>SATURATOR</h2>
+        <mui-toggle id="sat-active" label="ON"></mui-toggle>
+        <mui-knob id="sat-quality" label="Quality" value="0.0" min="0.01" max="1.0"></mui-knob>
+        <mui-knob id="sat-drive" label="Drive" value="0.0" min="0.0" max="6.0"></mui-knob>
+      </div>
+      <div class="c-mui-section">
+        <h2>COMP</h2>
+        <mui-toggle id="comp-active" label="ON"></mui-toggle>
+        <mui-knob id="comp-threshold" label="Threshold" value="-4.0" min="-48.0" max="0.0"></mui-knob>
+        <mui-knob id="comp-ratio" label="Ratio" value="4.0" min="1.0" max="20.0"></mui-knob>
+        <mui-knob id="comp-attack" label="Attack" value="0.015" min="0.0" max="1.0"></mui-knob>
+        <mui-knob id="comp-release" label="Release" value="0.300" min="0.0" max="2.0"></mui-knob>
+        <mui-knob id="comp-makeup" label="Makeup" value="0.0" min="0.0" max="20.0"></mui-knob>
+      </div>
+      <div class="c-mui-section" style="width:76px;">
+        <h2>MASTER</h2>
+        <mui-knob id="master-out" label="Out" value="0.0" min="-24.0" max="24.0"></mui-knob>
+      </div>
+
+    </div>
+
+    <!-- modal here -->
+    <div id="i-modal" class="c-modal">
+      <div class="c-modal-inner">
+        Loading assets...
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bundle Data -->
+  <script src="gridflux-r7/BUNDLE_DATA.js"></script>
+
+  <!-- GF Core + Modules -->
+  <script src="gridflux-r7/GridFlux.js"></script>
+  <script src="gridflux-r7/Master.js"></script>
+  <script src="gridflux-r7/Sampler.js"></script>
+  <script src="gridflux-r7/Timebase.js"></script>
+  <script src="gridflux-r7/EventView.js"></script>
+  <script src="gridflux-r7/Transport.js"></script>
+  <script src="gridflux-r7/Interaction.js"></script>
+  <script src="gridflux-r7/Bundle.js"></script>
+
+  <!-- entry point -->
+  <script type="text/javascript">
+    window.addEventListener('polymer-ready', GF.start);
+  </script>
+
+</body>
+
+
+</html>

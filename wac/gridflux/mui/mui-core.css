@@ -1,0 +1,93 @@
+/**
+ * color scheme
+  1. deepsea diver color palette
+    @deep-blue:     #31353D;
+    @light-blue:    #445878;
+    @sky-blue:      #92CDCF;
+*/
+
+/**
+/* MUI specific styles
+ */
+
+/* font import: assets */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url('assets/Roboto-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Play';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Play'), url('assets/Play-400.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Play';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Play-Bold'), url('assets/Play-700.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'muicon';
+  font-style: normal;
+  font-weight: normal;
+  src: url('assets/muicon.woff') format('woff');
+}
+
+/* aux elements */
+.c-mui-panel {
+  display: inline-block;
+  padding: 4px;
+  margin: 8px;
+  border-radius: 3px;
+  background-color: #F8F8F8;
+  box-shadow: 0 0 3px #000000;
+}
+
+.c-mui-panel h1 {
+  display: block;
+  line-height: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0 5px;
+  font-family: 'Play', sans-serif;
+  font-size: 12px;
+  background-color: #C5CBD6;
+  color: #31353D;
+}
+
+.c-mui-section h2 {
+  padding: 0 5px;
+  margin-top: -14px;
+  font-size: 10px;
+  font-family: 'Play';
+  font-weight: 300;
+  color: #A5A5A5;
+  text-align: center;
+}
+
+.c-mui-section {
+  position: relative;
+  display: inline-block;
+  margin: 25px 5px 0;
+  padding-bottom: 5px;
+  border-radius: 4px;
+  border-top: 1px solid #A5A5A5;
+  vertical-align: top;
+  text-align: center;
+}
+
+.c-mui-section-noborder {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  /*border-radius: 4px;*/
+  /*border-top: 1px solid #000;*/
+  vertical-align: bottom;
+  text-align: center;
+}

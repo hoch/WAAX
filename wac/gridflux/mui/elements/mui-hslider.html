@@ -1,0 +1,223 @@
+<polymer-element name="mui-hslider" attributes="value min max label">
+  <!-- global style -->
+  <link rel="stylesheet" polymer-scope="global" href="global.css">
+  <template>
+    <!-- style -->
+    <style>
+    @host {
+      * {
+        position: relative;
+        display: inline-block;
+        margin: 10px 0;
+        height: 14px;
+        line-height: 14px;
+        -webkit-user-select: none;
+      }
+    }
+    input:focus {
+      outline: none;
+    }
+    .c-hslider-label {
+      display: inline-block;
+      width: 60px;
+      height: 14px;
+      line-height: 14px;
+      font-family:'Play', sans-serif;
+      font-size: 10px;
+      text-align: center;
+      vertical-align: top;
+    }
+    .c-hslider-value {
+      display: inline-block;
+      width: 60px;
+      font-family:'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      border: none;
+      height: 14px;
+      font-size: 11px;
+      text-align: center;
+      line-height: 14px;
+      background-color: #eee;
+      border-radius: 2px;
+      vertical-align: top;
+    }
+    .c-hslider-value-select {
+      color: #fff;
+      background-color: #666;
+      box-shadow: inset 0 0 3px #000;
+    }
+    .c-hslider-flat {
+      display: inline-block;
+      cursor: move;
+      vertical-align: top;
+    }
+    .c-hslider-flat-outer {
+      /*fill: #353D42;*/
+      /*fill: #7E8AA2;*/
+      /*fill: #374140;*/
+      fill: #31353D;
+    }
+    .c-hslider-flat-inner {
+      /*fill: #505455;*/
+      /*fill: #EEE;*/
+      /*fill: #D9CB9E;*/
+      fill: #445878;
+    }
+    .c-hslider-flat-gauge {
+      /*stroke: #0CB4F5;*/
+      /*stroke: #FF9800;*/
+      /*stroke: #DC3522;*/
+      /*stroke: #92CDCF;
+      stroke-width: 5px;*/
+      fill: #92CDCF;
+    }
+    </style>
+
+    <!-- markup -->
+    <div class="c-hslider-label">{{label}}</div>
+    <svg id="eTouchable" class="c-hslider-flat" width="122" height="14" version="1.1" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="122" height="14" class="c-hslider-flat-outer" />
+      <!-- <circle cx="33" cy="33" r="26" class="c-hslider-flat-outer" /> -->
+      <rect x="1" y="1" width="120" height="12" class="c-hslider-flat-inner" />
+      <rect id="eSlider" x="1" y="1" width="120" height="12" class="c-hslider-flat-gauge" />
+      <!-- <circle cx="33" cy="33" r="18" class="c-hslider-flat-inner" /> -->
+    </svg>
+    <input id="eValueDisplay" type="text" class="c-hslider-value">
+
+  </template>
+
+  <!-- logic -->
+  <script>
+  Polymer('mui-hslider', {
+
+    // published
+    label: 'unlabeled',
+    value: 0.0,
+    min: 0.0,
+    max: 1.0,
+
+    // binding
+    targetUnit: null,
+    targetParam: null,
+    linked: false,
+
+    // private
+    _normValue: 0.0,
+    _gaugeWidth: 120,
+
+    // counter
+    _counter: 0,
+
+    // render UI data
+    render: function () {
+      this.$.eSlider.setAttribute('width', this._normValue * this._gaugeWidth);
+      this.$.eValueDisplay.value = this.value.toFixed(2);
+    },
+
+    // update: model => knob
+    update: function () {
+      this.value = Math.max(Math.min(this.value, this.max), this.min);
+      this._normValue = (this.value - this.min) / (this.max - this.min);
+      this.render();
+    },
+
+    // post: knob => model
+    post: function () {
+      if (this.linked) {
+        this.targetUnit.setParam(this.targetParam, this.value);
+      }
+      this.render();
+    },
+
+    // created = entry point
+    created: function () {
+      // enforced data type
+      this.value = parseFloat(this.value);
+      this.min = parseFloat(this.min);
+      this.max = parseFloat(this.max);
+
+      var prevData = {};
+      var mouseResponder = MUI.MouseResponder(
+        this.label,
+        this.$.eTouchable,
+        function (sender, action, data) {
+          switch (action) {
+            case 'clicked':
+              prevData = data;
+              this._normValue = data.x / this._gaugeWidth;
+              this._normValue = MUI.clamp(this._normValue, 0.0, 1.0);
+              this.value = this._normValue * (this.max - this.min) + this.min;
+              this.post();
+              break;
+            case 'dragged':
+              var delta = ((data.x - prevData.x) || -(data.y - prevData.y)) * ((data.shiftKey) ? 0.001 : 0.01);
+              prevData = data;
+              // norm => val => post
+              this._normValue += delta;
+              this._normValue = MUI.clamp(this._normValue, 0.0, 1.0);
+              this.value = this._normValue * (this.max - this.min) + this.min;
+              this.post();
+              break;
+            case 'released':
+              break;
+          }
+        }.bind(this)
+      );
+
+      // keyboard input responder
+      var d = this.$.eValueDisplay;
+      var keyResponder = MUI.KeyResponder(
+        this.label,
+        d,
+        function (sender, action, data) {
+          switch (action) {
+            case 'clicked':
+              d.className += ' c-hslider-value-select';
+              d.select();
+              break;
+            case 'keypressed':
+              if (data === 13) {
+                var v = parseFloat(d.value);
+                // sanity check
+                if (!isNaN(v)) {
+                  // val => norm => post
+                  this.value = MUI.clamp(v, this.min, this.max);
+                  this._normValue = (this.value - this.min) / (this.max - this.min);
+                  this.post();
+                }
+                d.blur();
+              }
+              break;
+            case 'finished':
+              d.className = 'c-hslider-value';
+              break;
+          }
+        }.bind(this)
+      );
+    },
+
+    ready: function () {
+      // initialize
+      this.update();
+    },
+
+    link: function (unit, paramName) {
+      // setting reference to unit (ui => unitparam)
+      this.targetUnit = unit;
+      this.targetParam = paramName;
+      this.linked = true;
+
+      // handling parameter change in unit (unitparam => ui)
+      // will invoke attributeChange when unitparam changed
+      this.bind('value', unit.params, paramName);
+    },
+
+    attributeChanged: function (attrName, oldVal, newVal) {
+      // console.log(++this._counter);
+      this.update();
+    }
+  });
+  </script>
+
+</polymer-element>

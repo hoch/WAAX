@@ -1,0 +1,105 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<polymer-element name="mui-select" attributes="label key value">
+  <template>
+    <!-- style -->
+    <link rel="stylesheet" href="mui-select.css" />
+    <!-- markup -->
+    <div class="c-select-label">{{ label }}</div>
+    <div id="eTouchable" class="c-select-view">
+      <div class="c-select-button" on-click="{{menuClicked}}">&blacktriangledown;</div>
+      <div class="c-select-value" on-click="{{menuClicked}}">{{ key }}</div>
+      <div id="eDropdown" class="c-select-dropdown">
+        <ul>
+          <template id="eItems" class="c-select-dropdown" repeat>
+            <li class="c-select-dropdown-item" on-click="{{itemClicked}}" id="{{ value }}">{{ key }}</li>
+          </template>
+        </ul>
+      </div>
+    </div>
+
+  </template>
+  <!-- logic -->
+  <script>
+    Polymer('mui-select', {
+
+      // published
+      label: 'unlabeled',
+      key: 'not ready yet',
+      value: null,
+
+      // private
+      menuShown: false,
+      model: null,
+
+      // binding to WAAX unit
+      targetUnit: null,
+      targetParam: null,
+      linked: false,
+      observer: null,
+
+      render: function () {
+        this.$.eDropdown.style.display = (this.menuShown) ? 'block' : 'none';
+      },
+
+      // model change => view update
+      update: function () {
+        this.key = MUI.findKeyByValue(this.$.eItems.model, this.value);
+        this.render();
+      },
+
+      // post: view change => model update
+      post: function () {
+        this.value = MUI.findValueByKey(this.$.eItems.model, this.key);
+        if (this.linked) {
+          // this.targetUnit.set(this.targetParam, this.value);
+          this.targetUnit.setParam(this.targetParam, this.key);
+        }
+        this.render();
+      },
+
+      menuClicked: function (event, detail, sender) {
+        event.stopPropagation();
+        this.menuShown = !this.menuShown;
+        this.render();
+      },
+
+      itemClicked: function (event, detail, sender) {
+        event.stopPropagation();
+        this.key = sender.textContent;
+        this.value = sender.id;
+        this.menuShown = false;
+        this.post();
+      },
+
+      // attribute changed without clicking
+      attributeChanged: function (attrName, oldVal, newVal) {
+        // console.log(attrName, oldVal, newVal);
+      },
+
+      ready: function () {
+      },
+
+      setModel: function (collection) {
+        this.$.eItems.model = collection;
+        this.post();
+      },
+
+      link: function (unit, paramName) {
+        // setting reference to unit (ui => unitparam)
+        this.targetUnit = unit;
+        this.targetParam = paramName;
+        this.linked = true;
+
+        // handling parameter change in unit (unitparam => ui)
+        // will invoke attributeChange when unitparam changed
+        // this.bind('value', unit.params, paramName);
+        // fix for Polymer 0.2.0
+        if (this.observer) {
+          // this.unbindAll();
+        }
+        this.observer = new PathObserver(unit.params, paramName);
+        this.bind('key', this.observer);
+      }
+    });
+  </script>
+</polymer-element>

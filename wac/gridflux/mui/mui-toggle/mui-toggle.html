@@ -1,0 +1,76 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<polymer-element name="mui-toggle" attributes="state label" on-tap="{{clicked}}">
+  <template>
+    <!-- style -->
+    <link rel="stylesheet" href="mui-toggle.css" />
+    <!-- markup -->
+    <div id="eTouchable" class="c-toggle-view">
+      <div id="eLed" class="c-toggle-led"></div>
+      <div class="c-toggle-label">{{label}}</div>
+    </div>
+  </template>
+  <!-- logic -->
+  <script>
+    Polymer('mui-toggle', {
+
+      // published
+      label: 'unlabeled',
+      state: false,
+
+      // binding
+      targetUnit: null,
+      targetParam: null,
+      linked: false,
+
+      // render UI data
+      render: function () {
+        this.$.eLed.className = "c-toggle-led " + this.state;
+      },
+
+      // update: model => knob
+      update: function () {
+        this.render();
+      },
+
+      // post: knob => model
+      post: function () {
+        if (this.linked) {
+          // this.targetUnit.set(this.targetParam, this.state);
+          this.targetUnit.setParam(this.targetParam, this.state);
+        }
+        this.render();
+      },
+
+      clicked: function () {
+        this.state = !this.state;
+        this.post();
+      },
+
+      attributeChanged: function (attrName, oldVal, newVal) {
+        this.update();
+      },
+
+      // created = entry point
+      created: function () {
+      },
+
+      ready: function () {
+        this.update();
+      },
+
+      link: function (unit, paramName) {
+        // setting reference to unit (ui => unitparam)
+        this.targetUnit = unit;
+        this.targetParam = paramName;
+        this.linked = true;
+
+        // handling parameter change in unit (unitparam => ui)
+        // will invoke attributeChange when unitparam changed
+        // fix for Polymer 0.2.0
+        this.bind('state', new PathObserver(unit.params, paramName));
+      },
+
+
+    });
+  </script>
+</polymer-element>

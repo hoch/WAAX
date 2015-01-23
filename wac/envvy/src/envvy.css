@@ -1,0 +1,210 @@
+/* color scheme
+base: 5E6F6A;
+base1: C9EDE2;
+dark: 1C4458;
+darker: 012840;
+accent: FEAC00;
+highlite: FCD82B;
+ */
+@-webkit-keyframes flash {
+  from { opacity: 0.5; }
+  to { opacity: 0; }
+}
+
+body {
+  background-color: #012840;
+  -webkit-user-select: none;
+  font-family: "Michroma", monospace;
+  margin: 0;
+  padding: 0;
+}
+
+dt {
+  font-size: 17px;
+  border: 1px solid #C9EDE2;
+  display: block;
+  width: 96%;
+  padding: 3px 5px;
+  border-radius: 3px;
+  background-color: rgba(94, 88, 88, 0.79);
+  color: #FEAC00;
+}
+
+dd {
+  font-size: 13px;
+  margin-bottom: 12px;
+  padding: 0;
+  margin: 1px 0 10px 2px;
+}
+
+.pull-left {
+  float: left;
+  width: 330px;
+}
+
+.pull-right {
+  float: right;
+  width: 330px;
+}
+
+.c-header {
+  position: relative;
+  width: 100%;
+  height: 40px;
+  z-index: 10;
+}
+
+.c-background {
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+  height: 500px;
+  top: 150px;
+  display: none;
+}
+
+h3 {
+  color: #FCD82B;
+  font-size: 24px;
+  padding: 0;
+  margin: 0;
+}
+
+.upper {
+  position: absolute;
+  color: #5E6F6A;
+  display: block;
+  font-size: 10px;
+  top: 1px;
+  left: 100px;
+}
+
+.c-share {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background-image: url("share.png");
+  background-color: transparent;
+  position: absolute;
+  right: 0;
+}
+
+.c-help {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background-image: url("help.png");
+  background-color: transparent;
+  position: absolute;
+  right: 35px;
+}
+
+.c-help-popup {
+  position: absolute;
+  top: 162px;
+  color: #1C4458;
+  width: 660px;
+  margin: 0 auto;
+  background-color: #DDD;
+  height: 360px;
+  border-radius: 10px;
+  z-index: 20;
+  padding: 20px;
+  display: none;
+  box-shadow: 0 0 60px #000;
+  border: 2px solid #777;
+}
+
+.c-share-popup {
+  position: absolute;
+  top: 260px;
+  color: #1C4458;
+  width: 660px;
+  margin: 0 auto;
+  background-color: #DDD;
+  border-radius: 10px;
+  z-index: 20;
+  padding: 80px 20px;
+  display: none;
+  box-shadow: 0 0 60px #000;
+  border: 2px solid #777;
+  text-align: center;
+}
+
+.container {
+  width: 780px;
+  margin: 100px auto 50px;
+}
+
+.c-track {
+  position: relative;
+  height: 75px;
+  z-index: 10;
+}
+
+.c-track-label {
+  color: #C9EDE2;
+  width: 70px;
+  line-height: 110px;
+  overflow: hidden;
+  position: absolute;
+  background: #1C4458;
+  border-radius: 8px 8px 8px 0;
+  font-family: "Michroma", monospace;
+  font-size: 12px;
+  padding-left: 8px;
+  height: 70px;
+}
+
+.highlight {
+  color: #1C4458;
+  background: #FEAC00;
+  box-shadow:
+    inset 1px 1px 2px #CCC,
+    inset -1px -1px 2px #666;
+}
+
+.c-track-steps {
+  position: absolute;
+  left: 85px;
+}
+
+.c-step-frame {
+  fill: #1C4458;
+  stroke: none; /*#5E6F6A;*/
+  stroke-width: 1.5;
+}
+
+.c-step-frame-highlighted {
+  fill: #1C4458;
+  stroke: #FEAC00;
+  stroke-width: 2;
+}
+
+.c-step-line {
+  fill: rgba(255, 255, 255, 0.25);
+  stroke: #C9EDE2;
+  stroke-width: 1.5;
+}
+
+.c-step-overlay {
+  fill: #fff;
+  opacity: 0;
+}
+
+.c-step-overlay-flash {
+  fill: #fff;
+  -webkit-animation-name: flash;
+  -webkit-animation-duration: 0.15s;
+}
+
+.c-footer {
+  font-family: monospace;
+  color: #5A7C8D;
+  text-align: center;
+}
+
+.c-footer a {
+  color: #C9EDE2;
+  text-decoration: none;
+}

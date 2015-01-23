@@ -1,0 +1,111 @@
+/* ----- header ----- */
+/*
+@import url(http://fonts.googleapis.com/css?family=Roboto:400);
+@import url(http://fonts.googleapis.com/css?family=Megrim);
+*/
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Roboto'), local('Roboto-Regular'), url(fonts/Roboto-Regular.woff) format('woff');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+
+@font-face {
+  font-family: 'Megrim';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Megrim'), url(fonts/Megrim.woff) format('woff');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+
+
+/* ----- demo style base ----- */
+/*body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  background-color: #6B6B6B;
+  -webkit-user-select: none;
+}
+*/
+
+body {
+  height: 100%;
+  margin: 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background: -webkit-radial-gradient(center, ellipse cover, rgba(181,189,200,1) 0%,rgba(130,140,149,1) 26%,rgba(40,52,59,1) 100%);
+}
+
+h1 {
+  font-family: 'Megrim', sans-serif;
+  color: #fff;
+  margin: 40px 10px 0;
+}
+
+.c-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.35);
+  line-height: 1.3;
+  width: 100%;
+  height: 100%;
+}
+
+.c-modal-inner {
+  font-family: 'Roboto', sans-serif;
+  font-size: 18px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 20;
+  margin-left: -325px;
+  margin-top: -250px;
+  width: 650px;
+  height: 250px;
+  overflow-x: hidden;
+  border-radius: 20px;
+  color: #fff;
+  padding: 20px;
+  border: 2px solid #FFF;
+}
+
+.container {
+  width: 1104px;
+  margin:20px auto 200px;
+  position: relative;
+}
+
+.c-social-buttons {
+  display: inline-block;
+  position: absolute;
+  right: 0;
+  top: 8px;
+  vertical-align: middle;
+}
+
+.button {
+  display: inline-block;
+}
+
+.c-transport-setting {
+  display: inline-block;
+  width: 33%;
+}
+
+.c-transport-button {
+  display: inline-block;
+  width: 33%;
+  text-align: center;
+}
+
+.c-transport-file {
+  display: inline-block;
+  width: 33%;
+  text-align: right;
+}
