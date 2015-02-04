@@ -16,20 +16,23 @@ var gulp        = require('gulp'),
     runSequence = require('run-sequence'),
     del         = require('del');
 
+var wrap        = require('gulp-wrap');
+
 var reload      = browserSync.reload;
 
 
-var WX_ALL = [
-  // core
+var WX_CORE = [
   'src/waax.js',
   'src/waax.extension.js',
   'src/waax.util.js',
   'src/waax.core.js',
-  'src/waax.timebase.js',
-  // plug_ins
-  'src/plug_ins/**/*.js'
+  'src/waax.timebase.js'
 ];
 
+var WX_PLUGINS = [
+  'src/plug_ins/**/*.js'
+];
+  
 
 // Clean: Empty the build directory before a complete build.
 gulp.task('clean', del.bind(null, [
@@ -38,27 +41,30 @@ gulp.task('clean', del.bind(null, [
 ]));
 
 
-// Core: Build waax.js into build/ path.
+// Everything: Build core and plug-ins.
 gulp.task('core', function () {
-  return gulp.src(WX_ALL)
+  return gulp.src(WX_CORE)
     .pipe(plugins.uglify({ mangle: false }))
-    .pipe(plugins.concat('waax.min.js'))
+    .pipe(plugins.concat('waaxcore.min.js'))
+    .pipe(wrap('(function () {\n"use strict";\n<%= contents %>\n})();'))
     .pipe(gulp.dest('build'))
     .pipe(plugins.size({ title: 'core' }));
 });
 
+gulp.task('plugins', function () {
+  return gulp.src(WX_PLUGINS)
+    .pipe(plugins.uglify({ mangle: false }))
+    .pipe(plugins.concat('plugins.min.js'))
+    .pipe(gulp.dest('build'))
+    .pipe(plugins.size({ title: 'plugins' }));
+});
 
-// Plugins: Build plug-in JS files into build/plug_ins/ path.
-// gulp.task('plugins', function () {
-//   return gulp.src([
-//     'src/plug_ins/**/*.js',
-//     '!src/plug_ins/Fader/fader.js'
-//   ])
-//     .pipe(plugins.uglify({ mangle: false }))
-//     .pipe(plugins.flatten())
-//     .pipe(gulp.dest('build/plug_ins'))
-//     .pipe(plugins.size({ title: 'plugins' }));
-// });
+gulp.task('everything', ['core', 'plugins'], function () {
+  gulp.src(['build/waaxcore.min.js', 'build/plugins.min.js'])
+    .pipe(plugins.concat('waax.min.js'))
+    .pipe(gulp.dest('build'))
+    .pipe(plugins.size({ title: 'everything' }));
+});
 
 
 // MUI: Build MUI elements into build/mui/ path.
@@ -83,8 +89,8 @@ gulp.task('serve', function () {
     // browser: 'google chrome canary'
   });
 
-  gulp.watch(['src/*.js', '!src/ktrl.js'], ['core', reload]);
-  gulp.watch(['src/plug_ins/**/*.js'], ['core', reload]);
+  gulp.watch(['src/*.js', '!src/ktrl.js'], ['everything', reload]);
+  gulp.watch(['src/plug_ins/**/*.js'], ['everything', reload]);
   gulp.watch(['src/mui/**/*.html'], ['mui', reload]);
   gulp.watch(['examples/**/*'], reload);
   gulp.watch(['test/**/*.html', 'test/**/*.js'], reload);
@@ -93,7 +99,7 @@ gulp.task('serve', function () {
 
 // Build: Clean and build everything in build/ path.
 gulp.task('build', function (cb) {
-  runSequence('clean', ['core', 'mui'], cb);
+  runSequence('clean', ['everything', 'mui'], cb);
 });
 
 
