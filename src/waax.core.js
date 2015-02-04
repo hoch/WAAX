@@ -183,7 +183,7 @@ ItemizedParam.prototype = {
         this.$callback.call(this._parent, this.value, time, rampType);
       }
     } else {
-      WX.Log.warn('Invalid value.');
+      WX.Log.warn('Invalid value (value not found in model).');
     }
   },
 

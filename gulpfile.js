@@ -26,7 +26,8 @@ var WX_CORE = [
   'src/waax.extension.js',
   'src/waax.util.js',
   'src/waax.core.js',
-  'src/waax.timebase.js'
+  'src/waax.timebase.js',
+  'src/mui/mui.js'
 ];
 
 var WX_PLUGINS = [

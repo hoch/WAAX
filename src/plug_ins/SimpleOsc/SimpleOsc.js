@@ -89,9 +89,9 @@
 
     // REQUIRED: plug-in default preset
     defaultPreset: {
-      oscType: 'Sine',
+      oscType: 'sine',
       oscFreq: WX.mtof(60),
-      lfoType: 'Sine',
+      lfoType: 'sine',
       lfoRate: 1.0,
       lfoDepth: 1.0
     },
