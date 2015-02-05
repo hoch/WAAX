@@ -9,10 +9,12 @@
     WX.PlugIn.defineType(this, 'Processor');
 
     // node creation and patching
-    this._panner = WX.Panner();
-    this._input.to(this._panner).to(this._output);
+    // this._panner = WX.Panner();
+    // this._input.to(this._panner).to(this._output);
+    
+    this._input.to(this._output);
 
-    this._panner.panningModel = 'equalpower';
+    // this._panner.panningModel = 'equalpower';
 
     WX.defineParams(this, {
 
@@ -31,13 +33,13 @@
         default: false
       },
 
-      pan: {
-        type: 'Generic',
-        name: 'Pan',
-        default: 0.0,
-        min: -1.0,
-        max: 1.0
-      },
+      // pan: {
+      //   type: 'Generic',
+      //   name: 'Pan',
+      //   default: 0.0,
+      //   min: -1.0,
+      //   max: 1.0
+      // },
 
       dB: {
         type: 'Generic',
@@ -58,7 +60,7 @@
 
     info: {
       name: 'Fader',
-      version: '0.0.2',
+      version: '0.0.3',
       api_version: '1.0.0-alpha',
       author: 'Hongchan Choi',
       type: 'Processor',
@@ -67,7 +69,7 @@
 
     defaultPreset: {
       mute: false,
-      pan: 0.0,
+      // pan: 0.0,
       dB: 0.0
     },
 
@@ -79,10 +81,10 @@
       }
     },
 
-    $pan: function (value, time, rampType) {
-      // TODO: compensate pan model attenuation (z=0.5)
-      this._panner.setPosition(value, 0, 0.5);
-    },
+    // $pan: function (value, time, rampType) {
+    //   // TODO: compensate pan model attenuation (z=0.5)
+    //   this._panner.setPosition(value, 0, 0.5);
+    // },
 
     $dB: function (value, time, rampType) {
       this.params.output.set(WX.dbtolin(value), time, rampType);
