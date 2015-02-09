@@ -122,8 +122,8 @@ Note.prototype = {
 
 
 /**
- * NoteClip abstraction. A collection of Note objects. Instantiated by
- *   {@link WX.NoteClip}.
+ * NoteClip abstraction. A collection of Note objects. Instantiated by 
+ *   WX.NoteClip.
  * @name NoteClip
  * @class
  */
@@ -271,12 +271,12 @@ NoteClip.prototype = {
   },
 
   /**
-   * Callback for note clip interation. Called by {@link NoteClip.iterate}.
+   * Callback for note clip interation. Called by NoteClip.iterate.
    * @callback callback_noteclip_iterate
    * @param {String} id Note ID.
    * @param {Note} Note object.
    * @param {Number} index Iteration index.
-   * @see {@link NoteClip.iterate}
+   * @see NoteClip.iterate
    */
 
   /**
@@ -479,6 +479,7 @@ Transport.prototype = {
       //   this.metronome.play(this.getAbsoluteTime(tick), accent);
       //   this.nextClick.beat += 1;
       // }
+      
     }
     // schedule next step
     requestAnimationFrame(this._run.bind(this));

@@ -55,7 +55,7 @@ WX.Log.error = function () {
 /**
  * Returns WAAX API version number. (semantic version)
  * @returns {Number} WAAX API version number
- * @see {@link http://semver.org/}
+ * @see http://semver.org/
  */
 WX.getVersion = function () {
   return this._VERSION;
@@ -400,7 +400,7 @@ WX.loadClip = function (clip, oncomplete, onprogress) {
  * Callback for clip loading completion. Called by {@link WX.loadClip}.
  * @callback callback_loadclip_oncomplete
  * @param {Object} clip WAAX clip
- * @see {@link WX.loadClip}
+ * @see WX.loadClip
  */
 
 /**
@@ -408,6 +408,6 @@ WX.loadClip = function (clip, oncomplete, onprogress) {
  * @callback callback_loadclip_onprogress
  * @param {Object} event XHR progress event object
  * @param {Object} clip WAAX clip
- * @see {@link WX.loadClip}
- * @see {@link https://dvcs.w3.org/hg/progress/raw-file/tip/Overview.html}
+ * @see WX.loadClip
+ * @see https://dvcs.w3.org/hg/progress/raw-file/tip/Overview.html
  */

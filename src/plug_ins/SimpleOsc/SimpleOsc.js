@@ -1,12 +1,24 @@
-/**
- * @wapl SimpleOsc
- * @author Hongchan Choi (hoch, hongchan.choi@gmail.com)
- */
+// Copyright 2011-2014 Hongchan Choi. All rights reserved.
+// Use of this source code is governed by MIT license that can be found in the
+// LICENSE file.
+
 (function (WX) {
 
   'use strict';
 
-  // REQUIRED: plug-in constructor
+  /**
+   * Implements SimpleOsc insturment.
+   * @type {WAPL}
+   * @name SimpleOsc
+   * @class
+   * @memberOf WX
+   * @param {Object} preset Parameter preset.
+   * @param {GenericParam} preset.oscType Oscillator type.
+   * @param {GenericParam} preset.oscFreq Oscillator frequency.
+   * @param {ItermizedParam} preset.lfoType LFO type.
+   * @param {GenericParam} preset.lfoRate LFO rate.
+   * @param {GenericParam} preset.lfoDepth LFO depth.
+   */
   function SimpleOsc(preset) {
 
     // REQUIRED: adding necessary modules
@@ -70,14 +82,11 @@
 
     });
 
-    // REQUIRED: initializing instance with preset
     WX.PlugIn.initPreset(this, preset);
   }
 
-  /** REQUIRED: plug-in prototype **/
   SimpleOsc.prototype = {
 
-    // REQUIRED: plug-in info
     info: {
       name: 'SimpleOsc',
       version: '0.0.2',
@@ -87,7 +96,6 @@
       description: '1 OSC with LFO'
     },
 
-    // REQUIRED: plug-in default preset
     defaultPreset: {
       oscType: 'sine',
       oscFreq: WX.mtof(60),
@@ -96,7 +104,6 @@
       lfoDepth: 1.0
     },
 
-    // REQUIRED: handlers for each parameter
     $oscType: function (value, time, rampType) {
       this._osc.type = value;
     },
@@ -117,7 +124,12 @@
       this._lfoGain.gain.set(value, time, rampType);
     },
 
-    // examples of realtime event processors
+    /**
+     * Start a note with pitch, velocity at time in seconds.
+     * @param  {Number} pitch    MIDI pitch
+     * @param  {Number} velocity MIDI velocity.
+     * @param  {Number} time     Time in seconds.
+     */
     noteOn: function (pitch, velocity, time) {
       time = (time || WX.now);
       this._amp.gain.set(velocity / 127, [time, 0.02], 3);
@@ -125,37 +137,35 @@
       // this.$oscFreq(WX.mtof(pitch), time + 0.02, 0);
     },
 
-    glide: function (pitch, time) {
-      time = (time || WX.now);
-      this.params.oscFreq.set(WX.mtof(pitch), time + 0.02, 0);
-      // this.$oscFreq(WX.mtof(pitch), time + 0.02, 1);
-    },
-
+    /**
+     * Stop a note at time in seconds.
+     * @param  {Number} time     Time in seconds.
+     */
     noteOff: function (time) {
       time = (time || WX.now);
       this._amp.gain.set(0.0, [time, 0.2], 3);
     },
 
+    /**
+     * Route incoming event data from other WAAX input devices.
+     * @param  {String} action Action type: ['noteon', 'noteoff']
+     * @param  {Object} data   Event data.
+     * @param  {Object} data.pitch   MIDI Pitch
+     * @param  {Object} data.velocity   MIDI Velocity.
+     */
     onData: function (action, data) {
       switch (action) {
         case 'noteon':
           this.noteOn(data.pitch, data.velocity);
-          break;
-        case 'glide':
-          this.glide(data.pitch);
           break;
         case 'noteoff':
           this.noteOff();
           break;
       }
     }
-
   };
 
-  // REQUIRED: extending plug-in prototype with modules
   WX.PlugIn.extendPrototype(SimpleOsc, 'Generator');
-
-  // REQUIRED: registering plug-in into WX ecosystem
   WX.PlugIn.register(SimpleOsc);
 
 })(WX);
