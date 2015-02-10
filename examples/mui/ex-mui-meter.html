@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>MUI | WAAX Examples</title>
+  <script src="../../build/waax.min.js"></script>
+  <script src="../../build/mui/bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <link rel="import" href="../../build/mui/mui.html">
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body unresolved>
+  <div class="wx-container">
+    <div class="wx-header">
+      <span class="wx-title">WAAX</span>
+      <span class="wx-info" id="wx-version"></span>
+      <span class="wx-menu">
+        <a href="..">Examples</a>
+      </span>
+    </div>
+
+    <h1>MUI Elements</h1>
+
+    <mui-meter id="meter"></mui-meter>
+
+  </div>
+  <script>
+    MUI.start(function () {
+      
+      var sp1 = WX.SP1({ ampSustain: 1.0 });
+      var meter = MUI.$('meter');
+      sp1.to(meter);
+
+      sp1.onReady = function () {
+        sp1.noteOn(60, 100);
+      };
+      sp1.loadClip({
+        name: 'drums',
+        url: '../../../sound/loops/drums.mp3'
+      });
+
+    });
+  </script>
+  <script src="../examples.js"></script>
+</body>
+
+</html>
