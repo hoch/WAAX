@@ -76,6 +76,9 @@
           converb = WX.ConVerb({ mix: 0.45 });
       impulse.to(converb).to(WX.Master);
 
+      debugger;
+      converb.set('output', [[0.0], [1.0, 2, 1], [0.0, 3, 2]]);
+
       // TODO: fix this...
       var irClips = [], counter = irData.length;
       for (var i = 0; i < irData.length; i++) {
