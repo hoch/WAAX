@@ -8,7 +8,7 @@
 
   // pre-generation of impulse data
   // NOTE: static data for all Impulse instances
-  var binSize = 4096,
+  var binSize = 2048,
       mag = new Float32Array(binSize),
       phase = new Float32Array(binSize);
   for (var i = 0; i < binSize; ++i) {
