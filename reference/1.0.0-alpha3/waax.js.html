@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <meta name="generator" content="JSDoc 3.3.0-dev">
+  <meta name="generator" content="JSDoc 3.4.0-dev">
   <meta charset="utf-8">
   <title>Source: waax.js</title>
   <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Karla:400,400i,700,700i" type="text/css">
@@ -33,21 +33,6 @@
 // Use of this source code is governed by MIT license that can be found in the
 // LICENSE file.
 
-// AudioContext detection and minimum monkey-patching. Inline execution.
-(function () {
-  var _audioContextFlagWebKit = window.hasOwnProperty(&#x27;webkitAudioContext&#x27;),
-      _audioContextFlagNonPrefixed = window.hasOwnProperty(&#x27;AudioContext&#x27;);
-  if (!_audioContextFlagWebKit &amp;amp;&amp;amp; !_audioContextFlagNonPrefixed) {
-    throw new Error(&#x27;FATAL: Web Audio API is not supported on your browser.&#x27;);
-  } else {
-    if (_audioContextFlagWebKit &amp;amp;&amp;amp; !_audioContextFlagNonPrefixed) {
-      window.AudioContext = window.webkitAudioContext;
-    }
-  }
-})();
-
-&#x27;use strict&#x27;;
-
 /**
  * @namespace WX
  */
@@ -55,26 +40,96 @@ window.WX = {
   _VERSION: &#x27;1.0.0-alpha3&#x27;
 };
 
-WX.WAVEFORMS = [
-  { key: &#x27;Sine&#x27;, value: &#x27;sine&#x27; },
-  { key: &#x27;Square&#x27;, value: &#x27;square&#x27; },
-  { key: &#x27;Sawtooth&#x27;, value: &#x27;sawtooth&#x27; },
-  { key: &#x27;Triangle&#x27;, value: &#x27;triangle&#x27; }
+// Monkey patching and feature detection.
+var _webkitAC = window.hasOwnProperty(&#x27;webkitAudioContext&#x27;);
+var _AC = window.hasOwnProperty(&#x27;AudioContext&#x27;);
+
+if (!_webkitAC &amp;amp;&amp;amp; !_AC) {
+  throw new Error(&#x27;Error: Web Audio API is not supported on your browser.&#x27;);
+} else {
+  if (_webkitAC &amp;amp;&amp;amp; !_AC) {
+    window.AudioContext = window.webkitAudioContext;
+  }
+}
+
+// Create AudioContext.
+WX._ctx = new AudioContext();
+
+// Checking the minimum dependency.
+var _dependency = [
+  // &#x27;createStereoPanner&#x27;,
 ];
 
-WX.FILTER_TYPES = [
-  { key:&#x27;LP&#x27; , value: &#x27;lowpass&#x27; },
-  { key:&#x27;HP&#x27; , value: &#x27;highpass&#x27; },
-  { key:&#x27;BP&#x27; , value: &#x27;bandpass&#x27; },
-  { key:&#x27;LS&#x27; , value: &#x27;lowshelf&#x27; },
-  { key:&#x27;HS&#x27; , value: &#x27;highshelf&#x27; },
-  { key:&#x27;PK&#x27; , value: &#x27;peaking&#x27; },
-  { key:&#x27;BR&#x27; , value: &#x27;notch&#x27; },
-  { key:&#x27;AP&#x27; , value: &#x27;allpass&#x27; }
-];
+for (var i = 0; i &amp;lt; _dependency.length; i++) {
+  if (typeof WX._ctx[_dependency[i]] === &#x27;undefined&#x27;) {
+    var message = &#x27;Error: &quot;&#x27; + _dependency + &#x27;&quot; is not supported in AudioContext.&#x27;;
+    throw new Error(message);
+  }
+}
 
-// WAAX internal audio context
-WX._ctx = new AudioContext();</code></pre>
+/**
+ * @typedef WAPL
+ * @description Web Audio API Plug-in Object.
+ * @type {Object}
+ */
+
+/**
+ * @typedef WXModel
+ * @description Contains a model for data binding.
+ * @type {Array}
+ * @example
+ * var model = [
+ *   { key:&#x27;Sine&#x27;, value:&#x27;sine&#x27; },
+ *   { key:&#x27;Sawtooth&#x27;, value:&#x27;sawtooth&#x27; }
+ *   ...
+ * ];
+ */
+
+/**
+ * @typedef WXClip
+ * @description WAAX abstraction of sample and meta data.
+ * @type {Object}
+ * @property {String} name User-defined name of sample.
+ * @property {String} url URL of audio file.
+ * @property {Object} buffer A placeholder for ArrayBuffer object.
+ * @example
+ * var clip = {
+ *   name: &#x27;Cool Sample&#x27;,
+ *   url: &#x27;http://mystaticdata.com/samples/coolsample.wav&#x27;,
+ *   buffer: null
+ * };
+ */
+
+/**
+ * @typedef WXSampleZone
+ * @description WAAX abstraction of sampler instrument data.
+ * @type {Object}
+ * @property {WXClip} clip WXClip object.
+ * @property {Number} basePitch Original sample pitch.
+ * @property {Boolean} loop Looping flag.
+ * @property {Number} loopStart Loop start point in seconds.
+ * @property {Number} loopEnd Loop end point in seconds.
+ * @property {Number} pitchLow Low pitch bound.
+ * @property {Number} pitchHigh High pitch bound.
+ * @property {Number} velocityLow Low velocity bound.
+ * @property {Number} velocityHigh High velocity bound.
+ * @property {Boolean} pitchModulation Switch for pitch sensitivity modulation.
+ * @property {Boolean} velocityModulatio Switch for velocity sensitivity modulation.
+ * @example
+ * var sampleZone = {
+ *   clip: WXClip
+ *   basePitch: 60            // samples original pitch
+ *   loop: true,
+ *   loopStart: 0.1,
+ *   loopEnd: 0.5,
+ *   pitchLow: 12,            // pitch low bound
+ *   pitchHigh: 96,           // pitch high bound
+ *   velocityLow: 12,         // velocity lower bound
+ *   velocityHigh: 127,       // velocity high bound
+ *   pitchModulation: true,   // use pitch modulation
+ *   velocityModulatio: true  // use velocity moduation
+ * };
+ */</code></pre>
           </article>
         </div>
       </div>
@@ -84,7 +139,7 @@ WX._ctx = new AudioContext();</code></pre>
   <footer id="jsdoc-footer" class="jsdoc-footer">
     <div id="jsdoc-footer-container">
       <p>
-        Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc</a> 3.3.0-dev on January 2, 2015.
+        Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc</a> 3.4.0-dev on February 5, 2015.
       </p>
     </div>
   </footer>
@@ -94,6 +149,7 @@ WX._ctx = new AudioContext();</code></pre>
   <script src="scripts/prettify.js"></script>
   <script src="scripts/jsdoc-toc.js"></script>
   <script src="scripts/linenumber.js"></script>
+  <script src="scripts/scrollanchor.js"></script>
 </body>
 
 </html>

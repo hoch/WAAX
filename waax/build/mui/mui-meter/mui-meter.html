@@ -1,0 +1,214 @@
+<!--
+  `mui-meter`
+  @version 1.0.0-alpha3
+  @description MUI level meter abstraction. Can be considered as AudioNode, to
+    visualize output of AnalyserNode.
+-->
+
+<polymer-element name="mui-meter">
+<template>
+  <style>
+    :host {
+      width: 64px;
+      display: block;
+      overflow: hidden;
+      margin-bottom: 5px;
+    }
+    .mui-meter-container {
+      /*width: 100%;*/
+      position: relative;
+      display: block;
+      vertical-align: top;
+      overflow: hidden;
+    }
+    .mui-meter-toolbar {
+      display: block;
+      height: 28px;
+      background-color: #eee;
+    }
+  </style>
+  <div id="eContainer" class="mui-meter-container">
+    <canvas id="eOnScreenCanvas"></canvas>
+    <div id="eValue"></div>
+  </div>
+</template>
+<script>
+  Polymer({
+
+    _ctx: null,
+    _inlet: null,
+    _buffer: null,
+    _currentLevel: -100,
+    _maxLevelSoFar: -100,
+
+    _levelEstimate: 0.0,
+    _b0_a: 1.0 - Math.exp(-1 / (0.003 * WX.srate)),
+    _b0_r: 1.0 - Math.exp(-1 / (0.006 * WX.srate)),
+
+    _settings: {
+      maxdB: 0.0,
+      mindB: -60.0,
+      grid: true,
+      gridColor: '#333',
+      meterColor: '#03a9f4'
+    },
+
+    _initializeAnalyzer: function () {
+      this._inlet = WX.Analyzer();
+      var bc = this._inlet.frequencyBinCount;
+      this._buffer = new Float32Array(bc);
+      this._settings.nyquist = WX.srate * 0.5;
+      this._settings.binCount = bc;
+      this._settings.binSize = WX.srate / bc;
+      this._settings.logMax = Math.log((bc - 1) / 1.0, 2.0);
+      this._settings.baseX = 0.0;
+      this._settings.unitX = 0.0;
+      this._settings.scaleY = 0.0;
+    },
+
+    _estimateLevel: function (x) {
+      // rms level
+      x = x * x;
+      var delta = x - this._levelEstimate;
+      if (delta > 0) {
+        this._levelEstimate += this._b0_a * delta;
+      } else {
+        this._levelEstimate += this._b0_r * delta;
+      }
+    },
+
+    _resize: function () {
+      this._ctx.canvas.style.width = '100%';
+      this._ctx.canvas.width = this.clientWidth;
+      this._ctx.canvas.height = this.clientHeight;
+      this._settings.baseX = this._ctx.canvas.width / 4.0;
+      this._settings.unitX = this._ctx.canvas.width / this._buffer.length;
+      this._settings.scaleY = this._ctx.canvas.height;
+    },
+
+    _clearCanvas: function () {
+      this._ctx.fillStyle = '#222';
+      this._ctx.fillRect(0, 0, this.clientWidth, this.clientHeight);
+    },
+
+    _drawForeground: function () {
+      var c = this._ctx,
+          s = this._settings,
+          dBGridUnit = 12.0,
+          numUnits = ~~(100 / dBGridUnit);
+      c.lineWidth = 0.4;
+      c.strokeStyle = this._settings.gridColor;
+      c.fillStyle = this._settings.gridColor;
+      c.beginPath();
+      // db grid
+      for (var grid = 0; grid < numUnits; grid++) {
+        var y = grid * c.canvas.height / numUnits;
+        var d = 0.0 + (dBGridUnit * grid);
+        c.moveTo(0.0, y);
+        c.lineTo(c.canvas.width, y);
+        c.fillText(~~(d) + "dB", c.canvas.width - 26, y - 3);
+      }
+      c.stroke();
+    },
+
+    _drawBackground: function () {
+    },
+
+    _drawMeter: function () {
+      var c = this._ctx,
+          s = this._settings;
+      // clear and draw grids
+      c.clearRect(0, 0, c.canvas.width, c.canvas.height);
+
+      // if (s.grid) {
+      //   this._drawBackground();
+      // }
+      // // drawing spectrum
+      // c.lineWidth = 1.2;
+      // c.strokeStyle = s.spectrumColor;
+      // c.beginPath();
+      // this._inlet.getFloatFrequencyData(this._buffer);
+      // for(var i = 1; i < s.binCount; i++) {
+      //   if (s.scale === 'lin') {
+      //     c.moveTo(i * s.unitX, s.scaleY);
+      //     c.lineTo(i * s.unitX, (this._buffer[i] * -0.01) * s.scaleY);
+      //   } else {
+      //     var x = c.canvas.width * Math.log(i / 1, s.logBase) / s.logMax;
+      //     c.lineTo(x, (this._buffer[i] * -0.01) * s.scaleY);
+      //   }
+      // }
+      // c.stroke();
+      this._inlet.getFloatTimeDomainData(this._buffer);
+      // for(var i = 1; i < s.binCount; i++) {
+        // if (s.scale === 'lin') {
+        //   c.moveTo(i * s.unitX, s.scaleY);
+        //   c.lineTo(i * s.unitX, (this._buffer[i] * -0.01) * s.scaleY);
+        // } else {
+        //   var x = c.canvas.width * Math.log(i / 1, s.logBase) / s.logMax;
+        //   c.lineTo(x, (this._buffer[i] * -0.01) * s.scaleY);
+        // }
+      // }
+      for (var i = 0; i < this._buffer.length; i+=4) {
+        this._estimateLevel(this._buffer[i]);
+      }
+      var detected = WX.lintodb(Math.sqrt(this._levelEstimate));
+      var height = (100 + detected) / 100 * c.canvas.height;
+      c.fillStyle = this._settings.meterColor;
+      c.fillRect(0, c.canvas.height - height, c.canvas.width, height);
+
+      if (detected > this._maxLevelSoFar) {
+        this.$.eValue.textContent = detected.toString();
+        this._maxLevelSoFar = detected;
+      }
+    },
+
+    _draw: function () {
+      // this._clearCanvas();
+      // this._drawBackground();
+      this._drawMeter();
+      this._drawForeground();
+    },
+
+    update: function () {
+      if (!this._freeze) {
+        this._draw();
+      }
+      requestAnimationFrame(this.update.bind(this));
+    },
+
+    ready: function () {
+
+      // create 2d context
+      this._ctx = this.$.eOnScreenCanvas.getContext('2d');
+
+      // initialization
+      this._initializeAnalyzer();
+      this._resize();
+
+      // UI specific vars
+      var prevData, uy;
+
+      // mouse responder
+      var mouseResponder = MUI.MouseResponder(
+        this.label,
+        this.$.eOnScreenCanvas,
+        function (sender, action, data) {
+          // TODO: needs to be refactored!
+          switch (action) {
+            case 'clicked':
+              break;
+            case 'dragged':
+              break;
+            case 'released':
+              break;
+          }
+          prevData = data;
+        }.bind(this)
+      );
+
+      // start
+      this.update();
+    }
+  });
+</script>
+</polymer-element>
