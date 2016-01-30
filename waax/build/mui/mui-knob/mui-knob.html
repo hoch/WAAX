@@ -127,12 +127,22 @@
       // counter
       _counter: 0,
 
+      // helper method for svg update
+      _updateArc: function (target) {
+        var x1 = this._arcCenter + this._arcRadius * Math.cos(this._offset);
+        var y1 = this._arcCenter + this._arcRadius * Math.sin(this._offset);
+        var x2 = this._arcCenter + this._arcRadius * Math.cos(target + this._offset);
+        var y2 = this._arcCenter + this._arcRadius * Math.sin(target + this._offset);
+        var flag = (target < Math.PI) ? 0 : 1;
+        var d = 'M ' + x1 + ' ' + y1 + ' A ' + this._arcRadius + ' ' + this._arcRadius;
+        d += ' 0 ' + flag + ' 1 ' + x2 + ' ' + y2 + ' ';
+        this.$.eKnob.setAttribute('d', d);
+      },
+
       // render UI data
       render: function () {
         var target = this._normValue * Math.PI * 1.5 ;
-        this._arcPath.x = this._arcCenter + this._arcRadius * Math.cos(this._offset + target);
-        this._arcPath.y = this._arcCenter + this._arcRadius * Math.sin(this._offset + target);
-        this._arcPath.largeArcFlag = (target < Math.PI) ? false : true;
+        this._updateArc(target);
         this.$.eValueDisplay.value = this.value.toFixed(2);
       },
 
@@ -187,16 +197,8 @@
 
         // create arc path
         var target = this._normValue * Math.PI * 1.5;
-        var x1 = this._arcCenter + this._arcRadius * Math.cos(this._offset);
-        var y1 = this._arcCenter + this._arcRadius * Math.sin(this._offset);
-        var x2 = this._arcCenter + this._arcRadius * Math.cos(target + this._offset);
-        var y2 = this._arcCenter + this._arcRadius * Math.sin(target + this._offset);
-        var flag = (target < Math.PI) ? 0 : 1;
-        var d = 'M ' + x1 + ' ' + y1 + ' A ' + this._arcRadius + ' ' + this._arcRadius;
-        d += ' 0 ' + flag + ' 1 ' + x2 + ' ' + y2 + ' ';
-        this.$.eKnob.setAttribute('d', d);
+        this._updateArc(target);
         this.$.eValueDisplay.value = this.value.toFixed(2);
-        this._arcPath = this.$.eKnob.pathSegList.getItem(1);
 
         // mouse responder
         var prevData = {};
