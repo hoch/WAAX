@@ -57,6 +57,10 @@
 
     this._nPanner.connect(this._nOutput);
     this._nOutput.connect(this._nActive);
+
+    // This works!!
+    // this._nOutput.connect(WX.context.destination);
+
     this._nActive.connect(this._nSend1);
     this._nActive.connect(this._nSend2);
     this._nActive.connect(this._nSend3);

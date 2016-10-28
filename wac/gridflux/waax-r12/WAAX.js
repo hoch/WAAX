@@ -68,106 +68,107 @@ window.WX = {};
    * API support checking and monkey patching
    * @note WAAX r12 only supports: Chrome (primary), Safari
    */
-  var _kApiAvailable = false;
+  var _kApiAvailable = true;
   var _kLegacySupport = false;
-  if (!window.hasOwnProperty('webkitAudioContext') && !window.hasOwnProperty('AudioContext')) {
-    WX.log.error('AudioContext seems to be missing. Bye.');
-    return null;
-  } else {
-    if (!window.hasOwnProperty('webkitAudioContext')) {
-      WX.log.error('WAAX currently does not support FireFox due to its incomplete implementation of Web Audio API. Use Chrome or Safari. bye.');
-      return null;
-    } else {
-      WX.log.info('Web Audio API fully supported.');
-      _kApiAvailable = true;
-      // helper
-      var fixSetTarget = function (param) {
-        if (!param)
-          return;
-        if (!param.setTargetAtTime)
-          param.setTargetAtTime = param.setTargetValueAtTime;
-      };
-      window.AudioContext = window.webkitAudioContext;
-      // and implements legacy support for safari
-      if (!AudioContext.prototype.hasOwnProperty('createGain')) {
-        _kLegacySupport = true;
-        WX.log.info('adding legacy support on audio context...');
 
-        // monkey patching: cwilso
-        AudioContext.prototype.createGain = AudioContext.prototype.createGainNode;
-        AudioContext.prototype.createDelay = AudioContext.prototype.createDelayNode;
+  // if (!window.hasOwnProperty('webkitAudioContext') && !window.hasOwnProperty('AudioContext')) {
+  //   WX.log.error('AudioContext seems to be missing. Bye.');
+  //   return null;
+  // } else {
+  //   if (!window.hasOwnProperty('webkitAudioContext')) {
+  //     WX.log.error('WAAX currently does not support FireFox due to its incomplete implementation of Web Audio API. Use Chrome or Safari. bye.');
+  //     return null;
+  //   } else {
+  //     WX.log.info('Web Audio API fully supported.');
+  //     _kApiAvailable = true;
+  //     // helper
+  //     var fixSetTarget = function (param) {
+  //       if (!param)
+  //         return;
+  //       if (!param.setTargetAtTime)
+  //         param.setTargetAtTime = param.setTargetValueAtTime;
+  //     };
+  //     window.AudioContext = window.webkitAudioContext;
+  //     // and implements legacy support for safari
+  //     if (!AudioContext.prototype.hasOwnProperty('createGain')) {
+  //       _kLegacySupport = true;
+  //       WX.log.info('adding legacy support on audio context...');
 
-        AudioContext.prototype.internal_createGain = AudioContext.prototype.createGain;
-        AudioContext.prototype.createGain = function() {
-          var node = this.internal_createGain();
-          fixSetTarget(node.gain);
-          return node;
-        };
+  //       // monkey patching: cwilso
+  //       AudioContext.prototype.createGain = AudioContext.prototype.createGainNode;
+  //       AudioContext.prototype.createDelay = AudioContext.prototype.createDelayNode;
 
-        AudioContext.prototype.internal_createDelay = AudioContext.prototype.createDelay;
-        AudioContext.prototype.createDelay = function() {
-          var node = this.internal_createDelay();
-          fixSetTarget(node.delayTime);
-          return node;
-        };
+  //       AudioContext.prototype.internal_createGain = AudioContext.prototype.createGain;
+  //       AudioContext.prototype.createGain = function() {
+  //         var node = this.internal_createGain();
+  //         fixSetTarget(node.gain);
+  //         return node;
+  //       };
 
-        AudioContext.prototype.internal_createBufferSource = AudioContext.prototype.createBufferSource;
-        AudioContext.prototype.createBufferSource = function() {
-          var node = this.internal_createBufferSource();
-          if (!node.start) {
-            node.start = function(when, offset, duration) {
-              if (offset || duration)
-                this.noteGrainOn(when, offset, duration);
-              else
-                this.noteOn(when);
-            };
-          }
-          if (!node.stop) {
-            node.stop = node.noteOff;
-          }
-          fixSetTarget(node.playbackRate);
-          return node;
-        };
+  //       AudioContext.prototype.internal_createDelay = AudioContext.prototype.createDelay;
+  //       AudioContext.prototype.createDelay = function() {
+  //         var node = this.internal_createDelay();
+  //         fixSetTarget(node.delayTime);
+  //         return node;
+  //       };
 
-        AudioContext.prototype.internal_createDynamicsCompressor = AudioContext.prototype.createDynamicsCompressor;
-        AudioContext.prototype.createDynamicsCompressor = function() {
-          var node = this.internal_createDynamicsCompressor();
-          fixSetTarget(node.threshold);
-          fixSetTarget(node.knee);
-          fixSetTarget(node.ratio);
-          fixSetTarget(node.reduction);
-          fixSetTarget(node.attack);
-          fixSetTarget(node.release);
-          return node;
-        };
+  //       AudioContext.prototype.internal_createBufferSource = AudioContext.prototype.createBufferSource;
+  //       AudioContext.prototype.createBufferSource = function() {
+  //         var node = this.internal_createBufferSource();
+  //         if (!node.start) {
+  //           node.start = function(when, offset, duration) {
+  //             if (offset || duration)
+  //               this.noteGrainOn(when, offset, duration);
+  //             else
+  //               this.noteOn(when);
+  //           };
+  //         }
+  //         if (!node.stop) {
+  //           node.stop = node.noteOff;
+  //         }
+  //         fixSetTarget(node.playbackRate);
+  //         return node;
+  //       };
 
-        AudioContext.prototype.internal_createBiquadFilter = AudioContext.prototype.createBiquadFilter;
-        AudioContext.prototype.createBiquadFilter = function() {
-          var node = this.internal_createBiquadFilter();
-          fixSetTarget(node.frequency);
-          fixSetTarget(node.detune);
-          fixSetTarget(node.Q);
-          fixSetTarget(node.gain);
-          return node;
-        };
+  //       AudioContext.prototype.internal_createDynamicsCompressor = AudioContext.prototype.createDynamicsCompressor;
+  //       AudioContext.prototype.createDynamicsCompressor = function() {
+  //         var node = this.internal_createDynamicsCompressor();
+  //         fixSetTarget(node.threshold);
+  //         fixSetTarget(node.knee);
+  //         fixSetTarget(node.ratio);
+  //         fixSetTarget(node.reduction);
+  //         fixSetTarget(node.attack);
+  //         fixSetTarget(node.release);
+  //         return node;
+  //       };
 
-        if (AudioContext.prototype.hasOwnProperty('createOscillator')) {
-          AudioContext.prototype.internal_createOscillator = AudioContext.prototype.createOscillator;
-          AudioContext.prototype.createOscillator = function() {
-            var node = this.internal_createOscillator();
-            if (!node.start)
-              node.start = node.noteOn;
-            if (!node.stop)
-              node.stop = node.noteOff;
-            fixSetTarget(node.frequency);
-            fixSetTarget(node.detune);
-            return node;
-          };
-        }
-        // END: monkey patching: cwilso
-      }
-    }
-  }
+  //       AudioContext.prototype.internal_createBiquadFilter = AudioContext.prototype.createBiquadFilter;
+  //       AudioContext.prototype.createBiquadFilter = function() {
+  //         var node = this.internal_createBiquadFilter();
+  //         fixSetTarget(node.frequency);
+  //         fixSetTarget(node.detune);
+  //         fixSetTarget(node.Q);
+  //         fixSetTarget(node.gain);
+  //         return node;
+  //       };
+
+  //       if (AudioContext.prototype.hasOwnProperty('createOscillator')) {
+  //         AudioContext.prototype.internal_createOscillator = AudioContext.prototype.createOscillator;
+  //         AudioContext.prototype.createOscillator = function() {
+  //           var node = this.internal_createOscillator();
+  //           if (!node.start)
+  //             node.start = node.noteOn;
+  //           if (!node.stop)
+  //             node.stop = node.noteOff;
+  //           fixSetTarget(node.frequency);
+  //           fixSetTarget(node.detune);
+  //           return node;
+  //         };
+  //       }
+  //       // END: monkey patching: cwilso
+  //     }
+  //   }
+  // }
 
 
 

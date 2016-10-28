@@ -15,6 +15,7 @@ GF.Sampler = { ID: 'Sampler' };
   for (var i = 0; i < 16; i++) {
     GF.Sampler.cells[i] = WX.Cell();
     GF.Sampler.cells[i].connect(GF.Master.nInput);
+    GF.Sampler.cells[i].connect(GF.Master.nInput);
     GF.Sampler.cells[i].connectSends(GF.Master.nSend1, GF.Master.nSend2, GF.Master.nSend3);
   }
 

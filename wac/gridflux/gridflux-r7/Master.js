@@ -29,12 +29,21 @@ GF.Master = { ID: 'GFMaster' };
   GF.Master.nSend1.connect(uChorus.inlet);
   GF.Master.nSend2.connect(uPingpong.inlet);
   GF.Master.nSend3.connect(uConverb.inlet);
-  GF.Master.nInput.connect(uSat.inlet);
-  uSat.connect(uComp.inlet);
-  uChorus.to(uSat);
-  uPingpong.to(uSat);
-  uConverb.to(uSat);
+  
+  // This is broken.
+  // GF.Master.nInput.connect(uSat.inlet);
+  // uSat.connect(uComp.inlet);
+  
+  GF.Master.nInput.connect(uComp.inlet);
+
+  uChorus.to(uComp);
+  uPingpong.to(uComp);
+  uConverb.to(uComp);
+
   uComp.to(WX.DAC);
+
+  // Hack it.
+  // GF.Master.nInput.connect(WX.context.destination);
 
   var buffermap = null;
   
